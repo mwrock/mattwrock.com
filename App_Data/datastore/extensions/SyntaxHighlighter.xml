@@ -1,0 +1,373 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ManagedExtension xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" Name="SyntaxHighlighter">
+  <AdminPage />
+  <Author>&lt;a target="_new" href="http://dotnetblogengine.net/"&gt;BlogEngine.NET&lt;/a&gt;</Author>
+  <Description>Adds &lt;a target="_new" href="http://alexgorbatchev.com/wiki/SyntaxHighlighter"&gt;Alex Gorbatchev's&lt;/a&gt; source code formatter</Description>
+  <Enabled>false</Enabled>
+  <Priority>0</Priority>
+  <Settings>
+    <Delimiter>44</Delimiter>
+    <Help>&lt;p&gt;This extension implements excellent Alex Gorbatchev's syntax highlighter JS library for source code formatting. Please refer to &lt;a target="_new" href="http://alexgorbatchev.com/wiki/SyntaxHighlighter:Usage"&gt;this site&lt;/a&gt; for usage.&lt;/p&gt;
+&lt;p&gt;&lt;b&gt;auto-links&lt;/b&gt;: Allows you to turn detection of links in the highlighted element on and off. If the option is turned off, URLs won't be clickable.&lt;/p&gt;
+&lt;p&gt;&lt;b&gt;collapse&lt;/b&gt;: Allows you to force highlighted elements on the page to be collapsed by default.&lt;/p&gt;
+&lt;p&gt;&lt;b&gt;gutter&lt;/b&gt;:	Allows you to turn gutter with line numbers on and off.&lt;/p&gt;
+&lt;p&gt;&lt;b&gt;light&lt;/b&gt;: Allows you to disable toolbar and gutter with a single property.&lt;/p&gt;
+&lt;p&gt;&lt;b&gt;smart-tabs&lt;/b&gt;:	Allows you to turn smart tabs feature on and off.&lt;/p&gt;
+&lt;p&gt;&lt;b&gt;tab-size&lt;/b&gt;: Allows you to adjust tab size.&lt;/p&gt;
+&lt;p&gt;&lt;b&gt;toolbar&lt;/b&gt;: Toggles toolbar on/off.&lt;/p&gt;
+&lt;p&gt;&lt;b&gt;wrap-lines&lt;/b&gt;: Allows you to turn line wrapping feature on and off.&lt;/p&gt;
+&lt;p&gt;&lt;a target="_new" href="http://alexgorbatchev.com/wiki/SyntaxHighlighter:Configuration"&gt;more...&lt;/a&gt;&lt;/p&gt;
+</Help>
+    <Hidden>false</Hidden>
+    <Index>0</Index>
+    <IsScalar>true</IsScalar>
+    <KeyField>gutter</KeyField>
+    <Name>Options</Name>
+    <Parameters>
+      <KeyField>false</KeyField>
+      <Label>Gutter</Label>
+      <MaxLength>100</MaxLength>
+      <Name>gutter</Name>
+      <ParamType>Boolean</ParamType>
+      <Required>false</Required>
+      <SelectedValue />
+      <Values>True</Values>
+    </Parameters>
+    <Parameters>
+      <KeyField>false</KeyField>
+      <Label>Smart tabs</Label>
+      <MaxLength>100</MaxLength>
+      <Name>smart-tabs</Name>
+      <ParamType>Boolean</ParamType>
+      <Required>false</Required>
+      <SelectedValue />
+      <Values>True</Values>
+    </Parameters>
+    <Parameters>
+      <KeyField>false</KeyField>
+      <Label>Auto links</Label>
+      <MaxLength>100</MaxLength>
+      <Name>auto-links</Name>
+      <ParamType>Boolean</ParamType>
+      <Required>false</Required>
+      <SelectedValue />
+      <Values>True</Values>
+    </Parameters>
+    <Parameters>
+      <KeyField>false</KeyField>
+      <Label>Collapse</Label>
+      <MaxLength>100</MaxLength>
+      <Name>collapse</Name>
+      <ParamType>Boolean</ParamType>
+      <Required>false</Required>
+      <SelectedValue />
+      <Values>False</Values>
+    </Parameters>
+    <Parameters>
+      <KeyField>false</KeyField>
+      <Label>Light</Label>
+      <MaxLength>100</MaxLength>
+      <Name>light</Name>
+      <ParamType>Boolean</ParamType>
+      <Required>false</Required>
+      <SelectedValue />
+      <Values>False</Values>
+    </Parameters>
+    <Parameters>
+      <KeyField>false</KeyField>
+      <Label>Tab size</Label>
+      <MaxLength>100</MaxLength>
+      <Name>tab-size</Name>
+      <ParamType>Integer</ParamType>
+      <Required>false</Required>
+      <SelectedValue />
+      <Values>0</Values>
+    </Parameters>
+    <Parameters>
+      <KeyField>false</KeyField>
+      <Label>Toolbar</Label>
+      <MaxLength>100</MaxLength>
+      <Name>toolbar</Name>
+      <ParamType>Boolean</ParamType>
+      <Required>false</Required>
+      <SelectedValue />
+      <Values>False</Values>
+    </Parameters>
+    <Parameters>
+      <KeyField>false</KeyField>
+      <Label>Wrap lines</Label>
+      <MaxLength>100</MaxLength>
+      <Name>wrap-lines</Name>
+      <ParamType>Boolean</ParamType>
+      <Required>false</Required>
+      <SelectedValue />
+      <Values>False</Values>
+    </Parameters>
+    <ShowAdd>true</ShowAdd>
+    <ShowDelete>true</ShowDelete>
+    <ShowEdit>true</ShowEdit>
+  </Settings>
+  <Settings>
+    <Delimiter>44</Delimiter>
+    <Help />
+    <Hidden>false</Hidden>
+    <Index>1</Index>
+    <IsScalar>true</IsScalar>
+    <KeyField>shBrushBash</KeyField>
+    <Name>Brushes</Name>
+    <Parameters>
+      <KeyField>false</KeyField>
+      <Label>Bash (bash, shell)</Label>
+      <MaxLength>100</MaxLength>
+      <Name>shBrushBash</Name>
+      <ParamType>Boolean</ParamType>
+      <Required>false</Required>
+      <SelectedValue />
+      <Values>False</Values>
+    </Parameters>
+    <Parameters>
+      <KeyField>false</KeyField>
+      <Label>C++ (cpp, c)</Label>
+      <MaxLength>100</MaxLength>
+      <Name>shBrushCpp</Name>
+      <ParamType>Boolean</ParamType>
+      <Required>false</Required>
+      <SelectedValue />
+      <Values>False</Values>
+    </Parameters>
+    <Parameters>
+      <KeyField>false</KeyField>
+      <Label>C# (c-sharp, csharp)</Label>
+      <MaxLength>100</MaxLength>
+      <Name>shBrushCSharp</Name>
+      <ParamType>Boolean</ParamType>
+      <Required>false</Required>
+      <SelectedValue />
+      <Values>True</Values>
+    </Parameters>
+    <Parameters>
+      <KeyField>false</KeyField>
+      <Label>Css (css)</Label>
+      <MaxLength>100</MaxLength>
+      <Name>shBrushCss</Name>
+      <ParamType>Boolean</ParamType>
+      <Required>false</Required>
+      <SelectedValue />
+      <Values>True</Values>
+    </Parameters>
+    <Parameters>
+      <KeyField>false</KeyField>
+      <Label>Delphi (delphi, pas, pascal)</Label>
+      <MaxLength>100</MaxLength>
+      <Name>shBrushDelphi</Name>
+      <ParamType>Boolean</ParamType>
+      <Required>false</Required>
+      <SelectedValue />
+      <Values>False</Values>
+    </Parameters>
+    <Parameters>
+      <KeyField>false</KeyField>
+      <Label>Diff (diff, patch)</Label>
+      <MaxLength>100</MaxLength>
+      <Name>shBrushDiff</Name>
+      <ParamType>Boolean</ParamType>
+      <Required>false</Required>
+      <SelectedValue />
+      <Values>False</Values>
+    </Parameters>
+    <Parameters>
+      <KeyField>false</KeyField>
+      <Label>Groovy (groovy)</Label>
+      <MaxLength>100</MaxLength>
+      <Name>shBrushGroovy</Name>
+      <ParamType>Boolean</ParamType>
+      <Required>false</Required>
+      <SelectedValue />
+      <Values>False</Values>
+    </Parameters>
+    <Parameters>
+      <KeyField>false</KeyField>
+      <Label>Java (java)</Label>
+      <MaxLength>100</MaxLength>
+      <Name>shBrushJava</Name>
+      <ParamType>Boolean</ParamType>
+      <Required>false</Required>
+      <SelectedValue />
+      <Values>False</Values>
+    </Parameters>
+    <Parameters>
+      <KeyField>false</KeyField>
+      <Label>JScript (js, jscript, javascript)</Label>
+      <MaxLength>100</MaxLength>
+      <Name>shBrushJScript</Name>
+      <ParamType>Boolean</ParamType>
+      <Required>false</Required>
+      <SelectedValue />
+      <Values>True</Values>
+    </Parameters>
+    <Parameters>
+      <KeyField>false</KeyField>
+      <Label>PHP (php)</Label>
+      <MaxLength>100</MaxLength>
+      <Name>shBrushPhp</Name>
+      <ParamType>Boolean</ParamType>
+      <Required>false</Required>
+      <SelectedValue />
+      <Values>False</Values>
+    </Parameters>
+    <Parameters>
+      <KeyField>false</KeyField>
+      <Label>Plain (plain, text)</Label>
+      <MaxLength>100</MaxLength>
+      <Name>shBrushPlain</Name>
+      <ParamType>Boolean</ParamType>
+      <Required>false</Required>
+      <SelectedValue />
+      <Values>True</Values>
+    </Parameters>
+    <Parameters>
+      <KeyField>false</KeyField>
+      <Label>Python (py, python)</Label>
+      <MaxLength>100</MaxLength>
+      <Name>shBrushPython</Name>
+      <ParamType>Boolean</ParamType>
+      <Required>false</Required>
+      <SelectedValue />
+      <Values>False</Values>
+    </Parameters>
+    <Parameters>
+      <KeyField>false</KeyField>
+      <Label>Ruby (rails, ror, ruby)</Label>
+      <MaxLength>100</MaxLength>
+      <Name>shBrushRuby</Name>
+      <ParamType>Boolean</ParamType>
+      <Required>false</Required>
+      <SelectedValue />
+      <Values>False</Values>
+    </Parameters>
+    <Parameters>
+      <KeyField>false</KeyField>
+      <Label>Scala (scala)</Label>
+      <MaxLength>100</MaxLength>
+      <Name>shBrushScala</Name>
+      <ParamType>Boolean</ParamType>
+      <Required>false</Required>
+      <SelectedValue />
+      <Values>False</Values>
+    </Parameters>
+    <Parameters>
+      <KeyField>false</KeyField>
+      <Label>SQL (sql)</Label>
+      <MaxLength>100</MaxLength>
+      <Name>shBrushSql</Name>
+      <ParamType>Boolean</ParamType>
+      <Required>false</Required>
+      <SelectedValue />
+      <Values>True</Values>
+    </Parameters>
+    <Parameters>
+      <KeyField>false</KeyField>
+      <Label>VB (vb, vbnet)</Label>
+      <MaxLength>100</MaxLength>
+      <Name>shBrushVb</Name>
+      <ParamType>Boolean</ParamType>
+      <Required>false</Required>
+      <SelectedValue />
+      <Values>True</Values>
+    </Parameters>
+    <Parameters>
+      <KeyField>false</KeyField>
+      <Label>XML (xml, xhtml, xslt, html, xhtml)</Label>
+      <MaxLength>100</MaxLength>
+      <Name>shBrushXml</Name>
+      <ParamType>Boolean</ParamType>
+      <Required>false</Required>
+      <SelectedValue />
+      <Values>True</Values>
+    </Parameters>
+    <Parameters>
+      <KeyField>false</KeyField>
+      <Label>Cold Fusion (cf, coldfusion)</Label>
+      <MaxLength>100</MaxLength>
+      <Name>shBrushColdFusion</Name>
+      <ParamType>Boolean</ParamType>
+      <Required>false</Required>
+      <SelectedValue />
+      <Values>False</Values>
+    </Parameters>
+    <Parameters>
+      <KeyField>false</KeyField>
+      <Label>Erlang (erlang, erl)</Label>
+      <MaxLength>100</MaxLength>
+      <Name>shBrushErlang</Name>
+      <ParamType>Boolean</ParamType>
+      <Required>false</Required>
+      <SelectedValue />
+      <Values>False</Values>
+    </Parameters>
+    <Parameters>
+      <KeyField>false</KeyField>
+      <Label>JavaFX (jfx, javafx)</Label>
+      <MaxLength>100</MaxLength>
+      <Name>shBrushJavaFX</Name>
+      <ParamType>Boolean</ParamType>
+      <Required>false</Required>
+      <SelectedValue />
+      <Values>False</Values>
+    </Parameters>
+    <Parameters>
+      <KeyField>false</KeyField>
+      <Label>Perl (perl, pl)</Label>
+      <MaxLength>100</MaxLength>
+      <Name>shBrushPerl</Name>
+      <ParamType>Boolean</ParamType>
+      <Required>false</Required>
+      <SelectedValue />
+      <Values>False</Values>
+    </Parameters>
+    <Parameters>
+      <KeyField>false</KeyField>
+      <Label>PowerSell (ps, powershell)</Label>
+      <MaxLength>100</MaxLength>
+      <Name>shBrushPowerShell</Name>
+      <ParamType>Boolean</ParamType>
+      <Required>false</Required>
+      <SelectedValue />
+      <Values>False</Values>
+    </Parameters>
+    <ShowAdd>true</ShowAdd>
+    <ShowDelete>true</ShowDelete>
+    <ShowEdit>true</ShowEdit>
+  </Settings>
+  <Settings>
+    <Delimiter>44</Delimiter>
+    <Help />
+    <Hidden>false</Hidden>
+    <Index>2</Index>
+    <IsScalar>true</IsScalar>
+    <KeyField>SelectedTheme</KeyField>
+    <Name>Themes</Name>
+    <Parameters>
+      <KeyField>false</KeyField>
+      <Label>Themes</Label>
+      <MaxLength>20</MaxLength>
+      <Name>SelectedTheme</Name>
+      <ParamType>ListBox</ParamType>
+      <Required>false</Required>
+      <SelectedValue>Default</SelectedValue>
+      <Values>Default</Values>
+      <Values>Django</Values>
+      <Values>Eclipse</Values>
+      <Values>Emacs</Values>
+      <Values>FadeToGrey</Values>
+      <Values>MDUltra</Values>
+      <Values>Midnight</Values>
+      <Values>Dark</Values>
+    </Parameters>
+    <ShowAdd>true</ShowAdd>
+    <ShowDelete>true</ShowDelete>
+    <ShowEdit>true</ShowEdit>
+  </Settings>
+  <ShowSettings>true</ShowSettings>
+  <Version>2.5</Version>
+</ManagedExtension>

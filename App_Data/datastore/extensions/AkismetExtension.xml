@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ManagedExtension xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" Name="AkismetExtension">
+  <Version>1.4</Version>
+  <Priority>999</Priority>
+  <Description>Passes comments to Askimet for validation</Description>
+  <Author>&lt;a href="http://www.codethinked.com"&gt;Justin Etheredge&lt;/a&gt;</Author>
+  <AdminPage />
+  <Enabled>true</Enabled>
+  <Settings>
+    <Index>0</Index>
+    <Name>AkismetExtension</Name>
+    <Help />
+    <Delimiter>44</Delimiter>
+    <Parameters>
+      <Name>apiKey</Name>
+      <Label>API Key</Label>
+      <MaxLength>100</MaxLength>
+      <Required>false</Required>
+      <KeyField>false</KeyField>
+      <Values>03361767eae9</Values>
+      <ParamType>String</ParamType>
+      <SelectedValue />
+    </Parameters>
+    <Parameters>
+      <Name>blogUrl</Name>
+      <Label>Blog URL</Label>
+      <MaxLength>100</MaxLength>
+      <Required>false</Required>
+      <KeyField>false</KeyField>
+      <Values>www.mattwrock.com</Values>
+      <ParamType>String</ParamType>
+      <SelectedValue />
+    </Parameters>
+    <KeyField>apiKey</KeyField>
+    <IsScalar>true</IsScalar>
+    <Hidden>false</Hidden>
+    <ShowAdd>true</ShowAdd>
+    <ShowEdit>true</ShowEdit>
+    <ShowDelete>true</ShowDelete>
+  </Settings>
+  <ShowSettings>true</ShowSettings>
+</ManagedExtension>

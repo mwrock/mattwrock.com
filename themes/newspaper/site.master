@@ -1,0 +1,52 @@
+<%@ Master Language="C#" AutoEventWireup="true" CodeFile="site.master.cs" Inherits="themes_Newspaper_site" %>
+<%@ Register Src="~/admin/menu.ascx" TagName="menu" TagPrefix="uc1" %>
+<%@ Import Namespace="BlogEngine.Core" %>
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head runat="server">
+    <link rel="stylesheet" href="style.css" type="text/css" />
+    <link rel="shortcut icon" href="~/pics/blogengine.ico" type="image/x-icon" />
+</head>
+<body>
+    <form id="form1" runat="server">
+        <div class="main">
+            <div class="header">
+                <h1>
+                    <a href="<%=Utils.AbsoluteWebRoot %>">
+                        <%=BlogSettings.Instance.Name %>
+                    </a>
+                </h1>
+                <h2>
+                    <%=BlogSettings.Instance.Description %>
+                </h2>
+            </div>
+            <div class="menu">
+                <span>
+                    <asp:LoginStatus ID="LoginStatus1" runat="Server" LoginText="Sign in" LogoutText="Sign out"
+                        EnableViewState="false" CssClass="login" />
+                </span>
+                <a href="~/" runat="server">Home</a> <a href="~/archive.aspx" runat="server">Archive</a>
+                <a id="A1" href="~/contact.aspx" runat="server">Contact</a>
+                <blog:PageList ID="PageList1" runat="Server" /><a 
+                href="<%=Utils.FeedUrl %>"><asp:Image ID="rssIcon" runat="server" ImageUrl="~/themes/Newspaper/rssicon.gif" ImageAlign="AbsBottom" />Subscribe</a>
+            </div>
+            <div class="content">
+                <div class="postContent">
+                    <asp:ContentPlaceHolder ID="cphBody" runat="server">
+                    </asp:ContentPlaceHolder>
+                </div>
+                <div class="sidebar">
+                  <blog:WidgetZone runat="server" ID="rightzone" />
+                </div>
+                <div class="clear"></div>
+            </div>
+            <div class="footer">
+                Powered by <a href="http://www.dotnetblogengine.net/" target="_blank">BlogEngine.NET
+                    <%=BlogSettings.Instance.Version() %>
+                </a>| Newspaper theme by <a href="http://www.jankoatwarpspeed.com/" target="_blank">Janko Jovanovic</a></div>
+        </div>
+    </form>
+</body>
+</html>

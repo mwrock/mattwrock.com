@@ -1,0 +1,241 @@
+﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<post>
+  <author>mwrock</author>
+  <title>The Perfect Build Part 1</title>
+  <description />
+  <content>&lt;p&gt;A year ago, my team was using Visual Source Safe as our version control repository and our builds were built and deployed manually using sophisticated tools like windows explorer and remote desktop. This was not a happy time.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;VSS was awfully slow and practically impossible to work with remotely. &lt;/li&gt;
+&lt;li&gt;VSS branching, tagging and merging capabilities were primitive at best.&lt;/li&gt;
+&lt;li&gt;Our manual deployments were not scripted and therefore not easily repeatable and certainly not guaranteeably repeatable.&lt;/li&gt;
+&lt;li&gt;Deployments were inadequately documented and it was often impossible to know exactly what was deployed and when.&lt;/li&gt;
+&lt;li&gt;Complicated deployments were time consuming, error prone and just plain stressful for the build engineer.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Well all of this has changed now. We migrated to Subversion for source control and implemented CruiseControl and NANT as an integration server and deployment solution. Looking back on this migration, I can honestly say that it represents the biggest leap forward we have made in terms of process improvement. This is a first in a series of blog posts where I will document this process in detail. I will outline how we tackled the following:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Repository structure: We did not want to merely copy our VSS repository tree. We wanted to create something fundamentlly more useful.&lt;/li&gt;
+&lt;li&gt;Generic NANT scripts to handle Visual Studio Projects and Solutions&lt;/li&gt;
+&lt;li&gt;Managing configuratioin files in different environments (dev, staging and production)&lt;/li&gt;
+&lt;li&gt;Automated tagging production deployments&lt;/li&gt;
+&lt;li&gt;Cruisecontrol organizaion&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Some may say, "Its only source control, what's the big deal?" Well our source is our product. Any inability to produce our product or any risk to the integrity of our product is a big deal. As developers, we interact with source control throughout every working day and it is imperative that these interactions are simple, reliable and valuable. If there is waste in terms of time or lost code at this layer of the develoopment process, its like a death by a thousand cuts to the whole dev team.&lt;/p&gt;
+&lt;p&gt;This was a migration that I took very seriously. Like most software shops, we are always very busy and juggle lots of projects at the same time. This migration provided no direct revenue increase to our business and was always difficult to prioritize. I was often asked "why don't we just migrate now? Just have Joe Jr. Developer port the code from VSS to SVN and be done with it." This was something I really wanted to think through, research and do right. I knew it was not going to be a "set and forget" operation. It needed to be planned, implemented and enforced and baby sat. My team, including myself, had been using VSS for years and were not familiar with the branch/merge paradigm of SVN. I knew we needed to understand these concepts and use them to their fullest. I also knewthat developers were going to experience hickups with usig SVN and its related tools. I needed to educate myself and make myself availale as a mentor of this technology although I was a novice. There was no budget to bring in a consultant.&lt;/p&gt;
+&lt;p&gt;So I researched on the web, I talked to colleagues with experience in SVN in varying environments, and I mapped out my own custom solution. My tech department is composed of different teams that produce and maintain several different applications that are web based, desktop and background services. We also have some common libraries shared and maintained by all teams and we share third party tools and libraries some of which are open source and require constant updates to new versions. We needed a solution that would allow us to build separate applications maintained by separate teams with code shared accross the organization. We needed a setup that would allow developers to commit code to a centralized Trunk that had all of the most recent changes but would present these changes to different applications in a controlled manner.&lt;/p&gt;
+&lt;p&gt;I beieve we have acieved exactly this and more. So what do we have now?&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;We have a source control repository that informs us of exactly what is on an individual dev's environment, on our integrated dev box, on staging and on production.&lt;/li&gt;
+&lt;li&gt;We have a setup that allows us to see exactly what code was deployed on which application on which date.&lt;/li&gt;
+&lt;li&gt;Commits to SVN are automaticaly built and deployed to our integration dev server&lt;/li&gt;
+&lt;li&gt;Commits to staging are automaically built and deployed to our staging servers.&lt;/li&gt;
+&lt;li&gt;With a click of a button in CruiseControl, an application can be deployed to our production server farms&lt;/li&gt;
+&lt;li&gt;Each environment can have its own versioned configuration&lt;/li&gt;
+&lt;li&gt;Rolling back to a previous deployment is trivial&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;My next post in this series will focus on the SVN structure we developed and how it partitions our different environments and applications but ensures that each new build incorporates the latest comon code.&lt;/p&gt;</content>
+  <ispublished>True</ispublished>
+  <isdeleted>False</isdeleted>
+  <iscommentsenabled>True</iscommentsenabled>
+  <pubDate>2009-09-29 22:00:00</pubDate>
+  <lastModified>2009-09-29 23:20:22</lastModified>
+  <raters>0</raters>
+  <rating>0</rating>
+  <slug>The-Perfect-Build-Part-1</slug>
+  <tags />
+  <comments>
+    <comment id="8cce6075-60b8-49ce-9e4d-5b290eddf9e4" parentid="00000000-0000-0000-0000-000000000000" approved="True" spam="False" deleted="False">
+      <date>2009-09-30 20:29:04</date>
+      <author>Khoi</author>
+      <email>ntkhoi@gmail.com</email>
+      <country>vn</country>
+      <ip>203.113.146.98</ip>
+      <content>Wait for the next post :).</content>
+    </comment>
+    <comment id="8b8ef308-fe4e-4396-9345-bd5dced06526" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="False">
+      <date>2011-02-27 21:21:35</date>
+      <author>Bleach costumes</author>
+      <email>dada@gmail.com</email>
+      <country>us</country>
+      <ip>67.202.72.174</ip>
+      <website>http://www.mycosplayclub.com/</website>
+      <moderatedby>App_Code.Extensions.StopForumSpam</moderatedby>
+      <avatar />
+      <content>I am a new member here. This is a good website. I believe will enjoy a good time here and get some valuable information from here.</content>
+    </comment>
+    <comment id="01f02c5a-a12a-4f30-85ff-956345fbcd54" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="False">
+      <date>2011-03-10 17:20:46</date>
+      <author>vigrx plus</author>
+      <email>fsadfsa@gmail.com</email>
+      <country>us</country>
+      <ip>173.63.81.48</ip>
+      <website>http://vigrx-plus-product-review.blogspot.com/</website>
+      <moderatedby>Rule:black list</moderatedby>
+      <avatar />
+      <content>very insightful post...</content>
+    </comment>
+    <comment id="f2737f9a-2ab3-4d31-b39e-85909e258057" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="False">
+      <date>2011-03-23 00:36:03</date>
+      <author>hentai</author>
+      <email>casino@casinoen.fr</email>
+      <country>fr</country>
+      <ip>91.210.104.246</ip>
+      <website>http://www.video-de-mangax.com/</website>
+      <moderatedby>Rule:black list</moderatedby>
+      <avatar />
+      <content>beautiful comments </content>
+    </comment>
+    <comment id="a1391562-79be-45a4-9821-32075014f10e" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="False" deleted="False">
+      <date>2011-03-30 02:24:38</date>
+      <author>condensing boilers</author>
+      <email>SallyElms@mailjjg.com</email>
+      <country>gb</country>
+      <ip>86.160.211.242</ip>
+      <website>http://www.condensingboilers.org/</website>
+      <avatar />
+      <content>I am so done of moving to a web page to comment and watching spam remarks. Cant they discover anything more enlightened to do with their life? How about a commentary connecting to  The Perfect Build Part 1 There is no smoke without a fire and on that point there are no comments without postings.</content>
+    </comment>
+    <comment id="000ffcc6-6eff-4a50-8e17-29e30bd29baf" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="False">
+      <date>2011-04-03 22:13:08</date>
+      <author>Consultant Seo</author>
+      <email>berengere.wabstemer@gmail.com</email>
+      <country>fr</country>
+      <ip>62.35.174.225</ip>
+      <website>http://www.seocherubin.com/</website>
+      <moderatedby>Rule:black list</moderatedby>
+      <avatar />
+      <content>Thanks for this, just one word +1&amp;quot; (like the new google service ^^ )</content>
+    </comment>
+    <comment id="774d4c5f-65c4-4ca0-92f3-7f722150a2df" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="False">
+      <date>2011-04-10 02:46:37</date>
+      <author>Tami Henfling</author>
+      <email>Flanary73@gmail.com</email>
+      <country>us</country>
+      <ip>174.140.168.250</ip>
+      <website>http://www.homes-orlando.com/idx/city/casselberry/?idx-d-SortOrders&lt;0&gt;-Column=Price&amp;idx-d-SortOrders&lt;0&gt;-Direction=DESC</website>
+      <moderatedby>Rule:black list</moderatedby>
+      <avatar />
+      <content>I’m not sure exactly how I found this blog because I had been researching information on Real Estate in Casselberry, FL, but anyway, I have thoroughly enjoyed reading it, keep it up!</content>
+    </comment>
+    <comment id="d5beb651-25b6-4b62-a9f2-3bf098561647" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="False">
+      <date>2011-04-26 21:44:29</date>
+      <author>male enhancement exercises</author>
+      <email>Berra@aol.com</email>
+      <country>us</country>
+      <ip>98.160.163.171</ip>
+      <website>http://bestmaleenhancementexercises.com/</website>
+      <moderatedby>Rule:black list</moderatedby>
+      <avatar />
+      <content>hello this is a nice blog i wonder how you find the time to keep updating it. anyway, keep up the good work.thank you</content>
+    </comment>
+    <comment id="28b45373-19ed-4519-b47f-ec9a41a80021" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="False" deleted="False">
+      <date>2011-05-15 19:06:57</date>
+      <author>Evie Curriere</author>
+      <email>Uhlman@slack.com</email>
+      <country>us</country>
+      <ip>98.211.154.20</ip>
+      <website>http://www.key-baby.com/</website>
+      <avatar />
+      <content>The actual issue at hand here is the thickness of the plastic brace that keeps the pacifier from going into the baby's mouth. The CPSC found that this plastic was &amp;quot;A few millimeters less&amp;quot; than the required thickness that is deemed safe. This inadvertent manufacturing miscue may have caused some of the pacifiers to be more flexible that intended and lead to the possibility of the whole pacifier entering a child's mouth.</content>
+    </comment>
+    <comment id="00e293d8-7aac-4dab-b16d-2c791d490e56" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="False">
+      <date>2011-05-15 19:07:00</date>
+      <author>Carmon Chabot</author>
+      <email>Pinckley@slack.com</email>
+      <country>us</country>
+      <ip>98.211.154.20</ip>
+      <website>http://www.key-baby.com/</website>
+      <moderatedby>Rule:black list</moderatedby>
+      <avatar />
+      <content>The actual issue at hand here is the thickness of the plastic brace that keeps the pacifier from going into the baby's mouth. The CPSC found that this plastic was &amp;quot;A few millimeters less&amp;quot; than the required thickness that is deemed safe. This inadvertent manufacturing miscue may have caused some of the pacifiers to be more flexible that intended and lead to the possibility of the whole pacifier entering a child's mouth.</content>
+    </comment>
+    <comment id="f34507f3-a02e-46f0-923c-39f7c23cf121" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="False">
+      <date>2011-05-15 19:07:03</date>
+      <author>Everette Monday</author>
+      <email>Higgenbotham@slack.com</email>
+      <country>us</country>
+      <ip>98.211.154.20</ip>
+      <website>http://www.key-baby.com/</website>
+      <moderatedby>Rule:black list</moderatedby>
+      <avatar />
+      <content>The actual issue at hand here is the thickness of the plastic brace that keeps the pacifier from going into the baby's mouth. The CPSC found that this plastic was &amp;quot;A few millimeters less&amp;quot; than the required thickness that is deemed safe. This inadvertent manufacturing miscue may have caused some of the pacifiers to be more flexible that intended and lead to the possibility of the whole pacifier entering a child's mouth.</content>
+    </comment>
+    <comment id="dc9be4e8-8ca4-4342-a4b4-9b6ada44cff0" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="False">
+      <date>2011-05-15 22:50:51</date>
+      <author>Virgilio Elroy</author>
+      <email>Gaudin@slack.com</email>
+      <country>us</country>
+      <ip>98.211.154.20</ip>
+      <website>http://www.harm-tech1.com/excellent-real-seo-results.html</website>
+      <moderatedby>Rule:black list</moderatedby>
+      <avatar />
+      <content>There were many accurate points made in your comments. However,if you go to</content>
+    </comment>
+    <comment id="93a208a0-d6e0-4a7f-a14d-458f9b8cbac1" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="False">
+      <date>2011-05-16 04:42:11</date>
+      <author>Horacio Giffith</author>
+      <email>Hougham@slack.com</email>
+      <country>us</country>
+      <ip>98.211.154.20</ip>
+      <website>http://www.harm-tech1.com/excellent-real-seo-results.html</website>
+      <moderatedby>Rule:black list</moderatedby>
+      <avatar />
+      <content>Thanks for the good post. As an &amp;lt;a href=”http://harm-tech1.com/internet-marketing-consultant-Damon-Abramson.html”&amp;gt;digital marketing consulting&amp;lt;/a&amp;gt; It gave me a few good take aways. I hope you have a nice day!</content>
+    </comment>
+    <comment id="240880d0-504f-4395-8e59-793cb177caea" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="False">
+      <date>2011-05-16 04:42:32</date>
+      <author>Providencia Villano</author>
+      <email>Tortorelli@slack.com</email>
+      <country>us</country>
+      <ip>98.211.154.20</ip>
+      <website>http://www.harm-tech1.com/best-web-marketing-services.html</website>
+      <moderatedby>Rule:black list</moderatedby>
+      <avatar />
+      <content>Great Comment. It got right to the heart of the matter.</content>
+    </comment>
+    <comment id="73156569-37a6-43f6-a242-a7218cb2d68d" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="False" deleted="False">
+      <date>2011-06-10 08:17:17</date>
+      <author>mission viejo hotels</author>
+      <email>Bucholtz90@gmail.com</email>
+      <country>us</country>
+      <ip>72.211.247.116</ip>
+      <website>http://www.missionviejohotels.org/</website>
+      <avatar />
+      <content>Nice job. It's about time somebody like you told the truth. Keep up the good work.</content>
+    </comment>
+    <comment id="c970f951-d462-47ab-8905-d4cadf0e656c" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="False">
+      <date>2011-06-10 09:52:43</date>
+      <author>Darell Plane</author>
+      <email>Marwick13@gmail.com</email>
+      <country>us</country>
+      <ip>72.211.247.116</ip>
+      <website>http://commercialinsurancenews.com/</website>
+      <moderatedby>Rule:black list</moderatedby>
+      <avatar />
+      <content>Do you have an rss feed (or whatever its called)? I didn't see it. Can you tell, but I am blonde.</content>
+    </comment>
+    <comment id="d8968d93-1c79-4636-8b74-5e989c90618e" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="False">
+      <date>2011-07-05 09:10:32</date>
+      <author>Annalee Krans</author>
+      <email>Carrithers10@gmail.com</email>
+      <country>us</country>
+      <ip>60.53.131.190</ip>
+      <website>http://fitnessequipmentexercise.info/gaiam-gripping-nonslip-yoga-socks-sm/</website>
+      <moderatedby>Rule:black list</moderatedby>
+      <avatar />
+      <content>I am glad that I noticed this blog , exactly the right info that I was searching for!.</content>
+    </comment>
+    <comment id="aef5747e-0bb5-44e8-90b5-159e449cde80" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="False">
+      <date>2011-07-10 17:47:57</date>
+      <author>Coach Outlet</author>
+      <email>xingwomeng3210@gmail.com</email>
+      <country>cn</country>
+      <ip>184.22.233.222</ip>
+      <website>http://www.coachfreeshipping.com/</website>
+      <moderatedby>App_Code.Extensions.StopForumSpam</moderatedby>
+      <avatar />
+      <content>Be who you are and say what you feel, because those who matter don’t mind, and those that mind, don’t matter.</content>
+    </comment>
+  </comments>
+  <categories />
+  <notifications />
+</post>

@@ -1,0 +1,1453 @@
+﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<post>
+  <author>mwrock</author>
+  <title>Getting TransactionScope to play nice with NHibernate</title>
+  <description />
+  <content>&lt;p&gt;My team is beginning to integrate NHibernate into a fairly large code base that makes frequent use of TransactionScope to ensure that the saving of related entities succeed or fail together. My own NHibernate experience has been primarily on green field projects and on existing projects where the NHibernate work was well isolated from existing plain ADO calls. Furthermore, my use of transactions has typically been from within stored procedures and I have never used any of the transactional functionality exposed by the ADO APIs. So this strange thing called TransactionScope was an entirely new concept for me to understand.&lt;/p&gt;  &lt;p&gt;Now before I elaborate on the drama and adventure that accompanied this learning experience and some of the failures that ensued, I’ll quickly jump to the moral of this story for those of you that simply want to know what is the right way to get NHibernate transactions to participate in a transaction defined by TransactionScope. Simply stated: its all in the nesting. Instantiate a TransactionScope on the outside and and begin and commit/rollback an NHibernate transaction on the inside.&lt;/p&gt;  &lt;div id="codeSnippetWrapper"&gt;   &lt;pre style="border-bottom-style: none; text-align: left; padding-bottom: 0px; line-height: 12pt; background-color: #f4f4f4; margin: 0em; border-left-style: none; padding-left: 0px; width: 100%; padding-right: 0px; font-family: &amp;#39;Courier New&amp;#39;, courier, monospace; direction: ltr; border-top-style: none; color: black; border-right-style: none; font-size: 8pt; overflow: visible; padding-top: 0px" id="codeSnippet"&gt;&lt;span style="color: #0000ff"&gt;using&lt;/span&gt;(var scope = &lt;span style="color: #0000ff"&gt;new&lt;/span&gt; TransactionScope())&lt;br /&gt;{&lt;br /&gt;    SaveEtitiesNotManagedByNH();&lt;br /&gt;    &lt;span style="color: #0000ff"&gt;using&lt;/span&gt; (var transaction = session.BeginTransaction())&lt;br /&gt;    {&lt;br /&gt;        session.SaveOrUpdate(entity);&lt;br /&gt;        transaction.Commit();&lt;br /&gt;    }&lt;br /&gt;    scope.Complete();&lt;br /&gt;}&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;What is happening here? Instantiating a new TransactionScope creates an “ambient” transaction.&amp;#160; What the heck is an ambient Transaction? An ambient transaction is part of the implicit programming model provided by the Systems.Transactions namespace. The msdn documentation advises developers to use this model instead of creating their own explicit transactions. The TransactionScope is ThreadStatic and therefore all ADO operations on that thread will participate in this ambient transaction.&lt;/p&gt;
+
+&lt;p&gt;There are some optional constructor arguments that can be used when creating a new TransactionScope that controls whether to create a brand new ambient transaction or to participate in one that already exists. For example, in the above block, it is possible that SaveEtitiesNotManagedByNH calls into methods that also have using blocks around a new TransactionScope. If new TransactionScopes are created with the default constructor, those scopes will participate in the same transaction as the one created by the outermost&amp;#160; TransactionScope. See the &lt;a href="http://msdn.microsoft.com/en-us/library/system.transactions.transactionscope.aspx"&gt;MSDN documentation&lt;/a&gt; for details on creating new TransactionScopes.&lt;/p&gt;
+
+&lt;p&gt;Since NHibernate 2.1 onward, the NHibernate transactions will participate in an ambient transaction if one exists. So in the code block above, all NHibernate&amp;#160; persistence logic is a part of the same transaction as any non NHibernate persistence code since it all occurs within the same TransactionScope.&lt;/p&gt;
+
+&lt;p&gt;When scope.Complete() is called, it simply sets a bit on the TransactionScope that claims that everything within the scope succeeded. When the TransactionScope is disposed at the end of the using block (or the outermost block if there are nested scopes), the transaction is commited as long as Completed was called. If completed was never called, the transaction is rolled back.&lt;/p&gt;
+
+&lt;h2&gt;TransactionScope/NHibernate Pitfalls&lt;/h2&gt;
+
+&lt;p&gt;So now that we have looked at the right way to manage the relationship between the&amp;#160; TransactionScope and NHibernate Transaction, lets look at some other techniques that might seem like a good idea but I assure you are bad.&lt;/p&gt;
+
+&lt;h3&gt;Following a Single Transaction per Request Unit of Work pattern&lt;/h3&gt;
+
+&lt;p&gt;Our original NHibernate implementation was following a Unit of Work pattern. This is a common and very nice pattern that typically involves opening an NHibernate session upon the first call into NHibernate and then closing the session in the EndRequest method of global.asax or a custom HttpModule. Our infrastructure took this one step further and opened a transaction after creating the session and committed or rolled it back in EndRequest. For now lets kindly suspend our disbelief in bad transaction management and pretend that this is a good idea because it supports a simple model where the developer can assume that all activity in a single request will succeed or fail together.&lt;/p&gt;
+
+&lt;p&gt;Following this technique, it is likely that an NHibernate explicit transaction will be created before an Ambient transaction exists.&lt;/p&gt;
+
+&lt;div id="codeSnippetWrapper"&gt;
+  &lt;pre style="border-bottom-style: none; text-align: left; padding-bottom: 0px; line-height: 12pt; background-color: #f4f4f4; margin: 0em; border-left-style: none; padding-left: 0px; width: 100%; padding-right: 0px; font-family: &amp;#39;Courier New&amp;#39;, courier, monospace; direction: ltr; border-top-style: none; color: black; border-right-style: none; font-size: 8pt; overflow: visible; padding-top: 0px" id="codeSnippet"&gt;session.GetEntityById(id);&lt;br /&gt;&lt;br /&gt;&lt;span style="color: #0000ff"&gt;using&lt;/span&gt;(var scope = &lt;span style="color: #0000ff"&gt;new&lt;/span&gt; TransactionScope())&lt;br /&gt;{&lt;br /&gt;    SaveEtitiesNotManagedByNH(); &lt;br /&gt;    session.SaveOrUpdate(entity); &lt;br /&gt;    scope.Complete();&lt;br /&gt;}&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;Here, NHibernate is used to retrieve an entity which, in our framework, causes a Transaction to begin. Therefore the non NHibernate activity is in a completely separate transaction. When the ambient transaction is created, it will look for the presence of an existing ambient transaction. There will be none and a completely new and separate transaction will be created.&amp;#160; As a result, operations in these two contexts will have no visibility of uncommited data in the other.&lt;/p&gt;
+
+&lt;p&gt;To remedy this, we created a TransactionScope in BeginRequest and stored it in HttpContext. On EndRequest, we would retrieve that TransactionScope and call Completed and dispose of it. This way we are guaranteed that the ambient transaction&amp;#160; exists before BeginTransaction is called on the NHibernate transaction and we can be assured that the NHibernate operations will enlist in that transactions.&lt;/p&gt;
+
+&lt;p&gt;This would fail randomly because in ASP.NET, there is no guarantee that BeginRequest and EndRequest will occur on the same thread. A Transaction scope will throw an exception if you try to dispose of it on a different thread than the one where it was created. So in the occasional event that EndRequest executed on a different thread then BeginRequest, this exception was thrown.&lt;/p&gt;
+
+&lt;p&gt;I then tried using PreRequestHandlerExecute and PostRequestHandlerExecute instead of BeginRequest and EndRequest. Those will always occur on the same thread. It appeared that this was a working solution and worked in our dev environments. However, when we moved this to an integration environment, we began seeing database timeout errors. Reviewing the active connections in the database, spids were blocking and the spid at the top of the blocking chain was holding an open transaction. What was particularly odd was that this spid was locking a resource that we thought was being inserted outside of a TransactionScope or any explicit transaction.&lt;/p&gt;
+
+&lt;p&gt;It ended up that the reason this was happening is that there are certain circumstances where PostRequestHandlerExecute is never called. For example on a Response.Redirect where endRequest is false. Under such circumstances, the TransactionScope is not disposed. Since the TransactionScope is in Thread Local Storage, it remains tied to the request’s thread even after the request ends. The thread returns to the worker pool and later gets pulled by another thread. In our case, this was a background thread that typically never used explicit transactions and simply inserted a row into a commonly queried table. After the background thread finished its work, since it never calls Commit, the table remains locked and simple queries by other requests on that table time out. To summarize this unfortunate series of events:&lt;/p&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;Web request begins and creates a new TransactionScope. &lt;/li&gt;
+
+  &lt;li&gt;The Request returns a 302 redirect and PostRequestHandlerExecute does not execute and therefore the TransactionScope is not disposed and remains in thread al storage. &lt;/li&gt;
+
+  &lt;li&gt;Thread returns to the worker pool. &lt;/li&gt;
+
+  &lt;li&gt;Background thread is launched from the worker pool and thread with undisposed TransactionScope is used. &lt;/li&gt;
+
+  &lt;li&gt;Thread inserts row into Table A. &lt;/li&gt;
+
+  &lt;li&gt;Thread exits and still does not call dispose and the transaction remains open. &lt;/li&gt;
+
+  &lt;li&gt;A new web request queries Table A and waits for the open transaction to release its exclusive lock. &lt;/li&gt;
+
+  &lt;li&gt;The new request times out since the lock is never released as the thread that owns the locking transaction is sitting idle in the thread pool. &lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;This is a nasty bug that thankfully never reached production. These kinds of bugs are always difficult to to troubleshoot, occur in nondeterministic patterns and affect not only the user who came in on that thread but can bring down the entire application.&lt;/p&gt;
+
+&lt;p&gt;Reflecting on this scenario, it became apparent that:&lt;/p&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;TransactionScope should always be limited to the confines of a using or Try/Finally block. Risking the fact that Dispose may never be called is too great. &lt;/li&gt;
+
+  &lt;li&gt;Keeping a transaction open during the entirety of a web request is extremely dangerous. It is unwise to assume that something, perhaps completely non database related, will never trigger a long running request and therefore lock up database resources that&amp;#160; again could bring down an entire site. This is one of the cardinal rules of ACID transactions to keep them as short as possible. &lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;So I decided to eliminate the one transaction per request technique. We continue to use Unit of Work for Sessions, but developers will be responsible for defining their own transactions according to the needs of the request.&lt;/p&gt;
+
+&lt;h3&gt;Failing to use explicit NHibernate Transactions within the TransactionScope&lt;/h3&gt;
+
+&lt;p&gt;Having resolved to abandon a single master TransactionScope and continue to use the TransactionScopes currently sprinkled throughout the code, it seemed rational that we could simply invoke our NHibernate persistence calls within a TransactionScope and all would be well. Something like the following seemed innocent enough:&lt;/p&gt;
+
+&lt;div id="codeSnippetWrapper"&gt;
+  &lt;pre style="border-bottom-style: none; text-align: left; padding-bottom: 0px; line-height: 12pt; background-color: #f4f4f4; margin: 0em; border-left-style: none; padding-left: 0px; width: 100%; padding-right: 0px; font-family: &amp;#39;Courier New&amp;#39;, courier, monospace; direction: ltr; border-top-style: none; color: black; border-right-style: none; font-size: 8pt; overflow: visible; padding-top: 0px" id="codeSnippet"&gt;&lt;span style="color: #0000ff"&gt;using&lt;/span&gt;(var scope = &lt;span style="color: #0000ff"&gt;new&lt;/span&gt; TransactionScope())&lt;br /&gt;{&lt;br /&gt;    SaveEtitiesNotManagedByNH();&lt;br /&gt;    session.SaveOrUpdate(entity);&lt;br /&gt;     scope.Complete();&lt;br /&gt;}&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;Well this quickly started throwing an error I had never seen before when disposing the TransactionScope. The message was something like “The state of this transaction is in doubt” with some methods in the stack trace calling something like PhaseOneCommit and an inner timeout exception. I’ll admit that&amp;#160; I have not dug into the NHibernate source to see exactly what is happening here, but it sounds like a distributed transaction gone bad. My guess is that the NHibernate activity is treated like a distributed transaction even though it is operating on the same database as the on NHibernate code. When NHibernate saves the data, that operation enlists in the TransactionScope but NHibernate has no awareness that it is involved and therefore it will never Commits its end of the distributed transaction and causes the TransactionScope to timeout.&lt;/p&gt;
+
+&lt;h2&gt;The Final Solution&lt;/h2&gt;
+
+&lt;p&gt;So the final solution involved a nesting pattern like the one shown at the beginning of this post. However, to make it easier to implemented I created a wrapper to wrap both the TransactionScopoe and the NHibernate transaction:&lt;/p&gt;
+
+&lt;div id="codeSnippetWrapper"&gt;
+  &lt;div id="codeSnippetWrapper"&gt;
+    &lt;pre style="border-bottom-style: none; text-align: left; padding-bottom: 0px; line-height: 12pt; background-color: #f4f4f4; margin: 0em; border-left-style: none; padding-left: 0px; width: 100%; padding-right: 0px; font-family: &amp;#39;Courier New&amp;#39;, courier, monospace; direction: ltr; border-top-style: none; color: black; border-right-style: none; font-size: 8pt; overflow: visible; padding-top: 0px" id="codeSnippet"&gt;&lt;span style="color: #0000ff"&gt;public&lt;/span&gt; &lt;span style="color: #0000ff"&gt;interface&lt;/span&gt; IOrmOuterTransactionScope : IDisposable&lt;br /&gt;{&lt;br /&gt;    &lt;span style="color: #0000ff"&gt;void&lt;/span&gt; Complete();&lt;br /&gt;}&lt;br /&gt;&lt;br /&gt;&lt;span style="color: #0000ff"&gt;public&lt;/span&gt; &lt;span style="color: #0000ff"&gt;class&lt;/span&gt; NhOuterTransactionScope : IOrmOuterTransactionScope&lt;br /&gt;{&lt;br /&gt;    &lt;span style="color: #0000ff"&gt;private&lt;/span&gt; &lt;span style="color: #0000ff"&gt;readonly&lt;/span&gt; ISession session;&lt;br /&gt;    &lt;span style="color: #0000ff"&gt;private&lt;/span&gt; &lt;span style="color: #0000ff"&gt;readonly&lt;/span&gt; TransactionScope scope;&lt;br /&gt;    &lt;span style="color: #0000ff"&gt;private&lt;/span&gt; &lt;span style="color: #0000ff"&gt;readonly&lt;/span&gt; ITransaction transaction;&lt;br /&gt;&lt;br /&gt;    &lt;span style="color: #0000ff"&gt;public&lt;/span&gt; NhOuterTransactionScope(ISession session)&lt;br /&gt;        : &lt;span style="color: #0000ff"&gt;this&lt;/span&gt;(session, TransactionScopeOption.Required, &lt;span style="color: #0000ff"&gt;new&lt;/span&gt; TransactionOptions {&lt;br /&gt;            IsolationLevel = IsolationLevel.RepeatableRead})&lt;br /&gt;    {&lt;br /&gt;    }&lt;br /&gt;&lt;br /&gt;    &lt;span style="color: #0000ff"&gt;public&lt;/span&gt; NhOuterTransactionScope( ISession session, &lt;br /&gt;                                    TransactionScopeOption transactionScopeOption, &lt;br /&gt;                                    TransactionOptions transactionOptions)&lt;br /&gt;    {&lt;br /&gt;        scope = &lt;span style="color: #0000ff"&gt;new&lt;/span&gt; TransactionScope(transactionScopeOption, transactionOptions);&lt;br /&gt;        &lt;span style="color: #0000ff"&gt;this&lt;/span&gt;.session = session;&lt;br /&gt;        transaction = session.BeginTransaction();&lt;br /&gt;    }&lt;br /&gt;&lt;br /&gt;    &lt;span style="color: #0000ff"&gt;public&lt;/span&gt; &lt;span style="color: #0000ff"&gt;void&lt;/span&gt; Complete()&lt;br /&gt;    {&lt;br /&gt;        session.Flush();&lt;br /&gt;        transaction.Commit();&lt;br /&gt;        scope.Complete();&lt;br /&gt;    }&lt;br /&gt;&lt;br /&gt;    &lt;span style="color: #0000ff"&gt;public&lt;/span&gt; &lt;span style="color: #0000ff"&gt;void&lt;/span&gt; Dispose()&lt;br /&gt;    {&lt;br /&gt;        &lt;span style="color: #0000ff"&gt;try&lt;/span&gt;&lt;br /&gt;        {&lt;br /&gt;            transaction.Dispose();&lt;br /&gt;        }&lt;br /&gt;        &lt;span style="color: #0000ff"&gt;finally&lt;/span&gt;&lt;br /&gt;        {&lt;br /&gt;            scope.Dispose();&lt;br /&gt;        }&lt;br /&gt;    }&lt;br /&gt;}&lt;/pre&gt;
+
+    &lt;br /&gt;&lt;/div&gt;
+
+  &lt;div&gt;
+    &lt;br /&gt;&lt;/div&gt;
+&lt;/div&gt;
+
+&lt;p&gt;Using an NHOuterTransactionScope, avoids the need for developers to create and commit the separate NHibernate transaction and more importantly it enforces the appropriate nesting order.&lt;/p&gt;</content>
+  <ispublished>True</ispublished>
+  <isdeleted>False</isdeleted>
+  <iscommentsenabled>True</iscommentsenabled>
+  <pubDate>2010-12-26 00:44:00</pubDate>
+  <lastModified>2011-01-12 17:30:04</lastModified>
+  <raters>7</raters>
+  <rating>4.857143</rating>
+  <slug>Getting-TransactionScope-to-play-nice-with-NHibernate</slug>
+  <tags />
+  <comments>
+    <comment id="12eeff61-e9b5-4b87-b023-1f620102442c" parentid="00000000-0000-0000-0000-000000000000" approved="True" spam="False" deleted="False">
+      <date>2010-12-26 11:31:54</date>
+      <author>Codebix.com</author>
+      <email>trackback</email>
+      <country />
+      <ip>67.231.245.122</ip>
+      <website>http://codebix.com/posts/post/160016/Getting-TransactionScope-to-play-nice-with-NHibernate</website>
+      <moderatedby>Auto</moderatedby>
+      <content>Codebix.com - Your post is on Codebix.com
+
+This post has been featured on Codebix.com. The place to find latest articles on programming. Click on the url to reach your post's page.</content>
+    </comment>
+    <comment id="99716c94-2229-442d-8813-8c94f2f66b60" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="True">
+      <date>2010-12-30 22:55:46</date>
+      <author>Dareen Grausso</author>
+      <email>Tennent@ymail.com</email>
+      <country>us</country>
+      <ip>203.208.31.160</ip>
+      <website>http://myfunblog.net/sarah-palin-is-“prayerful”</website>
+      <moderatedby>App_Code.Extensions.StopForumSpam</moderatedby>
+      <avatar />
+      <content>Hi, I have seen this text somewhere else before, are you the original author?</content>
+    </comment>
+    <comment id="afb4fb56-848c-4669-b467-9cb77c2efd11" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="True">
+      <date>2011-01-01 19:03:18</date>
+      <author>photos</author>
+      <email>Leskovar@gmail.com</email>
+      <country>us</country>
+      <ip>62.0.103.105</ip>
+      <website>http://www.gayaartprints.com/</website>
+      <moderatedby>App_Code.Extensions.StopForumSpam</moderatedby>
+      <avatar />
+      <content>great post, thanks. theres great stuff in this website</content>
+    </comment>
+    <comment id="9387ab5d-55bb-4df7-985f-1aec11a3f2e7" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="True">
+      <date>2011-01-04 02:31:37</date>
+      <author>Coconut Palm</author>
+      <email>Bertel@mail.com</email>
+      <country>us</country>
+      <ip>173.171.214.198</ip>
+      <website>http://coconutpalmtree.net/</website>
+      <moderatedby>App_Code.Extensions.StopForumSpam</moderatedby>
+      <avatar />
+      <content>So much fun on your site :)</content>
+    </comment>
+    <comment id="85c9db83-49c0-4617-a3f1-774e340d2164" parentid="00000000-0000-0000-0000-000000000000" approved="True" spam="False" deleted="False">
+      <date>2011-01-04 07:54:33</date>
+      <author>Matthew Manela</author>
+      <email>mmanela@gmail.com</email>
+      <country>us</country>
+      <ip>131.107.0.94</ip>
+      <website>http://matthewmanela.com/</website>
+      <moderatedby>mwrock</moderatedby>
+      <avatar />
+      <content>Very nice post.  This seems like it would be a common scenario people would encounter.  Anyone existing code base trying to convert from ADO.net to NHibernate would definitely benefit from knowing how to do this.
+
+I also agree without about the problem with the request based unit of work pattern.  It does seem dangerous to have a transaction live so long since it is hard to guarantee a request will end quickly at times.
+
+
+-Matt</content>
+    </comment>
+    <comment id="e08adf1c-6e1b-4cc3-9fa0-ef4b34fdcf19" parentid="00000000-0000-0000-0000-000000000000" approved="True" spam="False" deleted="False">
+      <date>2011-01-04 07:57:21</date>
+      <author>DotNetKicks.com</author>
+      <email>trackback</email>
+      <country />
+      <ip>74.86.105.210</ip>
+      <website>http://www.dotnetkicks.com/adonet/Getting_TransactionScope_to_play_nice_with_NHibernate</website>
+      <content>Getting TransactionScope to play nice with NHibernate
+
+You've been kicked (a good thing) - Trackback from DotNetKicks.com</content>
+    </comment>
+    <comment id="2e817c7e-0f2d-4262-8bb4-636ef90b3b26" parentid="00000000-0000-0000-0000-000000000000" approved="True" spam="False" deleted="False">
+      <date>2011-01-04 08:22:49</date>
+      <author>matthewmanela.com</author>
+      <email>pingback</email>
+      <country />
+      <ip>66.147.242.170</ip>
+      <website>http://matthewmanela.com/blog/using-nhibernate-with-existing-ado-net-transactions/</website>
+      <content>Pingback from matthewmanela.com
+
+ADO.NET |   Using NHibernate with existing ADO.NET transactions | Farblondzshet in Code with Matthew Manela</content>
+    </comment>
+    <comment id="7d829ff4-31dc-4960-965e-f91db0c89e2e" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="True">
+      <date>2011-01-04 10:34:16</date>
+      <author>My Stulick</author>
+      <email>Guarini47@ymail.com</email>
+      <country>us</country>
+      <ip>91.121.196.14</ip>
+      <website>http://www.autoshoppertogo.com/</website>
+      <moderatedby>App_Code.Extensions.StopForumSpam</moderatedby>
+      <avatar />
+      <content>Hey, I found your site on Yahoo! and thinks its really good. I will bookmark site and visit again soon. Have a good day!</content>
+    </comment>
+    <comment id="ca696640-1385-4c4b-8021-eace1e193ee2" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="False" deleted="True">
+      <date>2011-01-06 03:36:22</date>
+      <author>Darren Cook</author>
+      <email>n_jones71@gmail.com</email>
+      <country>au</country>
+      <ip>200.157.247.8</ip>
+      <website>http://www.careertests123.net/</website>
+      <avatar />
+      <content>Interesting post.. thanks</content>
+    </comment>
+    <comment id="58650de5-4985-481b-9eaa-c1eb1041e0f4" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="True">
+      <date>2011-01-06 04:21:19</date>
+      <author>Ami Kamb</author>
+      <email>478Seidel@hotmail.com</email>
+      <country>us</country>
+      <ip>92.46.55.46</ip>
+      <website>http://fabcollectibleitems.com/vintage-pocket-watch</website>
+      <moderatedby>App_Code.Extensions.StopForumSpam</moderatedby>
+      <avatar />
+      <content>I highly enjoyed reading this post, keep on producing such interesting stuff!</content>
+    </comment>
+    <comment id="9ff68fd4-090c-4254-9286-9f4c7696e5c3" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="True">
+      <date>2011-01-09 15:47:58</date>
+      <author>2GTS review</author>
+      <email>mcclaren@gmail.com</email>
+      <country>us</country>
+      <ip>94.23.65.174</ip>
+      <website>http://goarticles.com/article/2-GIRLS-TEACH-SEX-It-will-change-your-life.-FOREVER/3939763/</website>
+      <moderatedby>Rule:black list</moderatedby>
+      <avatar />
+      <content>This topic is simply matchless :), it is pleasant to me.</content>
+    </comment>
+    <comment id="bb96f9c7-bd10-46e2-a42a-537d157e3be7" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="False" deleted="True">
+      <date>2011-01-09 17:56:54</date>
+      <author>Business Domains</author>
+      <email>computerfixerupper@hotmail.com</email>
+      <country>us</country>
+      <ip>173.234.144.236</ip>
+      <website>http://reusedomains.com/feed/</website>
+      <avatar />
+      <content> Heya i’m for the first time here. I came across this board and I find It truly useful &amp;amp; it helped me out a lot. I hope to give something back and help others like you helped me.</content>
+    </comment>
+    <comment id="93c536cc-ccc7-476a-9ec7-cb7d1da0c9db" parentid="00000000-0000-0000-0000-000000000000" approved="True" spam="False" deleted="False">
+      <date>2011-01-11 08:26:04</date>
+      <author>mark</author>
+      <email>mark.uvodich@gmail.com</email>
+      <country>us</country>
+      <ip>198.51.229.30</ip>
+      <moderatedby>mwrock</moderatedby>
+      <avatar />
+      <content>Hey Matt,
+
+In this situation where are you storing the session?  Still in the HttpContext?  Are you getting the session out of the context every time you create an NhOuterTransactionScope?
+
+-Mark</content>
+    </comment>
+    <comment id="2bafed0f-f7af-4265-9efd-3c4cc3b90758" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="True">
+      <date>2011-01-11 13:26:57</date>
+      <author>Jocuri online</author>
+      <email>mihaivulpe26@gmail.com</email>
+      <country>us</country>
+      <ip>208.176.117.46</ip>
+      <website>http://www.e-jocurionline.org/</website>
+      <moderatedby>Rule:black list</moderatedby>
+      <avatar />
+      <content>I just got on the blogs and I am glad I discovered your blog. I will return. I would like to become familiar with learning RSS feeds. Perhaps that is what I will learn soon.</content>
+    </comment>
+    <comment id="560c40c7-1c09-4860-a93c-a0ef18c13900" parentid="00000000-0000-0000-0000-000000000000" approved="True" spam="False" deleted="False">
+      <date>2011-01-12 08:30:04</date>
+      <author>mwrock</author>
+      <email>matt@mattwrock.com</email>
+      <country>us</country>
+      <ip>131.107.0.74</ip>
+      <website>http://www.mattwrock.com/</website>
+      <moderatedby>mwrock</moderatedby>
+      <avatar />
+      <content>It is stored in HttpContext(or CallContext in non web environments) and retrieved from there every time a NhOuterTransactionScope is created. However the pulling from httpContext is encapsulated by a SessionManager class and a UnitOfWork framework that all works alongside of StructureMap. The result is that creating a TransactionScope is as simple as:
+
+using (var scope = sessionManager.CreateTransactionScope())
+{
+    ...
+}</content>
+    </comment>
+    <comment id="e0f03790-b488-474a-bc2e-4b893b2459a3" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="True">
+      <date>2011-01-12 16:00:53</date>
+      <author>Jocuri online</author>
+      <email>mihaivulpe26@gmail.com</email>
+      <country>us</country>
+      <ip>208.176.117.46</ip>
+      <website>http://www.e-jocurionline.org/</website>
+      <moderatedby>Rule:black list</moderatedby>
+      <avatar />
+      <content>Your blog is outrageous! I mean, Ive never been so entertained by anything in my life! Your vids are perfect for this. I mean, how did you manage to find something that matches your style of writing so well? Im really happy I started reading this today. Youve got a follower in me for sure!</content>
+    </comment>
+    <comment id="849986cc-09b9-4391-aafa-986112773289" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="True">
+      <date>2011-01-12 18:07:55</date>
+      <author>Hipolito M. Wiseman</author>
+      <email>Breehl@ymail.com</email>
+      <country>us</country>
+      <ip>201.16.205.109</ip>
+      <website>http://secure.hostgator.com/~affiliat/cgi-bin/affiliates/clickthru.cgi?id=postcd-scrabox-winning</website>
+      <moderatedby>Rule:black list</moderatedby>
+      <avatar />
+      <content>Use coupon code &amp;quot;hostgatorgift&amp;quot; for HostGator.com hosting to get free 1 month OFF.</content>
+    </comment>
+    <comment id="21e86c91-b950-4cbe-8246-65a91ed28129" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="True">
+      <date>2011-01-13 05:18:05</date>
+      <author>Jocuri online</author>
+      <email>mihaivulpe26@gmail.com</email>
+      <country>us</country>
+      <ip>208.176.117.46</ip>
+      <website>http://www.e-jocurionline.org/</website>
+      <moderatedby>Rule:black list</moderatedby>
+      <avatar />
+      <content>This is one of the most incredible blogs Ive read in a very long time. The amount of information in here is stunning, like you practically wrote the book on the subject. Your blog is great for anyone who wants to understand this subject more. Great stuff; please keep it up!</content>
+    </comment>
+    <comment id="d90e3bee-1187-4baf-b066-597adfbdbcb9" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="True">
+      <date>2011-01-15 07:03:37</date>
+      <author>Jocuri online</author>
+      <email>mihaivulpe26@gmail.com</email>
+      <country>us</country>
+      <ip>208.176.117.46</ip>
+      <website>http://www.e-jocurionline.org/</website>
+      <moderatedby>Rule:black list</moderatedby>
+      <avatar />
+      <content>Hello, this is a really fascinating web blog and ive loved reading several of the articles and posts contained upon the site, sustain the great work and hope to read a lot more exciting articles in the time to come.</content>
+    </comment>
+    <comment id="cdbcf006-4c0d-4835-94e4-c3f4942ec734" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="True">
+      <date>2011-01-15 22:16:59</date>
+      <author>Carroll B. Merriman</author>
+      <email>Hordyk@ymail.com</email>
+      <country>us</country>
+      <ip>82.199.137.20</ip>
+      <website>http://www.cheapdieselspots.com/</website>
+      <moderatedby>App_Code.Extensions.StopForumSpam</moderatedby>
+      <avatar />
+      <content>Freight Shippers make use of freight matching providers to find cheap freight even though logistics companies along with freight carriers fill their empty trucks. </content>
+    </comment>
+    <comment id="48899dd5-5687-42d5-87ac-f26650a286d1" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="True">
+      <date>2011-01-16 23:37:47</date>
+      <author>silkroad online gold</author>
+      <email>Breehl@ymail.com</email>
+      <country>us</country>
+      <ip>70.165.79.237</ip>
+      <website>http://www.bbqol.com/Silkroad-Online</website>
+      <moderatedby>Rule:black list</moderatedby>
+      <avatar />
+      <content>great blog! keep up the great work!</content>
+    </comment>
+    <comment id="df0061c8-3a6c-4ead-9c4b-4e8ce9970f3d" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="True">
+      <date>2011-01-17 17:45:44</date>
+      <author>Tyson F. Gautreaux</author>
+      <email>Domin7@gmail.com</email>
+      <country>us</country>
+      <ip>61.220.57.86</ip>
+      <website>http://www.cheapdieselstops.com/</website>
+      <moderatedby>App_Code.Extensions.StopForumSpam</moderatedby>
+      <avatar />
+      <content>Transportation Load boards are generally an important part of the freight marketplace for shippers, third party logistics firms, independent truck drivers, and carriers to find freight and get loaded. </content>
+    </comment>
+    <comment id="86324db2-4020-4912-868c-76cfcea22be0" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="True">
+      <date>2011-01-20 13:44:40</date>
+      <author>Hipolito M. Wiseman</author>
+      <email>Bozeman@hotmail.com</email>
+      <country>us</country>
+      <ip>83.169.11.38</ip>
+      <website>http://www.teakforboats.com/</website>
+      <moderatedby>App_Code.Extensions.StopForumSpam</moderatedby>
+      <avatar />
+      <content>Great post. I am glad to have found this page on the web after many searches.</content>
+    </comment>
+    <comment id="93577e07-68f8-4458-a336-5b3f74d36484" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="False" deleted="True">
+      <date>2011-01-20 16:46:14</date>
+      <author>SEO Company India</author>
+      <email>startupguide01@gmail.com</email>
+      <country>us</country>
+      <ip>65.98.105.106</ip>
+      <website>http://www.ensure.co.in/</website>
+      <avatar />
+      <content>Congratulations on having one of the most sophisticated blogs Ive come across in some time! Its just incredible how much you can take away from something simply because of how visually beautiful it is. Youve put together a great blog space --great graphics, videos, layout. This is definitely a must-see blog!</content>
+    </comment>
+    <comment id="bfb48157-06dc-4006-bd1a-99634b2e4ec6" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="False" deleted="True">
+      <date>2011-01-20 18:44:55</date>
+      <author>Reggae</author>
+      <email>Laborin1@gmail.com</email>
+      <country>us</country>
+      <ip>216.151.201.180</ip>
+      <website>http://www.dj14k.com/servlet/the-3263/General-Trees,-Sassafrass,-Culture/Detail</website>
+      <avatar />
+      <content>Seems you did a lot of work but im still baffled on how you got the site to look like this. I cant get mine to do anything!</content>
+    </comment>
+    <comment id="3ead40ad-dd74-4d22-9b2e-efe7c6f472dd" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="False" deleted="True">
+      <date>2011-01-22 20:44:02</date>
+      <author>Gta do pobrania</author>
+      <email>sparat@kjduy.it</email>
+      <country>pl</country>
+      <ip>87.205.59.128</ip>
+      <website>http://www.kistos.pila.pl/mod-zwierzeta-do-ls-2009.html</website>
+      <avatar />
+      <content>I used to be very happy to search out this net-site.I wished to thanks in your time for this wonderful read!! I undoubtedly enjoying every little bit of it and I have you bookmarked to take a look at new stuff you weblog post.</content>
+    </comment>
+    <comment id="a1e510c8-7b77-47a3-8ba6-362a21331344" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="True">
+      <date>2011-01-23 06:20:26</date>
+      <author>webcam jobs</author>
+      <email>Laborin1@gmail.com</email>
+      <country>us</country>
+      <ip>184.106.150.219</ip>
+      <website>http://www.i-camz.com/</website>
+      <moderatedby>Rule:black list</moderatedby>
+      <avatar />
+      <content>Thank you for the auspicious writeup. It in fact was a amusement account it. Look advanced to more added agreeable from you! By the way, how could we communicate?</content>
+    </comment>
+    <comment id="7b8bb6db-f3e4-4705-b0bb-53b27096ffab" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="False" deleted="False">
+      <date>2011-01-26 14:45:26</date>
+      <author>buy silkroad gold</author>
+      <email>Macdonnell15@gmail.com</email>
+      <country>us</country>
+      <ip>218.87.5.22</ip>
+      <website>http://www.silkroadgoldbuy.com/</website>
+      <avatar />
+      <content>thank you for posting this! I really enjoy it! </content>
+    </comment>
+    <comment id="0e4ee997-9218-480f-ba58-dd2ae04dc977" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="False">
+      <date>2011-01-27 09:22:05</date>
+      <author>buy silkroad gold</author>
+      <email>Eastwood@ymail.com</email>
+      <country>us</country>
+      <ip>218.87.5.22</ip>
+      <website>http://www.bymmo.com/Silkroad-Online</website>
+      <moderatedby>Rule:black list</moderatedby>
+      <avatar />
+      <content>great blog! keep up the great work!</content>
+    </comment>
+    <comment id="0b10d625-9f2d-4a5f-83e0-a48364a59bd4" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="False">
+      <date>2011-01-28 05:21:16</date>
+      <author>What is Rent to Own</author>
+      <email>Zamorano@restumail.com</email>
+      <country>us</country>
+      <ip>200.7.210.142</ip>
+      <website>http://www.whatisrenttoown.com/</website>
+      <moderatedby>App_Code.Extensions.StopForumSpam</moderatedby>
+      <avatar />
+      <content>I like this data shown and it has given me some sort of commitment to succeed for some reason, so thanks.</content>
+    </comment>
+    <comment id="bfb88c1f-3cfa-45bf-a854-13605e0983ce" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="False">
+      <date>2011-01-29 08:03:54</date>
+      <author>how to get rich easily</author>
+      <email>Spurling230@hotmail.com</email>
+      <country>us</country>
+      <ip>95.65.17.128</ip>
+      <website>http://www.howtogetricheasily.com/order.html</website>
+      <moderatedby>App_Code.Extensions.StopForumSpam</moderatedby>
+      <avatar />
+      <content>good read thanks :)</content>
+    </comment>
+    <comment id="8367d3b9-0837-4fd1-ba0f-3ef0ceb57cad" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="False" deleted="False">
+      <date>2011-01-30 08:26:36</date>
+      <author>buy silkroad gold</author>
+      <email>Melia13@gmail.com</email>
+      <country>us</country>
+      <ip>117.43.77.17</ip>
+      <website>http://www.silkroadgoldbuy.com/</website>
+      <avatar />
+      <content>Really enjoyed reading your articles!</content>
+    </comment>
+    <comment id="db7ff8f4-a3c1-4a4a-99c4-fc738d9bf7f2" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="False">
+      <date>2011-01-30 21:09:27</date>
+      <author>buy silkroad gold</author>
+      <email>Hanken2@gmail.com</email>
+      <country>us</country>
+      <ip>117.43.77.17</ip>
+      <website>http://www.bymmo.com/Silkroad-Online</website>
+      <moderatedby>Rule:black list</moderatedby>
+      <avatar />
+      <content>Thats a very nice info. Thank you for sharing it! </content>
+    </comment>
+    <comment id="91d793b5-5de0-49db-bd9e-92c9cc045ef9" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="False">
+      <date>2011-02-01 08:17:45</date>
+      <author>silkroad online gold</author>
+      <email>Tennent@ymail.com</email>
+      <country>us</country>
+      <ip>117.43.173.48</ip>
+      <website>http://www.bymmo.com/Silkroad-Online</website>
+      <moderatedby>Rule:black list</moderatedby>
+      <avatar />
+      <content>Really enjoyed reading your articles!</content>
+    </comment>
+    <comment id="e31d625d-23ac-4ce4-a521-91e4a38eee5f" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="False">
+      <date>2011-02-02 16:53:17</date>
+      <author>dentist in doncaster</author>
+      <email>Laugen@yahoo.com</email>
+      <country>us</country>
+      <ip>111.68.103.62</ip>
+      <website>http://dentistindoncaster.co.uk/orthodontist/</website>
+      <moderatedby>App_Code.Extensions.StopForumSpam</moderatedby>
+      <avatar />
+      <content>Good post, a tad above my head except for certain some-thing to take into consideration. Thank-you</content>
+    </comment>
+    <comment id="59f79ffc-7533-488e-af67-abb9db5b96e3" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="False">
+      <date>2011-02-04 18:35:08</date>
+      <author>Al Landor</author>
+      <email>Guittennez243@Hotmail.com</email>
+      <country>us</country>
+      <ip>195.70.35.101</ip>
+      <website>http://www.the-warez.com/</website>
+      <moderatedby>App_Code.Extensions.StopForumSpam</moderatedby>
+      <avatar />
+      <content>totally amazing site!</content>
+    </comment>
+    <comment id="eb4c0d97-9350-4599-bb4d-6120dcae73a8" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="False" deleted="False">
+      <date>2011-02-09 23:37:32</date>
+      <author>trustedCPAnetwork</author>
+      <email>dwaynewilliamsma@GMAIL.COM</email>
+      <country>us</country>
+      <ip>58.104.104.160</ip>
+      <website>http://cpapayoutschedule.eklmnhost.com/</website>
+      <avatar />
+      <content>It absolutely agree with the previous message</content>
+    </comment>
+    <comment id="628b01c6-8104-4769-95f0-d111bbdac554" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="False" deleted="False">
+      <date>2011-02-10 01:25:58</date>
+      <author>and</author>
+      <email>Hoeke_Burnie18@gmail.com</email>
+      <country>bd</country>
+      <ip>64.111.221.42</ip>
+      <website>http://fuck.com/</website>
+      <avatar />
+      <content>commenting usually isnt my thing, but ive spent an hour on the site, so thanks for the info</content>
+    </comment>
+    <comment id="26a1cc16-eb5b-4ab9-91e1-291eda1556b9" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="False" deleted="False">
+      <date>2011-02-11 08:19:57</date>
+      <author>Loan</author>
+      <email>Ameling@gmail.com</email>
+      <country>us</country>
+      <ip>125.163.108.47</ip>
+      <website>http://my.opera.com/edhoyz/blog/a-home-loan-calculator</website>
+      <avatar />
+      <content>This is my 1st moment i see here. I located so a lot of entertaining stuff in your blog site, especially its conversation. From the tons of responses on your content, I think I am not the simply one having all the enjoyment here! Keep up the good job.</content>
+    </comment>
+    <comment id="5327b0b2-adab-4c7d-9c5b-b7295cdc1b54" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="False">
+      <date>2011-02-15 13:57:23</date>
+      <author>and</author>
+      <email>Pituch_Bednarik19@mail.com</email>
+      <country>iq</country>
+      <ip>64.111.221.42</ip>
+      <website>http://fuck.com/</website>
+      <moderatedby>Rule:black list</moderatedby>
+      <avatar />
+      <content>wow, hot outcome close to this good topic. could wish to let me know how long period of time that will take? just because i am going to do the destination dissertation or probably it will be better to find the dissertation writing. thank you.</content>
+    </comment>
+    <comment id="4c6c7880-3483-43ca-a783-cff057f86ea3" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="False">
+      <date>2011-02-17 13:17:43</date>
+      <author>and</author>
+      <email>Leda_Wehby36@email.com</email>
+      <country>py</country>
+      <ip>64.111.221.42</ip>
+      <website>http://fuck.com/</website>
+      <moderatedby>Rule:black list</moderatedby>
+      <avatar />
+      <content>@ahmad you just need to go sign up for a wordpress account. they are free, you will receive an api key when you do that.</content>
+    </comment>
+    <comment id="71e945ae-4a9b-4f4d-a990-e60cf52370f9" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="False" deleted="False">
+      <date>2011-02-20 21:50:53</date>
+      <author>patrice catanzaro</author>
+      <email>malika@yahoo.com</email>
+      <country>us</country>
+      <ip>78.112.64.220</ip>
+      <website>http://www.lovapink.com/</website>
+      <avatar />
+      <content>Incroyable, ce sujet est plus que jamais d'actualit&amp;#233;! Bravo</content>
+    </comment>
+    <comment id="0c6e39cf-f5d3-4200-a9a3-9326abe18ae6" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="False">
+      <date>2011-02-21 22:02:59</date>
+      <author>Tyisha Emfinger</author>
+      <email>Wojnicki@gmail.com</email>
+      <country>us</country>
+      <ip>173.234.46.222</ip>
+      <website>http://greenlivingguru.blogspot.com/</website>
+      <moderatedby>App_Code.Extensions.StopForumSpam</moderatedby>
+      <avatar />
+      <content>Thanks for the information!</content>
+    </comment>
+    <comment id="625f1867-475f-4d76-ab18-e62296db091b" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="False">
+      <date>2011-02-23 10:31:59</date>
+      <author>buy silkroad gold</author>
+      <email>Pangilinan@ymail.com</email>
+      <country>us</country>
+      <ip>117.43.75.212</ip>
+      <website>http://www.silkroadgoldbuy.com/</website>
+      <moderatedby>Rule:black list</moderatedby>
+      <avatar />
+      <content>Thats a very nice info. Thank you for sharing it! </content>
+    </comment>
+    <comment id="ecba3b52-26cb-434d-b4d9-348d935a87cf" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="False">
+      <date>2011-02-23 12:05:45</date>
+      <author>how to make your voice deeper</author>
+      <email>Donelly98@yahoo.com</email>
+      <country>us</country>
+      <ip>217.124.240.130</ip>
+      <website>http://www.squidoo.com/how-to-get-a-deeper-voice</website>
+      <moderatedby>App_Code.Extensions.StopForumSpam</moderatedby>
+      <avatar />
+      <content>Just about all of what you point out happens to be supprisingly appropriate and it makes me ponder why I hadn't looked at this in this light before. This article truly did turn the light on for me as far as this particular issue goes. However at this time there is actually 1 position I am not too comfy with and whilst I try to reconcile that with the actual central theme of your issue, let me see what all the rest of your visitors have to say.Very well done.</content>
+    </comment>
+    <comment id="cfaa43ce-1bc1-4253-bf77-f0dddb615cb0" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="False">
+      <date>2011-02-26 17:36:59</date>
+      <author>rift gold</author>
+      <email>Melia13@gmail.com</email>
+      <country>us</country>
+      <ip>117.43.77.227</ip>
+      <website>http://www.bymmo.com/Rift-Gold</website>
+      <moderatedby>Rule:black list</moderatedby>
+      <avatar />
+      <content>Extremely useful and informative article! Thanks a lot for those tips!</content>
+    </comment>
+    <comment id="9a057eb5-5c3b-4699-a436-2ea6d265773c" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="False">
+      <date>2011-02-27 14:52:13</date>
+      <author>P90X</author>
+      <email>Breehl@ymail.com</email>
+      <country>us</country>
+      <ip>90.202.187.171</ip>
+      <website>http://honestreview4u.com/p90x</website>
+      <moderatedby>Rule:black list</moderatedby>
+      <avatar />
+      <content>distrustful</content>
+    </comment>
+    <comment id="939793f8-dfec-45aa-9507-90fe6c3f0b4f" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="False">
+      <date>2011-02-28 01:36:57</date>
+      <author>annuaire article</author>
+      <email>Braccia46@gmail.com</email>
+      <country>us</country>
+      <ip>88.169.92.9</ip>
+      <website>http://www.annuaire-articles.fr/category/informatique</website>
+      <moderatedby>Rule:black list</moderatedby>
+      <avatar />
+      <content>Proposez-vous une newsletter &amp;#224; ce sujet? Je suis &amp;#224; la recherche de nouvelles infos concernant certains points que vous abordez ici... Si quelqu'un peut m'aider, je l'en remercie d'avance!Bonjour, actuellement &amp;#233;tudiant en Licence pro, je suis &amp;#224; la recherche d'informations pertinentes concernant les points que vous abordez ici... Pourriez-vous citer certaines sources que vous avez utilis&amp;#233;es ici, merci d'avance!</content>
+    </comment>
+    <comment id="d74da480-ddce-4744-ae04-d82c2d16fd52" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="False">
+      <date>2011-02-28 10:35:15</date>
+      <author>lingerie sexy</author>
+      <email>Morles@yahoo.fr</email>
+      <country>us</country>
+      <ip>88.169.92.9</ip>
+      <website>http://www.lovapink.com/</website>
+      <moderatedby>Rule:black list</moderatedby>
+      <avatar />
+      <content>Is there other websites related to this topic that are compliant with your current point of view. Thank you.</content>
+    </comment>
+    <comment id="ec704659-9979-428c-a96f-483b813a53f5" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="False">
+      <date>2011-02-28 22:57:55</date>
+      <author>rift gold</author>
+      <email>Townsend@ymail.com</email>
+      <country>us</country>
+      <ip>65.112.209.164</ip>
+      <website>http://www.riftgoldcheap.com/</website>
+      <moderatedby>Rule:black list</moderatedby>
+      <avatar />
+      <content>Pretty good post. thanks so much for sharing.</content>
+    </comment>
+    <comment id="d76c8672-b269-4481-80a9-843d71e838fb" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="False">
+      <date>2011-03-01 23:25:08</date>
+      <author>plans for sheds</author>
+      <email>cooperativemish@orange.com</email>
+      <country>sn</country>
+      <ip>92.234.195.95</ip>
+      <website>http://plans-for-sheds.info/</website>
+      <moderatedby>Rule:black list</moderatedby>
+      <avatar />
+      <content>Love your blog I'm going to subscribe</content>
+    </comment>
+    <comment id="a63442c8-61df-4a38-8248-042c97d0654e" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="False">
+      <date>2011-03-02 16:50:13</date>
+      <author>farmville cheats</author>
+      <email>fearlessjunk75@vodafone.com</email>
+      <country>dk</country>
+      <ip>92.234.195.95</ip>
+      <website>http://www.farm-ville-cheats.co.uk/</website>
+      <moderatedby>Rule:black list</moderatedby>
+      <avatar />
+      <content>Love your blog I'm going to subscribe</content>
+    </comment>
+    <comment id="45bc8c4a-4007-46f1-b106-fa4e70b289d0" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="False">
+      <date>2011-03-02 17:05:55</date>
+      <author>farmville cheats</author>
+      <email>tallfinances35@hotmail.com</email>
+      <country>pt</country>
+      <ip>92.234.195.95</ip>
+      <website>http://www.farm-ville-cheats.co.uk/</website>
+      <moderatedby>Rule:black list</moderatedby>
+      <avatar />
+      <content>I should really be working</content>
+    </comment>
+    <comment id="35fecca2-a568-4091-935a-52c35c471e27" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="False" deleted="False">
+      <date>2011-03-03 19:21:24</date>
+      <author>John Sonmez</author>
+      <email>john.sonmez@gmail.com</email>
+      <country>us</country>
+      <ip>97.121.49.138</ip>
+      <website>http://simpleprogrammer.com/</website>
+      <avatar />
+      <content>Hi Matt,
+
+Any luck getting this to work with nested scopes?  The code I am working in has a similar structure as you are proposing, but it needs to handle nest transaction scope.
+
+I know NHibernate doesn't really support nested transactions, so I was wondering if you had encountered this and have a solution?</content>
+    </comment>
+    <comment id="1cfc5b1d-6d4b-4d13-9894-65a95de6f6b9" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="False">
+      <date>2011-03-04 08:05:13</date>
+      <author>vigrx plus</author>
+      <email>fsadfsa@gmail.com</email>
+      <country>us</country>
+      <ip>173.63.81.48</ip>
+      <website>http://www.revolutionhealth.com/pages/vigrx-plus-review</website>
+      <moderatedby>Rule:black list</moderatedby>
+      <avatar />
+      <content>thank you for this.. by the way, your layout is great.</content>
+    </comment>
+    <comment id="975bd8d8-6240-4227-a5d3-2c248de83c31" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="False">
+      <date>2011-03-04 10:48:39</date>
+      <author>buy rift gold</author>
+      <email>slieysey@gmail.com</email>
+      <country>us</country>
+      <ip>117.40.112.141</ip>
+      <website>http://www.bymmo.com/Rift-Gold</website>
+      <moderatedby>Rule:black list</moderatedby>
+      <avatar />
+      <content>I'm lovin' the blog. Alot of interesting information here.</content>
+    </comment>
+    <comment id="b07ff12e-153d-4b1b-95d0-278b8f0b8580" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="False">
+      <date>2011-03-04 14:57:58</date>
+      <author>John Sonmez</author>
+      <email>john.sonmez@gmail.com</email>
+      <country>us</country>
+      <ip>97.121.49.138</ip>
+      <website>http://simpleprogrammer.com/</website>
+      <moderatedby>Rule:black list</moderatedby>
+      <avatar />
+      <content>Have you tried getting this to work using nested transactions?  Your implementation doesn't seem to handle nesting transaction scopes.</content>
+    </comment>
+    <comment id="5bf444e4-87b2-4b0f-8664-db62c2b37b38" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="False" deleted="False">
+      <date>2011-03-05 20:03:56</date>
+      <author>Cleotilde Goldeman</author>
+      <email>Artus@gmail.com</email>
+      <country>us</country>
+      <ip>173.208.14.103</ip>
+      <website>http://barbecuefever.com/barbecues/stainless-steel-barbecues/</website>
+      <avatar />
+      <content>Thank you for this, it is actually great to come across a internet site which truly gives excellent information rather than posting rubbish. </content>
+    </comment>
+    <comment id="a5fa9b4f-b046-457d-8d64-423b9aa7b3f2" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="False">
+      <date>2011-03-06 14:27:18</date>
+      <author>vigrx plus</author>
+      <email>fsadfsa@gmail.com</email>
+      <country>us</country>
+      <ip>173.63.81.48</ip>
+      <website>http://vigrx-plus-product-review.blogspot.com/</website>
+      <moderatedby>Rule:black list</moderatedby>
+      <avatar />
+      <content>thank you for this.. by the way, your layout is great.</content>
+    </comment>
+    <comment id="a18851ea-52c9-4035-94cd-7ef0e9dcfa90" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="False">
+      <date>2011-03-07 19:06:45</date>
+      <author>buy rift gold</author>
+      <email>Laborin1@gmail.com</email>
+      <country>us</country>
+      <ip>117.43.172.218</ip>
+      <website>http://www.riftgoldcheap.com/</website>
+      <moderatedby>Rule:black list</moderatedby>
+      <avatar />
+      <content>Really enjoyed reading your articles!</content>
+    </comment>
+    <comment id="2226b98b-00a5-49db-ae04-cab527ba9a2b" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="False">
+      <date>2011-03-08 19:53:39</date>
+      <author>vigrx plus</author>
+      <email>fsadfsa@gmail.com</email>
+      <country>us</country>
+      <ip>173.63.81.48</ip>
+      <website>http://vigrx-plus-product-review.blogspot.com/</website>
+      <moderatedby>Rule:black list</moderatedby>
+      <avatar />
+      <content>thank you for this.. by the way, your layout is great.</content>
+    </comment>
+    <comment id="1c80d76d-e617-468c-90eb-d5ba0c1ba481" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="False">
+      <date>2011-03-09 02:46:31</date>
+      <author>dissolution societe</author>
+      <email>Mcgath59@gmail.com</email>
+      <country>us</country>
+      <ip>88.169.92.9</ip>
+      <website>http://www.dissolution-societe.fr/</website>
+      <moderatedby>Rule:black list</moderatedby>
+      <avatar />
+      <content>I'm preparing a lesson about this topic for next week, could I use your example to provide accurate information to my students? Regards, Clara.</content>
+    </comment>
+    <comment id="0759061d-d3ef-4011-8141-6b4f9923c94f" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="False">
+      <date>2011-03-09 16:00:53</date>
+      <author>vigrx plus</author>
+      <email>fsadfsa@gmail.com</email>
+      <country>us</country>
+      <ip>173.63.81.48</ip>
+      <website>http://vigrx-plus-product-review.blogspot.com/</website>
+      <moderatedby>Rule:black list</moderatedby>
+      <avatar />
+      <content>this post was very well said... thanks</content>
+    </comment>
+    <comment id="ca4d07ce-7495-4067-96e8-d0a515b9630b" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="False" deleted="False">
+      <date>2011-03-10 10:09:50</date>
+      <author>rift gold</author>
+      <email>Kriz@ymail.com</email>
+      <country>us</country>
+      <ip>117.43.174.45</ip>
+      <website>http://www.bbqol.com/Rift-Gold</website>
+      <avatar />
+      <content>Thats a very nice info. Thank you for sharing it! </content>
+    </comment>
+    <comment id="80add6b7-9e77-4412-affe-647ae005b0b6" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="False">
+      <date>2011-03-10 19:24:13</date>
+      <author>rift online gold</author>
+      <email>Rm6@gmail.com</email>
+      <country>us</country>
+      <ip>117.43.174.45</ip>
+      <website>http://www.riftgoldcheap.com/</website>
+      <moderatedby>Rule:black list</moderatedby>
+      <avatar />
+      <content>I'm lovin' the blog. Alot of interesting information here.</content>
+    </comment>
+    <comment id="97cdeac2-69c8-4bf9-b69f-c8d293150466" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="False">
+      <date>2011-03-12 09:50:44</date>
+      <author>rift gold</author>
+      <email>Parco5@gmail.com</email>
+      <country>us</country>
+      <ip>65.127.43.152</ip>
+      <website>http://www.bymmo.com/Rift-Gold</website>
+      <moderatedby>Rule:black list</moderatedby>
+      <avatar />
+      <content>thank you for posting this! I really enjoy it! </content>
+    </comment>
+    <comment id="afcb38bc-216c-49d6-9aeb-fe6f98911f20" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="False">
+      <date>2011-03-12 19:22:33</date>
+      <author>rift online gold</author>
+      <email>Fulenwider@ymail.com</email>
+      <country>us</country>
+      <ip>218.87.0.32</ip>
+      <website>http://www.bymmo.com/Rift-Gold</website>
+      <moderatedby>Rule:black list</moderatedby>
+      <avatar />
+      <content>Really enjoyed reading your articles!</content>
+    </comment>
+    <comment id="f25fcb58-a1a0-4943-9b99-573dd7b21b35" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="False">
+      <date>2011-03-13 23:59:26</date>
+      <author>lunettes</author>
+      <email>Rebeiro69@gmail.com</email>
+      <country>us</country>
+      <ip>88.169.92.9</ip>
+      <website>http://www.varionet.fr/</website>
+      <moderatedby>Rule:black list</moderatedby>
+      <avatar />
+      <content>Ce sujet n'est-il pas deja d&amp;#233;mod&amp;#233;? Il serait peut etre temps de proposer une nouvelle version...</content>
+    </comment>
+    <comment id="c2fe985d-067b-4b4e-ad36-fec1098f6d30" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="False">
+      <date>2011-03-14 08:08:04</date>
+      <author>lunettes ordinateur</author>
+      <email>Chriswell1@gmail.com</email>
+      <country>us</country>
+      <ip>88.169.92.9</ip>
+      <website>http://www.varionet.fr/</website>
+      <moderatedby>Rule:black list</moderatedby>
+      <avatar />
+      <content>Je cherchais un article sur ce sujet depuis quelques mois, vous traitez les points que j'attendais. Puis-je m'inscrire &amp;#224; une liste de diffusion de vos mises a jour s'il vous plait? Comment faire?</content>
+    </comment>
+    <comment id="30826451-385e-4b90-a487-527e99323f4d" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="False">
+      <date>2011-03-15 03:07:15</date>
+      <author>lunettes ordinateur</author>
+      <email>Tinnon93@gmail.com</email>
+      <country>us</country>
+      <ip>88.169.92.9</ip>
+      <website>http://www.lunettes-ordinateur.fr/</website>
+      <moderatedby>Rule:black list</moderatedby>
+      <avatar />
+      <content>I was looking for an article about this subject and this is the most informative I've ever found.</content>
+    </comment>
+    <comment id="151f6798-cf48-4fc3-bf79-90ce52af6cdf" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="False">
+      <date>2011-03-17 19:47:56</date>
+      <author>cheese sites</author>
+      <email>Deberg_Waldo33@hotmail.com</email>
+      <country>nl</country>
+      <ip>64.111.221.42</ip>
+      <website>http://cheese-sites.com/</website>
+      <moderatedby>Rule:black list</moderatedby>
+      <avatar />
+      <content>hi! its looks great here in your site,.  you give many information here thanks a lot,. i learn a lot here....</content>
+    </comment>
+    <comment id="354c6f09-7ffc-4860-90a3-22689d1c7b38" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="False">
+      <date>2011-03-17 20:50:43</date>
+      <author>forex</author>
+      <email>Destephano_Morena810@email.com</email>
+      <country>jp</country>
+      <ip>64.111.221.42</ip>
+      <website>http://www.forexgroups.com/</website>
+      <moderatedby>Rule:black list</moderatedby>
+      <avatar />
+      <content>gracias por el comentario hector. en efecto, es material introductorio, pero no hace mal a nadie. el recurso principal que se maneja es</content>
+    </comment>
+    <comment id="d99937d7-db06-42e5-84a3-7729579d77e8" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="False">
+      <date>2011-03-17 20:50:43</date>
+      <author>forex</author>
+      <email>Iorio_Saether110@myspace.com</email>
+      <country>de</country>
+      <ip>64.111.221.42</ip>
+      <website>http://www.forexgroups.com/</website>
+      <moderatedby>Rule:black list</moderatedby>
+      <avatar />
+      <content>jacks life � getting lots of .edu backlink to your website.</content>
+    </comment>
+    <comment id="77484202-55eb-448e-8fb3-8b64814883b8" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="False">
+      <date>2011-03-18 11:04:58</date>
+      <author>ufo videos</author>
+      <email>Eustache_Cambi101@hotmail.com</email>
+      <country>no</country>
+      <ip>64.111.221.42</ip>
+      <website>http://www.4ufo.com/</website>
+      <moderatedby>Rule:black list</moderatedby>
+      <avatar />
+      <content>stop entering spam comments.. all spam comments will be deleted promptly..</content>
+    </comment>
+    <comment id="46451df5-8e36-4d47-ab6e-3f0f5128238f" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="False">
+      <date>2011-03-18 19:22:01</date>
+      <author>St. Louis Wedding Dresses</author>
+      <email>Darakjy@gmail.com</email>
+      <country>us</country>
+      <ip>65.49.94.147</ip>
+      <website>http://www.stlouisweddinginsider.com/2011/03/avoid-the-bridal-gown-nightmare/</website>
+      <moderatedby>Rule:black list</moderatedby>
+      <avatar />
+      <content>You presented some good suggestions there. I did a searching on the niche and uncovered the majority of people should agree having your blog.</content>
+    </comment>
+    <comment id="3bd46282-2af4-4d44-8635-9ab0bb99239e" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="False">
+      <date>2011-03-21 12:58:56</date>
+      <author>Top Dating</author>
+      <email>Fulenwider@ymail.com</email>
+      <country>us</country>
+      <ip>196.41.132.28</ip>
+      <website>http://hornydevildating.com/blog/2010/10/how-to-make-people-laugh-online-dating-chat-and-singles-tips/</website>
+      <moderatedby>Rule:black list</moderatedby>
+      <avatar />
+      <content>While searching on Dating I found your blog, there are some good posts here and I'll be checking back</content>
+    </comment>
+    <comment id="59aedc16-f1d2-46c6-a26d-934ff7d62eee" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="False">
+      <date>2011-03-23 15:40:27</date>
+      <author>Floyd Genta</author>
+      <email>Tannahill3745@yahoo.com</email>
+      <country>us</country>
+      <ip>62.176.15.67</ip>
+      <website>http://worldwideemaillists.com/hong_kong_email_list.html</website>
+      <moderatedby>App_Code.Extensions.StopForumSpam</moderatedby>
+      <avatar />
+      <content>We are getting ready to go to Hong Kong in the winter, I really enjoy reading about it,  I want to know more about the people of Hong Kong how they live and where they live</content>
+    </comment>
+    <comment id="0f9c0d4f-b3f7-41e7-bc5d-6d705de729a0" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="False">
+      <date>2011-03-26 12:56:41</date>
+      <author>winnipeg computer repair</author>
+      <email>bill@freePCrepairnotes.net</email>
+      <country>ca</country>
+      <ip>50.72.68.239</ip>
+      <website>http://winnipegcomputerrepairs.blogspot.com/</website>
+      <moderatedby>Rule:black list</moderatedby>
+      <avatar />
+      <content>Hey Thank You For Sharing! Good Information To Know. Good Site, Great Info, Good Blog And Keep Up The Good Work! btw, I Tried Adding Your RSS To Feed To My Feed Reader But It Says RSS Is Disabled And To Contact The Website Adminstrator!? Your End? My End? Please Reply Thanks!</content>
+    </comment>
+    <comment id="0433e60b-4652-4177-962c-8d4bc8230d4b" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="False">
+      <date>2011-03-26 13:03:21</date>
+      <author>Issac Maneton</author>
+      <email>Macdonnell15@gmail.com</email>
+      <country>us</country>
+      <ip>209.220.104.127</ip>
+      <website>http://watchsuckerpunchonlinefree.com/</website>
+      <moderatedby>Rule:black list</moderatedby>
+      <avatar />
+      <content>I'll wait for your next post :)</content>
+    </comment>
+    <comment id="ec1c3e11-d965-4ff5-a915-e3a15631bb07" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="False">
+      <date>2011-03-31 09:22:45</date>
+      <author>Melody Deem</author>
+      <email>Berezny@gmail.com</email>
+      <country>us</country>
+      <ip>173.234.26.21</ip>
+      <website>http://www.arenaofmovies.com/</website>
+      <moderatedby>App_Code.Extensions.StopForumSpam</moderatedby>
+      <avatar />
+      <content>fantastic site ill be back for sure !wicked! </content>
+    </comment>
+    <comment id="be515bda-5a77-4009-a735-c3542bc11dde" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="False">
+      <date>2011-04-02 23:54:30</date>
+      <author>Hipolito M. Wiseman</author>
+      <email>Fariss@yahoo.com</email>
+      <country>us</country>
+      <ip>208.100.27.136</ip>
+      <website>http://www.pqrstuv.com/</website>
+      <moderatedby>App_Code.Extensions.StopForumSpam</moderatedby>
+      <avatar />
+      <content>Well, interesting thoughts. I can't say that I agree with you completely but your arguement is well thought out.</content>
+    </comment>
+    <comment id="802588d9-fbb4-44d0-8ea6-d0f403b1a6ef" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="False">
+      <date>2011-04-03 15:08:59</date>
+      <author>SEO R�f�rencement</author>
+      <email>selda.miriani@gmail.com</email>
+      <country>fr</country>
+      <ip>62.35.174.225</ip>
+      <website>http://www.seocherubin.com/</website>
+      <moderatedby>Rule:black list</moderatedby>
+      <avatar />
+      <content>Thanks for this, just one word +1&amp;quot; (like the new google service ^^ )</content>
+    </comment>
+    <comment id="65b5e29f-cb7d-4cbe-b58a-9d5e2a61b89c" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="False" deleted="False">
+      <date>2011-04-04 18:23:41</date>
+      <author>Ask Pinoy</author>
+      <email>Siona@gmail.com</email>
+      <country>us</country>
+      <ip>98.255.17.14</ip>
+      <website>http://www.askpinoy.com/</website>
+      <avatar />
+      <content>Stressed is Desserts spelled backwards.</content>
+    </comment>
+    <comment id="af2991c7-976b-4540-9ed7-7fbb0480334d" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="False">
+      <date>2011-04-05 16:50:08</date>
+      <author>Angeleena</author>
+      <email>Ashraf@gmail.com</email>
+      <country>us</country>
+      <ip>195.229.242.57</ip>
+      <website>http://www.savingmymarriage.biz/</website>
+      <moderatedby>App_Code.Extensions.StopForumSpam</moderatedby>
+      <avatar />
+      <content>Great post... Good Luck</content>
+    </comment>
+    <comment id="397c382e-c6b0-48be-ba72-ffbd7a76d5d9" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="False" deleted="False">
+      <date>2011-04-06 12:10:12</date>
+      <author>Custom Software Developer</author>
+      <email>sethczerepak@gmail.com</email>
+      <country>us</country>
+      <ip>72.92.98.237</ip>
+      <website>http://customsoftwaredevelopment.com/</website>
+      <avatar />
+      <content>Thanks, Matt, for this great post.  I'll be coming back and reading some more of your posts in the near future.</content>
+    </comment>
+    <comment id="715637e0-75a1-4ddc-8739-a03787988f9a" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="False">
+      <date>2011-04-07 00:25:33</date>
+      <author>Ask Pinoy</author>
+      <email>Barba@gmail.com</email>
+      <country>us</country>
+      <ip>98.255.17.14</ip>
+      <website>http://www.askpinoy.com/</website>
+      <moderatedby>Rule:black list</moderatedby>
+      <avatar />
+      <content>Mary Stuart became Queen of Scotland when she was only six days old.</content>
+    </comment>
+    <comment id="62c8af29-0252-404e-84bc-da1927c56d79" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="False">
+      <date>2011-04-08 15:56:39</date>
+      <author>Pinay Scandal</author>
+      <email>Quintal@gmail.com</email>
+      <country>us</country>
+      <ip>98.255.17.14</ip>
+      <website>http://www.pinoypride.net/videos</website>
+      <moderatedby>Rule:black list</moderatedby>
+      <avatar />
+      <content>Dueling is legal in Paraguay as long as both parties are registered blood donors.</content>
+    </comment>
+    <comment id="195b6100-cfad-4fd3-a1e1-175168e1363c" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="False">
+      <date>2011-04-13 19:23:03</date>
+      <author>science</author>
+      <email>Gale_Eun108@myspace.com</email>
+      <country>mo</country>
+      <ip>64.111.221.42</ip>
+      <website>http://www.weeklyscience.com/</website>
+      <moderatedby>Rule:black list</moderatedby>
+      <avatar />
+      <content>i got it to work for all of you who come from google. you can read my solution at my blog (that now works)</content>
+    </comment>
+    <comment id="1d3b5877-d783-4f40-8743-db9d27b20ac2" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="False">
+      <date>2011-04-15 05:29:17</date>
+      <author>David Downy</author>
+      <email>Fabus90@gmail.com</email>
+      <country>us</country>
+      <ip>77.47.129.43</ip>
+      <website>http://railtrainonline.info/</website>
+      <moderatedby>App_Code.Extensions.StopForumSpam</moderatedby>
+      <avatar />
+      <content>Hiya! You some form of professional? Nice message. Can you inform me the right way to subscribe your blog?</content>
+    </comment>
+    <comment id="238f6fb5-04b3-4f17-975a-ce725064ad76" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="False">
+      <date>2011-04-17 01:23:26</date>
+      <author>buy a home</author>
+      <email>Sha_Boisselle37@yahoo.com</email>
+      <country>kg</country>
+      <ip>64.111.221.42</ip>
+      <website>http://www.houses.com/</website>
+      <moderatedby>Rule:black list</moderatedby>
+      <avatar />
+      <content>hi. i just noticed that your site looks like it has a few code problems at the very top of your websites page. is it an older version of blog engine?��im not sure if everybody is getting this same bugginess when browsing your blog? i am using a totally different browser than most people, referred to as lynx, so that is what might be causing it? i just wanted to make sure you know. thanks for posting some great postings and i will try to return back with a completely different browser to check things out!</content>
+    </comment>
+    <comment id="74a8735a-bb8b-48e0-8dfe-f1a6ac9630b2" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="False">
+      <date>2011-04-19 21:06:33</date>
+      <author>wirerope</author>
+      <email>Schoffstall_Adalberto1010@myspace.com</email>
+      <country>de</country>
+      <ip>64.111.221.42</ip>
+      <website>http://www.elitesalesinc.com/</website>
+      <moderatedby>Rule:black list</moderatedby>
+      <avatar />
+      <content>n most occassions i don't post comments on articles, but i want to say that this article really inspired me to do it. amazingly nice post</content>
+    </comment>
+    <comment id="49147ada-06bf-43a4-84f3-0af1f08d4cbb" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="False">
+      <date>2011-04-21 02:30:07</date>
+      <author>buy rift platinum</author>
+      <email>friendlinzh@qq.com</email>
+      <country>us</country>
+      <ip>12.41.69.131</ip>
+      <website>http://www.gamemammy.com/Rift-Gold</website>
+      <moderatedby>Rule:black list</moderatedby>
+      <avatar />
+      <content>I began talking about the charr in terms of being not dudes with cat heads but as chimera-like monsters that joined several animals together</content>
+    </comment>
+    <comment id="53ef1adf-713b-4f87-8b2e-92355a5a57ec" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="False">
+      <date>2011-04-21 15:16:35</date>
+      <author>Berta Teague</author>
+      <email>27Cantoni@hotmail.com</email>
+      <country>us</country>
+      <ip>94.23.23.171</ip>
+      <website>http://deck-design.ca/Deck_Picture.html</website>
+      <moderatedby>App_Code.Extensions.StopForumSpam</moderatedby>
+      <avatar />
+      <content>Hey there, I'm brand new here combined with still discovering the ropes. This can be a perfect blog after some help from experts. Anxious about interacting with network here. </content>
+    </comment>
+    <comment id="0b6cab94-a5b3-4549-8b2e-5d602bf89a26" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="False">
+      <date>2011-04-23 15:00:38</date>
+      <author>buy rift platinum</author>
+      <email>friendlinzh@qq.com</email>
+      <country>us</country>
+      <ip>121.204.204.159</ip>
+      <website>http://www.gamemammy.com/Rift-Gold</website>
+      <moderatedby>Rule:black list</moderatedby>
+      <avatar />
+      <content>Pau Gasol finally found his inner aggressiveness with an assist from Derek Fisher</content>
+    </comment>
+    <comment id="8e08d880-a29e-489f-a74b-9f25a5380d43" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="False">
+      <date>2011-05-04 00:28:17</date>
+      <author>birth defects</author>
+      <email>ynah211989@gmail.com</email>
+      <country>us</country>
+      <ip>121.97.59.61</ip>
+      <website>http://www.duejustice.com/</website>
+      <moderatedby>App_Code.Extensions.StopForumSpam</moderatedby>
+      <avatar />
+      <content>I’ve just sent a link to this publish to a friend, as I am aware they’ll find it intriguing.</content>
+    </comment>
+    <comment id="4515c20f-be68-4618-8710-2abf8399a187" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="False" deleted="False">
+      <date>2011-05-05 04:27:23</date>
+      <author>adesivou</author>
+      <email>Steenrod@gmail.com</email>
+      <country>us</country>
+      <ip>173.234.11.58</ip>
+      <website>http://slink-wheel.info/stories/21728/Adesivo_para_Parede.html</website>
+      <avatar />
+      <content>great post! blog favorited (:</content>
+    </comment>
+    <comment id="efe53e28-7a7b-443c-b2e5-ca1a1909746a" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="False">
+      <date>2011-05-05 07:27:33</date>
+      <author>accutane lawyer</author>
+      <email>asd12@gmail.com</email>
+      <country>us</country>
+      <ip>121.97.59.61</ip>
+      <website>http://www.youraccutanelawsuit.com/</website>
+      <moderatedby>Rule:black list</moderatedby>
+      <avatar />
+      <content>wow! this is very awesome..i like it,</content>
+    </comment>
+    <comment id="19da4289-1635-4fae-8823-b195e36c90e2" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="False">
+      <date>2011-05-05 10:43:49</date>
+      <author>solar hot water systems</author>
+      <email>kintarusheen@gmail.com</email>
+      <country>us</country>
+      <ip>121.97.59.61</ip>
+      <website>http://www.watersolarsystem.com/</website>
+      <moderatedby>Rule:black list</moderatedby>
+      <avatar />
+      <content>hey just wanna say thank you for this great blog..nice topic keep it up</content>
+    </comment>
+    <comment id="6d7653d9-9bd2-4482-a47a-bc555e4fdcee" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="False">
+      <date>2011-05-07 14:57:49</date>
+      <author>some free stuff</author>
+      <email>Canders_Galentine1965@mymail.com</email>
+      <country>om</country>
+      <ip>64.111.221.42</ip>
+      <website>http://my-url-site.com/free</website>
+      <moderatedby>Rule:black list</moderatedby>
+      <avatar />
+      <content>i read a lot of blogs on a daily basis and for the most part just wanted to make a quick comment to say i�m glad i found your blog. thanks.</content>
+    </comment>
+    <comment id="ec142c2a-ff11-4ff1-a9a0-2f368320d467" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="False">
+      <date>2011-05-09 20:50:53</date>
+      <author>fighter tube</author>
+      <email>Hieatt_Myra1994@mymail.com</email>
+      <country>rw</country>
+      <ip>64.111.221.42</ip>
+      <website>http://www.fightervideos.com/</website>
+      <moderatedby>Rule:black list</moderatedby>
+      <avatar />
+      <content>i have the same problem with the print on the keys disappearing quite quickly when it is heavily used. its definitely the biggest problem with every keyboard i have had.</content>
+    </comment>
+    <comment id="783e5f80-356b-44ed-bf1a-bce0c093826d" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="False">
+      <date>2011-05-12 12:57:53</date>
+      <author>buy choppers</author>
+      <email>Billiot_Alverta2010@hotmail.com</email>
+      <country>il</country>
+      <ip>64.111.221.42</ip>
+      <website>http://www.findchopper.com/</website>
+      <moderatedby>Rule:black list</moderatedby>
+      <avatar />
+      <content>Where can i find your rss? I cant find it</content>
+    </comment>
+    <comment id="d0e3efaf-7dea-49f1-99dc-b2b5a23e8615" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="False">
+      <date>2011-05-12 14:36:17</date>
+      <author>wing</author>
+      <email>Whisted_Duitscher1960@fastmail.com</email>
+      <country>lv</country>
+      <ip>64.111.221.42</ip>
+      <website>http://www.buywings.com/</website>
+      <moderatedby>Rule:black list</moderatedby>
+      <avatar />
+      <content>We have the Very best complimentary hot sauce in addition to hot wing marinade recipes, as well as the Most delicious hot wing gravies on the planet, come to investigate this fun and also informative website all about the Hottest hot salsas and the best Warm Wing eating challenges and hot sauce recipes.</content>
+    </comment>
+    <comment id="f0cb6af8-4a99-4007-a983-b53d3afd1f30" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="False">
+      <date>2011-05-12 22:15:42</date>
+      <author>chicken pox</author>
+      <email>Thornbrugh_Silvana1983@mymail.com</email>
+      <country>ec</country>
+      <ip>64.111.221.42</ip>
+      <website>http://www.upox.com/</website>
+      <moderatedby>Rule:black list</moderatedby>
+      <avatar />
+      <content>Oh i really envy the way you post topics, how i wish i could write like that.:::~</content>
+    </comment>
+    <comment id="6e3b79f5-8db9-4595-a23a-066f8c480c11" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="False">
+      <date>2011-05-18 09:40:24</date>
+      <author>get free pics</author>
+      <email>Madlyn_Leffert2000@myspace.com</email>
+      <country>se</country>
+      <ip>64.111.221.42</ip>
+      <website>http://go-to-my-site.su/</website>
+      <moderatedby>Rule:black list</moderatedby>
+      <avatar />
+      <content>FYI, the MediumTrust trace issue was fixed in SVN just after SubSonic Beta 2 rolled... It will be included in Beta 3....</content>
+    </comment>
+    <comment id="e28a60b5-5723-49e8-ad0d-2c788c7c8a7c" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="False">
+      <date>2011-05-21 00:57:43</date>
+      <author>wnba</author>
+      <email>Genzel_Malcom1954@yahoo.com</email>
+      <country>fo</country>
+      <ip>64.111.221.42</ip>
+      <website>http://www.ynba.com/</website>
+      <moderatedby>Rule:black list</moderatedby>
+      <avatar />
+      <content>runs pmdepartment skilled isoneworld still appartment trendsbut executed humans utterance felony</content>
+    </comment>
+    <comment id="d4146e2a-937e-446a-ae52-77ecd04dfaaa" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="False">
+      <date>2011-05-21 08:34:26</date>
+      <author>doctor</author>
+      <email>Schmith_Meloan1995@msn.com</email>
+      <country>it</country>
+      <ip>64.111.221.42</ip>
+      <website>http://www.drpractices.com/</website>
+      <moderatedby>Rule:black list</moderatedby>
+      <avatar />
+      <content>I had been originally treated using Intense pulsed light which often is not the best method to get hair removal. I started off with complete leg laser hair removal. I visited a good Dr . that applied a strong older fractionated laser machine however was left with spotty spots. And then I made a decision to get a</content>
+    </comment>
+    <comment id="4788b278-245d-44cb-8372-7fa8122c583d" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="False">
+      <date>2011-05-21 21:22:57</date>
+      <author>shirts</author>
+      <email>Growell_Nembhard1951@yahoo.com</email>
+      <country>ca</country>
+      <ip>64.111.221.42</ip>
+      <website>http://www.circats.com/</website>
+      <moderatedby>Rule:black list</moderatedby>
+      <avatar />
+      <content>I would like to show some thanks to you for bailing me out of this particular instance. As a result of surfing around throughout the online world and seeing advice that were not productive, I figured my life was gone. Being alive without the answers to the issues youve resolved by way of your entire short post is a critical case, as well as those that might have negatively damaged my career if I hadnt discovered your web site. Your understanding and kindness in controlling every aspect was useful. I dont know what I wouldve done if I had not discovered such a solution like this. Im able to at this moment look ahead to my future. Thanks very much for your expert and result oriented help. I will not think twice to recommend your site to any person who needs and wants guidelines on this topic.</content>
+    </comment>
+    <comment id="28532eb4-470d-4370-8a80-2ebabdb5373f" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="False">
+      <date>2011-05-24 00:51:36</date>
+      <author>wing</author>
+      <email>Schreuder_Goetze1987@hotmail.com</email>
+      <country>lb</country>
+      <ip>64.111.221.42</ip>
+      <website>http://www.buywings.com/</website>
+      <moderatedby>Rule:black list</moderatedby>
+      <avatar />
+      <content>Maybe I should go &amp;amp; shout some right wing stuff so they can throw me out, just for fun.</content>
+    </comment>
+    <comment id="9446ad4b-94d2-48a6-83c2-f03b63e6e48a" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="False">
+      <date>2011-05-24 00:54:33</date>
+      <author>chicken pox</author>
+      <email>Kayastha_Magan1987@gmail.com</email>
+      <country>tn</country>
+      <ip>64.111.221.42</ip>
+      <website>http://www.upox.com/</website>
+      <moderatedby>Rule:black list</moderatedby>
+      <avatar />
+      <content>It's pretty interesting that the mainstream media has changed the way it looks at this recently dont you think? What used to neve be brought up or discussed has changed. Frankly it is about time we see a change.</content>
+    </comment>
+    <comment id="dcf6cd9e-6d7e-4cc5-9f73-14b9b3d18eaf" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="False">
+      <date>2011-05-24 12:32:41</date>
+      <author>snooker</author>
+      <email>Tameka_Demler1999@yahoo.com</email>
+      <country>gr</country>
+      <ip>64.111.221.42</ip>
+      <website>http://www.snookervideos.com/</website>
+      <moderatedby>Rule:black list</moderatedby>
+      <avatar />
+      <content>I would like to thank you for the efforts you have made in writing this post. I am hoping the same best work from you in the future as well. In fact your creative writing abilities has inspired me to start my own BlogEngine blog now. Really the blogging is spreading its wings rapidly. Your write up is a fine example of it.</content>
+    </comment>
+    <comment id="3afa675d-fc57-4f29-b3f3-d9b6bdbe8c30" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="False">
+      <date>2011-05-25 10:35:16</date>
+      <author>aa</author>
+      <email>Tonnessen_Hafferkamp1952@yahoo.com</email>
+      <country>tm</country>
+      <ip>64.111.221.42</ip>
+      <website>http://www.aablog.com/</website>
+      <moderatedby>Rule:black list</moderatedby>
+      <avatar />
+      <content>I would like to thanks for the efforts you have contributed in writing this blog. I am hoping the same top-quality blog post from you in the future as well. In fact your creative writing skill has inspired me to get my own blog now. Really the blogging is spreading its wings quickly. Your write up is a good model of it.</content>
+    </comment>
+    <comment id="88f3fb5d-f441-445c-b064-9343d89af2e0" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="False">
+      <date>2011-05-27 11:34:48</date>
+      <author>hosting companies</author>
+      <email>Tapian_Nazzaro2004@msn.com</email>
+      <country>ma</country>
+      <ip>64.111.221.42</ip>
+      <website>http://www.worldwideserver.com/</website>
+      <moderatedby>Rule:black list</moderatedby>
+      <avatar />
+      <content>Excellent blog here! Also your web site loads up very fast! What web host are you using? Can I get your affiliate link to your host? I wish my site loaded up as fast as yours lol</content>
+    </comment>
+    <comment id="5fcfd829-042f-4f4f-a302-929fdae976d9" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="False">
+      <date>2011-05-27 16:13:18</date>
+      <author>african foods</author>
+      <email>Elia_Hutchen2008@mails.com</email>
+      <country>ro</country>
+      <ip>64.111.221.42</ip>
+      <website>http://www.africafoods.com/</website>
+      <moderatedby>Rule:black list</moderatedby>
+      <avatar />
+      <content>Last month, when i visited your blog i got an error on the mysql server of yours.-*,-</content>
+    </comment>
+    <comment id="6d0c1e8a-bcec-46ee-bcd8-2d05215e07a1" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="False">
+      <date>2011-05-29 20:14:08</date>
+      <author>new york</author>
+      <email>Kalehuawehe_Deroin1976@hotmail.com</email>
+      <country>il</country>
+      <ip>64.111.221.42</ip>
+      <website>http://www.knny.com/</website>
+      <moderatedby>Rule:black list</moderatedby>
+      <avatar />
+      <content>Last month, when i visited your blog i got an error on the mysql server of yours.,:**'</content>
+    </comment>
+    <comment id="ea3f7e49-a5ca-41c8-9090-f09fab7457a2" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="False" deleted="False">
+      <date>2011-06-02 19:08:40</date>
+      <author>Michaela Mallek</author>
+      <email>Sevier4786@gmail.com</email>
+      <country>us</country>
+      <ip>173.208.57.14</ip>
+      <website>http://okcentennialband.com/</website>
+      <avatar />
+      <content>It seems like daily NATO is exceeding the UN Mandate in Libya. I sure hope this doesn't turn into another Afghanistan. I wish the unfortunate did not always suffer in these situations.</content>
+    </comment>
+    <comment id="e63dffbb-adfc-44d8-9256-ca0ee625f488" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="False">
+      <date>2011-06-02 23:05:40</date>
+      <author>Leagal Weed</author>
+      <email>Stange90@legalnugs.com</email>
+      <country>us</country>
+      <ip>184.82.186.123</ip>
+      <website>http://legalnugs.com/</website>
+      <moderatedby>App_Code.Extensions.StopForumSpam</moderatedby>
+      <avatar />
+      <content>At Least 1 – 1.5 Million Americans are Legal Medical Marijuana Patients. Market for these patients in sixteen states and D.C. estimated at between $2 – $6 billion annually.</content>
+    </comment>
+    <comment id="49531e8d-b697-4d3c-912a-420ea58240a7" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="False">
+      <date>2011-06-03 12:08:42</date>
+      <author>Leagal Weed</author>
+      <email>Vannortwick53@legalnugs.com</email>
+      <country>us</country>
+      <ip>173.208.36.160</ip>
+      <website>http://legalnugs.com/</website>
+      <moderatedby>App_Code.Extensions.StopForumSpam</moderatedby>
+      <avatar />
+      <content>At Least 1 – 1.5 Million Americans are Legal Medical Marijuana Patients. Market for these patients in sixteen states and D.C. estimated at between $2 – $6 billion annually.</content>
+    </comment>
+    <comment id="b2e576e2-714d-4424-8144-d3208fec2fab" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="False">
+      <date>2011-06-12 00:32:24</date>
+      <author />
+      <email>dsk.nafissatou@gmail.com</email>
+      <country>fr</country>
+      <ip>62.35.174.225</ip>
+      <moderatedby>Rule:black list</moderatedby>
+      <avatar />
+      <content>I would like to tweet this article but i could clic on twitter button... :(</content>
+    </comment>
+    <comment id="91247bfd-85d1-49e1-8e57-9159c9c0d107" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="False">
+      <date>2011-06-12 02:04:35</date>
+      <author>my cool site</author>
+      <email>Sook_Sheller1974@mymail.com</email>
+      <country>ch</country>
+      <ip>109.235.49.143</ip>
+      <website>http://mycoolfreesite.fr/</website>
+      <moderatedby>App_Code.Extensions.StopForumSpam</moderatedby>
+      <avatar />
+      <content>Just thought i would comment and say good articles! I want to learn better english because I want to study in the US soon. Your blog is fantastic for learning the engslish language. You have good style and I learn alot! Best, Markus</content>
+    </comment>
+    <comment id="ac11a266-0da5-4a12-a4cd-4ada0225e6a7" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="False">
+      <date>2011-06-23 07:19:28</date>
+      <author>Movies, Games, Software, encyclopedia</author>
+      <email>levan.kipshidze@gmail.com</email>
+      <country>ge</country>
+      <ip>95.137.159.101</ip>
+      <website>http://gefile.com/</website>
+      <moderatedby>Rule:black list</moderatedby>
+      <avatar />
+      <content>Please Click</content>
+    </comment>
+    <comment id="c786daa5-98af-4591-b0fb-ef8536f24e3a" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="False">
+      <date>2011-07-11 04:51:34</date>
+      <author>Easy Website Builder</author>
+      <email>Higbee@googlemail.com</email>
+      <country>us</country>
+      <ip>173.234.249.245</ip>
+      <website>http://www.flashfactory.com/</website>
+      <moderatedby>App_Code.Extensions.StopForumSpam</moderatedby>
+      <avatar />
+      <content>Howdy We're very delighted We came across the weblog wrock::blog | Getting TransactionScope to play nice with NHibernate My partner and I truly found you simply by accident, when I was researching on Askjeeve to get something else entirely, Nonetheless We're here now and I would just want to say many thanks for the incredible posting plus a complete entertaining web log By the way my prayers go with those at atomic plant hopefully you are healthy plus safe  !!!</content>
+    </comment>
+    <comment id="628c5e4b-b747-438e-938b-07296413a934" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="False">
+      <date>2011-07-16 19:20:46</date>
+      <author>painting contractor</author>
+      <email>Melia13@gmail.com</email>
+      <country>us</country>
+      <ip>68.185.64.255</ip>
+      <website>http://qosmiox505.com/exterior_paint__interior_paint.htm</website>
+      <moderatedby>Rule:black list</moderatedby>
+      <avatar />
+      <content>I just came across your blog and wanted to drop you a note telling you how impressed I was with the information you have posted here. I also have a web site &amp;amp; blog about **painting contractor, here is the site:http://qosmiox505.com/exterior_paint__interior_paint.htm ** so I know I'm talking about when I say your site is top- notch! Keep up the great work, you are providing a great online resource</content>
+    </comment>
+  </comments>
+  <categories />
+  <notifications>
+    <email>dwaynewilliamsma@GMAIL.COM</email>
+    <email>john.sonmez@gmail.com</email>
+  </notifications>
+</post>

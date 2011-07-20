@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<SerializableStringDictionary>
+  <SerializableStringDictionary>
+    <DictionaryEntry Key="showrating" Value="False" />
+    <DictionaryEntry Key="showcomments" Value="False" />
+    <DictionaryEntry Key="numberofposts" Value="10" />
+  </SerializableStringDictionary>
+</SerializableStringDictionary>

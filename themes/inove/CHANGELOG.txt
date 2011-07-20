@@ -1,0 +1,7 @@
+    VERSION DATE       TYPE   CHANGES
+    1.0.3   2008/10/11 FIXED  Fixed style for Firefox2.
+                       FIXED  Fixed trackback style.
+                       FIXED  Fixed 'Categories & Tags' options.
+                       NEW    Added German language support. (Thanks Nicola Tiling)
+                       NEW    Added Danish language support. (Thanks Soeren Eskildsen)
+                       NEW    Created this CHANGLOG file.

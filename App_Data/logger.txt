@@ -1,0 +1,748 @@
+*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
+Date: 12/19/2010 11:24:01 AM
+Contents Below
+Custom filter [App_Code.Extensions.StopForumSpam] - found spam; comment id: 6095010b-a5ea-4fe9-b534-176a13452b45
+*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
+Date: 12/20/2010 12:01:43 AM
+Contents Below
+Custom filter [App_Code.Extensions.StopForumSpam] - found spam; comment id: 1dced128-996f-4d64-9a9d-1cc401092fda
+*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
+Date: 12/20/2010 3:50:58 AM
+Contents Below
+Custom filter [App_Code.Extensions.StopForumSpam] - found spam; comment id: 333c6fdc-82a9-4a25-bbee-5cb07375da0b
+*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
+Date: 12/21/2010 10:08:46 AM
+Contents Below
+Custom filter [App_Code.Extensions.StopForumSpam] - found spam; comment id: b6e75513-af20-4287-b831-b2c8759a4a71
+*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
+Date: 12/22/2010 4:09:11 PM
+Contents Below
+Custom filter [App_Code.Extensions.StopForumSpam] - found spam; comment id: c3ee48da-e283-47f3-8cff-e3de3af914d1
+*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
+Date: 12/23/2010 9:09:56 PM
+Contents Below
+Custom filter [App_Code.Extensions.StopForumSpam] - found spam; comment id: 64e7bf4e-b501-42a6-889a-05ac972a9bdc
+*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
+Date: 12/23/2010 10:30:53 PM
+Contents Below
+Custom filter [App_Code.Extensions.StopForumSpam] - found spam; comment id: 9f1cc72d-77e6-47e1-ad55-667af3611485
+*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
+Date: 12/24/2010 9:53:31 AM
+Contents Below
+Custom filter [App_Code.Extensions.StopForumSpam] - found spam; comment id: 79181810-bfcf-4488-96d9-0c4e2ea30ebd
+*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
+Date: 12/25/2010 5:11:59 AM
+Contents Below
+Custom filter [App_Code.Extensions.StopForumSpam] - found spam; comment id: c9401dc0-ca30-40ec-8092-d1b9c04e93c1
+*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
+Date: 12/25/2010 5:12:29 AM
+Contents Below
+Custom filter [App_Code.Extensions.StopForumSpam] - found spam; comment id: 9f381b68-dae0-42b5-9e78-688c1d88a082
+*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
+Date: 12/25/2010 7:17:13 PM
+Contents Below
+Custom filter [App_Code.Extensions.StopForumSpam] - found spam; comment id: ae12f3c9-008f-4c71-9039-3834b5eab7b8
+*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
+Date: 12/28/2010 9:02:15 PM
+Contents Below
+Custom filter [App_Code.Extensions.StopForumSpam] - found spam; comment id: 506a4378-f94c-4dec-8a28-24a562c54f72
+*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
+Date: 12/29/2010 10:13:09 AM
+Contents Below
+Custom filter [App_Code.Extensions.StopForumSpam] - found spam; comment id: 37707c30-7044-469c-a1b3-8d9101020c6d
+*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
+Date: 12/30/2010 12:09:40 AM
+Contents Below
+Custom filter [App_Code.Extensions.StopForumSpam] - found spam; comment id: 34942ec5-0d35-4ad0-a248-5d00950d8257
+*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
+Date: 12/30/2010 12:09:57 AM
+Contents Below
+Custom filter [App_Code.Extensions.StopForumSpam] - found spam; comment id: 8e8bb3d9-cc10-4b14-b5c8-42b13173281c
+*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
+Date: 12/30/2010 10:55:22 PM
+Contents Below
+Custom filter [App_Code.Extensions.StopForumSpam] - found spam; comment id: 0fd8b7c0-f892-4407-9544-c8751be75e6d
+*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
+Date: 12/30/2010 10:55:37 PM
+Contents Below
+Custom filter [App_Code.Extensions.StopForumSpam] - found spam; comment id: b4560a3b-682c-412d-87e5-a9615e68b58e
+*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
+Date: 12/30/2010 10:55:46 PM
+Contents Below
+Custom filter [App_Code.Extensions.StopForumSpam] - found spam; comment id: 99716c94-2229-442d-8813-8c94f2f66b60
+*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
+Date: 12/31/2010 1:33:27 PM
+Contents Below
+Custom filter [App_Code.Extensions.StopForumSpam] - found spam; comment id: 3d1a701c-1c18-4d56-971d-7c3cb5f355ba
+*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
+Date: 12/31/2010 6:14:05 PM
+Contents Below
+Custom filter [App_Code.Extensions.StopForumSpam] - found spam; comment id: 5aeaff77-c1d5-42a9-9b9a-ef0bf8a65525
+*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
+Date: 12/31/2010 8:57:08 PM
+Contents Below
+Custom filter [App_Code.Extensions.StopForumSpam] - found spam; comment id: 20e26f42-e3b6-4cc7-9346-de1ee8d93d90
+*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
+Date: 1/1/2011 7:03:18 PM
+Contents Below
+Custom filter [App_Code.Extensions.StopForumSpam] - found spam; comment id: afb4fb56-848c-4669-b467-9cb77c2efd11
+*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
+Date: 03/01/2011 19:32:51
+Contents Below
+Custom filter [App_Code.Extensions.StopForumSpam] - found spam; comment id: 0252eeaa-82c4-400c-a64b-2a101fdf45bb
+*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
+Date: 03/01/2011 7:37:01 PM
+Contents Below
+Custom filter [App_Code.Extensions.StopForumSpam] - found spam; comment id: 0101a0b9-bd12-4837-a279-9ebcbdeb8d34
+*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
+Date: 1/4/2011 2:31:38 AM
+Contents Below
+Custom filter [App_Code.Extensions.StopForumSpam] - found spam; comment id: 9387ab5d-55bb-4df7-985f-1aec11a3f2e7
+*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
+Date: 1/4/2011 10:34:17 AM
+Contents Below
+Custom filter [App_Code.Extensions.StopForumSpam] - found spam; comment id: 7d829ff4-31dc-4960-965e-f91db0c89e2e
+*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
+Date: 1/4/2011 4:49:13 PM
+Contents Below
+Custom filter [App_Code.Extensions.StopForumSpam] - found spam; comment id: e8b44f2a-67bd-4225-85ad-1e2407ac181d
+*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
+Date: 1/4/2011 10:11:20 PM
+Contents Below
+Custom filter [App_Code.Extensions.StopForumSpam] - found spam; comment id: dd8cdf08-224d-40bb-a82f-258f8d461b8d
+*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
+Date: 6/01/2011 3:35:32 AM
+Contents Below
+Custom filter [App_Code.Extensions.StopForumSpam] - found spam; comment id: 7ab91e05-be2d-42af-9eff-64219932df5f
+*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
+Date: 6/01/2011 3:35:50 AM
+Contents Below
+Custom filter [App_Code.Extensions.StopForumSpam] - found spam; comment id: f16b009d-1235-4094-bf6a-727441f7472f
+*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
+Date: 6/01/2011 4:21:20 AM
+Contents Below
+Custom filter [App_Code.Extensions.StopForumSpam] - found spam; comment id: 58650de5-4985-481b-9eaa-c1eb1041e0f4
+*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
+Date: 1/6/2011 8:25:55 PM
+Contents Below
+Custom filter [App_Code.Extensions.StopForumSpam] - found spam; comment id: 8e2dddbd-a070-49a6-a32d-a207f3a51585
+*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
+Date: 8/01/2011 6:04:01 AM
+Contents Below
+Custom filter [App_Code.Extensions.StopForumSpam] - found spam; comment id: dee64ae0-5b19-4e57-8d67-0a99e569ebc1
+*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
+Date: 1/8/2011 8:32:54 PM
+Contents Below
+Custom filter [App_Code.Extensions.StopForumSpam] - found spam; comment id: 0bcc5b4e-b091-4a53-8a00-2f3ac3009321
+*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
+Date: 1/9/2011 6:39:46 AM
+Contents Below
+Custom filter [App_Code.Extensions.StopForumSpam] - found spam; comment id: 1523b63b-0ce2-43bc-9c43-0f171f9de543
+*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
+Date: 1/9/2011 9:54:14 AM
+Contents Below
+Custom filter [App_Code.Extensions.StopForumSpam] - found spam; comment id: 13009d67-f3d9-4ff9-9c14-c6927c803cda
+*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
+Date: 09/01/2011 22:57:49
+Contents Below
+Custom filter [App_Code.Extensions.StopForumSpam] - found spam; comment id: edefaa41-1835-4d4c-823e-c45fea1848b3
+*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
+Date: 09/01/2011 23:13:47
+Contents Below
+Custom filter [App_Code.Extensions.StopForumSpam] - found spam; comment id: ffc967d3-7127-4b38-9aa9-077a63a4ae17
+*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
+Date: 1/10/2011 4:40:31 AM
+Contents Below
+Custom filter [App_Code.Extensions.StopForumSpam] - found spam; comment id: e76cffbc-632c-4345-8b2b-009709d01fc0
+*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
+Date: 11/01/2011 15:22:55
+Contents Below
+Custom filter [App_Code.Extensions.StopForumSpam] - found spam; comment id: f67b9d67-ab4a-4096-8ae3-948c703b4f1c
+*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
+Date: 11-01-2011 19:16:12
+Contents Below
+Custom filter [App_Code.Extensions.StopForumSpam] - found spam; comment id: 82bf4e5e-55f4-474a-9950-0e2388a8bd02
+*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
+Date: 1/12/2011 4:00:48 PM
+Contents Below
+Custom filter [App_Code.Extensions.StopForumSpam] - found spam; comment id: b5bf9e31-688c-4315-a93a-85a49b280830
+*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
+Date: 12.1.2011 18:07:08
+Contents Below
+Custom filter [App_Code.Extensions.StopForumSpam] - found spam; comment id: e1c98d86-3b4d-46a5-846b-c04b0de9e835
+*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
+Date: 13/01/2011 11:53:23
+Contents Below
+Custom filter [App_Code.Extensions.StopForumSpam] - found spam; comment id: 777973b7-ef2a-4372-bc92-d8d95f45845f
+*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
+Date: 14/01/2011 11:54:15 AM
+Contents Below
+Custom filter [App_Code.Extensions.StopForumSpam] - found spam; comment id: a966729e-7a83-46b4-8505-b4a4ca7cfca0
+*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
+Date: 1/14/2011 10:10:15 PM
+Contents Below
+Custom filter [App_Code.Extensions.StopForumSpam] - found spam; comment id: 9656f996-8914-465e-8aef-d38416705fa2
+*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
+Date: 1/14/2011 11:05:49 PM
+Contents Below
+Custom filter [App_Code.Extensions.StopForumSpam] - found spam; comment id: f4b60c8f-9e2e-4d0d-9071-30c703e0a313
+*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
+Date: 1/15/2011 6:42:44 AM
+Contents Below
+Custom filter [App_Code.Extensions.StopForumSpam] - found spam; comment id: a22e3624-9ed2-4746-a09f-ae8f6457b8ea
+*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
+Date: 1/15/2011 5:39:15 PM
+Contents Below
+Custom filter [App_Code.Extensions.StopForumSpam] - found spam; comment id: 2a2ae4d5-394a-4bc9-be43-32c87c740beb
+*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
+Date: 1/15/2011 10:16:59 PM
+Contents Below
+Custom filter [App_Code.Extensions.StopForumSpam] - found spam; comment id: cdbcf006-4c0d-4835-94e4-c3f4942ec734
+*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
+Date: 1/15/2011 10:44:25 PM
+Contents Below
+Custom filter [App_Code.Extensions.StopForumSpam] - found spam; comment id: 5be3c5e0-1151-4a1e-bb3a-d48862e89661
+*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
+Date: 16/01/2011 17:57:00
+Contents Below
+Custom filter [App_Code.Extensions.StopForumSpam] - found spam; comment id: e54ac1e3-7e28-46ef-81b8-3049bea6045c
+*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
+Date: 1/17/2011 8:34:28 AM
+Contents Below
+Custom filter [App_Code.Extensions.StopForumSpam] - found spam; comment id: 00cd6383-8a5c-4183-bcb6-b851e0ebcec1
+*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
+Date: 1/17/2011 5:45:45 PM
+Contents Below
+Custom filter [App_Code.Extensions.StopForumSpam] - found spam; comment id: df0061c8-3a6c-4ead-9c4b-4e8ce9970f3d
+*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
+Date: 1/17/2011 10:05:59 PM
+Contents Below
+Custom filter [App_Code.Extensions.StopForumSpam] - found spam; comment id: 52fb858b-d9e8-45d1-a347-40a2ff8e48c0
+*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
+Date: 18.1.2011 11:36:53
+Contents Below
+Custom filter [App_Code.Extensions.StopForumSpam] - found spam; comment id: 2180c4ec-0ead-4c0a-8743-af97e858c2ec
+*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
+Date: 1/18/2011 7:43:09 PM
+Contents Below
+Custom filter [App_Code.Extensions.StopForumSpam] - found spam; comment id: b4fa24b0-4b0d-4612-b57b-2d108ad10962
+*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
+Date: 1/18/2011 10:29:03 PM
+Contents Below
+Custom filter [App_Code.Extensions.StopForumSpam] - found spam; comment id: 7e4ef3b2-d194-490a-a129-78bac22eb455
+*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
+Date: 20/01/2011 13:44:41
+Contents Below
+Custom filter [App_Code.Extensions.StopForumSpam] - found spam; comment id: 86324db2-4020-4912-868c-76cfcea22be0
+*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
+Date: 1/20/2011 7:58:56 PM
+Contents Below
+Custom filter [App_Code.Extensions.StopForumSpam] - found spam; comment id: 2d74c10e-7d1c-408c-9eea-183280cd5264
+*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
+Date: 1/20/2011 9:18:03 PM
+Contents Below
+Custom filter [App_Code.Extensions.StopForumSpam] - found spam; comment id: 040d6a9c-3d0e-491b-af78-ad107a6f4d72
+*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
+Date: 1/21/2011 12:11:52 PM
+Contents Below
+Custom filter [App_Code.Extensions.StopForumSpam] - found spam; comment id: ae8013b1-9e93-4ed0-b98c-bf569d0d16a8
+*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
+Date: 21.01.2011 14:47:37
+Contents Below
+Custom filter [App_Code.Extensions.StopForumSpam] - found spam; comment id: b814a516-43ad-4ea2-a9bc-c6d48aa08196
+*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
+Date: 1/22/2011 3:10:16 AM
+Contents Below
+Custom filter [App_Code.Extensions.StopForumSpam] - found spam; comment id: 5b89bef8-f718-4265-8479-228942098b8e
+*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
+Date: 22/01/2011 16:38:21
+Contents Below
+Custom filter [App_Code.Extensions.StopForumSpam] - found spam; comment id: 764b798e-69b0-4d96-bdcf-3b1da5909f84
+*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
+Date: 25/01/2011 10:01:23
+Contents Below
+Custom filter [App_Code.Extensions.StopForumSpam] - found spam; comment id: a8cb4dbd-0f0d-4ed5-ba9e-2df8d4cea54a
+*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
+Date: 1/25/2011 9:38:12 PM
+Contents Below
+Custom filter [App_Code.Extensions.StopForumSpam] - found spam; comment id: fb7b47d2-4d92-443c-a161-8cb67a88ff46
+*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
+Date: 1/27/2011 5:35:42 AM
+Contents Below
+Custom filter [App_Code.Extensions.StopForumSpam] - found spam; comment id: 18a48b3d-91bc-4640-8755-27d8e67542b2
+*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
+Date: 27.01.2011 11:49:15
+Contents Below
+Custom filter [App_Code.Extensions.StopForumSpam] - found spam; comment id: 6778944c-1105-45dd-a780-0f104c5a90d9
+*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
+Date: 1/27/2011 3:18:57 PM
+Contents Below
+Custom filter [App_Code.Extensions.StopForumSpam] - found spam; comment id: a3f5dfdb-2fe1-447d-909e-bcf04841ea55
+*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
+Date: 1/28/2011 5:21:17 AM
+Contents Below
+Custom filter [App_Code.Extensions.StopForumSpam] - found spam; comment id: 0b10d625-9f2d-4a5f-83e0-a48364a59bd4
+*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
+Date: 29/01/2011 08:03:55
+Contents Below
+Custom filter [App_Code.Extensions.StopForumSpam] - found spam; comment id: bfb88c1f-3cfa-45bf-a854-13605e0983ce
+*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
+Date: 1/30/2011 12:42:37 AM
+Contents Below
+Custom filter [App_Code.Extensions.StopForumSpam] - found spam; comment id: 5d637674-f8db-4b39-b216-8d55e726a0cb
+*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
+Date: 2011-01-30 14:43:17
+Contents Below
+Custom filter [App_Code.Extensions.StopForumSpam] - found spam; comment id: 8310a6b6-337e-43c2-acb0-575057d652ac
+*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
+Date: 2011-01-30 15:32:08
+Contents Below
+Custom filter [App_Code.Extensions.StopForumSpam] - found spam; comment id: b742a109-b428-407e-9493-ef384b763857
+*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
+Date: 01.02.2011 13:13:59
+Contents Below
+Custom filter [App_Code.Extensions.StopForumSpam] - found spam; comment id: 00c1aa5b-05f7-44d9-8f7e-b9a836972bae
+*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
+Date: 2/2/2011 12:15:29 AM
+Contents Below
+Custom filter [App_Code.Extensions.StopForumSpam] - found spam; comment id: 4e6a33e9-916d-4eec-bd59-85f12374ae3d
+*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
+Date: 02/02/2011 2:22:26 AM
+Contents Below
+Custom filter [App_Code.Extensions.StopForumSpam] - found spam; comment id: 5ffbd0ff-ad17-433d-9b53-fbeb2ae573f3
+*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
+Date: 02.02.2011 06:28:49
+Contents Below
+Custom filter [App_Code.Extensions.StopForumSpam] - found spam; comment id: 7ad83d60-3afa-4066-9809-92f34a29e426
+*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
+Date: 2/2/2011 4:53:18 PM
+Contents Below
+Custom filter [App_Code.Extensions.StopForumSpam] - found spam; comment id: e31d625d-23ac-4ce4-a521-91e4a38eee5f
+*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
+Date: 2/3/2011 11:39:28 AM
+Contents Below
+Custom filter [App_Code.Extensions.StopForumSpam] - found spam; comment id: b1ca61e8-ee84-41e6-a527-14c2262325bf
+*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
+Date: 04/02/2011 02:43:30
+Contents Below
+Custom filter [App_Code.Extensions.StopForumSpam] - found spam; comment id: bd381d59-d1ad-44dc-97e5-40701ec9f228
+*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
+Date: 2/4/2011 3:09:31 PM
+Contents Below
+Custom filter [App_Code.Extensions.StopForumSpam] - found spam; comment id: b118faf9-cf39-4f33-a3c0-caf7d4e2b601
+*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
+Date: 04/02/2011 18:35:09
+Contents Below
+Custom filter [App_Code.Extensions.StopForumSpam] - found spam; comment id: 59f79ffc-7533-488e-af67-abb9db5b96e3
+*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
+Date: 2/5/2011 7:30:59 PM
+Contents Below
+Custom filter [App_Code.Extensions.StopForumSpam] - found spam; comment id: 616d5ef1-697a-42a6-a55d-b8eaa106c835
+*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
+Date: 06/02/2011 19:50:40
+Contents Below
+Custom filter [App_Code.Extensions.StopForumSpam] - found spam; comment id: 7ce24652-0be7-410c-8244-e4540cb7a762
+*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
+Date: 2/8/2011 10:08:03 AM
+Contents Below
+Custom filter [App_Code.Extensions.StopForumSpam] - found spam; comment id: 4e89c73e-ca70-4e9a-b567-288ee966c58c
+*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
+Date: 2/10/2011 3:01:37 PM
+Contents Below
+Custom filter [App_Code.Extensions.StopForumSpam] - found spam; comment id: 2c31b2ac-616a-4c45-b1f7-999423604ede
+*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
+Date: 2/10/2011 8:06:27 PM
+Contents Below
+Custom filter [App_Code.Extensions.StopForumSpam] - found spam; comment id: a853e8c7-1427-4286-90d8-dcf6e9dc13c9
+*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
+Date: 2/13/2011 9:36:57 AM
+Contents Below
+Custom filter [App_Code.Extensions.StopForumSpam] - found spam; comment id: 1deebe29-bf71-4585-929e-a2e05bafe4a0
+*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
+Date: 2/13/2011 5:48:46 PM
+Contents Below
+Custom filter [App_Code.Extensions.StopForumSpam] - found spam; comment id: 7dd9da5d-7ddf-48b3-ac08-8c5f4e588ccc
+*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
+Date: 2/13/2011 8:02:28 PM
+Contents Below
+Custom filter [App_Code.Extensions.StopForumSpam] - found spam; comment id: 9935c714-1131-4f4a-8f3c-1e87e4cc4325
+*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
+Date: 2/15/2011 1:08:18 AM
+Contents Below
+Custom filter [App_Code.Extensions.StopForumSpam] - found spam; comment id: 5928baac-729e-405b-9030-40af192bb3a7
+*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
+Date: 2/15/2011 1:08:20 AM
+Contents Below
+Custom filter [App_Code.Extensions.StopForumSpam] - found spam; comment id: cb3efbc9-9025-4964-ae22-2be98ea325f6
+*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
+Date: 2/15/2011 4:27:59 PM
+Contents Below
+Custom filter [App_Code.Extensions.StopForumSpam] - found spam; comment id: 847c237c-812a-4571-83ef-4cefe8360cf4
+*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
+Date: 2/16/2011 4:29:53 PM
+Contents Below
+Custom filter [App_Code.Extensions.StopForumSpam] - found spam; comment id: 255ed18c-6ebe-4fee-bb4e-ae4c4a8d9e51
+*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
+Date: 2/18/2011 8:45:18 PM
+Contents Below
+Custom filter [App_Code.Extensions.StopForumSpam] - found spam; comment id: c4096a6c-76ec-461c-8a7f-c760701b8920
+*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
+Date: 19-02-2011 17:46:04
+Contents Below
+Custom filter [App_Code.Extensions.StopForumSpam] - found spam; comment id: 3c9d303c-4df4-4059-bb28-0a7c053d9396
+*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
+Date: 2011/2/19 17:57:18
+Contents Below
+Custom filter [App_Code.Extensions.StopForumSpam] - found spam; comment id: bf5d37fa-77ac-4e50-a67f-8e662587a9fd
+*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
+Date: 2/21/2011 12:44:31 PM
+Contents Below
+Custom filter [App_Code.Extensions.StopForumSpam] - found spam; comment id: 63fa8a84-185d-41cb-a0cc-c2491ff373b9
+*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
+Date: 2/21/2011 10:03:00 PM
+Contents Below
+Custom filter [App_Code.Extensions.StopForumSpam] - found spam; comment id: 0c6e39cf-f5d3-4200-a9a3-9326abe18ae6
+*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
+Date: 2/22/2011 2:43:52 AM
+Contents Below
+Custom filter [App_Code.Extensions.StopForumSpam] - found spam; comment id: 1dd81f49-8bd4-49c2-bc36-447be9eab90d
+*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
+Date: 2/22/2011 11:49:32 PM
+Contents Below
+Custom filter [App_Code.Extensions.StopForumSpam] - found spam; comment id: 1c740e68-ed37-4544-a2b7-539d80c789d3
+*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
+Date: 2/23/2011 12:44:13 AM
+Contents Below
+Custom filter [App_Code.Extensions.StopForumSpam] - found spam; comment id: 17689e48-9b7b-4c4b-986d-03acbdf1d8c1
+*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
+Date: 2/23/2011 12:05:45 PM
+Contents Below
+Custom filter [App_Code.Extensions.StopForumSpam] - found spam; comment id: ecba3b52-26cb-434d-b4d9-348d935a87cf
+*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
+Date: 2011/2/27 21:21:36
+Contents Below
+Custom filter [App_Code.Extensions.StopForumSpam] - found spam; comment id: 8b8ef308-fe4e-4396-9345-bd5dced06526
+*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
+Date: 27/02/2011 23:24:30
+Contents Below
+Custom filter [App_Code.Extensions.StopForumSpam] - found spam; comment id: aa04f5cb-b8fe-49dc-81a7-055d08661f26
+*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
+Date: 28-2-2011 0:16:16
+Contents Below
+Custom filter [App_Code.Extensions.StopForumSpam] - found spam; comment id: dcec6bcc-60f5-4904-8b03-27bde1c9cd55
+*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
+Date: 2/28/2011 7:18:00 AM
+Contents Below
+Custom filter [App_Code.Extensions.StopForumSpam] - found spam; comment id: 70b88a92-aaa8-4366-b0b9-1de7959586be
+*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
+Date: 02/03/2011 9:22:05
+Contents Below
+Custom filter [App_Code.Extensions.StopForumSpam] - found spam; comment id: f61b2a94-b1c7-4a47-b297-b3e5319b3cf1
+*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
+Date: 2011-03-04 01:56:49
+Contents Below
+Custom filter [App_Code.Extensions.StopForumSpam] - found spam; comment id: e1b04c01-0acd-4b17-b27a-5de9794a8b83
+*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
+Date: 3/5/2011 7:32:08 AM
+Contents Below
+Custom filter [App_Code.Extensions.StopForumSpam] - found spam; comment id: c7680981-4e9a-4bcf-aaaf-991fe6ce600d
+*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
+Date: 06/03/2011 4:59:45 PM
+Contents Below
+Custom filter [App_Code.Extensions.StopForumSpam] - found spam; comment id: 4a4b6f2a-adbd-40ba-9683-937255227c3c
+*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
+Date: 2011-03-07 13:40:19
+Contents Below
+Custom filter [App_Code.Extensions.StopForumSpam] - found spam; comment id: c94737aa-8ac3-4725-b1d3-29fed7a4de98
+*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
+Date: 2011-03-07 15:05:24
+Contents Below
+Custom filter [App_Code.Extensions.StopForumSpam] - found spam; comment id: d63656e4-209e-403b-8631-fbf8bc13f8b1
+*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
+Date: 3/8/2011 10:59:36 AM
+Contents Below
+Custom filter [App_Code.Extensions.StopForumSpam] - found spam; comment id: e746225d-a558-407e-9380-0e3be91dc9a1
+*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
+Date: 08/03/2011 18:41:49
+Contents Below
+Custom filter [App_Code.Extensions.StopForumSpam] - found spam; comment id: 4787d348-70ae-49e0-ae75-a7b779e4ff1e
+*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
+Date: 3/13/2011 11:05:48 PM
+Contents Below
+Custom filter [App_Code.Extensions.StopForumSpam] - found spam; comment id: 33e392b4-70e4-4da0-aa0d-09855239139e
+*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
+Date: 3/16/2011 4:56:46 AM
+Contents Below
+Custom filter [App_Code.Extensions.StopForumSpam] - found spam; comment id: 7a4dd9fe-c8e6-4472-a316-08ae0cbc40f8
+*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
+Date: 3/19/2011 2:34:01 AM
+Contents Below
+Custom filter [App_Code.Extensions.StopForumSpam] - found spam; comment id: 3dc7348a-33e1-4f71-b2c8-f0109218c988
+*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
+Date: 3/19/2011 4:04:26 AM
+Contents Below
+Custom filter [App_Code.Extensions.StopForumSpam] - found spam; comment id: d1e80649-eec2-4040-a3cf-935cecd0864d
+*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
+Date: 3/20/2011 1:29:16 PM
+Contents Below
+Custom filter [App_Code.Extensions.StopForumSpam] - found spam; comment id: b17a758a-1edc-44ce-9d4d-41f4a9df4cc2
+*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
+Date: 3/23/2011 3:40:28 PM
+Contents Below
+Custom filter [App_Code.Extensions.StopForumSpam] - found spam; comment id: 59aedc16-f1d2-46c6-a26d-934ff7d62eee
+*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
+Date: 3/24/2011 5:25:30 PM
+Contents Below
+Custom filter [App_Code.Extensions.StopForumSpam] - found spam; comment id: 52936e69-e6f5-4b44-95a3-84bdd4daf50b
+*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
+Date: 27/03/2011 21:26:33
+Contents Below
+Custom filter [App_Code.Extensions.StopForumSpam] - found spam; comment id: 255c15bc-1125-4f7f-b516-7f7aa43d6767
+*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
+Date: 3/28/2011 7:12:56 AM
+Contents Below
+Custom filter [App_Code.Extensions.StopForumSpam] - found spam; comment id: ff92f0fb-1456-4b7f-bea4-78d789b7eab1
+*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
+Date: 3/29/2011 4:37:58 PM
+Contents Below
+Custom filter [App_Code.Extensions.StopForumSpam] - found spam; comment id: ba04c989-2d64-4c7b-9131-7676e1fa4cac
+*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
+Date: 31-3-2011 9:22:49
+Contents Below
+Custom filter [App_Code.Extensions.StopForumSpam] - found spam; comment id: ec1c3e11-d965-4ff5-a915-e3a15631bb07
+*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
+Date: 3/31/2011 4:23:10 PM
+Contents Below
+Custom filter [App_Code.Extensions.StopForumSpam] - found spam; comment id: f2ef115a-e26e-4de4-a54b-f1c94e407085
+*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
+Date: 3/31/2011 5:57:54 PM
+Contents Below
+Custom filter [App_Code.Extensions.StopForumSpam] - found spam; comment id: 93e79b7a-3c11-470c-ade3-4e9c2e52ded6
+*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
+Date: 31/03/2011 21.37.23
+Contents Below
+Custom filter [App_Code.Extensions.StopForumSpam] - found spam; comment id: 37b4df29-7ce2-4948-8101-566eb829a4f0
+*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
+Date: 3/31/2011 9:51:07 PM
+Contents Below
+Custom filter [App_Code.Extensions.StopForumSpam] - found spam; comment id: f8792778-e3eb-4a7c-8cbd-c3237beb19a3
+*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
+Date: 4/2/2011 11:54:31 PM
+Contents Below
+Custom filter [App_Code.Extensions.StopForumSpam] - found spam; comment id: be515bda-5a77-4009-a735-c3542bc11dde
+*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
+Date: 4/4/2011 1:21:30 PM
+Contents Below
+Custom filter [App_Code.Extensions.StopForumSpam] - found spam; comment id: 1e520d91-3037-40d5-9f06-cbfa8564408f
+*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
+Date: 05/04/2011 04:16:31
+Contents Below
+Custom filter [App_Code.Extensions.StopForumSpam] - found spam; comment id: d9142435-0547-4930-8262-98825f1d43bd
+*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
+Date: 4/5/2011 5:06:25 AM
+Contents Below
+Custom filter [App_Code.Extensions.StopForumSpam] - found spam; comment id: 3b8f14e3-5389-4d6b-ae29-1d03f03e271e
+*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
+Date: 4/5/2011 4:49:58 PM
+Contents Below
+Custom filter [App_Code.Extensions.StopForumSpam] - found spam; comment id: 244e07b1-4e3a-404a-9881-b567736b33af
+*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
+Date: 4/5/2011 4:50:08 PM
+Contents Below
+Custom filter [App_Code.Extensions.StopForumSpam] - found spam; comment id: af2991c7-976b-4540-9ed7-7fbb0480334d
+*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
+Date: 4/13/2011 10:04:45 AM
+Contents Below
+Error sending email in SendMailMessage:  Insufficient system storage. The server response was: <matt@mattwrock.com> Mailbox size limit exceeded
+*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
+Date: 4/14/2011 7:19:32 PM
+Contents Below
+Error sending email in SendMailMessage:  Insufficient system storage. The server response was: <matt@mattwrock.com> Mailbox size limit exceeded
+*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
+Date: 15.04.2011 5:29:18
+Contents Below
+Custom filter [App_Code.Extensions.StopForumSpam] - found spam; comment id: 1d3b5877-d783-4f40-8743-db9d27b20ac2
+*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
+Date: 4/21/2011 5:17:58 AM
+Contents Below
+Custom filter [App_Code.Extensions.StopForumSpam] - found spam; comment id: a3a09698-0bb9-40c9-a10e-6b572dec8730
+*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
+Date: 4/21/2011 11:18:59 AM
+Contents Below
+Custom filter [App_Code.Extensions.StopForumSpam] - found spam; comment id: 04716cdc-0737-4dd9-8459-25eb0c714eb6
+*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
+Date: 21/04/2011 3:16:36 PM
+Contents Below
+Custom filter [App_Code.Extensions.StopForumSpam] - found spam; comment id: 53ef1adf-713b-4f87-8b2e-92355a5a57ec
+*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
+Date: 21/04/2011 3:16:46 PM
+Contents Below
+Custom filter [App_Code.Extensions.StopForumSpam] - found spam; comment id: 932c4447-3c6e-48e9-a603-3d4c765db971
+*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
+Date: 4/22/2011 8:37:28 AM
+Contents Below
+Custom filter [App_Code.Extensions.StopForumSpam] - found spam; comment id: 2919ea63-466c-4ddb-ba64-dfe5f7a7d3b7
+*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
+Date: 4/22/2011 11:09:44 AM
+Contents Below
+Custom filter [App_Code.Extensions.StopForumSpam] - found spam; comment id: 3d6376b1-45f5-45c7-8157-4907ec98dd9b
+*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
+Date: 4/26/2011 12:32:08 AM
+Contents Below
+Custom filter [App_Code.Extensions.StopForumSpam] - found spam; comment id: a5791984-eb17-45f4-b9d2-4f62323c9cb6
+*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
+Date: 04/05/2011 00:28:18
+Contents Below
+Custom filter [App_Code.Extensions.StopForumSpam] - found spam; comment id: 8e08d880-a29e-489f-a74b-9f25a5380d43
+*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
+Date: 07/05/2011 21:13:23
+Contents Below
+Custom filter [App_Code.Extensions.StopForumSpam] - found spam; comment id: 9497ef65-2c7a-4901-8ba8-0b555156156c
+*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
+Date: 5/21/2011 10:16:51 AM
+Contents Below
+Custom filter [App_Code.Extensions.StopForumSpam] - found spam; comment id: 4c785690-79d8-415c-b92e-80f2ba292ec4
+*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
+Date: 22.05.2011 20:59:09
+Contents Below
+Custom filter [App_Code.Extensions.StopForumSpam] - found spam; comment id: 74931f5c-5b37-46fd-b003-91816ea3c902
+*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
+Date: 23-05-2011 11:28:38
+Contents Below
+Custom filter [App_Code.Extensions.StopForumSpam] - found spam; comment id: bb949de4-775d-47ab-96d4-7d3ccc0f0624
+*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
+Date: 5/24/2011 1:09:10 PM
+Contents Below
+Custom filter [App_Code.Extensions.StopForumSpam] - found spam; comment id: 3d4076ca-c7fc-4399-b4fb-da636edbb676
+*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
+Date: 27-05-2011 01:10:41
+Contents Below
+Custom filter [App_Code.Extensions.StopForumSpam] - found spam; comment id: 6991a2c9-b0ec-46d5-95a7-0d6bf008e539
+*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
+Date: 5/27/2011 12:01:27 PM
+Contents Below
+Custom filter [App_Code.Extensions.StopForumSpam] - found spam; comment id: ca8cc0d3-7eb2-4b5d-bc9b-11fa97b64829
+*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
+Date: 6/2/2011 3:03:32 PM
+Contents Below
+Custom filter [App_Code.Extensions.StopForumSpam] - found spam; comment id: c40c42b8-2741-4554-a4ae-e057c85820c2
+*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
+Date: 6/2/2011 11:05:35 PM
+Contents Below
+Custom filter [App_Code.Extensions.StopForumSpam] - found spam; comment id: b6b8e9a2-d3d5-440a-8519-309060dc11c8
+*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
+Date: 6/2/2011 11:05:40 PM
+Contents Below
+Custom filter [App_Code.Extensions.StopForumSpam] - found spam; comment id: e63dffbb-adfc-44d8-9256-ca0ee625f488
+*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
+Date: 6/3/2011 9:25:31 AM
+Contents Below
+Custom filter [App_Code.Extensions.StopForumSpam] - found spam; comment id: 15116216-5a8f-4375-897f-67fbb16f38cf
+*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
+Date: 6/3/2011 12:08:43 PM
+Contents Below
+Custom filter [App_Code.Extensions.StopForumSpam] - found spam; comment id: 49531e8d-b697-4d3c-912a-420ea58240a7
+*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
+Date: 6/5/2011 6:05:37 AM
+Contents Below
+Custom filter [App_Code.Extensions.StopForumSpam] - found spam; comment id: 6a048b70-11c0-4460-8035-874ffccdd77c
+*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
+Date: 06/06/2011 2.09.56
+Contents Below
+Custom filter [App_Code.Extensions.StopForumSpam] - found spam; comment id: e3ffece4-7059-4d41-b722-343bd396b2ae
+*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
+Date: 06/06/2011 12:01:40
+Contents Below
+Custom filter [App_Code.Extensions.StopForumSpam] - found spam; comment id: b95673d4-3b13-4b40-8686-b0a65cffe8fa
+*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
+Date: 07-06-2011 06:21:03
+Contents Below
+Custom filter [App_Code.Extensions.StopForumSpam] - found spam; comment id: 71289ef8-b0e5-43b6-8f23-62b0d04146ec
+*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
+Date: 6/7/2011 8:52:46 AM
+Contents Below
+Custom filter [App_Code.Extensions.StopForumSpam] - found spam; comment id: 7bed7b4e-6105-4dfd-b21b-34349a7cbd05
+*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
+Date: 6/7/2011 11:09:39 AM
+Contents Below
+Custom filter [App_Code.Extensions.StopForumSpam] - found spam; comment id: 1b064039-b483-48fe-9cb5-f1d39c39c464
+*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
+Date: 6/7/2011 6:49:19 PM
+Contents Below
+Custom filter [App_Code.Extensions.StopForumSpam] - found spam; comment id: 1f9cfc32-c46e-45da-bb79-9a0e9fdc2405
+*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
+Date: 6/8/2011 11:38:12 PM
+Contents Below
+Custom filter [App_Code.Extensions.StopForumSpam] - found spam; comment id: 32d9885a-8e2f-492c-a501-7772698e7fbb
+*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
+Date: 6/9/2011 9:08:58 AM
+Contents Below
+Custom filter [App_Code.Extensions.StopForumSpam] - found spam; comment id: 99f475fb-7525-4342-aa36-30e805b6546f
+*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
+Date: 6/12/2011 2:04:36 AM
+Contents Below
+Custom filter [App_Code.Extensions.StopForumSpam] - found spam; comment id: 91247bfd-85d1-49e1-8e57-9159c9c0d107
+*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
+Date: 6/14/2011 8:49:14 PM
+Contents Below
+Error checking stopforumspam.com: Unable to connect to the remote server
+*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
+Date: 6/15/2011 1:55:48 AM
+Contents Below
+Error checking stopforumspam.com: Unable to connect to the remote server
+*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
+Date: 6/21/2011 6:52:55 PM
+Contents Below
+Custom filter [App_Code.Extensions.StopForumSpam] - found spam; comment id: ded17dda-5e75-426c-a31b-a1dea4fec07e
+*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
+Date: 2011/6/21 下午 10:11:55
+Contents Below
+Custom filter [App_Code.Extensions.StopForumSpam] - found spam; comment id: 393ab90b-5a1b-44b3-961a-0fbe980b9647
+*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
+Date: 6/22/2011 6:00:45 PM
+Contents Below
+Custom filter [App_Code.Extensions.StopForumSpam] - found spam; comment id: 438ff3fe-53d8-44ce-8b34-9277b40fbe59
+*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
+Date: 6/28/2011 9:33:44 AM
+Contents Below
+Custom filter [App_Code.Extensions.StopForumSpam] - found spam; comment id: e355b043-0587-49d9-86c0-85034568181c
+*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
+Date: 7/3/2011 4:49:25 PM
+Contents Below
+Custom filter [App_Code.Extensions.StopForumSpam] - found spam; comment id: 3096ae87-1944-4043-af2e-f40cf42b322f
+*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
+Date: 7/10/2011 1:33:32 AM
+Contents Below
+Custom filter [App_Code.Extensions.StopForumSpam] - found spam; comment id: 4b632b09-f141-4018-b4cf-2a9b868cbc37
+*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
+Date: 7/10/2011 1:33:35 AM
+Contents Below
+Custom filter [App_Code.Extensions.StopForumSpam] - found spam; comment id: 48799616-6c8f-4f78-a863-a920a17352dd
+*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
+Date: 2011/7/10 17:47:58
+Contents Below
+Custom filter [App_Code.Extensions.StopForumSpam] - found spam; comment id: aef5747e-0bb5-44e8-90b5-159e449cde80
+*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
+Date: 7/11/2011 3:03:17 AM
+Contents Below
+Custom filter [App_Code.Extensions.StopForumSpam] - found spam; comment id: 4ee09381-f20f-4fe6-9975-1d490444d0c1
+*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
+Date: 7/11/2011 4:03:04 AM
+Contents Below
+Custom filter [App_Code.Extensions.StopForumSpam] - found spam; comment id: 0fd8473e-17c6-400e-99cd-6a174badf6eb
+*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
+Date: 7/11/2011 4:51:35 AM
+Contents Below
+Custom filter [App_Code.Extensions.StopForumSpam] - found spam; comment id: c786daa5-98af-4591-b0fb-ef8536f24e3a
+*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
+Date: 2011/7/12 2:10:33
+Contents Below
+Custom filter [App_Code.Extensions.StopForumSpam] - found spam; comment id: d2b39ece-94c4-49be-8c37-a9153ca1ef27
+*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
+Date: 2011/7/15 2:15:57
+Contents Below
+Custom filter [App_Code.Extensions.StopForumSpam] - found spam; comment id: 66049690-0cee-4a57-8938-214c28818344
+*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
+Date: 7/18/2011 5:34:36 PM
+Contents Below
+Custom filter [App_Code.Extensions.StopForumSpam] - found spam; comment id: 1eaf517c-b2db-4361-bbd6-22e40de9700c

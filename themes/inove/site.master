@@ -1,0 +1,83 @@
+<%@ Master Language="C#" AutoEventWireup="true" CodeFile="site.master.cs" Inherits="site" %>
+<%@ Import Namespace="BlogEngine.Core" %>
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+<head runat="server" profile="http://gmpg.org/xfn/11">
+    <link rel="stylesheet" href="style.css" type="text/css" />
+    <link rel="shortcut icon" href="~/pics/blogengine.ico" type="image/x-icon"/>
+</head>
+<body>
+<form id="Form1" runat="Server" class="body">
+<div id="wrap">
+<div id="container">
+  <div id="header">
+  <div id="caption">
+    <h1 id="title"><a href="<%=Utils.AbsoluteWebRoot %>"><%=BlogSettings.Instance.Name %></a></h1>
+    <div id="tagline"><%=BlogSettings.Instance.Description %></div>
+    </div> 
+
+  
+  <div id="navigation">
+    
+    <ul id="menus">
+      <li <%=MenuClass("default.aspx")%>><a class="home" href="<%=Utils.AbsoluteWebRoot %>" rel="home"><%=Resources.labels.home %></a></li>
+      <li <%=MenuClass("archive.aspx")%>><a href="<%=Utils.AbsoluteWebRoot %>archive.aspx"><%=Resources.labels.archive %></a></li>
+      <li <%=MenuClass("contact.aspx")%>><a href="<%=Utils.AbsoluteWebRoot %>contact.aspx"><%=Resources.labels.contact %></a></li>
+      <li <%=MenuClass("login.aspx")%>><a runat="server" id="aLogin" /></li>
+    </ul>
+    <div id="searchbox">
+    <div class="content">
+
+<input id="searchfield" class="textfield" type="text" onkeypress="if(event.keyCode==13) return Search('<%=Utils.RelativeWebRoot%>')" />
+<div id="Div1">
+<div class="bt">
+<a class="switcher">Switcher</a>
+</div>
+</div> 
+</div>
+    </div> 
+  </div>
+  
+   </div> 
+    <div id="content">
+    <div id="main">
+      <blog:SearchOnSearch runat="server" MaxResults="3" Headline="You searched for" Text="Here are some results for the search term on this website" />
+      <asp:ContentPlaceHolder ID="cphBody" runat="server" />
+    </div>
+    
+    <div id="sidebar">
+    <div id="northsidebar" class="sidebar">
+        <div class="widget feeds_weight">
+            <div class="content">
+              <a id="feedrss" href="<%=Utils.FeedUrl %>" class="feed" title="Subscribe to this blog...">
+                    <abbr title="Really Simple Syndication">
+                        RSS</abbr>
+                    feed </a>
+                <div class="fixed" ></div> 
+            </div>
+        </div>
+        <blog:WidgetZone runat="server" ID="rightzone" />
+      </div> 
+    </div>
+    <div class="fixed"></div> 
+</div> 
+<div id="footer">
+<a id="gotop" onclick="MGJS.goTop();return false;" href="#">Top</a>
+<div id="copyright">  Powered by <a href="http://www.dotnetblogengine.net">BlogEngine.NET</a> <%=BlogSettings.Instance.Version() %></div>
+<div id="themeinfo">
+
+ Theme by
+<a href="http://www.neoease.com/">mg12</a>, adapted by <a href="http://www.onesoft.dk/">onesoft</a>
+. Valid
+<a href="http://validator.w3.org/check?uri=referer">XHTML 1.1</a>
+and
+<a href="http://jigsaw.w3.org/css-validator/">CSS 3</a>. 
+</div> 
+</div> 
+</div> 
+</div>    
+</form>
+  
+</body>
+</html>

@@ -1,0 +1,985 @@
+﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<post>
+  <author>mwrock</author>
+  <title>Implementing  custom Membership Provider and Role Provider for Authenticating ASP.NET MVC Applications</title>
+  <description />
+  <content>&lt;p&gt;The .NET framework provides a provider model that allows developers to implement common user management and authentication functionality in ASP.NET applications. Out of the box, the framework ships with a few providers that allow you to easily wire up a user management system with very little to zero back end code. For instance, you can use the SqlMembershipProvider and the SqlRoleProvider which will create a database for you with tables for maintaining users and their roles. There are also providers available that use Active Directory as the user and role data store.&lt;/p&gt;
+&lt;p&gt;This is great in many cases and can save you from writing a lot of tedious plumbing code. However, there are many instances where this may not be appropriate:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;I personally don&amp;rsquo;t feel comfortable having third party code create my user schema. Perhaps I&amp;rsquo;m being overly sensitive here.&lt;/li&gt;
+&lt;li&gt;You don&amp;rsquo;t use Sql Server or Active Directory. If you are using MySql to manage your user data, neither the out of the box providers will work for you.&lt;/li&gt;
+&lt;li&gt;You already have your own user data and schema which you want to continue using. You will need to implement your own providers to work with your schema.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;I fall into the first and third scenarios listed above. I have multiple applications that all run on top of a common user/role management database. I want to be able to use Forms Authentication to provide my web security and I want all user validation and role checking to leverage the database schema that I already have. Fortunately, creating custom Membership and Role providers proved to be rather easy and this post will walk you through the necessary steps to get up and running.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Defining Users, Roles and Rights&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;My schema has the following key tables:&lt;br /&gt;A users table which defines individual users and their user names, human names, passwords and role.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;A role table that defines individual roles. It&amp;rsquo;s a simple lookup table with role_id and role_name columns.&lt;/li&gt;
+&lt;li&gt;A right table which is also a simple lookup table with Right_id and right_name columns.&lt;/li&gt;
+&lt;li&gt;A role_right table which defines many to many relationships between roles and rights. It has a role_id and right_id columns. Individual roles contain a collection of one to N number of rights.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;These tables are mapped to classes via nHibernate.&lt;/p&gt;
+&lt;p&gt;Here is the User class:&lt;/p&gt;
+&lt;pre&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp; public class User : IPrincipal&lt;br /&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp; {&lt;br /&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; protected User() { }&lt;/pre&gt;
+&lt;pre&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; public User(int userId, string userName, string fullName, string password)&lt;br /&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; {&lt;br /&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; UserId = userId;&lt;br /&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; UserName = userName;&lt;br /&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; FullName = fullName;&lt;br /&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; Password = password;&lt;br /&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; }&lt;br /&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; public virtual int UserId { get; set; }&lt;br /&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; public virtual string UserName { get; set; }&lt;br /&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; public virtual string FullName { get; set; }&lt;br /&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; public virtual string Password { get; set; }&lt;/pre&gt;
+&lt;pre&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; public virtual IIdentity Identity&lt;br /&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; {&lt;br /&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; get;&lt;br /&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; set;&lt;br /&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; }&lt;/pre&gt;
+&lt;pre&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; public virtual bool IsInRole(string role)&lt;br /&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; {&lt;br /&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; if (Role.Description.ToLower() == role.ToLower())&lt;br /&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; return true;&lt;/pre&gt;
+&lt;pre&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; foreach (Right right in Role.Rights)&lt;br /&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; {&lt;br /&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; if (right.Description.ToLower() == role.ToLower())&lt;br /&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; return true;&lt;br /&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; }&lt;br /&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; return false;&lt;br /&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; }&lt;/pre&gt;
+&lt;pre&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp; }&lt;/pre&gt;
+&lt;p&gt;&amp;nbsp;&lt;/p&gt;
+&lt;p&gt;You will notice that User derives from IPrincipal. This is not necessary to allow User to operate with my MembershipProvider implementation, but it allows me the option to use the User class within other frameworks that work with IPrincipal. For example, I may want to be able to directly interact with User when calling the Controller base class User property. This just requires me to implement the Identity property and the bool IsInRole(string roleName) method. When we get to the RoleProvider implementation, you will see that the IsInRole implementation is used there. You may also notice something else that may appear peculiar: a role here can be either a role or a right. This might be a bit of a hack to shim my finer grained right based schema into the ASP.NET role based framework, but it works for me.&lt;/p&gt;
+&lt;p&gt;Here are the Role and Right classes. They are simple data objects:&lt;/p&gt;
+&lt;pre&gt;&amp;nbsp;&amp;nbsp; public&amp;nbsp; class Role&lt;br /&gt;&amp;nbsp;&amp;nbsp; {&lt;br /&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; protected Role() { }&lt;/pre&gt;
+&lt;pre&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; public Role(int roleid, string roleDescription)&lt;br /&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; {&lt;br /&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; RoleId = roleid;&lt;br /&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; Description = roleDescription;&lt;br /&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; }&lt;br /&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; public virtual int RoleId { get; set; }&lt;br /&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; public virtual string Description { get; set; }&lt;br /&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; public virtual IList&amp;lt;Right&amp;gt; Rights { get; set; }&lt;br /&gt;&amp;nbsp;&amp;nbsp; }&lt;/pre&gt;
+&lt;pre&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp; public class Right&lt;br /&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp; {&lt;br /&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; protected Right() { }&lt;/pre&gt;
+&lt;pre&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; public Right(int rightId, string description)&lt;br /&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; {&lt;br /&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; RightId = rightId;&lt;br /&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; Description = description;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; &lt;br /&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; }&lt;/pre&gt;
+&lt;pre&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; public virtual int RightId { get; set; }&lt;br /&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; public virtual string Description { get; set; }&lt;/pre&gt;
+&lt;pre&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp; }&lt;/pre&gt;
+&lt;p&gt;&amp;nbsp;&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Implementing the providers&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;So now with the basic data classes behind us, we can implement the membership and role providers. These implementations must derrive from MembershipProvider and RoleProvider. Note that these base classes contain a lot of methods that I have no use for. The Membership Provider model was designed to handle all sorts of user related functionality like creating users, modifying paswords, etc. I just need basic logon and role checking; so a lot of my methods throw NotImplementedExceptions. However, all methods required to handle authentication and role checking are implemented.&lt;/p&gt;
+&lt;p&gt;&lt;br /&gt;Here is the Membership Provider:&lt;/p&gt;
+&lt;pre&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp; public class AdminMemberProvider : MembershipProvider&lt;br /&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp; {&lt;br /&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; #region Unimplemented MembershipProvider Methods&lt;/pre&gt;
+&lt;pre&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; public override string ApplicationName&lt;br /&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; {&lt;br /&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; get&lt;br /&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; {&lt;br /&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; throw new NotImplementedException();&lt;br /&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; }&lt;br /&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; set&lt;br /&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; {&lt;br /&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; throw new NotImplementedException();&lt;br /&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; }&lt;br /&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; }&lt;/pre&gt;
+&lt;pre&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; public override bool ChangePassword(string username, string oldPassword, string newPassword)&lt;br /&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; {&lt;br /&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; throw new NotImplementedException();&lt;br /&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; }&lt;/pre&gt;
+&lt;pre&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; public override bool ChangePasswordQuestionAndAnswer(string username, string password, string newPasswordQuestion, string newPasswordAnswer)&lt;br /&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; {&lt;br /&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; throw new NotImplementedException();&lt;br /&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; }&lt;/pre&gt;
+&lt;pre&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; public override MembershipUser CreateUser(string username, string password, string email, string passwordQuestion, string passwordAnswer, bool isApproved, object providerUserKey, out MembershipCreateStatus status)&lt;br /&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; {&lt;br /&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; throw new NotImplementedException();&lt;br /&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; }&lt;br /&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&lt;/pre&gt;
+&lt;pre&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; public override bool DeleteUser(string username, bool deleteAllRelatedData)&lt;br /&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; {&lt;br /&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; throw new NotImplementedException();&lt;br /&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; }&lt;/pre&gt;
+&lt;pre&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; public override bool EnablePasswordReset&lt;br /&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; {&lt;br /&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; get { throw new NotImplementedException(); }&lt;br /&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; }&lt;/pre&gt;
+&lt;pre&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; public override bool EnablePasswordRetrieval&lt;br /&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; {&lt;br /&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; get { throw new NotImplementedException(); }&lt;br /&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; }&lt;/pre&gt;
+&lt;pre&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; public override MembershipUserCollection FindUsersByEmail(string emailToMatch, int pageIndex, int pageSize, out int totalRecords)&lt;br /&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; {&lt;br /&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; throw new NotImplementedException();&lt;br /&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; }&lt;/pre&gt;
+&lt;pre&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; public override MembershipUserCollection FindUsersByName(string usernameToMatch, int pageIndex, int pageSize, out int totalRecords)&lt;br /&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; {&lt;br /&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; throw new NotImplementedException();&lt;br /&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; }&lt;/pre&gt;
+&lt;pre&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; public override MembershipUserCollection GetAllUsers(int pageIndex, int pageSize, out int totalRecords)&lt;br /&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; {&lt;br /&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; throw new NotImplementedException();&lt;br /&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; }&lt;/pre&gt;
+&lt;pre&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; public override int GetNumberOfUsersOnline()&lt;br /&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; {&lt;br /&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; throw new NotImplementedException();&lt;br /&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; }&lt;/pre&gt;
+&lt;pre&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; public override string GetPassword(string username, string answer)&lt;br /&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; {&lt;br /&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; throw new NotImplementedException();&lt;br /&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; }&lt;/pre&gt;
+&lt;pre&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; public override MembershipUser GetUser(string username, bool userIsOnline)&lt;br /&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; {&lt;br /&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; throw new NotImplementedException();&lt;br /&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; }&lt;/pre&gt;
+&lt;pre&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; public override MembershipUser GetUser(object providerUserKey, bool userIsOnline)&lt;br /&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; {&lt;br /&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; throw new NotImplementedException();&lt;br /&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; }&lt;/pre&gt;
+&lt;pre&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; public override string GetUserNameByEmail(string email)&lt;br /&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; {&lt;br /&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; throw new NotImplementedException();&lt;br /&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; }&lt;/pre&gt;
+&lt;pre&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; public override int MaxInvalidPasswordAttempts&lt;br /&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; {&lt;br /&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; get { throw new NotImplementedException(); }&lt;br /&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; }&lt;/pre&gt;
+&lt;pre&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; public override int MinRequiredNonAlphanumericCharacters&lt;br /&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; {&lt;br /&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; get { throw new NotImplementedException(); }&lt;br /&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; }&lt;/pre&gt;
+&lt;pre&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; public override int MinRequiredPasswordLength&lt;br /&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; {&lt;br /&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; get { throw new NotImplementedException(); }&lt;br /&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; }&lt;/pre&gt;
+&lt;pre&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; public override int PasswordAttemptWindow&lt;br /&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; {&lt;br /&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; get { throw new NotImplementedException(); }&lt;br /&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; }&lt;/pre&gt;
+&lt;pre&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; public override MembershipPasswordFormat PasswordFormat&lt;br /&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; {&lt;br /&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; get { throw new NotImplementedException(); }&lt;br /&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; }&lt;/pre&gt;
+&lt;pre&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; public override string PasswordStrengthRegularExpression&lt;br /&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; {&lt;br /&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; get { throw new NotImplementedException(); }&lt;br /&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; }&lt;/pre&gt;
+&lt;pre&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; public override bool RequiresQuestionAndAnswer&lt;br /&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; {&lt;br /&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; get { throw new NotImplementedException(); }&lt;br /&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; }&lt;/pre&gt;
+&lt;pre&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; public override bool RequiresUniqueEmail&lt;br /&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; {&lt;br /&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; get { throw new NotImplementedException(); }&lt;br /&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; }&lt;/pre&gt;
+&lt;pre&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; public override string ResetPassword(string username, string answer)&lt;br /&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; {&lt;br /&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; throw new NotImplementedException();&lt;br /&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; }&lt;/pre&gt;
+&lt;pre&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; public override bool UnlockUser(string userName)&lt;br /&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; {&lt;br /&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; throw new NotImplementedException();&lt;br /&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; }&lt;/pre&gt;
+&lt;pre&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; public override void UpdateUser(MembershipUser user)&lt;br /&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; {&lt;br /&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; throw new NotImplementedException();&lt;br /&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; }&lt;br /&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; &lt;br /&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; #endregion&lt;/pre&gt;
+&lt;pre&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; IUserRepository _repository;&lt;/pre&gt;
+&lt;pre&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; public AdminMemberProvider() : this(null)&lt;br /&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; {&lt;br /&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; }&lt;/pre&gt;
+&lt;pre&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; public AdminMemberProvider(IUserRepository repository) : base()&lt;br /&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; {&lt;br /&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; _repository = repository ?? UserRepositoryFactory.GetRepository();&lt;br /&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; }&lt;/pre&gt;
+&lt;pre&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; public User User&lt;br /&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; {&lt;br /&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; get;&lt;br /&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; private set;&lt;br /&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; }&lt;br /&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; public UserAdmin.DataEntities.User CreateUser(string fullName,string passWord, string email)&lt;br /&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; {&lt;br /&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; return (null);&lt;br /&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; }&lt;br /&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; public override bool ValidateUser(string username, string password)&lt;br /&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; {&lt;br /&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; if(string.IsNullOrEmpty(password.Trim())) return false;&lt;/pre&gt;
+&lt;pre&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; string hash = EncryptPassword(password);&lt;br /&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; User user = _repository.GetByUserName(username);&lt;br /&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; if (user == null) return false;&lt;/pre&gt;
+&lt;pre&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; if (user.Password == hash)&lt;br /&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; {&lt;br /&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; User = user;&lt;br /&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; return true;&lt;br /&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; }&lt;/pre&gt;
+&lt;pre&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; return false;&lt;br /&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; }&lt;/pre&gt;
+&lt;pre&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; /// &amp;lt;summary&amp;gt;&lt;br /&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; /// Procuses an MD5 hash string of the password&lt;br /&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; /// &amp;lt;/summary&amp;gt;&lt;br /&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; /// &amp;lt;param name="password"&amp;gt;password to hash&amp;lt;/param&amp;gt;&lt;br /&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; /// &amp;lt;returns&amp;gt;MD5 Hash string&amp;lt;/returns&amp;gt;&lt;br /&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; protected string EncryptPassword(string password)&lt;br /&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; {&lt;br /&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; //we use codepage 1252 because that is what sql server uses&lt;br /&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; byte[] pwdBytes = Encoding.GetEncoding(1252).GetBytes(password);&lt;br /&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; byte[] hashBytes = System.Security.Cryptography.MD5.Create().ComputeHash(pwdBytes);&lt;br /&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; return Encoding.GetEncoding(1252).GetString(hashBytes);&lt;br /&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; }&lt;/pre&gt;
+&lt;pre&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp; }&lt;br /&gt;}&lt;/pre&gt;
+&lt;p&gt;The key method implemented here is ValidateUser. This uses the Repository pattern to query the user by name and then compares the password in the repository with the password passed to the method. My default repository is backed by nHibernate, but it could be plain ADO or a fake repository for testing purposes. You will need to implement your own UserRepositoryFactory based on your data store. Note that I am encrypting the passed password before the comparison. This is because our passwords are hashed in the database.&lt;/p&gt;
+&lt;p&gt;Here is the Role Provider:&lt;/p&gt;
+&lt;pre&gt;&lt;br /&gt;&amp;nbsp;&amp;nbsp; public class AdminRoleProvider : RoleProvider&lt;br /&gt;&amp;nbsp;&amp;nbsp; {&lt;br /&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; IUserRepository _repository;&lt;br /&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; public AdminRoleProvider(): this(UserRepositoryFactory.GetRepository()) &lt;br /&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; {&lt;br /&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; &lt;br /&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; }&lt;br /&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; public AdminRoleProvider(IUserRepository repository) : base()&lt;br /&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; {&lt;br /&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; _repository = repository ?? UserRepositoryFactory.GetRepository();&lt;br /&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; }&lt;br /&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; public override bool IsUserInRole(string username, string roleName)&lt;br /&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; {&lt;br /&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; User user = _repository.GetByUserName(username);&lt;br /&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; if(user!=null)&lt;br /&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; return user.IsInRole(roleName);&lt;br /&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; else&lt;br /&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; return false;&lt;br /&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; }&lt;br /&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; public override string ApplicationName&lt;br /&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; {&lt;br /&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; get&lt;br /&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; {&lt;br /&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; throw new NotImplementedException();&lt;br /&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; }&lt;br /&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; set&lt;br /&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; {&lt;br /&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; throw new NotImplementedException();&lt;br /&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; }&lt;br /&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; }&lt;br /&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; public override void AddUsersToRoles(string[] usernames, string[] roleNames)&lt;br /&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; {&lt;br /&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; throw new NotImplementedException();&lt;br /&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; }&lt;br /&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; public override void RemoveUsersFromRoles(string[] usernames, string[] roleNames)&lt;br /&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; {&lt;br /&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; throw new NotImplementedException();&lt;br /&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; }&lt;br /&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; public override void CreateRole(string roleName)&lt;br /&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; {&lt;br /&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; throw new NotImplementedException();&lt;br /&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; }&lt;br /&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; public override bool DeleteRole(string roleName, bool throwOnPopulatedRole)&lt;br /&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; {&lt;br /&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; throw new NotImplementedException();&lt;br /&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; }&lt;br /&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; public override bool RoleExists(string roleName)&lt;br /&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; {&lt;br /&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; throw new NotImplementedException();&lt;br /&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; }&lt;br /&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; public override string[] GetRolesForUser(string username)&lt;br /&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; {&lt;br /&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; User user = _repository.GetByUserName(username);&lt;br /&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; string[] roles = new string[user.Role.Rights.Count + 1];&lt;br /&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; roles[0] = user.Role.Description;&lt;br /&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; int idx = 0;&lt;br /&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; foreach (Right right in user.Role.Rights)&lt;br /&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; roles[++idx] = right.Description;&lt;/pre&gt;
+&lt;pre&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; return roles;&lt;br /&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; }&lt;br /&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; public override string[] GetUsersInRole(string roleName)&lt;br /&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; {&lt;br /&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; throw new NotImplementedException();&lt;br /&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; }&lt;/pre&gt;
+&lt;pre&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; public override string[] FindUsersInRole(string roleName, string usernameToMatch)&lt;br /&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; {&lt;br /&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; throw new NotImplementedException();&lt;/pre&gt;
+&lt;pre&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; }&lt;br /&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; public override string[] GetAllRoles()&lt;br /&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; {&lt;br /&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; throw new NotImplementedException();&lt;/pre&gt;
+&lt;pre&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; }&lt;br /&gt;&amp;nbsp;&amp;nbsp; }&lt;br /&gt;}&lt;/pre&gt;
+&lt;p&gt;Again, many methods of the base class are unimplemented because I did not need the functionality.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Wiring the providers in web.config&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;This is all the code we need for the &amp;ldquo;model&amp;rdquo; level user authentication and role checking. Next we have to wire these classes up in our web.config so that the application knows to use them. The following should be inside of &amp;lt;system.web&amp;gt;:&lt;/p&gt;
+&lt;pre&gt;&lt;br /&gt;&amp;lt;authentication mode="Forms" &amp;gt;&lt;br /&gt;&amp;lt;forms loginUrl="~/LoginAccount/LogOn" path="/" /&amp;gt;&lt;br /&gt;&amp;lt;/authentication&amp;gt;&lt;br /&gt;&amp;lt;authorization&amp;gt;&lt;br /&gt;&amp;lt;deny users="?"/&amp;gt;&lt;br /&gt;&amp;lt;/authorization&amp;gt;&lt;br /&gt;&amp;lt;membership defaultProvider="AdminMemberProvider" userIsOnlineTimeWindow="15"&amp;gt;&lt;br /&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; &amp;lt;providers&amp;gt;&lt;br /&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; &amp;lt;clear/&amp;gt;&lt;br /&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; &amp;lt;add name="AdminMemberProvider" type="UserAdmin.DomainEntities.AdminMemberProvider, UserAdmin" /&amp;gt;&lt;br /&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; &amp;lt;/providers&amp;gt;&lt;br /&gt;&amp;lt;/membership&amp;gt;&lt;br /&gt;&amp;lt;roleManager defaultProvider="AdminRoleProvider" enabled="true" cacheRolesInCookie="true"&amp;gt;&lt;br /&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; &amp;lt;providers&amp;gt;&lt;br /&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; &amp;lt;clear/&amp;gt;&lt;br /&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; &amp;lt;add name="AdminRoleProvider" type="UserAdmin.DomainEntities.AdminRoleProvider, UserAdmin" /&amp;gt;&lt;br /&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; &amp;lt;/providers&amp;gt;&lt;br /&gt;&amp;lt;/roleManager&amp;gt;&lt;/pre&gt;
+&lt;p&gt;&amp;nbsp;&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Brining in the Controller and View&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;The only thing left now is to code the controllers. First our LoginAccountController needs to be able to log users in and out of the application:&lt;/p&gt;
+&lt;pre&gt;&lt;br /&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp; public class LoginAccountController : Controller&lt;br /&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp; {&lt;br /&gt;&amp;nbsp; UserMemberProvider provider = (UserMemberProvider) Membership.Provider;&lt;br /&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; public LoginAccountController()&lt;br /&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; {&lt;br /&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; }&lt;/pre&gt;
+&lt;pre&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; public ActionResult LogOn()&lt;br /&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; {&lt;br /&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; return View();&lt;br /&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; }&lt;/pre&gt;
+&lt;pre&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; [AcceptVerbs(HttpVerbs.Post)]&lt;br /&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; public ActionResult LogOn(string userName, string password, string returnUrl)&lt;br /&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; {&lt;/pre&gt;
+&lt;pre&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; if (!ValidateLogOn(userName, password))&lt;br /&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; {&lt;br /&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; return View();&lt;br /&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; }&lt;br /&gt;&amp;nbsp;&amp;nbsp;&lt;br /&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; UserAdmin.DataEntities.User&amp;nbsp; user = provider.GetUser();&lt;br /&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; FormsAuthentication.SetAuthCookie(user.UserName, false);&lt;br /&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; if (!String.IsNullOrEmpty(returnUrl) &amp;amp;&amp;amp; returnUrl != "/")&lt;br /&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; {&lt;br /&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; return Redirect(returnUrl);&lt;br /&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; }&lt;br /&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; else&lt;br /&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; {&lt;br /&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; return RedirectToAction("Index", "Home");&lt;br /&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; }&lt;br /&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; }&lt;/pre&gt;
+&lt;pre&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; public ActionResult LogOff()&lt;br /&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; {&lt;/pre&gt;
+&lt;pre&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; FormsAuthentication.SignOut();&lt;br /&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; return RedirectToAction("Index", "Home");&lt;br /&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; }&lt;/pre&gt;
+&lt;pre&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; private bool ValidateLogOn(string userName, string password)&lt;br /&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; {&lt;br /&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; if (String.IsNullOrEmpty(userName))&lt;br /&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; {&lt;br /&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; ModelState.AddModelError("username", "You must specify a username.");&lt;br /&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; }&lt;br /&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; if (String.IsNullOrEmpty(password))&lt;br /&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; {&lt;br /&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; ModelState.AddModelError("password", "You must specify a password.");&lt;br /&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; }&lt;br /&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; if (!provider.ValidateUser(userName, password))&lt;br /&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; {&lt;br /&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; ModelState.AddModelError("_FORM", "The username or password provided is incorrect.");&lt;br /&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; }&lt;/pre&gt;
+&lt;pre&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; return ModelState.IsValid;&lt;br /&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; }&lt;/pre&gt;
+&lt;pre&gt;&amp;nbsp;}&lt;/pre&gt;
+&lt;p&gt;&amp;nbsp;&lt;/p&gt;
+&lt;p&gt;Here is our login form in the view:&lt;/p&gt;
+&lt;pre&gt;&amp;lt;div id="errorpanel"&amp;gt;&lt;br /&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp; &amp;lt;%= Html.ValidationSummary() %&amp;gt;&lt;br /&gt;&amp;lt;/div&amp;gt;&lt;/pre&gt;
+&lt;pre&gt;&amp;lt;div class="signinbox"&amp;gt;&lt;br /&gt;&amp;nbsp;&lt;br /&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; &amp;lt;% using (Html.BeginForm()) { %&amp;gt;&lt;br /&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp; &amp;lt;table&amp;gt;&lt;br /&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; &amp;lt;tr&amp;gt;&lt;br /&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; &amp;lt;td&amp;gt;&lt;br /&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; Email:&lt;br /&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; &amp;lt;/td&amp;gt;&lt;br /&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; &amp;lt;td&amp;gt;&lt;br /&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; &amp;lt;%= Html.TextBox("username", null, new { @class = "userbox"}) %&amp;gt;&lt;br /&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; &amp;lt;/td&amp;gt;&lt;br /&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; &amp;lt;/tr&amp;gt;&lt;br /&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; &amp;lt;tr&amp;gt;&lt;br /&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; &amp;lt;td&amp;gt;&lt;br /&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; Password:&lt;br /&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; &amp;lt;/td&amp;gt;&lt;br /&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; &amp;lt;td&amp;gt;&lt;br /&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; &amp;lt;%= Html.Password("password", null, new { @class = "passwordbox"}) %&amp;gt;&lt;br /&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; &amp;lt;/td&amp;gt;&lt;br /&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; &amp;lt;/tr&amp;gt;&lt;br /&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; &amp;lt;tr&amp;gt;&lt;br /&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; &amp;lt;td&amp;gt;&lt;br /&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; &amp;lt;input type="image" src="/Content/images/buttonLogin.gif" alt="Login" width="80" height="20"&lt;br /&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; border="0" id="Image1" name="Image1"&amp;gt;&lt;br /&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; &amp;lt;/td&amp;gt;&lt;br /&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; &amp;lt;td align="right" valign="bottom"&amp;gt;&lt;br /&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; &amp;lt;/td&amp;gt;&lt;br /&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; &amp;lt;/tr&amp;gt;&lt;br /&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp; &amp;lt;/table&amp;gt;&lt;br /&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; &amp;lt;% } %&amp;gt;&lt;br /&gt;&amp;nbsp;&lt;br /&gt;&amp;lt;/div&amp;gt;&lt;/pre&gt;
+&lt;p&gt;&amp;nbsp;&lt;/p&gt;
+&lt;p&gt;That&amp;rsquo;s it. It&amp;rsquo;s really pretty simple.&lt;/p&gt;</content>
+  <ispublished>True</ispublished>
+  <isdeleted>False</isdeleted>
+  <iscommentsenabled>True</iscommentsenabled>
+  <pubDate>2009-10-13 21:58:00</pubDate>
+  <lastModified>2011-01-12 17:14:17</lastModified>
+  <raters>24</raters>
+  <rating>4.041666</rating>
+  <slug>Implementing-custom-Membership-Provider-and-Role-Provider-for-Authinticating-ASPNET-MVC-Applications</slug>
+  <tags />
+  <comments>
+    <comment id="d6f68ab6-04e0-4778-8a07-47702e61e273" parentid="00000000-0000-0000-0000-000000000000" approved="True" spam="False" deleted="False">
+      <date>2009-10-16 13:58:05</date>
+      <author>Heavy Metal God</author>
+      <email>ddelucie@hotmail.com</email>
+      <country>us</country>
+      <ip>68.5.232.74</ip>
+      <website>http://www.heavymetalpower.com/</website>
+      <content>&amp;quot;I personally don’t feel comfortable having third party code create my user schema. Perhaps I’m being overly sensitive here.&amp;quot;
+
+Yes you are.  :-)</content>
+    </comment>
+    <comment id="90d958a2-6cfa-44e4-8893-77360a40b336" parentid="00000000-0000-0000-0000-000000000000" approved="True" spam="False" deleted="False">
+      <date>2009-10-20 07:23:33</date>
+      <author>Stacey</author>
+      <email>belldandy.asgard@gmail.com</email>
+      <country>us</country>
+      <ip>69.6.174.174</ip>
+      <content>Thank you so, so much for posting this. You have absolutely made my day in every possible way.</content>
+    </comment>
+    <comment id="751236f6-805f-4dd7-b497-954ff4b90092" parentid="00000000-0000-0000-0000-000000000000" approved="True" spam="False" deleted="False">
+      <date>2009-10-25 10:21:39</date>
+      <author>Kevin Jensen</author>
+      <email>kevin@kineticmedia.net</email>
+      <country>us</country>
+      <ip>75.73.170.134</ip>
+      <website>http://www.kineticmedia.net/</website>
+      <content>nice article!  Can you display how you inject your custom principle/identity classes?
+
+</content>
+    </comment>
+    <comment id="4953e118-2d58-4966-bcb2-1614485990dd" parentid="00000000-0000-0000-0000-000000000000" approved="True" spam="False" deleted="True">
+      <date>2010-12-19 13:37:13</date>
+      <author>Cholesterol Lowering Foods</author>
+      <email>Rm6@gmail.com</email>
+      <country>us</country>
+      <ip>64.120.87.51</ip>
+      <website>http://cholesterol-lowering-foods.com/</website>
+      <moderatedby>Auto</moderatedby>
+      <avatar />
+      <content>I've been searching for over an hour on Google for this! Excellent source of information.</content>
+    </comment>
+    <comment id="81121383-8dcd-4681-ade2-9b3f4558ceb1" parentid="00000000-0000-0000-0000-000000000000" approved="True" spam="False" deleted="False">
+      <date>2010-12-20 05:36:54</date>
+      <author>Atilla Malas</author>
+      <email>atilla.malas@gmail.com</email>
+      <country>nl</country>
+      <ip>192.41.140.2</ip>
+      <moderatedby>Auto</moderatedby>
+      <avatar />
+      <content>Hi, is it possible that you also provide example or refer to a UserRepositoryFactory implementation. Thx.</content>
+    </comment>
+    <comment id="31b22920-d652-428b-bd1f-cd6d0b25f9ff" parentid="00000000-0000-0000-0000-000000000000" approved="True" spam="False" deleted="True">
+      <date>2010-12-22 20:58:03</date>
+      <author>Althea Schuld</author>
+      <email>Lokuta9412@ymail.com</email>
+      <country>us</country>
+      <ip>173.208.19.195</ip>
+      <website>http://ted73weiss.tripod.com/personal-loans-for-bad-credit-no/</website>
+      <moderatedby>Auto</moderatedby>
+      <avatar />
+      <content>Great Post, I love to read articles that are informative and beneficial in nature. Thank you for sharing your experiences and I look forward to reading more.</content>
+    </comment>
+    <comment id="9f381b68-dae0-42b5-9e78-688c1d88a082" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="True">
+      <date>2010-12-25 05:12:29</date>
+      <author>crypter</author>
+      <email>alfaboy1979@hotmail.it</email>
+      <country>us</country>
+      <ip>62.129.245.186</ip>
+      <website>http://www.onlinecrypter.com/</website>
+      <moderatedby>App_Code.Extensions.StopForumSpam</moderatedby>
+      <avatar />
+      <content>Bookmarked for later use, Great article, thank you.</content>
+    </comment>
+    <comment id="38616bd9-c064-4c20-8dab-6d3d3028401c" parentid="00000000-0000-0000-0000-000000000000" approved="True" spam="False" deleted="True">
+      <date>2010-12-27 00:38:43</date>
+      <author>hl5370dw</author>
+      <email>lastsea@hotmail.com</email>
+      <country>us</country>
+      <ip>118.173.6.158</ip>
+      <website>http://www.hl5370dw.com/</website>
+      <moderatedby>Auto</moderatedby>
+      <avatar />
+      <content>I really like your website because you gave me about info and resource I've never seen that before. I' l stay tuned on your web site. </content>
+    </comment>
+    <comment id="b4560a3b-682c-412d-87e5-a9615e68b58e" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="True">
+      <date>2010-12-30 22:55:37</date>
+      <author>Marla Tresrch</author>
+      <email>araceli93728@hotmail.com</email>
+      <country>us</country>
+      <ip>203.189.143.7</ip>
+      <website>http://myfunblog.net/new-gwa-club-penguin-music-video-–-lil’-hipster-girl-–-lmfao-2</website>
+      <moderatedby>App_Code.Extensions.StopForumSpam</moderatedby>
+      <avatar />
+      <content>This is really nice post, I've added that into my RSS feed reader. Thank you.</content>
+    </comment>
+    <comment id="6ffce05f-a0f8-451e-9bc1-c175fdef9043" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="False" deleted="True">
+      <date>2011-01-04 20:14:49</date>
+      <author>Ultimate WordPress Templates</author>
+      <email>Carmolli411@gmail.com</email>
+      <country>us</country>
+      <ip>173.246.36.118</ip>
+      <website>http://www.premiumnewstheme.com/</website>
+      <avatar />
+      <content>Jinglei is a popular actress (and director of Letter From An Unknown Woman) in China, who in 2005 began a blog ('I got the joy of expressing myself') which within a few months had garnered 11.5m visits and spurred thousands of other Chinese to blog. In 2006 statisticians at Technorati, having previously not factored China into their calculations, realised Jinglei's blog was the most popular in the world. In it she reports on her day-to-day moods, reflections, travels, social life and cats ('Finally the first kitten's been born!!!</content>
+    </comment>
+    <comment id="7ab91e05-be2d-42af-9eff-64219932df5f" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="True">
+      <date>2011-01-06 03:35:32</date>
+      <author>Belinda Johnston</author>
+      <email>r_eastwood72@yahoo.com</email>
+      <country>au</country>
+      <ip>118.175.86.33</ip>
+      <website>http://www.careertests123.net/</website>
+      <moderatedby>App_Code.Extensions.StopForumSpam</moderatedby>
+      <avatar />
+      <content>Excellent post!! :)</content>
+    </comment>
+    <comment id="0d205a52-13e8-4805-afb4-4f264d673c20" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="False" deleted="True">
+      <date>2011-01-06 17:38:32</date>
+      <author>Keturah Luksa</author>
+      <email>184Zane@hotmail.com</email>
+      <country>us</country>
+      <ip>69.162.146.232</ip>
+      <website>http://vintageturquoisejewelry.info/chunky-turquoise-necklace</website>
+      <avatar />
+      <content>Thanks for posting some fantastic data, i've already bookmarked your blog and have shared the link with several of my buddies, so you've got yourself some regular readers.</content>
+    </comment>
+    <comment id="3d9cd8a1-0083-40e8-b48f-0ca57442801e" parentid="00000000-0000-0000-0000-000000000000" approved="True" spam="False" deleted="False">
+      <date>2011-01-07 11:49:27</date>
+      <author>cbmeeks</author>
+      <email>cbmeeks@gmail.com</email>
+      <country>us</country>
+      <ip>74.205.130.194</ip>
+      <website>http://flocktravel.com/</website>
+      <moderatedby>mwrock</moderatedby>
+      <avatar />
+      <content>Thanks for this article.  I code in Rails at night but use Java/C# during the day.  In a recent project, I needed to add a custom membership provider to a ASP.NET/MVC app.  This helped a lot.
+
+Thanks again!
+</content>
+    </comment>
+    <comment id="843ffc86-880a-4542-a158-9705745fc9ca" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="True">
+      <date>2011-01-09 15:47:38</date>
+      <author>2GTS review</author>
+      <email>bobak2662@yahoo.com</email>
+      <country>us</country>
+      <ip>94.23.65.174</ip>
+      <website>http://goarticles.com/article/2-GIRLS-TEACH-SEX-It-will-change-your-life.-FOREVER/3939763/</website>
+      <moderatedby>Rule:black list</moderatedby>
+      <avatar />
+      <content>What charming phrase</content>
+    </comment>
+    <comment id="edefaa41-1835-4d4c-823e-c45fea1848b3" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="True">
+      <date>2011-01-09 22:57:48</date>
+      <author>Jamila Gourdine</author>
+      <email>Brienen@gmail.com</email>
+      <country>us</country>
+      <ip>209.61.133.73</ip>
+      <website>http://gamehackscentral.com/</website>
+      <moderatedby>App_Code.Extensions.StopForumSpam</moderatedby>
+      <avatar />
+      <content>Nice great content keep it up :)</content>
+    </comment>
+    <comment id="ee15a7f2-27a3-4f12-a59e-915d5292113e" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="False" deleted="True">
+      <date>2011-01-09 23:13:41</date>
+      <author>Ariel Baysinger</author>
+      <email>Baeskens@gmail.com</email>
+      <country>us</country>
+      <ip>189.51.208.200</ip>
+      <website>http://manixroms.com/</website>
+      <avatar />
+      <content>Nice great content keep it up :)</content>
+    </comment>
+    <comment id="ffc967d3-7127-4b38-9aa9-077a63a4ae17" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="True">
+      <date>2011-01-09 23:13:47</date>
+      <author>Garret Boebinger</author>
+      <email>Shankles@aol.com</email>
+      <country>ie</country>
+      <ip>89.100.14.253</ip>
+      <website>http://www.dublinceramictilers.com/</website>
+      <moderatedby>App_Code.Extensions.StopForumSpam</moderatedby>
+      <avatar />
+      <content>Been in the industry a good while now and still like to keep informed...Thanks for the article</content>
+    </comment>
+    <comment id="2efef028-046c-48c4-8e7b-71cbaa198b98" parentid="00000000-0000-0000-0000-000000000000" approved="True" spam="False" deleted="False">
+      <date>2011-01-11 03:52:00</date>
+      <author>Atilla Malas</author>
+      <email>atilla.malas@gmail.com</email>
+      <country>nl</country>
+      <ip>192.41.140.2</ip>
+      <moderatedby>mwrock</moderatedby>
+      <avatar />
+      <content>I started using this. In my case there is an issue, other than username,password there is also a [b]third parameter [/b]identifying the [i]repository [/i]to which this user belongs. Can you suggest how to add another parameter to this method. Thanks</content>
+    </comment>
+    <comment id="c69ee3f7-ec18-4eb3-8023-6eb1db5083a4" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="False" deleted="True">
+      <date>2011-01-12 02:48:42</date>
+      <author>pay day loans</author>
+      <email>a592017629@yahoo.com</email>
+      <country>us</country>
+      <ip>79.116.137.237</ip>
+      <website>http://www.myonlinepayday.com/</website>
+      <avatar />
+      <content>Be a craftsman in speech that thou mayest be strong, for the strength of one is the tongue, and speech is mightier than all fighting.</content>
+    </comment>
+    <comment id="4ee3cd23-e20f-4c35-9bca-4bab5dd2b5fe" parentid="00000000-0000-0000-0000-000000000000" approved="True" spam="False" deleted="False">
+      <date>2011-01-12 08:14:17</date>
+      <author>mwrock</author>
+      <email>matt@mattwrock.com</email>
+      <country>us</country>
+      <ip>131.107.0.74</ip>
+      <website>http://www.mattwrock.com/</website>
+      <moderatedby>mwrock</moderatedby>
+      <avatar />
+      <content>You could simply add a repository parameter to the controller method and provider validation.</content>
+    </comment>
+    <comment id="49bc92c7-d4cf-4bc2-8e6e-7952b571967e" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="True">
+      <date>2011-01-15 07:03:31</date>
+      <author>Jocuri online</author>
+      <email>mihaivulpe26@gmail.com</email>
+      <country>us</country>
+      <ip>208.176.117.46</ip>
+      <website>http://www.e-jocurionline.org/</website>
+      <moderatedby>Rule:black list</moderatedby>
+      <avatar />
+      <content>I just got on the blogs and I am glad I discovered your blog. I will return. I would like to become familiar with learning RSS feeds. Perhaps that is what I will learn soon.</content>
+    </comment>
+    <comment id="427ce216-9aac-464e-8530-887bb7dc7aa3" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="False" deleted="True">
+      <date>2011-01-18 18:39:17</date>
+      <author>Jacksonville Internet Marketing Expert</author>
+      <email>Mohn34@gmail.com</email>
+      <country>us</country>
+      <ip>173.234.48.99</ip>
+      <website>http://www.youtube.com/watch?v=Li5CO6Niy3w</website>
+      <avatar />
+      <content>I have been scouring the Web for such info and just wanted to say thanks to u for this post. BTW, just off topic, where can i find a copy of this look? – Regards</content>
+    </comment>
+    <comment id="452eee1d-bad9-4b02-82ff-f445531391e9" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="False" deleted="True">
+      <date>2011-01-19 04:56:03</date>
+      <author>vino senza solfiti</author>
+      <email>socerbox@gmail.com</email>
+      <country>it</country>
+      <ip>122.177.145.72</ip>
+      <website>http://www.nuovacappelletta.it/barbera_ssa500.php</website>
+      <avatar />
+      <content>This is the awesome post. This is really knowledgeable post to all the students. 
+</content>
+    </comment>
+    <comment id="ebe5d2d4-a1c1-440e-b1db-56c1ec71ca47" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="False" deleted="True">
+      <date>2011-01-19 13:09:25</date>
+      <author>Iris Park</author>
+      <email>ionarchitect28@gmail.com</email>
+      <country>us</country>
+      <ip>64.120.17.152</ip>
+      <website>http://www.mycollegesandcareers.com/careers /special-education-teacher/special-education-teacher-salary</website>
+      <avatar />
+      <content>Special Education is one of the most exciting areas of teaching. Learn more about this exciting career and &amp;lt;a href=&amp;quot;http://www.mycollegesandcareers.com/careers%20/special-education-teacher/special-education-teacher-salary&amp;quot; title=&amp;quot;special education teacher salary&amp;quot;&amp;gt; special education teacher salary&amp;lt;/a&amp;gt; information.</content>
+    </comment>
+    <comment id="ba8ff621-c425-47c3-bcb9-3d259f89534f" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="False" deleted="False">
+      <date>2011-02-03 02:51:21</date>
+      <author>boiler breakdown</author>
+      <email>JaneBlake@mailbbb.com</email>
+      <country>gb</country>
+      <ip>86.179.113.181</ip>
+      <website>http://www.boiler-breakdown.co.uk/</website>
+      <avatar />
+      <content>I have today read  Implementing custom Membership Provider and Role Provider for Authenticating ASP NET MVC Applications on your site and several different articles. I am not going to remark on what everyone else has currently stated as numerous comments are odd, but I do reckon they should comment on your reporting of the matter. Why didnt I remember about this? I would truly wish to study more on this issue. </content>
+    </comment>
+    <comment id="b118faf9-cf39-4f33-a3c0-caf7d4e2b601" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="False">
+      <date>2011-02-04 15:09:30</date>
+      <author>hdmi cable cheapest price</author>
+      <email>Ellerson@gmail.com</email>
+      <country>us</country>
+      <ip>67.214.168.190</ip>
+      <website>http://www.hdmicablecheap.com/</website>
+      <moderatedby>App_Code.Extensions.StopForumSpam</moderatedby>
+      <avatar />
+      <content>I really felt the need to compliment this post.  It really evoked a sense of satisfaction when I read it and I hope to read your thoughts again soon.</content>
+    </comment>
+    <comment id="9e5a0d2f-c537-48f2-b152-b50b14d95862" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="False">
+      <date>2011-02-04 18:35:25</date>
+      <author>Roberto Alwardt</author>
+      <email>Tuten375@Hotmail.com</email>
+      <country>us</country>
+      <ip>157.181.65.134</ip>
+      <website>http://www.the-warez.com/</website>
+      <moderatedby>Rule:black list</moderatedby>
+      <avatar />
+      <content>http://www.the-warez.com is the answer</content>
+    </comment>
+    <comment id="1b2e3cb0-35f7-4981-82c0-2773e6679e63" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="False" deleted="False">
+      <date>2011-02-12 07:28:21</date>
+      <author>Mahdi</author>
+      <email>virtualworld72@gmail.com</email>
+      <country>us</country>
+      <ip>85.9.88.60</ip>
+      <avatar />
+      <content>Wow finally i found a article about my problem!
+
+Matt, your article is exactly which i want but i am very new to Asp.Net MVC, so is there any simple sample project about this ?
+
+Thanks</content>
+    </comment>
+    <comment id="9cdc13ac-a01b-4f4d-9a2b-746b42b20083" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="False">
+      <date>2011-02-12 14:23:58</date>
+      <author>Mahdi</author>
+      <email>virtualworld72@gmail.com</email>
+      <country>us</country>
+      <ip>85.9.76.187</ip>
+      <moderatedby>Rule:black list</moderatedby>
+      <avatar />
+      <content>Hi Matt,
+
+after too searching i found my answer in your article, but i'm very new to asp.net mvc so is there any simple sample about this?
+
+Thanks</content>
+    </comment>
+    <comment id="9935c714-1131-4f4a-8f3c-1e87e4cc4325" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="False">
+      <date>2011-02-13 20:02:27</date>
+      <author>bug a cell phone</author>
+      <email>Criswell43@yahoo.com</email>
+      <country>us</country>
+      <ip>200.70.25.242</ip>
+      <website>http://www.youtube.com/watch?v=ofec5gYlZ74</website>
+      <moderatedby>App_Code.Extensions.StopForumSpam</moderatedby>
+      <avatar />
+      <content>There are certainly quite a lot of particulars like that to take into consideration. That may be a nice point to bring up. I provide the ideas above as normal inspiration however clearly there are questions like the one you deliver up the place a very powerful thing can be working in honest good faith. I don?t know if greatest practices have emerged around things like that, however I am sure that your job is clearly recognized as a fair game. Both boys and girls really feel the influence of just a second’s pleasure, for the remainder of their lives.</content>
+    </comment>
+    <comment id="cb3efbc9-9025-4964-ae22-2be98ea325f6" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="False">
+      <date>2011-02-15 01:08:20</date>
+      <author>FPS Freek</author>
+      <email>2710Kuwana@aol.com</email>
+      <country>us</country>
+      <ip>173.234.228.30</ip>
+      <website>http://www.modsticks.com/</website>
+      <moderatedby>App_Code.Extensions.StopForumSpam</moderatedby>
+      <avatar />
+      <content>Excellent post.</content>
+    </comment>
+    <comment id="13b13a13-4537-4706-8046-efd7aa9f3d8b" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="False">
+      <date>2011-02-17 08:16:58</date>
+      <author>traffic estimator</author>
+      <email>lukqy9ggukq@msn.com</email>
+      <country>us</country>
+      <ip>64.120.34.87</ip>
+      <website>http://www.lovestraffic.com/traffic-tactics/website-traffic-questions</website>
+      <moderatedby>Rule:black list</moderatedby>
+      <avatar />
+      <content>staying up for reading extra from you in the future that is really great things</content>
+    </comment>
+    <comment id="fd69a952-6a1b-4571-b65b-f27e30bb55ba" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="False" deleted="False">
+      <date>2011-02-23 01:25:18</date>
+      <author>Nike Duck Shoes</author>
+      <email>plvz1025@gmail.com</email>
+      <country>cn</country>
+      <ip>175.44.9.31</ip>
+      <website>http://www.airforceshoesonline.com/</website>
+      <avatar />
+      <content>your website is so great that i love it very much. thank you for sharing it with us.</content>
+    </comment>
+    <comment id="5fe81968-d79f-423f-9156-f711595ac27f" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="False" deleted="False">
+      <date>2011-02-27 14:47:17</date>
+      <author>this</author>
+      <email>Fukuda8@gmail.com</email>
+      <country>us</country>
+      <ip>90.202.187.171</ip>
+      <website>http://honestreview4u.com/p90x</website>
+      <avatar />
+      <content>happy family barbies</content>
+    </comment>
+    <comment id="e4b29b85-122f-4352-bfbd-8794bc41abca" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="False" deleted="False">
+      <date>2011-02-27 22:47:04</date>
+      <author>radii shoes</author>
+      <email>3543215@qq.com</email>
+      <country>cn</country>
+      <ip>117.26.222.124</ip>
+      <website>http://www.radiinoble.com/</website>
+      <avatar />
+      <content>Good share,you article very great, very usefull for us…thank you
+</content>
+    </comment>
+    <comment id="dcec6bcc-60f5-4904-8b03-27bde1c9cd55" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="False">
+      <date>2011-02-28 00:16:16</date>
+      <author>Directory Mark</author>
+      <email>seo-webmarketing@gmx.com</email>
+      <country>us</country>
+      <ip>187.12.211.122</ip>
+      <website>http://www.seo-webmarketing.nl/</website>
+      <moderatedby>App_Code.Extensions.StopForumSpam</moderatedby>
+      <avatar />
+      <content>This is on of the kind of posts, It could be my mistake, which I dont get so. Please explain a little more.</content>
+    </comment>
+    <comment id="70b88a92-aaa8-4366-b0b9-1de7959586be" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="False">
+      <date>2011-02-28 07:17:59</date>
+      <author>laterooms london</author>
+      <email>Sukovich@gmail.com</email>
+      <country>us</country>
+      <ip>65.49.94.147</ip>
+      <website>http://www.hotelsservice.com/search2.php?hotelcity=London</website>
+      <moderatedby>App_Code.Extensions.StopForumSpam</moderatedby>
+      <avatar />
+      <content>You made some good stuff there. I did a search on the content and uncovered a lot of people might go along having your blog.</content>
+    </comment>
+    <comment id="c7680981-4e9a-4bcf-aaaf-991fe6ce600d" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="False">
+      <date>2011-03-05 07:32:07</date>
+      <author>laterooms london</author>
+      <email>Kyles@gmail.com</email>
+      <country>us</country>
+      <ip>65.49.94.145</ip>
+      <website>http://www.hotelsservice.com/search2.php?hotelcity=London</website>
+      <moderatedby>App_Code.Extensions.StopForumSpam</moderatedby>
+      <avatar />
+      <content>You presented some very nice specifics there. I did a hunt on the point and uncovered most people could consent having your blog.</content>
+    </comment>
+    <comment id="816ee883-cf4d-4296-9091-cd53ef93447d" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="False" deleted="False">
+      <date>2011-03-08 02:32:11</date>
+      <author>central heating</author>
+      <email>TammySmith@mailgbb.com</email>
+      <country>gb</country>
+      <ip>86.177.105.7</ip>
+      <website>http://www.central-heating.info/</website>
+      <avatar />
+      <content>I have scanned a couple of of the articles on your site now additionally to  Implementing custom Membership Provider and Role Provider for Authenticating ASP NET MVC Applications, and I truly appreciate your way of writing. An essay a day keeps the remarks arriving.</content>
+    </comment>
+    <comment id="9c2de732-3ed5-4bd2-ac3b-3cc6fa0068ac" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="False">
+      <date>2011-03-08 19:58:27</date>
+      <author>Jesusa Callander</author>
+      <email>Kindberg@gmail.com</email>
+      <country>us</country>
+      <ip>173.234.31.73</ip>
+      <website>http://barbecuefever.com/barbecues/charcoal-barbecues/</website>
+      <moderatedby>Rule:black list</moderatedby>
+      <avatar />
+      <content>Thanks a lot for this, it truly is fantastic to discover a website which really provides good information rather than posting junk. </content>
+    </comment>
+    <comment id="2a424897-6f6c-4784-9480-79240bd89a51" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="False" deleted="False">
+      <date>2011-03-10 12:48:28</date>
+      <author>Omar</author>
+      <email>dev@kilone.com</email>
+      <country>us</country>
+      <ip>98.119.43.58</ip>
+      <website>http://www.watchdoddy.com/</website>
+      <avatar />
+      <content>Great article
+
+Will this work with the security annotations?
+[Authorize] etc? </content>
+    </comment>
+    <comment id="72020e3d-b5f4-4aef-ac97-8877e6ce7bea" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="False" deleted="False">
+      <date>2011-03-11 10:14:42</date>
+      <author>Beula Mickell</author>
+      <email>Pestano@gmail.com</email>
+      <country>us</country>
+      <ip>173.234.30.90</ip>
+      <website>http://barbecuefever.com/barbecues/stainless-steel-barbecues/</website>
+      <avatar />
+      <content>Hi and thanks for this, it's superb to come across a internet site which genuinely delivers excellent information instead of posting junk. </content>
+    </comment>
+    <comment id="44f5608a-8ce7-4b6e-accf-06498e3d161c" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="False">
+      <date>2011-03-11 17:26:18</date>
+      <author>laterooms london</author>
+      <email>Higgens@gmail.com</email>
+      <country>us</country>
+      <ip>65.49.94.145</ip>
+      <website>http://www.hotelsservice.com/search2.php?hotelcity=London</website>
+      <moderatedby>Rule:black list</moderatedby>
+      <avatar />
+      <content>You made some really good specifics there. I did a browse on the topic and found most people may go along having your blog.</content>
+    </comment>
+    <comment id="9e892108-98d2-4150-a479-aa42481956e8" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="False">
+      <date>2011-03-16 04:02:02</date>
+      <author>reading glasses</author>
+      <email>Brandner25@gmail.com</email>
+      <country>us</country>
+      <ip>88.169.92.9</ip>
+      <website>http://www.varionetglasses.com/</website>
+      <moderatedby>Rule:black list</moderatedby>
+      <avatar />
+      <content>I'm a graduating student and my final presentation deals with this topic. Can I use your pictures to illustrate my master's degree thesis? Thank you and regards, Jenny.</content>
+    </comment>
+    <comment id="b1c5119a-e0f1-4556-87a0-dab160b6ba92" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="False">
+      <date>2011-03-16 11:57:49</date>
+      <author>Miss Forensic Psychologist</author>
+      <email>onlinecollegesguru@gmail.com</email>
+      <country>us</country>
+      <ip>173.208.100.164</ip>
+      <website>http://www.mycollegesandcareers.com/careers/forensic-psychologist/forensic-psychologist-salary/</website>
+      <moderatedby>Rule:black list</moderatedby>
+      <avatar />
+      <content>The forensic psychologist salary can be a great factor in stepping into that field.</content>
+    </comment>
+    <comment id="9bf530eb-acff-4e01-8344-399399cf835e" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="False">
+      <date>2011-03-20 04:24:06</date>
+      <author>steve</author>
+      <email>Johal61@yahoo.com</email>
+      <country>us</country>
+      <ip>88.169.92.9</ip>
+      <website>http://www.universalaffiliates.com/wp-content/plugins/simplepie_1.2/demo/minimalistic.php?feed=feede1.n1-117-117.analyse-concurrentielle.com</website>
+      <moderatedby>Rule:black list</moderatedby>
+      <avatar />
+      <content>Don't you think that this topic is already outdated to publish such an article? It seems that newest products are now available and can bring more interest than the one you described here...</content>
+    </comment>
+    <comment id="391780bf-89cd-4e4b-ba47-131c90aa173d" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="False">
+      <date>2011-03-21 01:17:59</date>
+      <author>Personals</author>
+      <email>Fulenwider@ymail.com</email>
+      <country>us</country>
+      <ip>80.82.150.158</ip>
+      <website>http://hornydevildating.com/blog/2010/10/how-to-make-people-laugh-online-dating-chat-and-singles-tips/</website>
+      <moderatedby>Rule:black list</moderatedby>
+      <avatar />
+      <content>There are so many blogs around relating to dating, it's always great to find some fresh content</content>
+    </comment>
+    <comment id="ab10f535-b54d-431d-a1e7-166f6eba95b8" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="False">
+      <date>2011-03-22 14:54:13</date>
+      <author>rachat credit immobilier</author>
+      <email>Ficek@yopmail.fr</email>
+      <country>fr</country>
+      <ip>85.68.185.243</ip>
+      <website>http://www.racheter-un-credit.co.cc/rachat-de-credit-moto/index.html</website>
+      <moderatedby>Rule:black list</moderatedby>
+      <avatar />
+      <content>Wow! �to ideja! �to koncept! Lijepa .. Amazing ... </content>
+    </comment>
+    <comment id="2412fa27-e589-431a-9bee-c4b02d74b19f" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="False" deleted="False">
+      <date>2011-03-24 09:14:10</date>
+      <author>Holger Kreissl</author>
+      <email>kreissl@gmail.com</email>
+      <country>de</country>
+      <ip>195.13.40.75</ip>
+      <avatar />
+      <content>Great post its what i am looking for. But i dont understand your User class. In the IsInRole Method you access a Role Member that isnt defined anywhere? So what is this? Its not part of IPrincipal but you are accessing it right there...
+
+if (Role.Description.ToLower() == role.ToLower())
+
+Thanks</content>
+    </comment>
+    <comment id="ce0a9c11-09b3-4625-a867-e4f869fb9272" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="False">
+      <date>2011-03-24 21:16:11</date>
+      <author>Jeramy Bonetti</author>
+      <email>Nosbisch@yahoo.com</email>
+      <country>us</country>
+      <ip>79.125.120.127</ip>
+      <website>http://superhealthlinks.com/</website>
+      <moderatedby>Rule:black list</moderatedby>
+      <avatar />
+      <content>Thanks for posting.  I'm bookmarking your blog and will certainly return!</content>
+    </comment>
+    <comment id="a7c4a852-26df-47c4-9ef1-8dfb6bf0da5e" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="False">
+      <date>2011-03-27 00:56:36</date>
+      <author>rift gold</author>
+      <email>friendlinzh@qq.com</email>
+      <country>us</country>
+      <ip>68.15.122.120</ip>
+      <website>http://www.gamemammy.com/Rift-Gold</website>
+      <moderatedby>Rule:black list</moderatedby>
+      <avatar />
+      <content>SELECT CONVERT(nvarchar(20), CAST(’2008-04-04 16:07:07.920′ AS DateTime), 101);</content>
+    </comment>
+    <comment id="0f87c80d-6e95-4e5e-8275-71c8b18ebd87" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="False">
+      <date>2011-03-27 00:57:02</date>
+      <author>rift gold</author>
+      <email>friendlinzh@qq.com</email>
+      <country>us</country>
+      <ip>68.15.122.120</ip>
+      <website>http://www.gamemammy.com/Rift-Gold</website>
+      <moderatedby>Rule:black list</moderatedby>
+      <avatar />
+      <content>Enjoy! </content>
+    </comment>
+    <comment id="88f37617-f8c2-48b6-b2ae-d9dad65d460c" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="False" deleted="False">
+      <date>2011-03-27 22:21:08</date>
+      <author>Play Omaha</author>
+      <email>omaha_player@yopmail.com</email>
+      <country>us</country>
+      <ip>91.110.242.224</ip>
+      <website>http://www.holdempokerskills.com/howtoplayomaha.html</website>
+      <avatar />
+      <content>Top draw more of the same please, loved it.</content>
+    </comment>
+    <comment id="249d5f2e-c81c-4571-9888-cd470aee7df7" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="False">
+      <date>2011-03-29 16:36:54</date>
+      <author>Theodore	Peele</author>
+      <email>hostmaster@plig.net</email>
+      <country>us</country>
+      <ip>222.165.130.214</ip>
+      <website>http://www.freepresscorps.com/resources/</website>
+      <moderatedby>Rule:black list</moderatedby>
+      <avatar />
+      <content>Definitely bookmarking this. Don't stop writing these articles are really useful!</content>
+    </comment>
+    <comment id="60f893c8-89a6-4dd4-b7b5-0a92a7a98313" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="False">
+      <date>2011-04-04 00:08:46</date>
+      <author>Prestation R�f�rencement</author>
+      <email>seocontest2010@gmail.com</email>
+      <country>fr</country>
+      <ip>62.35.174.225</ip>
+      <website>http://www.seotaurus.com/</website>
+      <moderatedby>Rule:black list</moderatedby>
+      <avatar />
+      <content>I'm really interested and i would like to share this with my student friends, do you have a pdf version?</content>
+    </comment>
+    <comment id="2347ac14-b1b6-4730-a1a5-2a5a505ec444" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="False" deleted="False">
+      <date>2011-04-08 02:06:26</date>
+      <author>vino senza solfiti</author>
+      <email>sharma.gagan002@gmail.com</email>
+      <country>it</country>
+      <ip>122.177.91.233</ip>
+      <website>http://www.nuovacappelletta.it/barbera_ssa500.php</website>
+      <avatar />
+      <content>Hi, I found your post really helpful. It helped me all the way in completing my assignment, I am also giving a referance link of your blog in my case study. Thanks for posting such informative content. Keep posting.</content>
+    </comment>
+    <comment id="eb958966-6b6a-4678-82ae-04c85db1905e" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="False" deleted="False">
+      <date>2011-04-10 12:48:25</date>
+      <author>http://www.enema-video.net</author>
+      <email>Koor@yahoo.com</email>
+      <country>us</country>
+      <ip>173.234.127.55</ip>
+      <website>http://www.enema-video.net/</website>
+      <avatar />
+      <content>Mr. Obama is an enema of America. No I spelled it right. When he gets done we won't have shit.</content>
+    </comment>
+    <comment id="e637a23a-427e-44e6-badf-1fa4f3b86f11" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="False">
+      <date>2011-04-10 16:53:12</date>
+      <author>Leota Cruey</author>
+      <email>Siverling89@gmail.com</email>
+      <country>us</country>
+      <ip>174.140.168.250</ip>
+      <website>http://homes-orlando.com/idx/city/altamonte-springs/?idx-q-PropertyTypes=119&amp;idx-d-SortOrders&lt;0&gt;-Column=Price&amp;idx-d-SortOrders&lt;0&gt;-Direction=DESC</website>
+      <moderatedby>Rule:black list</moderatedby>
+      <avatar />
+      <content>Great article, I’ve bookmarked this page and have a feeling I’ll be returning to it often.</content>
+    </comment>
+    <comment id="6e738a52-93a5-41ae-862b-cca053f6e8eb" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="False">
+      <date>2011-04-12 21:30:10</date>
+      <author>entertainment gossip</author>
+      <email>Danoski8@google.com</email>
+      <country>us</country>
+      <ip>108.62.16.57</ip>
+      <website>http://gossipnewsviews.co.uk/category/entertainment</website>
+      <moderatedby>Rule:black list</moderatedby>
+      <avatar />
+      <content>Look ahead to reading extra from you in the future that is really great things</content>
+    </comment>
+    <comment id="8c5bd566-ed0c-4064-85c2-49fdf9586b44" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="False" deleted="False">
+      <date>2011-04-17 23:05:08</date>
+      <author>Luke W.</author>
+      <email>luke.winikates@gmail.com</email>
+      <country>us</country>
+      <ip>76.102.49.76</ip>
+      <avatar />
+      <content>Hi Matt,
+
+I found your blog post while on my own quest to better understand Forms Auth, and you helped talk me out of my hand-rolled authentication attribute.
+
+I'm curious to get your take on something, though:
+I'm using forms auth with my own DB schema, but I'm not using Roles in any way.
+
+I guess I'm not seeing the added value of bringing the MembershipProvider implementation into the picture given that I'm not using ASP.NET roles for anything. This has me wondering if I'm lazy, or if I'm missing some other benefit of using a full MembershipProvider implementation. 
+
+I think I'd probably feel differently if Roles mattered to me, but I'm not seeing it right now, and I wonder if I'm being unreasonable, or if laziness is wisdom here? </content>
+    </comment>
+    <comment id="296bf6fd-e1d1-4328-a2c8-9544a86d0bb8" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="False" deleted="False">
+      <date>2011-04-18 02:39:33</date>
+      <author>contest to win</author>
+      <email>winonlineprizes@yahoo.com</email>
+      <country>us</country>
+      <ip>180.149.9.69</ip>
+      <website>http://www.diggsquares.com/</website>
+      <avatar />
+      <content>It is a cool post as I have bookmarked this on my PC. To read this kind of post is very new to me. Many many thanks for sharing such a nice blog.
+
+</content>
+    </comment>
+    <comment id="a34b7012-48ba-4c2a-acef-74d1493c8001" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="False" deleted="False">
+      <date>2011-04-21 07:39:04</date>
+      <author>Markita Paruta</author>
+      <email>Fortgang@gmail.com</email>
+      <country>us</country>
+      <ip>173.234.27.199</ip>
+      <website>http://barbecuefever.com/barbecue-recipes/beef-recipes/burgers/grilled-beef-burger/</website>
+      <avatar />
+      <content>Terrific post.I wish to thank you for this informative you shared as I required the idea for a school project.</content>
+    </comment>
+    <comment id="ceadaecf-983e-4d4d-88ce-486d9d32951d" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="False" deleted="False">
+      <date>2011-04-25 22:35:08</date>
+      <author>Locali Roma</author>
+      <email>socerbox@gmail.com</email>
+      <country>it</country>
+      <ip>122.176.84.224</ip>
+      <website>http://www.romaexclusiveparty.com/</website>
+      <avatar />
+      <content>Hi, I agree with every statement that you have made in the post and I really appreciate your effort in gathering up the information. Thanks for it.
+</content>
+    </comment>
+    <comment id="8e7ca089-7338-4d0c-bed8-bbc18d5d096c" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="False">
+      <date>2011-04-25 22:36:30</date>
+      <author>Locali Roma</author>
+      <email>socerbox@gmail.com</email>
+      <country>it</country>
+      <ip>122.176.84.224</ip>
+      <website>http://www.romaexclusiveparty.com/</website>
+      <moderatedby>Rule:black list</moderatedby>
+      <avatar />
+      <content>Hi, I agree with every statement that you have made in the post and I really appreciate your effort in gathering up the information. Thanks for it.
+</content>
+    </comment>
+    <comment id="51b93ae4-6b43-41bd-841a-c078d8358760" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="False">
+      <date>2011-04-25 22:38:44</date>
+      <author>Sale per feste roma</author>
+      <email>socerbox@gmail.com</email>
+      <country>it</country>
+      <ip>122.176.84.224</ip>
+      <website>http://www.festa18anniroma.com/sale-feste-18-anni-roma/</website>
+      <moderatedby>Rule:black list</moderatedby>
+      <avatar />
+      <content>Hi, Thanks for sharing such a wonderful piece of information. I must say that while reading your post I found my thoughts in agreement with the topic that you have discussed, which happens very rare. 
+</content>
+    </comment>
+    <comment id="5aa5d094-e3f0-4d2d-8e99-3d23f675ada5" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="False" deleted="False">
+      <date>2011-04-26 04:13:32</date>
+      <author>Winnifred Roller</author>
+      <email>Wolsdorf350@mail.com</email>
+      <country>us</country>
+      <ip>72.35.120.227</ip>
+      <website>http://www.rebuildingcredittips.com/02/secured-credit-cards/</website>
+      <avatar />
+      <content>It's nice to come across a writer that supplies helpful information.  I'll be saving this blog so I can come back.  Thank you for the hard work you put in your blog.</content>
+    </comment>
+    <comment id="e48e5ae1-b4dc-4cd1-8460-916a624b2059" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="False">
+      <date>2011-04-26 12:18:31</date>
+      <author>Wedding in the Adirondacks</author>
+      <email>Sosby9@gmail.com</email>
+      <country>us</country>
+      <ip>74.79.214.208</ip>
+      <website>http://adirondackweddingshq.com/</website>
+      <moderatedby>Rule:black list</moderatedby>
+      <avatar />
+      <content>I think you are total correct.</content>
+    </comment>
+    <comment id="48de4b99-91c3-420f-af99-99144357c1c7" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="False" deleted="False">
+      <date>2011-04-27 03:02:31</date>
+      <author>Sweet_simran</author>
+      <email>shikhargangrade@gmail.com</email>
+      <country>in</country>
+      <ip>122.168.109.38</ip>
+      <avatar />
+      <content>HI ,
+Thamks alot for the whole tutorial.
+It could be more better if you added zip file of whole project.
+I waiting for your responce.</content>
+    </comment>
+    <comment id="2afb7b33-d6e8-41d3-a46b-ecf654a5e524" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="False" deleted="False">
+      <date>2011-05-10 06:01:19</date>
+      <author>junior</author>
+      <email>junior_luiz@hotmail.com</email>
+      <country>br</country>
+      <ip>200.253.5.150</ip>
+      <avatar />
+      <content>use this procedure with mvc 3 and entity framework ? would like </content>
+    </comment>
+    <comment id="530cce4f-91e4-4aad-b7f1-470cac3c3de2" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="False">
+      <date>2011-05-14 17:03:29</date>
+      <author>Demunn Cameron</author>
+      <email>Cadive72@hotmail.com</email>
+      <country>us</country>
+      <ip>71.123.224.33</ip>
+      <website>http://www.all-aboutinsurance.net/SR_22_Insurance.html</website>
+      <moderatedby>Rule:black list</moderatedby>
+      <avatar />
+      <content>It is a very interesting piece of writing.  It is rather helpful and you also have definitely conducted your preparation in advance of writing that content.  I have to return and pursue your upcoming content.</content>
+    </comment>
+    <comment id="300e8ff6-d51c-4a31-a2c6-a2ed4d481590" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="False" deleted="False">
+      <date>2011-06-02 19:08:36</date>
+      <author>Georgene Wisdom</author>
+      <email>Unch2730@gmail.com</email>
+      <country>us</country>
+      <ip>173.234.158.104</ip>
+      <website>http://okcentennialband.com/</website>
+      <avatar />
+      <content>It seems like daily NATO is exceeding the UN Mandate in Libya. I sure hope this doesn't turn into another Afghanistan. I wish the poor did not always suffer in these situations.</content>
+    </comment>
+    <comment id="eea533e2-03d2-4972-b09a-583e85924bcd" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="False" deleted="False">
+      <date>2011-06-03 10:04:21</date>
+      <author>Luie Ribeiro</author>
+      <email>luieribeiro@gmail.com</email>
+      <country>za</country>
+      <ip>41.177.77.201</ip>
+      <website>http://www.objectstudio.net/</website>
+      <avatar />
+      <content>Hey Mark
+
+Struggled to find exactly this, and it simply works!! Thanks</content>
+    </comment>
+    <comment id="7276f8c6-d35f-43fd-b66f-162351f12c1d" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="False" deleted="False">
+      <date>2011-06-20 21:21:39</date>
+      <author>fsda</author>
+      <email>dfsdafsdf@sdf.ddd</email>
+      <country>us</country>
+      <ip>113.160.57.22</ip>
+      <avatar />
+      <content> sdfd f ds</content>
+    </comment>
+    <comment id="438ff3fe-53d8-44ce-8b34-9277b40fbe59" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="False">
+      <date>2011-06-22 18:00:43</date>
+      <author>server</author>
+      <email>Lepine_Bambino1965@mymail.com</email>
+      <country>ph</country>
+      <ip>212.91.180.250</ip>
+      <website>http://www.worldwideserver.com/</website>
+      <moderatedby>App_Code.Extensions.StopForumSpam</moderatedby>
+      <avatar />
+      <content>Last month, when i visited your blog i got an error on the mysql server of yours.-&amp;quot;*;</content>
+    </comment>
+    <comment id="357b9ae5-17aa-44b8-a8f3-409fe67093de" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="False">
+      <date>2011-06-23 07:19:12</date>
+      <author>Movies, Games, Software, encyclopedia</author>
+      <email>levan.kipshidze@gmail.com</email>
+      <country>ge</country>
+      <ip>95.137.159.101</ip>
+      <website>http://gefile.com/</website>
+      <moderatedby>Rule:black list</moderatedby>
+      <avatar />
+      <content>Please Click</content>
+    </comment>
+    <comment id="0427d164-7e83-4d33-b117-6b266ef5a9d9" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="False">
+      <date>2011-07-11 00:50:59</date>
+      <author>Doris Anderson</author>
+      <email>2BORNOT2B@GoDaddy.com</email>
+      <country>us</country>
+      <ip>71.123.224.33</ip>
+      <website>http://www.all-aboutinsurance.net/SR_22_Insurance.html</website>
+      <moderatedby>Rule:black list</moderatedby>
+      <avatar />
+      <content>That is a extremely helpful piece of writing.  It is rather beneficial and you simply have clearly conducted your preparation leading up to penning this unique content.  I will have to revisit and read your upcoming articles.</content>
+    </comment>
+    <comment id="66049690-0cee-4a57-8938-214c28818344" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="False">
+      <date>2011-07-15 02:15:56</date>
+      <author>Herve Leger</author>
+      <email>xiejiahui6984@gmail.com</email>
+      <country>cn</country>
+      <ip>70.32.38.85</ip>
+      <website>http://www.hervelegerdress.cc/</website>
+      <moderatedby>App_Code.Extensions.StopForumSpam</moderatedby>
+      <avatar />
+      <content>When i tend not to uncover almost any change concerning Islam in addition to Islamic fundamentalists. I do believe faith would be the origin, in addition to on the origin fundamentalism evolves to be a deadly stalk. In the event most of us take out fundamentalism in addition to hold faith, then one time or maybe a different fundamentalism will probably mature all over again. I need to claim of which mainly because many liberals generally shield Islam in addition to responsibility fundamentalists intended for developing complications. Although Islam per se oppresses women of all ages. Islam per se isn't going to make it possible for democracy and it also violates people proper rights.</content>
+    </comment>
+    <comment id="09763a38-a2d3-496b-8c71-e6afa5195452" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="False">
+      <date>2011-07-16 15:43:58</date>
+      <author>painting contractor</author>
+      <email>Kriz@ymail.com</email>
+      <country>us</country>
+      <ip>68.185.64.255</ip>
+      <website>http://qosmiox505.com/exterior_paint__interior_paint.htm</website>
+      <moderatedby>Rule:black list</moderatedby>
+      <avatar />
+      <content>I just came across your blog and wanted to drop you a note telling you how impressed I was with the information you have posted here. I also have a web site &amp;amp; blog about **painting contractor, here is the site:http://qosmiox505.com/exterior_paint__interior_paint.htm ** so I know I'm talking about when I say your site is top- notch! Keep up the great work, you are providing a great online resource</content>
+    </comment>
+  </comments>
+  <categories />
+  <notifications>
+    <email>belldandy.asgard@gmail.com</email>
+    <email>kevin@kineticmedia.net</email>
+    <email>atilla.malas@gmail.com</email>
+    <email>virtualworld72@gmail.com</email>
+    <email>dev@kilone.com</email>
+    <email>kreissl@gmail.com</email>
+    <email>luke.winikates@gmail.com</email>
+    <email>shikhargangrade@gmail.com</email>
+  </notifications>
+</post>

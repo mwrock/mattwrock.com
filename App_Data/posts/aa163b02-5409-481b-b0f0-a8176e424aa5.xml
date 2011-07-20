@@ -1,0 +1,118 @@
+﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<post>
+  <author>mwrock</author>
+  <title>Web Site Performance - It's not just your code</title>
+  <description />
+  <content>&lt;p&gt;I'm a software developer. By default, I tend to focus on optimizing my code and architecture patterns in order to tune performance. However, there are factors that lie well outside of your application code and structure that can have a profound impact on web site performance. Two of these factors that this post will focus on are the use of a CDN and IIS compresion settings.&lt;/p&gt;
+&lt;p&gt;Over the last month, me and my team have contracted a CDN and tweaked compression settings resulting in a 40% improvement of aveage page load time outside of our immediate geographical region!&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Using a CDN for static content&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;A CDN (content delivery network) is a company that has data centers distributed over the globe. Some of the dominant players are Akamai, CDNetworks and Limelight. These have many data centers dispersed over the United States as well as several scattered internationaly. Chances are they have servers that are located much closer to your users than your own servers. You may not think this is a big deal. What's a couple hundred milliseconds to load an image? Well if your site has alot of images as well as css and javascript (jquery alone packs a hefty download size), the boost can be&amp;nbsp; significant. Not only will average load time improve, but you will be less suseptible to general internet peaks and jitters that can potentially cause significant and annoying load delays.&lt;/p&gt;
+&lt;p&gt;One of the disadvantages of using a CDN is cost. You will need to work with a commercial CDN if you want to have your own images and other static content that you have authored to be hosted via CDN. However, several popular frameworks are freely hosted on the CDNs of large internet companies. For example just this week &lt;a href="http://weblogs.asp.net/scottgu/archive/2009/09/15/announcing-the-microsoft-ajax-cdn.aspx" target="_blank"&gt;Scott Guthrie announced&lt;/a&gt; that Microsoft will be hosting jQuery and the asp.net AJAX libraries. You can also use&lt;a href="http://code.google.com/apis/ajaxlibs/documentation/#jquery" target="_blank"&gt; Google's CDN&lt;/a&gt; to serve jQuery. I use Yahoo's YUI ajax libraries and they can be served from Yahoo. Another cost related consideration is that the bandwidth you would be paying to serve this content yourself is now absorbed by the CDN.&lt;/p&gt;
+&lt;p&gt;One other disadvantage that I often hear related to CDNs is that the control and availability of the content is now at the mercy of the CDN. Well I personally feel much more comfortable using Google's vast network resources than my own.&lt;/p&gt;
+&lt;p&gt;Migrating to a CDN for the hosting of your own media is fairly transparent and painless especially if you already host all of this content on its own domain or sub domain (ie images.coolsite.com). The CDN will assign you a DNS CNAME and you will add that to your domain's zone file. Now all requests for static content will go to the CDN's servers. If they do not have the content, they will go to your server to get it. Then all subsequent requests will go to the CDN's cache. You can specify what the cache expiration will be and you should also be able to manually flush the cache if you need to.&lt;/p&gt;
+&lt;p&gt;One other perk that most commercial CDNs provide is detailed reporting on bandwidth and geographical data telling where your content is being requested from.&lt;/p&gt;
+&lt;p&gt;Our servers are based in California's Silicon Valley and we realized a 30% performance boost in the midwest and eastern United States. It should also be noted that our pages are very image light. So a site that has lots of rich media has even more to gain.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Compress Everything&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;I had always been compressing static content but not dynamic content. I think I was scared off by the warnings that the IIS documentation gives regarding high CPU usage. Yes, compression does incur CPU overhead, but with today's CPU specs, chances are that it is not significant enough to keep you from turning on this feature. Our servers tend to run at about 5 to 10%. After turning on dynamic content compression, I saw no noticable CPU increase but I did see a 10% increase in page load performance. All of this is free and took me just a few minutes to configure. In fact it is better than free, you will save on bandwidth.&lt;/p&gt;
+&lt;p&gt;I did do some poking around the web for best practices and found that it is worth while to tweak the default compression levels in IIS. Here is a good &lt;a href="http://weblogs.asp.net/owscott/archive/2009/02/22/iis-7-compression-good-bad-how-much.aspx" target="_blank"&gt;blog article&lt;/a&gt; that goes into detail on this topic. To turn on static and dynamic compression at the ideal levels on IIS 7. I issued these commands:&lt;/p&gt;
+&lt;pre&gt;C:\Windows\System32\Inetsrv\Appcmd.exe set config -section:urlCompression -doStaticCompression:true -doDynamicCompression:true &lt;/pre&gt;
+&lt;pre&gt;C:\Windows\System32\Inetsrv\Appcmd.exe set config
+-section:httpCompression -[name='gzip'].staticCompressionLevel:9
+-[name='gzip'].dynamicCompressionLevel:4&lt;/pre&gt;
+&lt;p&gt;&amp;nbsp;&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Tools for analyzing page load performance&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;Here are a few nice tools I use to observe and analyze web site performance:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;&lt;a href="http://getfirebug.com/" target="_blank"&gt;Firebug&lt;/a&gt;. A must have Firefox plugin that will tell how long each resource takes to load.&lt;/li&gt;
+&lt;li&gt;An external monitoring service. I use &lt;a href="http://gomez.com" target="_blank"&gt;Gomez&lt;/a&gt;. This will not only tell you how long it takes for your site to load, but it can monitor from around the globe and provide very rich and detailed reporting. I have several alerts configured that page me if my site is taking too long to load or is broken. "Broken" can mean 500 errors, Server too busy errors, non responsive servers due to server outages or bad DNS or it can even mean a failed pattern match of strings expected on the page.&lt;/li&gt;
+&lt;li&gt;&lt;a href="http://developer.yahoo.com/yslow/" target="_blank"&gt;YSlow&lt;/a&gt;. This is a firefox plugin from Yahoo that works with Firebug and analyzes several key indicators on your site. It examines your headers, caching, javascript, style sheet usage and much more and then gives you a detailed list of possible improvements you can make.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;&amp;nbsp;&lt;/p&gt;
+&lt;p&gt;So if you feel that you have done all the code tweaking you can to get the most performance from your site, think again and take a look at these tools to see how the outside world is experiencing your content.&lt;/p&gt;</content>
+  <ispublished>True</ispublished>
+  <isdeleted>False</isdeleted>
+  <iscommentsenabled>True</iscommentsenabled>
+  <pubDate>2009-09-18 09:23:00</pubDate>
+  <lastModified>2009-09-18 15:26:43</lastModified>
+  <raters>1</raters>
+  <rating>5</rating>
+  <slug>Web-Site-Performance-Its-not-just-your-code</slug>
+  <tags />
+  <comments>
+    <comment id="3b70dd16-4add-4931-95a0-e0aef80868e4" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="False" deleted="True">
+      <date>2011-01-20 23:07:20</date>
+      <author>fast personal loans</author>
+      <email>leroy.mccauley@alltel.net</email>
+      <country>us</country>
+      <ip>79.116.141.144</ip>
+      <website>http://cashusloans.com/fast-personal-loans.html</website>
+      <avatar />
+      <content>We are healed from suffering only by experiencing it to the full.</content>
+    </comment>
+    <comment id="92bfb0ec-2d5f-45fa-b45c-fd8758970bfc" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="False" deleted="False">
+      <date>2011-02-05 15:06:11</date>
+      <author>exercises to flatten stomach</author>
+      <email>Vanness@aol.com</email>
+      <country>us</country>
+      <ip>108.18.162.165</ip>
+      <website>http://exercisestoflattenstomach.jimdo.com/</website>
+      <avatar />
+      <content>Hello thank you for the nice read i just bookmarked your feed and will be on the look out for new posts.</content>
+    </comment>
+    <comment id="d1e80649-eec2-4040-a3cf-935cecd0864d" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="False">
+      <date>2011-03-19 04:04:25</date>
+      <author>viagra</author>
+      <email>casino@casinoen.fr</email>
+      <country>fr</country>
+      <ip>91.210.104.246</ip>
+      <website>http://hyunviscera.playfulclub.com/2011/02/22/for-other-uses-see-viagra/</website>
+      <moderatedby>App_Code.Extensions.StopForumSpam</moderatedby>
+      <avatar />
+      <content>beautiful comments </content>
+    </comment>
+    <comment id="47a38a2f-2e3c-4ae3-826a-c9544ffa1473" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="False">
+      <date>2011-03-22 07:50:35</date>
+      <author>hentai</author>
+      <email>casino@casinoen.fr</email>
+      <country>fr</country>
+      <ip>91.210.104.246</ip>
+      <website>http://www.video-de-mangax.com/</website>
+      <moderatedby>Rule:black list</moderatedby>
+      <avatar />
+      <content>thanks for this nice tips </content>
+    </comment>
+    <comment id="f1093f59-6acb-44e6-8d41-1cca0972759b" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="False" deleted="False">
+      <date>2011-03-26 00:07:54</date>
+      <author>how to copy wii games</author>
+      <email>Vivar@aol.com</email>
+      <country>us</country>
+      <ip>108.18.162.168</ip>
+      <website>http://howto-copywiigames.jimdo.com/</website>
+      <avatar />
+      <content>hi this is a cool website i wonder how you find the time to keep updating it. anyway, keep up the good work.thanks</content>
+    </comment>
+    <comment id="eddfd8ae-3e0c-4f7e-ba32-73754019f464" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="False" deleted="False">
+      <date>2011-03-31 00:49:40</date>
+      <author>drainages</author>
+      <email>MarkGraves@mailaej.com</email>
+      <country>gb</country>
+      <ip>86.160.212.34</ip>
+      <website>http://www.drainages.co.uk/</website>
+      <avatar />
+      <content> Web Site Performance   It's not just your code was enormously illuminating cheers, I reckon your browsers would maybe want a good deal more posts such as this. Take care that you do not restrain yourself. MAny authors limit themselves to subjects they consider they are able to perform. Be certain you can run as far as your psyche will permit you.</content>
+    </comment>
+    <comment id="791d41e0-47a1-44f8-88bb-2a65ce34a6ef" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="False">
+      <date>2011-06-29 12:12:44</date>
+      <author>What to Invest in</author>
+      <email>sethczerepak@gmail.com</email>
+      <country>us</country>
+      <ip>112.198.79.175</ip>
+      <website>http://whattoinvestinnow.com/</website>
+      <moderatedby>Rule:black list</moderatedby>
+      <avatar />
+      <content>Whew! I'm really glad you shared this because I've been brainstorming over my code for the past few hours already! I thought my website would never be fixed but thanks to your post, I found the help I needed!</content>
+    </comment>
+  </comments>
+  <categories />
+  <notifications />
+</post>
