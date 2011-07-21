@@ -19,15 +19,8 @@ namespace App_Code.Controls
     /// </summary>
     public class PageMenu : Control
     {
-        public PageMenu()
-        {
-            BlogEngine.Core.Page.Saved += delegate { _Html = null; };
-        }
-
         #region Properties
 
-        private static object _SyncRoot = new object();
-        private static string _Html;
         private bool _ulIdSet = false;
         string _curPage = HttpUtility.UrlEncode(GetPageName(HttpContext.Current.Request.RawUrl.ToLower()));
 
@@ -35,15 +28,10 @@ namespace App_Code.Controls
         {
             get
             {
-                lock (_SyncRoot)
-                {
-                    HtmlGenericControl ul = BindPages();
-                    System.IO.StringWriter sw = new System.IO.StringWriter();
-                    ul.RenderControl(new HtmlTextWriter(sw));
-                    _Html = sw.ToString();
-                }
-
-                return _Html;
+                HtmlGenericControl ul = BindPages();
+                System.IO.StringWriter sw = new System.IO.StringWriter();
+                ul.RenderControl(new HtmlTextWriter(sw));
+                return sw.ToString();
             }
         }
 

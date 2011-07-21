@@ -11,6 +11,15 @@
     <link rel="shortcut icon" href="~/pics/blogengine.ico" type="image/x-icon" />
 </head>
 <body>
+    <script type="text/javascript">
+
+        var SiteVars = {
+            ApplicationRelativeWebRoot: '<%= Utils.ApplicationRelativeWebRoot %>',
+            RelativeWebRoot: '<%= Utils.RelativeWebRoot %>',
+            BlogInstanceId: '<%= Blog.CurrentInstance.Id %>'
+        };
+
+    </script>
     <div class="page">
         <form id="form1" runat="server">
 
@@ -20,14 +29,14 @@
 
             <div class="header">
                 <div class="be-logo">
-                    <span><%=BlogSettings.Instance.Name %> Admin</span>
-                </div>                                  
+                    <span><%=BlogSettings.Instance.Name %> <%=Resources.labels.admin %></span>
+                </div>
                 <div class="toolbox">
-                    Welcome <%= UserProfile() == null ? Page.User.Identity.Name : UserProfile().DisplayName %>
+                    <%= Resources.labels.welcome %> <%= UserProfile() == null ? Page.User.Identity.Name : UserProfile().DisplayName %>
                     | <a href="<%=Utils.RelativeWebRoot %>admin/Users/Profile.aspx?id=<%=Page.User.Identity.Name %>"><%=Resources.labels.myProfile %></a>
                     | <a href="<%=Utils.RelativeWebRoot %>"><%=Resources.labels.goToFrontPage %></a>
-                    | <asp:LoginStatus ID="LoginStatus1" runat="server" SkinID="adminLoginStatus"  />
-                </div>                                   
+                    | <a runat="server" id="aLogin" />
+                </div>                                 
             </div>
             
             <div class="tabs toprounded">
@@ -41,7 +50,7 @@
 
             <div id="footer">
                 <a href="http://dotnetblogengine.net">BlogEngine.NET <%=BlogSettings.Instance.Version() %></a> | 
-                <a id="donate" runat="server" href="~/admin/Donate.aspx" alt="Donate" target="_new"><%=Resources.labels.makeDonation %></a>          
+                <a id="donate" href="<%= Utils.RelativeWebRoot %>admin/Donate.aspx" target="_new"><%=Resources.labels.makeDonation %></a>          
             </div>
 
         </form>    

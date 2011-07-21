@@ -16,9 +16,18 @@
 
         protected void Page_Load(object sender, EventArgs e)
         {
-            Security.DemandUserHasRight(BlogEngine.Core.Rights.AccessAdminPages, true);
+            CheckSecurity();
 
             phNewUserRoles.Visible = Security.IsAuthorizedTo(BlogEngine.Core.Rights.EditOtherUsersRoles);
+        }
+
+        private static void CheckSecurity()
+        {
+            Security.DemandUserHasRight(AuthorizationCheck.HasAll, true, new[] {
+                BlogEngine.Core.Rights.AccessAdminPages,
+                BlogEngine.Core.Rights.EditOtherUsers
+            });
+            
         }
 
         /// <summary>
@@ -28,6 +37,8 @@
         [WebMethod]
         public static List<MembershipUser> GetUsers()
         {
+            CheckSecurity();
+
             int count;
             var userCollection = Membership.Provider.GetAllUsers(0, 999, out count);
             var users = userCollection.Cast<MembershipUser>().ToList();
@@ -50,7 +61,7 @@
             {
                 var ret = string.Empty;
                 const string Ptrn = "<input type=\"checkbox\" id=\"{0}\" class=\"chkRole\" /><span class=\"lbl\">{0}</span>";
-                var allRoles = System.Web.Security.Roles.GetAllRoles().Where(r => !r.Equals(BlogSettings.Instance.AnonymousRole, StringComparison.OrdinalIgnoreCase));
+                var allRoles = System.Web.Security.Roles.GetAllRoles().Where(r => !r.Equals(BlogConfig.AnonymousRole, StringComparison.OrdinalIgnoreCase));
                 return allRoles.Aggregate(ret, (current, r) => current + string.Format(Ptrn, r, string.Empty));
             }
         }

@@ -493,6 +493,12 @@
   <data name="showCountryChooserDescription" xml:space="preserve">
     <value>Om landväljaren inte visas så kommer det inte visas någon flagga vid varje kommentar.</value>
   </data>
+  <data name="showEnableWebsiteInComments" xml:space="preserve">
+    <value>Need Translation:Enable Website in Comments</value>
+  </data>
+  <data name="showEnableWebsiteInCommentsDescription" xml:space="preserve">
+    <value>Need Translation:Choose whether to allow Website to be published in Comments</value>
+  </data>
   <data name="showDescriptionInPostList" xml:space="preserve">
     <value>Visa bara beskrivning i post</value>
   </data>

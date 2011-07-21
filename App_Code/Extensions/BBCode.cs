@@ -1,10 +1,11 @@
 ﻿#region using
 
+using System;
 using System.Data;
-
 using BlogEngine.Core;
 using BlogEngine.Core.Web.Controls;
 using BlogEngine.Core.Web.Extensions;
+using System.Collections.Generic;
 
 #endregion
 
@@ -18,9 +19,14 @@ public class BBCode
     #region Constants and Fields
 
     /// <summary>
+    /// The sync root.
+    /// </summary>
+    private static readonly object syncRoot = new object();
+
+    /// <summary>
     /// The settings.
     /// </summary>
-    private static ExtensionSettings settings;
+    private static Dictionary<Guid, ExtensionSettings> blogsSettings = new Dictionary<Guid, ExtensionSettings>();
 
     #endregion
 
@@ -32,6 +38,7 @@ public class BBCode
     static BBCode()
     {
         Comment.Serving += PostCommentServing;
+        var s = Settings;
     }
 
     /// <summary>
@@ -42,53 +49,56 @@ public class BBCode
     {
         get
         {
-            if (settings == null)
+            Guid blogId = Blog.CurrentInstance.Id;
+
+            if (!blogsSettings.ContainsKey(blogId))
             {
-                // create settings object. You need to pass exactly your
-                // extension class name (case sencitive)
-                var extensionSettings = new ExtensionSettings("BBCode");
+                lock (syncRoot)
+                {
+                    if (!blogsSettings.ContainsKey(blogId))
+                    {
+                        // create settings object. You need to pass exactly your
+                        // extension class name (case sencitive)
+                        var extensionSettings = new ExtensionSettings("BBCode");
 
-                // -----------------------------------------------------
-                // 1. Simple
-                // -----------------------------------------------------
-                // settings.AddParameter("Code");
-                // settings.AddParameter("OpenTag");
-                // settings.AddParameter("CloseTag");
-                // -----------------------------------------------------
-                // 2. Some more options
-                // -----------------------------------------------------
-                // settings.AddParameter("Code");
-                // settings.AddParameter("OpenTag", "Open Tag");
-                // settings.AddParameter("CloseTag", "Close Tag");
+                        // -----------------------------------------------------
+                        // 1. Simple
+                        // -----------------------------------------------------
+                        // settings.AddParameter("Code");
+                        // settings.AddParameter("OpenTag");
+                        // settings.AddParameter("CloseTag");
+                        // -----------------------------------------------------
+                        // 2. Some more options
+                        // -----------------------------------------------------
+                        // settings.AddParameter("Code");
+                        // settings.AddParameter("OpenTag", "Open Tag");
+                        // settings.AddParameter("CloseTag", "Close Tag");
 
-                //// describe specific rules applied to entering parameters. overrides default wording.
-                // settings.Help = "Converts BBCode to XHTML in the comments. Close tag is optional.";
-                // -----------------------------------------------------
-                // 3. More options including import defaults
-                // -----------------------------------------------------
-                extensionSettings.AddParameter("Code", "Code", 20, true);
-                extensionSettings.AddParameter("OpenTag", "Open Tag", 150, true);
-                extensionSettings.AddParameter("CloseTag", "Close Tag");
+                        //// describe specific rules applied to entering parameters. overrides default wording.
+                        // settings.Help = "Converts BBCode to XHTML in the comments. Close tag is optional.";
+                        // -----------------------------------------------------
+                        // 3. More options including import defaults
+                        // -----------------------------------------------------
+                        extensionSettings.AddParameter("Code", "Code", 20, true);
+                        extensionSettings.AddParameter("OpenTag", "Open Tag", 150, true);
+                        extensionSettings.AddParameter("CloseTag", "Close Tag");
 
-                // describe specific rules for entering parameters
-                extensionSettings.Help = "Converts BBCode to XHTML in the comments. Close tag is optional.";
+                        // describe specific rules for entering parameters
+                        extensionSettings.Help = "Converts BBCode to XHTML in the comments. Close tag is optional.";
 
-                extensionSettings.AddValues(new[] { "b", "strong", string.Empty });
-                extensionSettings.AddValues(new[] { "i", "em", string.Empty });
-                extensionSettings.AddValues(new[] { "u", "span style=\"text-decoration:underline\"", "span" });
-                extensionSettings.AddValues(new[] { "quote", "cite title=\"Quote\"", "cite" });
+                        extensionSettings.AddValues(new[] { "b", "strong", string.Empty });
+                        extensionSettings.AddValues(new[] { "i", "em", string.Empty });
+                        extensionSettings.AddValues(new[] { "u", "span style=\"text-decoration:underline\"", "span" });
+                        extensionSettings.AddValues(new[] { "quote", "cite title=\"Quote\"", "cite" });
 
-                // ------------------------------------------------------
-                ExtensionManager.ImportSettings(extensionSettings);
-                settings = ExtensionManager.GetSettings("BBCode");
+                        // ------------------------------------------------------
+                        ExtensionManager.ImportSettings(extensionSettings);
+                        blogsSettings[blogId] = ExtensionManager.GetSettings("BBCode");
+                    }
+                }
             }
 
-            return settings;
-        }
-
-        set
-        {
-            settings = value;
+            return blogsSettings[blogId];
         }
     }
 
@@ -153,6 +163,9 @@ public class BBCode
     /// <param name="e">The <see cref="BlogEngine.Core.ServingEventArgs"/> instance containing the event data.</param>
     private static void PostCommentServing(object sender, ServingEventArgs e)
     {
+        if(!ExtensionManager.ExtensionEnabled("BBCode"))
+            return;
+
         var body = e.Body;
 
         // retrieve parameters back as a data table

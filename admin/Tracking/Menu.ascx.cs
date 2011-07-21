@@ -1,12 +1,8 @@
-﻿namespace Admin.Comments
+﻿namespace Admin.Tracking
 {
     using System;
     using System.Web.UI;
-    using System.Web.UI.HtmlControls;
-
     using BlogEngine.Core;
-
-    using Resources;
 
     /// <summary>
     /// The admin comments menu.

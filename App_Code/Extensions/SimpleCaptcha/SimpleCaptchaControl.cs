@@ -190,8 +190,7 @@ namespace App_Code.Controls
         /// </param>
         protected override void RenderContents(HtmlTextWriter output)
         {
-            output.RenderBeginTag(HtmlTextWriterTag.Br);
-            output.RenderEndTag();
+            output.RenderBeginTag(HtmlTextWriterTag.P);
             output.AddAttribute(HtmlTextWriterAttribute.For, SimpleCaptchaAnswerField);
             output.RenderBeginTag(HtmlTextWriterTag.Label);
             output.Write(this.simpleCaptchaLabel);
@@ -199,6 +198,7 @@ namespace App_Code.Controls
 
             output.AddAttribute(HtmlTextWriterAttribute.Id, SimpleCaptchaAnswerField);
             output.AddAttribute(HtmlTextWriterAttribute.Name, SimpleCaptchaAnswerField);
+            output.AddAttribute(HtmlTextWriterAttribute.Type, "text");
             output.AddAttribute(HtmlTextWriterAttribute.Tabindex, this.TabIndex.ToString());
             output.AddAttribute(HtmlTextWriterAttribute.Maxlength, Convert.ToString(SimpleCaptcha.MaxCaptchaLength));
             output.AddAttribute(HtmlTextWriterAttribute.Value, string.Empty);
@@ -211,7 +211,6 @@ namespace App_Code.Controls
             output.RenderBeginTag(HtmlTextWriterTag.Span);
             output.WriteLine(this.ErrorMessage);
             output.RenderEndTag();
-            output.RenderBeginTag(HtmlTextWriterTag.Br);
             output.RenderEndTag();
         }
 

@@ -26,9 +26,14 @@ namespace App_Code.Controls
         #region Constants and Fields
 
         /// <summary>
+        /// The sync root.
+        /// </summary>
+        private static readonly object syncRoot = new object();
+
+        /// <summary>
         /// The posts.
         /// </summary>
-        private static readonly List<Post> Posts = new List<Post>();
+        private static readonly Dictionary<Guid, List<Post>> blogsPosts = new Dictionary<Guid, List<Post>>();
 
         #endregion
 
@@ -45,6 +50,31 @@ namespace App_Code.Controls
             Post.CommentRemoved += (sender, args) => BuildPostList();
             Post.Rated += (sender, args) => BuildPostList();
             BlogSettings.Changed += (sender, args) => BuildPostList();
+        }
+
+        #endregion
+
+        #region Properties
+
+        private static List<Post> Posts
+        {
+            get
+            {
+                Guid blogId = Blog.CurrentInstance.Id;
+
+                if (!blogsPosts.ContainsKey(blogId))
+                {
+                    lock (syncRoot)
+                    {
+                        if (!blogsPosts.ContainsKey(blogId))
+                        {
+                            blogsPosts[blogId] = new List<Post>();
+                        }
+                    }
+                }
+
+                return blogsPosts[blogId];
+            }
         }
 
         #endregion

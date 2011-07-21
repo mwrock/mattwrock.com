@@ -21,7 +21,7 @@
 		<div class="content-box-left">
             <h1><%=Resources.labels.pages %></h1>
             <div class="tableToolBox">
-                Show : <a href="#" class="current" onclick="LoadPages('All')">All</a> | <a href="#" onclick="LoadPages('Draft')">Drafts</a> | <a href="#" onclick="LoadPages('Published')">Published</a>
+                <%=Resources.labels.show %> : <a href="#" class="current" onclick="LoadPages('All')"><%=Resources.labels.all %></a> | <a href="#" onclick="LoadPages('Draft')"><%=Resources.labels.drafts %></a> | <a href="#" onclick="LoadPages('Published')"><%=Resources.labels.published %></a>
             </div>
             <div id="Container"></div>
         </div>

@@ -1,0 +1,45 @@
+﻿{#if $T.d == null}
+<br />
+<div class="info">
+    There are no packages to display.
+</div>
+{#else}
+<ul class="gallery Theme">
+    {#foreach $T.d as p}
+    <li>
+        <div class="ext">
+            <div class="ext-img">
+                <img src="{$T.p.IconUrl}" class="thumbnail" alt="theme" />
+            </div>                   
+            <div class="ext-prop">
+                {#if $T.p.PackageUrl.length > 0}
+                    <a href="{$T.p.PackageUrl}" target="_new">
+                        <h2>{$T.p.Title}<span> - Version: {$T.p.Version}</span></h2>
+                    </a>
+                {#else}
+                    <h2>{$T.p.Title}<span> - Version: {$T.p.Version}</span></h2>
+                {#/if}
+                <div class="properties">
+                    <p>{$T.p.Description}</p>
+                    {#if $T.p.Tags != null}
+                        <p class="tags">Tags: {$T.p.Tags}</p> 
+                    {#/if}
+                    <p class="status">
+                        Last Updated: {$T.p.LastUpdated}&nbsp;&#124;&nbsp;
+                        Author: {$T.p.Authors}&nbsp;&#124;&nbsp;
+                        Downloads: {$T.p.DownloadCount}
+                    </p>
+                    {#if $T.p.Website != null}
+                        <p class="website">Website: <a target="_new" href="{$T.p.Website}">{$T.p.Website}</a></p> 
+                    {#/if}
+                    <p>
+                        <a href="" class="newAction" onclick="InstallPackage('{$T.p.Id}'); return false;">Install</a>
+                        <img id="pkg-{$T.p.Id}" class="loader2" src="../../pics/ajax-loader.gif" style="display: none;" alt="loader" />
+                    </p>
+                </div>
+            </div> 
+        </div>        
+    </li>
+    {#/for}
+</ul>
+{#/if}

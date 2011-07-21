@@ -1,5 +1,5 @@
 ﻿<%@ Page Language="C#" MasterPageFile="~/admin/admin.master" ValidateRequest="False"
-    AutoEventWireup="true" CodeFile="Controls.aspx.cs" Inherits="Admin.Pages.Controls"
+    AutoEventWireup="true" CodeFile="Controls.aspx.cs" Inherits="admin.Widgets.Controls"
     Title="Control settings" %>
 <%@ Register src="Menu.ascx" tagname="TabMenu" tagprefix="menu" %>
 
@@ -58,8 +58,12 @@
                         ErrorMessage="<%$Resources:labels,required %>" />
                 </li>
                 <li>
-                <asp:CheckBox runat="Server" ID="cbEnableCommentSearch" />
-                <asp:Label runat="server" AssociatedControlID="cbEnableCommentSearch" Text='<%$ Code: Resources.labels.enableCommentSearch %>' />
+                    <asp:CheckBox runat="Server" ID="cbEnableCommentSearch" />
+                    <asp:Label runat="server" AssociatedControlID="cbEnableCommentSearch" Text='<%$ Code: Resources.labels.enableCommentSearch %>' />
+                </li>
+                <li>
+                    <asp:CheckBox runat="server" ID="cbShowIncludeCommentsOption" />
+                    <asp:Label runat="server" AssociatedControlID="cbShowIncludeCommentsOption" Text="Show include comments option" />
                 </li>
             </ul>
 

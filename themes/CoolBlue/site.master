@@ -1,0 +1,130 @@
+﻿<%@ Master Language="C#" AutoEventWireup="true" CodeFile="site.master.cs" Inherits="StandardSite" %>
+<%@ Import Namespace="BlogEngine.Core" %>
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head runat="server" profile="http://gmpg.org/xfn/11">
+    <link rel="stylesheet" type="text/css" media="screen" href="css/reset.css" />
+    <link rel="stylesheet" type="text/css" media="screen" href="coolblue.css" />
+    <link rel="stylesheet" type="text/css" media="screen" href="css/enhancements.css" />
+    <link rel="shortcut icon" href="~/pics/blogengine.ico" type="image/x-icon"/>
+</head>
+<body runat="server" id="body">
+
+<form id="Form1" runat="Server">
+
+<!--header -->
+    <div id="header-wrap"><div id="header">
+
+	    <a name="top"></a>
+
+	    <h1 id="logo-text"><a href="<%=Utils.AbsoluteWebRoot %>"><%=BlogSettings.Instance.Name %></a></h1>
+	    <p id="slogan"><%=BlogSettings.Instance.Description %></p>
+
+	    <div  id="nav">
+		    <ul>
+                <li><a href="<%=Utils.AbsoluteWebRoot %>" rel="home"><%=Resources.labels.home %></a></li>
+                <li><a href="<%=Utils.AbsoluteWebRoot %>archive.aspx"><%=Resources.labels.archive %></a></li>
+                <li><a href="<%=Utils.AbsoluteWebRoot %>contact.aspx"><%=Resources.labels.contact %></a></li>
+                <li><a runat="server" id="aLogin" /></li>
+                <li><a href="javascript:void(BlogEngine.filterByAPML())" class="apmlfilter"><%=Resources.labels.filterByApml %></a></li>
+		    </ul>
+	    </div>
+
+       <p id="rss">
+          <a href="<%=Utils.FeedUrl %>"><%=Resources.labels.subscribe %></a>
+       </p>
+
+       <div id="quick-search">
+           <fieldset class="search">
+              <label for="qsearch">Search:</label>
+              <input class="tbox" type="text" id="searchfield" value="<%=BlogSettings.Instance.SearchDefaultText%>" onblur="BlogEngine.searchClear('<%=BlogSettings.Instance.SearchDefaultText%>')" onfocus="BlogEngine.searchClear('<%=BlogSettings.Instance.SearchDefaultText%>')" onkeypress="if(event.keyCode==13) return BlogEngine.search('<%=Utils.RelativeWebRoot%>')" />
+              <button class="btn" title="Submit Search" id="searchsubmit" onkeypress="BlogEngine.search('<%=Utils.RelativeWebRoot%>');" onclick="BlogEngine.search('<%=Utils.RelativeWebRoot%>');return false;">Search</button>
+           </fieldset>
+       </div>
+  </div></div>
+<!--/header-->
+
+
+    <!-- content-outer -->
+    <div id="content-wrap" class="clear" >
+	    <!-- content -->
+       <div id="content">
+
+   	        <!-- main -->
+            <div id="main">
+                 <asp:ContentPlaceHolder ID="cphBody" runat="server" />
+	        </div>
+
+            <!-- sidebar -->
+		    <div id="sidebar">
+                <blog:SearchOnSearch ID="SearchOnSearch1" runat="server" MaxResults="3" Headline="You searched for" Text="Here are some results for the search term on this website" />
+                <blog:WidgetZone ID="WidgetZone1" runat="server" ZoneName="PageSide" />
+		    </div>
+
+	    </div>
+    </div>
+
+
+    <!-- footer-outer -->
+    <div id="footer-outer" class="clear"><div id="footer-wrap">
+
+	     <div class="col">
+
+		    <h3>Contact Info</h3>
+
+		    <p>
+		    <strong>Phone: </strong>+1234567<br/>
+		    <strong>Fax: </strong>+123456789
+		    </p>
+
+		    <p><strong>Address: </strong>123 Put Your Address Here</p>
+            <p><strong>E-mail: </strong>me@me.com</p>
+		    <p>Want more info - go to our <a href="<%=Utils.AbsoluteWebRoot %>contact.aspx">contact page</a></p>
+
+          <h3>Updates</h3>
+
+          <ul class="subscribe-stuff">
+      	        <li><a title="RSS" href="<%=Utils.FeedUrl %>" rel="nofollow"><img alt="RSS" title="RSS" src="<%=VirtualPathUtility.ToAbsolute("~/themes/CoolBlue/images/")%>social_rss.png" /></a></li>
+      	        <li><a title="Facebook" href="<%=Utils.AbsoluteWebRoot %>" rel="nofollow"><img alt="Facebook" title="Facebook" src="<%=VirtualPathUtility.ToAbsolute("~/themes/CoolBlue/images/")%>social_facebook.png" /></a></li>
+			    <li><a title="Twitter" href="<%=Utils.AbsoluteWebRoot %>" rel="nofollow"><img alt="Twitter" title="Twitter" src="<%=VirtualPathUtility.ToAbsolute("~/themes/CoolBlue/images/")%>social_twitter.png" /></a></li>
+			    <li><a title="Contact" href="<%=Utils.AbsoluteWebRoot %>contact.aspx" rel="nofollow"><img alt="Contact" title="Contact" src="<%=VirtualPathUtility.ToAbsolute("~/themes/CoolBlue/images/")%>social_email.png" /></a></li>
+          </ul>
+
+          <p>Stay up to date. Subscribe via
+		    <a href="<%=Utils.FeedUrl %>">RSS</a>, <a href="<%=Utils.AbsoluteWebRoot %>">Facebook</a> or <a href="<%=Utils.AbsoluteWebRoot %>">Twitter</a>
+		  </p>
+
+	    </div>
+
+        <blog:WidgetZone ID="WidgetZone2" runat="server" ZoneName="PageBottom" />
+
+    <!-- /footer-outer -->
+    </div></div>
+
+    <!-- footer-bottom -->
+    <div id="footer-bottom">
+
+	    <p class="bottom-left">
+		    &copy; 2010 <strong>Copyright Info</strong>&nbsp; &nbsp; &nbsp;
+		    Template by <a href="http://www.styleshout.com/">styleshout</a> | Configured by <a href="http://www.reddybrek.com">Richard Reddy</a> | Powered by <a href="http://www.dotnetblogengine.net">BlogEngine.NET</a> <%=BlogSettings.Instance.Version() %>
+	    </p>
+
+	    <p class="bottom-right">
+		    <a href="<%=Utils.AbsoluteWebRoot %>" rel="home"><%=Resources.labels.home %></a> |
+		    <a href="<%=Utils.AbsoluteWebRoot %>archive.aspx"><%=Resources.labels.archive %></a> |
+		    <a href="<%=Utils.AbsoluteWebRoot %>contact.aspx"><%=Resources.labels.contact %></a> |
+          <strong><a href="#top">Back to Top</a></strong>
+       </p>
+
+    <!-- /footer-bottom-->
+    </div>
+
+
+
+
+
+  </form>
+  
+</body>
+</html>

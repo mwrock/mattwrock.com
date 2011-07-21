@@ -6,7 +6,6 @@
     using System.Web.UI.WebControls;
     using System.Globalization;
     using System.Web.Services;
-    using System.Threading;
     using Resources;
     using BlogEngine.Core;
     using BlogEngine.Core.Json;
@@ -25,7 +24,6 @@
         {
             WebUtils.CheckRightsForAdminSettingsPage(false);
 
-            BindThemes();
             BindCultures();
             BindRoles();
             BindSettings();
@@ -39,7 +37,7 @@
         private void BindRoles()
         {
             ddlSelfRegistrationInitialRole.AppendDataBoundItems = true;
-            ddlSelfRegistrationInitialRole.DataSource = Roles.GetAllRoles().Where(r => !r.Equals(BlogSettings.Instance.AnonymousRole, StringComparison.OrdinalIgnoreCase));
+            ddlSelfRegistrationInitialRole.DataSource = Roles.GetAllRoles().Where(r => !r.Equals(BlogConfig.AnonymousRole, StringComparison.OrdinalIgnoreCase));
             ddlSelfRegistrationInitialRole.DataBind();
         }
 
@@ -55,8 +53,6 @@
             txtDescription.Text = BlogSettings.Instance.Description;
             txtPostsPerPage.Text = BlogSettings.Instance.PostsPerPage.ToString();
             cbShowRelatedPosts.Checked = BlogSettings.Instance.EnableRelatedPosts;
-            ddlTheme.SelectedValue = BlogSettings.Instance.Theme;
-            ddlMobileTheme.SelectedValue = BlogSettings.Instance.MobileTheme;
             txtThemeCookieName.Text = BlogSettings.Instance.ThemeCookieName;
             cbUseBlogNameInPageTitles.Checked = BlogSettings.Instance.UseBlogNameInPageTitles;
             cbEnableRating.Checked = BlogSettings.Instance.EnableRating;
@@ -70,22 +66,9 @@
             ddlCulture.SelectedValue = BlogSettings.Instance.Culture;
             txtTimeZone.Text = BlogSettings.Instance.Timezone.ToString();
             cbShowPostNavigation.Checked = BlogSettings.Instance.ShowPostNavigation;
+            cbEnablePasswordReset.Checked = BlogSettings.Instance.EnablePasswordReset;
             cbEnableSelfRegistration.Checked = BlogSettings.Instance.EnableSelfRegistration;
             Utils.SelectListItemByValue(ddlSelfRegistrationInitialRole, BlogSettings.Instance.SelfRegistrationInitialRole);
-        }
-
-        /// <summary>
-        /// The bind themes.
-        /// </summary>
-        private void BindThemes()
-        {
-            var path = Server.MapPath(string.Format("{0}themes/", Utils.RelativeWebRoot));
-            foreach (var dic in Directory.GetDirectories(path))
-            {
-                var index = dic.LastIndexOf(Path.DirectorySeparatorChar) + 1;
-                ddlTheme.Items.Add(dic.Substring(index));
-                ddlMobileTheme.Items.Add(dic.Substring(index));
-            }
         }
 
         /// <summary>
@@ -118,7 +101,7 @@
             }
             else
             {
-                var path = Server.MapPath(string.Format("{0}App_GlobalResources/", Utils.RelativeWebRoot));
+                var path = Server.MapPath(string.Format("{0}App_GlobalResources/", Utils.ApplicationRelativeWebRoot));
                 foreach (var file in Directory.GetFiles(path, "labels.*.resx"))
                 {
                     var index = file.LastIndexOf(Path.DirectorySeparatorChar) + 1;
@@ -150,16 +133,14 @@
         /// <param name="showPostNavigation">Show post navigation</param>
         /// <param name="culture">Culture</param>
         /// <param name="timezone">Time zone</param>
+        /// <param name="enablePasswordReset">Enable password resets</param>
         /// <param name="enableSelfRegistration">Enable self registration</param>
-        /// <param name="requireLoginToViewPosts">Require login to view posts</param>
         /// <param name="selfRegistrationInitialRole">Self registration initial role</param>
         /// <returns></returns>
         [WebMethod]
         public static JsonResponse Save(string name, 
 			string desc,
 			string postsPerPage,
-			string theme,
-			string mobileTheme,
 			string themeCookieName,
 			string useBlogNameInPageTitles,
 			string enableRelatedPosts,
@@ -172,6 +153,7 @@
 			string showPostNavigation,
 			string culture,
 			string timezone,
+            string enablePasswordReset,
 			string enableSelfRegistration,
             string selfRegistrationInitialRole)
         {
@@ -188,8 +170,6 @@
                 BlogSettings.Instance.Name = name;
                 BlogSettings.Instance.Description = desc;
 				BlogSettings.Instance.PostsPerPage = int.Parse(postsPerPage);
-				BlogSettings.Instance.Theme = theme;
-				BlogSettings.Instance.MobileTheme = mobileTheme;
 				BlogSettings.Instance.ThemeCookieName = themeCookieName;
 				BlogSettings.Instance.UseBlogNameInPageTitles = bool.Parse(useBlogNameInPageTitles);
 				BlogSettings.Instance.EnableRelatedPosts = bool.Parse(enableRelatedPosts);
@@ -204,6 +184,7 @@
 				BlogSettings.Instance.ShowPostNavigation = bool.Parse(showPostNavigation);
 				BlogSettings.Instance.Culture = culture;
 				BlogSettings.Instance.Timezone = double.Parse(timezone);
+                BlogSettings.Instance.EnablePasswordReset = bool.Parse(enablePasswordReset);
 				BlogSettings.Instance.EnableSelfRegistration = bool.Parse(enableSelfRegistration);
                 BlogSettings.Instance.SelfRegistrationInitialRole = selfRegistrationInitialRole;
 

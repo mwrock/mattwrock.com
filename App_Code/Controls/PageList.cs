@@ -11,6 +11,8 @@ namespace App_Code.Controls
     using System.Linq;
     using System.Web.UI;
     using System.Web.UI.HtmlControls;
+    using System.Collections.Generic;
+    using BlogEngine.Core;
 
     /// <summary>
     /// Builds a page list.
@@ -22,7 +24,12 @@ namespace App_Code.Controls
         /// <summary>
         /// The html string.
         /// </summary>
-        private static string html;
+        private static Dictionary<Guid, string> blogsHtml = new Dictionary<Guid, string>();
+
+        /// <summary>
+        /// The sync root.
+        /// </summary>
+        private static readonly object syncRoot = new object();
 
         #endregion
 
@@ -43,17 +50,44 @@ namespace App_Code.Controls
 
         private static void RefreshCachedHtml()
         {
-            html = string.Empty;
+            Html = string.Empty;
 
             if (BlogEngine.Core.Page.Pages != null)
             {
                 var ul = BindPages();
-                html = BlogEngine.Core.Utils.RenderControl(ul);
-              
+                Html = BlogEngine.Core.Utils.RenderControl(ul);
             }
         }
         #endregion
 
+        #region Properties
+
+        private static string Html
+        {
+            get
+            { 
+                Guid blogId = Blog.CurrentInstance.Id;
+
+                if (!blogsHtml.ContainsKey(blogId))
+                {
+                    lock (syncRoot)
+                    {
+                        if (!blogsHtml.ContainsKey(blogId))
+                        {
+                            blogsHtml[blogId] = string.Empty;
+                        }
+                    }
+                }
+
+                return blogsHtml[blogId];
+            }
+            set
+            {
+                blogsHtml[Blog.CurrentInstance.Id] = value;
+            }
+        }
+
+        #endregion
 
         #region Public Methods
 
@@ -63,7 +97,7 @@ namespace App_Code.Controls
         /// <param name="writer">The <see cref="T:System.Web.UI.HtmlTextWriter"/> object that receives the control content.</param>
         public override void RenderControl(HtmlTextWriter writer)
         {
-            writer.Write(PageList.html);
+            writer.Write(PageList.Html);
            // writer.Write(Environment.NewLine);
         }
 

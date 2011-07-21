@@ -3,7 +3,6 @@
 <%@ Import Namespace="BlogEngine.Core" %>
 
 <asp:Content ID="Content1" ContentPlaceHolderID="cphAdmin" Runat="Server"> 
-    <script type="text/javascript" src="http://ajax.microsoft.com/ajax/jquery.validate/1.7/jquery.validate.min.js"></script>
 
     <script type="text/javascript">
         LoadComments(1);
@@ -14,7 +13,7 @@
 			<menu:TabMenu ID="TabMenu" runat="server" />
 		</div>
 		<div class="content-box-left">
-            <h1>Pending Approval</h1>
+            <h1><%=Resources.labels.pendingApproval %></h1>
             <div class="tableToolBox">
                 <div class="Pager"></div>
             </div>

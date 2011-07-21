@@ -112,10 +112,10 @@
     <value>2.0</value>
   </resheader>
   <resheader name="reader">
-    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <resheader name="writer">
-    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="add" xml:space="preserve">
     <value>Добавить</value>
@@ -492,6 +492,12 @@
   </data>
   <data name="showCountryChooserDescription" xml:space="preserve">
     <value>Без выбора страны около комментариев не будут отображаться флаги</value>
+  </data>
+  <data name="showEnableWebsiteInComments" xml:space="preserve">
+    <value>Need Translation:Enable Website in Comments</value>
+  </data>
+  <data name="showEnableWebsiteInCommentsDescription" xml:space="preserve">
+    <value>Need Translation:Choose whether to allow Website to be published in Comments</value>
   </data>
   <data name="showDescriptionInPostList" xml:space="preserve">
     <value>Краткие описания в списке записей</value>
@@ -1077,5 +1083,71 @@
   </data>
   <data name="returnToBlog" xml:space="preserve">
     <value>Вернуться в начало</value>
+  </data>
+  <data name="latestFromTheGallery" xml:space="preserve">
+    <value>Новинки галереи</value>
+  </data>
+  <data name="savedByAtTime" xml:space="preserve">
+    <value>Автор: {0} дата: {1}</value>
+  </data>
+  <data name="active" xml:space="preserve">
+    <value>Активный</value>
+  </data>
+  <data name="available" xml:space="preserve">
+    <value>Имеющиеся</value>
+  </data>
+  <data name="currentTheme" xml:space="preserve">
+    <value>Основная тема</value>
+  </data>
+  <data name="gallery" xml:space="preserve">
+    <value>Галерея</value>
+  </data>
+  <data name="installed" xml:space="preserve">
+    <value>Установленные</value>
+  </data>
+  <data name="preview" xml:space="preserve">
+    <value>Предосмотр</value>
+  </data>
+  <data name="setAsCurrentTheme" xml:space="preserve">
+    <value>Выбрать основной темой</value>
+  </data>
+  <data name="setAsMobileTheme" xml:space="preserve">
+    <value>Выбрать мобильной темой</value>
+  </data>
+  <data name="themes" xml:space="preserve">
+    <value>Темы</value>
+  </data>
+  <data name="alphaNumeric" xml:space="preserve">
+    <value>Алфавиту</value>
+  </data>
+  <data name="downloads" xml:space="preserve">
+    <value>Загрузки</value>
+  </data>
+  <data name="newest" xml:space="preserve">
+    <value>Новинки</value>
+  </data>
+  <data name="orderBy" xml:space="preserve">
+    <value>Сортировать по</value>
+  </data>
+  <data name="acceptAnyTextBeforeHostname" xml:space="preserve">
+    <value>Разрешать техт перед хостом</value>
+  </data>
+  <data name="activeThemes" xml:space="preserve">
+    <value>Активные темы</value>
+  </data>
+  <data name="blogs" xml:space="preserve">
+    <value>Блоги</value>
+  </data>
+  <data name="existingBlogToCreateNewBlogFrom" xml:space="preserve">
+    <value>Прототип нового блога</value>
+  </data>
+  <data name="hostName" xml:space="preserve">
+    <value>Имя хоста (необязательно)</value>
+  </data>
+  <data name="storageContainerName" xml:space="preserve">
+    <value>Название папки для данных</value>
+  </data>
+  <data name="virtualPath" xml:space="preserve">
+    <value>Виртуальный адрес</value>
   </data>
 </root>

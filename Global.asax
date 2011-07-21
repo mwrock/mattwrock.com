@@ -14,6 +14,7 @@
     {
         HttpContext context = ((HttpApplication)sender).Context;
         Exception ex = context.Server.GetLastError();
+        
         if (ex == null || !(ex is HttpException) || (ex as HttpException).GetHttpCode() == 404)
         {
             return;
@@ -50,28 +51,23 @@
         // this 500 error request to error.aspx.
     }
 
-    /// <summary>
-    /// Hooks up the available extensions located in the App_Code folder.
-    /// An extension must be decorated with the ExtensionAttribute to work.
-    /// <example>
-    ///  <code>
-    /// [Extension("Description of the SomeExtension class")]
-    /// public class SomeExtension
-    /// {
-    ///   //There must be a parameterless default constructor.
-    ///   public SomeExtension()
-    ///   {
-    ///     //Hook up to the BlogEngine.NET events.
-    ///   }
-    /// }
-    /// </code>
-    /// </example>
-    /// </summary>
     void Application_Start(object sender, EventArgs e)
     {
-        Utils.LoadExtensions();
+        // intentionally not using Application_Start.  instead application
+        // start code is below in FirstRequestInitialization.  this is to
+        // workaround IIS7 integrated mode issue where HttpContext.Request
+        // is not available during Application_Start.
     }
 
+    void Application_BeginRequest(object source, EventArgs e)
+    {
+        HttpApplication app = (HttpApplication)source;
+        HttpContext context = app.Context;
+        
+        // Attempt to perform first request initialization
+        FirstRequestInitialization.Initialize(context);
+    }
+        
     /// <summary>
     /// Sets the culture based on the language selection in the settings.
     /// </summary>
@@ -85,5 +81,25 @@
             Thread.CurrentThread.CurrentCulture = defaultCulture;
         }
     }
- 
+
+    private class FirstRequestInitialization
+    {
+        private static bool _initializedAlready = false;
+        private readonly static object _SyncRoot = new Object();
+
+        // Initialize only on the first request
+        public static void Initialize(HttpContext context)
+        {
+            if (_initializedAlready) { return; }
+
+            lock (_SyncRoot)
+            {
+                if (_initializedAlready) { return; }
+
+                Utils.LoadExtensions();
+                _initializedAlready = true;
+            }
+        }
+    }
+    
 </script>

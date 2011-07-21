@@ -18,7 +18,10 @@
 
         protected void Page_Load(object sender, EventArgs e)
         {
-            Security.DemandUserHasRight(BlogEngine.Core.Rights.AccessAdminPages, true);
+            Security.DemandUserHasRight(AuthorizationCheck.HasAll, true, new[] {
+                BlogEngine.Core.Rights.AccessAdminPages,
+                BlogEngine.Core.Rights.ViewRoles });
+
         }
 
         /// <summary>

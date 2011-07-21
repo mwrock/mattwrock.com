@@ -1,0 +1,79 @@
+﻿@using BlogEngine.Core.Packaging
+
+@{
+    Page.Title = Resources.labels.themes;
+    Layout = "~/admin/_Layout.cshtml";
+
+    var loaderSrc = Path.Combine(BlogEngine.Core.Utils.ApplicationRelativeWebRoot, "pics/ajax-loader.gif");
+
+    // disallow gallery page in child blogs.
+    var canManageThemes = BlogEngine.Core.Blog.CurrentInstance.IsPrimary;
+    
+    var tab = "1";
+    if(!string.IsNullOrEmpty(Request.QueryString["t"])){
+        tab = Request.QueryString["t"];   
+    }
+    if (tab == "2" && !canManageThemes)
+    {   
+        Response.Redirect("Themes.cshtml");
+        return;
+    }
+
+    var page = 1;
+    if(!string.IsNullOrEmpty(Request.QueryString["p"])){
+        page = int.Parse(Request.QueryString["p"]);
+    }
+}
+
+ <script type="text/javascript">
+     $(document).ready(function () {
+         $('.loader2').hide();
+         $('.page-loader').hide();
+         if (Querystring('t') == '2') {
+             GalleryGetPackages(1);
+         }
+     });
+</script>
+
+<div class="content-box-outer">
+    <div class="content-box-right">
+        @RenderPage("_menu.cshtml")
+	</div>
+    <div class="content-box-left">
+        <h1>
+            @Resources.labels.themes
+            @if (tab == "1"){
+                if (canManageThemes) {
+                    <a href="Themes.cshtml?t=2" class="image-gallery cboxElement">@Resources.labels.gallery</a>
+                }
+            }
+            else{
+                <a href="Themes.cshtml" class="image-gallery cboxElement">@Resources.labels.installed</a>
+            }
+        </h1>
+
+        <div>
+            @if (tab == "1"){
+                @Helpers.AdminHelper.InstalledThemes()
+            }
+            else{
+            <div class="gallery-options">
+                <div id="gallery-search">
+                    <input type="text" value="" id="searchGallery" />
+                    <input type="submit" id="btnGalSearch" class="btn primary" onclick="GalleryGetPackages(1); return false;" value="@Resources.labels.search" />
+                </div>
+                <span>@Resources.labels.orderBy: </span>
+                <select id="gallery-sort-order" onchange="GalleryGetPackages(1)">
+                    <option value="Alphanumeric">@Resources.labels.alphaNumeric</option>
+                    <option value="Downloads">@Resources.labels.downloads</option>
+                    <option value="Newest" selected="selected">@Resources.labels.newest</option>
+                </select>
+                <img class="page-loader" src="@loaderSrc" alt="loader" />
+            </div>
+            <div id="Container"></div>
+            <div id="Pager"></div>
+            }
+        </div>
+        <div class="clear"></div>
+    </div>
+</div>

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<SerializableStringDictionary>
+  <SerializableStringDictionary>
+    <DictionaryEntry Key="pollinginterval" Value="" />
+    <DictionaryEntry Key="followmetext" Value="Follow me on Twitter" />
+    <DictionaryEntry Key="maxitems" Value="1" />
+    <DictionaryEntry Key="feedurl" Value="https://twitter.com/mwrockx" />
+    <DictionaryEntry Key="accounturl" Value="@mwrockx" />
+  </SerializableStringDictionary>
+</SerializableStringDictionary>

@@ -1,7 +1,7 @@
 ﻿<%@ Control Language="C#" AutoEventWireup="true" CodeFile="edit.ascx.cs" Inherits="Widgets.TextBox.Edit" %>
 <%@ Import Namespace="BlogEngine.Core" %>
 
-<script type="text/javascript" src="<%=Utils.RelativeWebRoot %>editors/tiny_mce_3_3_9_2/tiny_mce.js"></script>
+<script type="text/javascript" src="<%=Utils.RelativeWebRoot %>editors/tiny_mce_3_4_3_1/tiny_mce.js"></script>
 <script type="text/javascript">
 	tinyMCE.init({
 		// General options
@@ -19,6 +19,7 @@
 		theme_advanced_statusbar_location: "bottom",
 		theme_advanced_resizing: true,
 		theme_advanced_source_editor_height: 425,
+		gecko_spellcheck : true,
 		
 		tab_focus : ":prev,:next"
 	});

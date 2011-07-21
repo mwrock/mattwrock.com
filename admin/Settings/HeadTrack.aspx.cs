@@ -1,20 +1,10 @@
 ﻿namespace admin.Settings
 {
     using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Web;
-    using System.Web.UI;
-    using System.Web.UI.WebControls;
-    using System.Globalization;
     using System.Web.Services;
-    using System.Threading;
-    using System.Web.Security;
-
     using Resources;
     using BlogEngine.Core;
     using BlogEngine.Core.Json;
-    using BlogEngine.Core.API.BlogML;
     using App_Code;
 
     using Page = System.Web.UI.Page;
@@ -29,10 +19,10 @@
         {
             WebUtils.CheckRightsForAdminSettingsPage(false);
 
-            this.BindSettings();
+            BindSettings();
 
-            this.Page.MaintainScrollPositionOnPostBack = true;
-            this.Page.Title = labels.settings;
+            Page.MaintainScrollPositionOnPostBack = true;
+            Page.Title = labels.settings;
             base.OnInit(e);
         }
 
@@ -44,12 +34,12 @@
             // -----------------------------------------------------------------------
             // HTML header section
             // -----------------------------------------------------------------------
-            this.txtHtmlHeader.Text = BlogSettings.Instance.HtmlHeader;
+            txtHtmlHeader.Text = BlogSettings.Instance.HtmlHeader;
 
             // -----------------------------------------------------------------------
             // Visitor tracking settings
             // -----------------------------------------------------------------------
-            this.txtTrackingScript.Text = BlogSettings.Instance.TrackingScript;
+            txtTrackingScript.Text = BlogSettings.Instance.TrackingScript;
         }
 
         /// <summary>
@@ -61,8 +51,7 @@
         [WebMethod]
         public static JsonResponse Save(string hdr, string ftr)
         {
-            JsonResponse response = new JsonResponse();
-            response.Success = false;
+            var response = new JsonResponse {Success = false};
 
             if (!WebUtils.CheckRightsForAdminSettingsPage(true))
             {

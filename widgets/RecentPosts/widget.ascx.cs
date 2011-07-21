@@ -51,11 +51,11 @@ namespace Widgets.RecentPosts
         /// </summary>
         static Widget()
         {
-            Post.Saved += (sender, args) => HttpRuntime.Cache.Remove("widget_recentposts");
-            Post.CommentAdded += (sender, args) => HttpRuntime.Cache.Remove("widget_recentposts");
-            Post.CommentRemoved += (sender, args) => HttpRuntime.Cache.Remove("widget_recentposts");
-            Post.Rated += (sender, args) => HttpRuntime.Cache.Remove("widget_recentposts");
-            BlogSettings.Changed += (sender, args) => HttpRuntime.Cache.Remove("widget_recentposts");
+            Post.Saved += (sender, args) => Blog.CurrentInstance.Cache.Remove("widget_recentposts");
+            Post.CommentAdded += (sender, args) => Blog.CurrentInstance.Cache.Remove("widget_recentposts");
+            Post.CommentRemoved += (sender, args) => Blog.CurrentInstance.Cache.Remove("widget_recentposts");
+            Post.Rated += (sender, args) => Blog.CurrentInstance.Cache.Remove("widget_recentposts");
+            BlogSettings.Changed += (sender, args) => Blog.CurrentInstance.Cache.Remove("widget_recentposts");
         }
 
         #endregion
@@ -101,20 +101,20 @@ namespace Widgets.RecentPosts
                 numberOfPosts = int.Parse(settings["numberofposts"]);
             }
 
-            if (HttpRuntime.Cache["widget_recentposts"] == null)
+            if (Blog.CurrentInstance.Cache["widget_recentposts"] == null)
             {
                 var visiblePosts = Post.Posts.FindAll(p => p.IsVisibleToPublic);
 
                 var max = Math.Min(visiblePosts.Count, numberOfPosts);
                 var list = visiblePosts.GetRange(0, max);
-                HttpRuntime.Cache.Insert("widget_recentposts", list);
+                Blog.CurrentInstance.Cache.Insert("widget_recentposts", list);
             }
 
-            var content = RenderPosts((List<Post>)HttpRuntime.Cache["widget_recentposts"], settings);
+            var content = RenderPosts((List<Post>)Blog.CurrentInstance.Cache["widget_recentposts"], settings);
 
             var html = new LiteralControl(content);
                 
-                // new LiteralControl((string)HttpRuntime.Cache["widget_recentposts"]);
+                // new LiteralControl((string)Blog.CurrentInstance.Cache["widget_recentposts"]);
             this.phPosts.Controls.Add(html);
         }
 
@@ -132,7 +132,7 @@ namespace Widgets.RecentPosts
         {
             if (posts.Count == 0)
             {
-                // HttpRuntime.Cache.Insert("widget_recentposts", "<p>" + Resources.labels.none + "</p>");
+                // Blog.CurrentInstance.Cache.Insert("widget_recentposts", "<p>" + Resources.labels.none + "</p>");
                 return string.Format("<p>{0}</p>", labels.none);
             }
 
@@ -191,7 +191,7 @@ namespace Widgets.RecentPosts
 
             sb.Append("</ul>");
 
-            // HttpRuntime.Cache.Insert("widget_recentposts", sb.ToString());
+            // Blog.CurrentInstance.Cache.Insert("widget_recentposts", sb.ToString());
             return sb.ToString();
         }
 

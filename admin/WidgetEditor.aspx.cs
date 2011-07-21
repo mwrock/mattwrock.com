@@ -45,42 +45,42 @@ namespace Admin
         {
             if (!Security.IsAuthorizedTo(Rights.ManageWidgets))
             {
-                this.Response.StatusCode = 403;
-                this.Response.Clear();
-                this.Response.End();
+                Response.StatusCode = 403;
+                Response.Clear();
+                Response.End();
             }
 
-            var widget = this.Request.QueryString["widget"];
-            var id = this.Request.QueryString["id"];
-            var move = this.Request.QueryString["move"];
-            var add = this.Request.QueryString["add"];
-            var remove = this.Request.QueryString["remove"];
-            var zone = this.Request.QueryString["zone"];
-            var getMoveItems = this.Request.QueryString["getmoveitems"];
+            var widget = Request.QueryString["widget"];
+            var id = Request.QueryString["id"];
+            var move = Request.QueryString["move"];
+            var add = Request.QueryString["add"];
+            var remove = Request.QueryString["remove"];
+            var zone = Request.QueryString["zone"];
+            var getMoveItems = Request.QueryString["getmoveitems"];
 
             if (!string.IsNullOrEmpty(widget) && !string.IsNullOrEmpty(id))
             {
-                this.InitEditor(widget, id, zone);
+                InitEditor(widget, id, zone);
             }
 
             if (!string.IsNullOrEmpty(move))
             {
-                this.MoveWidgets(move);
+                MoveWidgets(move);
             }
 
             if (!string.IsNullOrEmpty(add))
             {
-                this.AddWidget(add, zone);
+                AddWidget(add, zone);
             }
 
             if (!string.IsNullOrEmpty(remove) && remove.Length == 36)
             {
-                this.RemoveWidget(remove, zone);
+                RemoveWidget(remove, zone);
             }
 
             if (!string.IsNullOrEmpty(getMoveItems))
             {
-                this.GetMoveItems(getMoveItems);
+                GetMoveItems(getMoveItems);
             }
 
             base.OnInit(e);
@@ -98,7 +98,7 @@ namespace Admin
         private void AddWidget(string type, string zone)
         {
             var widget =
-                (WidgetBase)this.LoadControl(string.Format("{0}widgets/{1}/widget.ascx", Utils.RelativeWebRoot, type));
+                (WidgetBase)LoadControl(string.Format("{0}widgets/{1}/widget.ascx", Utils.ApplicationRelativeWebRoot, type));
             widget.WidgetId = Guid.NewGuid();
             widget.ID = widget.WidgetId.ToString().Replace("-", string.Empty);
             widget.Title = type;
@@ -109,12 +109,13 @@ namespace Admin
             // Load a widget container for this new widget.  This will return the WidgetContainer
             // with the new widget in it.
             var widgetContainer = WidgetContainer.GetWidgetContainer(widget);
+            widgetContainer.RenderContainer();
 
             // need to manually invoke the loading process, since the Loading process for this Http Request
             // page lifecycle has already fired.
             widgetContainer.ProcessLoad();
 
-            this.Response.Clear();
+            Response.Clear();
             try
             {
                 using (var sw = new StringWriter())
@@ -123,17 +124,17 @@ namespace Admin
 
                     // Using ? as a delimiter. ? is a safe delimiter because it cannot appear in a
                     // zonename because ? is one of the characters removed by Utils.RemoveIllegalCharacters().
-                    this.Response.Write(string.Format("{0}?{1}", zone, sw));
+                    Response.Write(string.Format("{0}?{1}", zone, sw));
                 }
             }
             catch (HttpException)
             {
-                this.Response.Write("reload");
+                Response.Write("reload");
             }
 
-            this.SaveNewWidget(widget, zone);
+            SaveNewWidget(widget, zone);
             WidgetEditBase.OnSaved();
-            this.Response.End();
+            Response.End();
         }
 
         /// <summary>
@@ -144,7 +145,7 @@ namespace Admin
         /// </param>
         private void GetMoveItems(string zoneNames)
         {
-            var moveWidgetTo = (string)this.GetGlobalResourceObject("labels", "moveWidgetTo") ?? string.Empty;
+            var moveWidgetTo = (string)GetGlobalResourceObject("labels", "moveWidgetTo") ?? string.Empty;
 
             var sb = new StringBuilder();
             sb.AppendFormat("{{ moveWidgetTo: '{0}', zones: [", moveWidgetTo.Replace("'", "\\'"));
@@ -163,7 +164,7 @@ namespace Admin
                     // through Utils.RemoveIllegalCharacters().  Therefore, escaping is unnecessary.
                     sb.AppendFormat(" {{ zoneName: '{0}', widgets: [ ", zone);
 
-                    var doc = this.GetXmlDocument(zone);
+                    var doc = GetXmlDocument(zone);
 
                     var firstWidget = true;
                     var widgets = doc.SelectSingleNode("widgets");
@@ -210,9 +211,9 @@ namespace Admin
             }
 
             sb.Append(" ] } ");
-            this.Response.Clear();
-            this.Response.Write(sb.ToString());
-            this.Response.End();
+            Response.Clear();
+            Response.Write(sb.ToString());
+            Response.End();
         }
 
         /// <summary>
@@ -227,7 +228,7 @@ namespace Admin
         private XmlDocument GetXmlDocument(string zone)
         {
             XmlDocument doc;
-            if (this.Cache[zone] == null)
+            if (Blog.CurrentInstance.Cache[zone] == null)
             {
                 var ws = new WidgetSettings(zone) { SettingsBehavior = new XmlDocumentBehavior() };
                 doc = (XmlDocument)ws.GetSettings();
@@ -237,10 +238,10 @@ namespace Admin
                     doc.AppendChild(widgets);
                 }
 
-                this.Cache[zone] = doc;
+                Blog.CurrentInstance.Cache[zone] = doc;
             }
 
-            return (XmlDocument)this.Cache[zone];
+            return (XmlDocument)Blog.CurrentInstance.Cache[zone];
         }
 
         /// <summary>
@@ -257,13 +258,13 @@ namespace Admin
         /// </param>
         private void InitEditor(string type, string id, string zone)
         {
-            var doc = this.GetXmlDocument(zone);
+            var doc = GetXmlDocument(zone);
             var node = doc.SelectSingleNode(string.Format("//widget[@id=\"{0}\"]", id));
-            var fileName = string.Format("{0}widgets/{1}/edit.ascx", Utils.RelativeWebRoot, type);
+            var fileName = string.Format("{0}widgets/{1}/edit.ascx", Utils.ApplicationRelativeWebRoot, type);
 
-            if (File.Exists(this.Server.MapPath(fileName)))
+            if (File.Exists(Server.MapPath(fileName)))
             {
-                var edit = (WidgetEditBase)this.LoadControl(fileName);
+                var edit = (WidgetEditBase)LoadControl(fileName);
                 if (node != null && node.Attributes != null)
                 {
                     edit.WidgetId = new Guid(node.Attributes["id"].InnerText);
@@ -272,22 +273,22 @@ namespace Admin
                 }
 
                 edit.ID = "widget";
-                this.phEdit.Controls.Add(edit);
+                phEdit.Controls.Add(edit);
             }
 
-            if (!this.Page.IsPostBack)
+            if (!Page.IsPostBack)
             {
                 if (node != null && node.Attributes != null)
                 {
-                    this.cbShowTitle.Checked = bool.Parse(node.Attributes["showTitle"].InnerText);
-                    this.txtTitle.Text = node.Attributes["title"].InnerText;
+                    cbShowTitle.Checked = bool.Parse(node.Attributes["showTitle"].InnerText);
+                    txtTitle.Text = node.Attributes["title"].InnerText;
                 }
 
-                this.txtTitle.Focus();
-                this.btnSave.Text = labels.save;
+                txtTitle.Focus();
+                btnSave.Text = labels.save;
             }
 
-            this.btnSave.Click += this.BtnSaveClick;
+            btnSave.Click += BtnSaveClick;
         }
 
         /// <summary>
@@ -311,8 +312,8 @@ namespace Admin
                 // Ensure widgetToMoveId and moveBeforeWidgetId are not the same.
                 if (!widgetToMoveId.Equals(moveBeforeWidgetId))
                 {
-                    var oldZoneDoc = this.GetXmlDocument(oldZone);
-                    var newZoneDoc = this.GetXmlDocument(newZone);
+                    var oldZoneDoc = GetXmlDocument(oldZone);
+                    var newZoneDoc = GetXmlDocument(newZone);
 
                     // If a widget is moving within its own widget, oldZoneDoc and newZoneDoc will
                     // be referencing the same XmlDocument.  This is okay.
@@ -359,11 +360,11 @@ namespace Admin
                                 }
                             }
 
-                            this.SaveXmlDocument(oldZoneDoc, oldZone);
+                            SaveXmlDocument(oldZoneDoc, oldZone);
 
                             if (!oldZone.Equals(newZone))
                             {
-                                this.SaveXmlDocument(newZoneDoc, newZone);
+                                SaveXmlDocument(newZoneDoc, newZone);
                             }
 
                             WidgetEditBase.OnSaved();
@@ -375,9 +376,9 @@ namespace Admin
                 }
             }
 
-            this.Response.Clear();
-            this.Response.Write(responseData);
-            this.Response.End();
+            Response.Clear();
+            Response.Write(responseData);
+            Response.End();
         }
 
         /// <summary>
@@ -391,7 +392,7 @@ namespace Admin
         /// </param>
         private void RemoveWidget(string id, string zone)
         {
-            var doc = this.GetXmlDocument(zone);
+            var doc = GetXmlDocument(zone);
             var node = doc.SelectSingleNode(string.Format("//widget[@id=\"{0}\"]", id));
             if (node == null)
             {
@@ -404,17 +405,17 @@ namespace Admin
                 node.ParentNode.RemoveChild(node);
             }
 
-            this.SaveXmlDocument(doc, zone);
+            SaveXmlDocument(doc, zone);
 
             // remove widget itself
             BlogService.RemoveFromDataStore(ExtensionType.Widget, id);
-            this.Cache.Remove(string.Format("be_widget_{0}", id));
+            Blog.CurrentInstance.Cache.Remove(string.Format("be_widget_{0}", id));
 
             WidgetEditBase.OnSaved();
 
-            this.Response.Clear();
-            this.Response.Write(id + zone);
-            this.Response.End();
+            Response.Clear();
+            Response.Write(id + zone);
+            Response.End();
         }
 
         /// <summary>
@@ -428,7 +429,7 @@ namespace Admin
         /// </param>
         private void SaveNewWidget(WidgetBase widget, string zone)
         {
-            var doc = this.GetXmlDocument(zone);
+            var doc = GetXmlDocument(zone);
             XmlNode node = doc.CreateElement("widget");
             node.InnerText = widget.Name;
 
@@ -454,12 +455,14 @@ namespace Admin
             }
 
             var widgets = doc.SelectSingleNode("widgets");
-            if (widgets != null)
+            if (widgets == null)
             {
-                widgets.AppendChild(node);
+                widgets = doc.CreateElement("widgets");
+                doc.AppendChild(widgets);
             }
+            widgets.AppendChild(node);
 
-            this.SaveXmlDocument(doc, zone);
+            SaveXmlDocument(doc, zone);
         }
 
         /// <summary>
@@ -475,7 +478,7 @@ namespace Admin
         {
             var ws = new WidgetSettings(zone) { SettingsBehavior = new XmlDocumentBehavior() };
             ws.SaveSettings(doc);
-            this.Cache[zone] = doc;
+            Blog.CurrentInstance.Cache[zone] = doc;
         }
 
         /// <summary>
@@ -489,47 +492,47 @@ namespace Admin
         /// </param>
         private void BtnSaveClick(object sender, EventArgs e)
         {
-            var widget = (WidgetEditBase)this.FindControl("widget");
-            var zone = this.Request.QueryString["zone"];
+            var widget = (WidgetEditBase)FindControl("widget");
+            var zone = Request.QueryString["zone"];
 
             if (widget != null)
             {
                 widget.Save();
             }
 
-            var doc = this.GetXmlDocument(zone);
-            var node = doc.SelectSingleNode(string.Format("//widget[@id=\"{0}\"]", this.Request.QueryString["id"]));
+            var doc = GetXmlDocument(zone);
+            var node = doc.SelectSingleNode(string.Format("//widget[@id=\"{0}\"]", Request.QueryString["id"]));
             var changed = false;
 
             if (node != null && node.Attributes != null)
             {
-                if (node.Attributes["title"].InnerText != this.txtTitle.Text.Trim())
+                if (node.Attributes["title"].InnerText != txtTitle.Text.Trim())
                 {
-                    node.Attributes["title"].InnerText = this.txtTitle.Text.Trim();
+                    node.Attributes["title"].InnerText = txtTitle.Text.Trim();
                     changed = true;
                 }
 
-                if (node.Attributes["showTitle"].InnerText != this.cbShowTitle.Checked.ToString())
+                if (node.Attributes["showTitle"].InnerText != cbShowTitle.Checked.ToString())
                 {
-                    node.Attributes["showTitle"].InnerText = this.cbShowTitle.Checked.ToString();
+                    node.Attributes["showTitle"].InnerText = cbShowTitle.Checked.ToString();
                     changed = true;
                 }
             }
 
             if (changed)
             {
-                this.SaveXmlDocument(doc, zone);
+                SaveXmlDocument(doc, zone);
             }
 
             WidgetEditBase.OnSaved();
-            this.Cache.Remove(string.Format("widget_{0}", this.Request.QueryString["id"]));
+            Blog.CurrentInstance.Cache.Remove(string.Format("widget_{0}", Request.QueryString["id"]));
 
             // To avoid JS errors with TextBox widget loading tinyMce scripts while
             // the edit window is closing, don't output phEdit.
-            this.phEdit.Visible = false;
+            phEdit.Visible = false;
 
             const string Script = "PostEdit();";
-            this.Page.ClientScript.RegisterStartupScript(this.GetType(), "closeWindow", Script, true);
+            Page.ClientScript.RegisterStartupScript(this.GetType(), "closeWindow", Script, true);
         }
 
         #endregion

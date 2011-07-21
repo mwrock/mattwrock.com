@@ -42,9 +42,9 @@ namespace Widgets.RecentComments
         /// </summary>
         static Widget()
         {
-            Post.CommentAdded += (sender, args) => HttpRuntime.Cache.Remove("widget_recentcomments");
-            Post.CommentRemoved += (sender, args) => HttpRuntime.Cache.Remove("widget_recentcomments");
-            BlogSettings.Changed += (sender, args) => HttpRuntime.Cache.Remove("widget_recentcomments");
+            Post.CommentAdded += (sender, args) => Blog.CurrentInstance.Cache.Remove("widget_recentcomments");
+            Post.CommentRemoved += (sender, args) => Blog.CurrentInstance.Cache.Remove("widget_recentcomments");
+            BlogSettings.Changed += (sender, args) => Blog.CurrentInstance.Cache.Remove("widget_recentcomments");
         }
 
         #endregion
@@ -90,7 +90,7 @@ namespace Widgets.RecentComments
                 numberOfComments = int.Parse(settings["numberofcomments"]);
             }
 
-            if (HttpRuntime.Cache["widget_recentcomments"] == null)
+            if (Blog.CurrentInstance.Cache["widget_recentcomments"] == null)
             {
                 var comments = new List<Comment>();
 
@@ -105,14 +105,14 @@ namespace Widgets.RecentComments
 
                 var max = Math.Min(comments.Count, numberOfComments);
                 var list = comments.GetRange(0, max);
-                HttpRuntime.Cache.Insert("widget_recentcomments", list);
+                Blog.CurrentInstance.Cache.Insert("widget_recentcomments", list);
             }
 
-            var content = RenderComments((List<Comment>)HttpRuntime.Cache["widget_recentcomments"]);
+            var content = RenderComments((List<Comment>)Blog.CurrentInstance.Cache["widget_recentcomments"]);
 
             var html = new LiteralControl(content);
 
-            // new LiteralControl((string)HttpRuntime.Cache["widget_recentcomments"]);
+            // new LiteralControl((string)Blog.CurrentInstance.Cache["widget_recentcomments"]);
             this.phPosts.Controls.Add(html);
         }
 
@@ -129,7 +129,7 @@ namespace Widgets.RecentComments
         {
             if (comments.Count == 0)
             {
-                // HttpRuntime.Cache.Insert("widget_recentcomments", "<p>" + Resources.labels.none + "</p>");
+                // Blog.CurrentInstance.Cache.Insert("widget_recentcomments", "<p>" + Resources.labels.none + "</p>");
                 return string.Format("<p>{0}</p>", labels.none);
             }
 
@@ -219,7 +219,7 @@ namespace Widgets.RecentComments
             sw.Write(rss);
             return sw.ToString();
 
-            // HttpRuntime.Cache.Insert("widget_recentcomments", sw.ToString());
+            // Blog.CurrentInstance.Cache.Insert("widget_recentcomments", sw.ToString());
         }
 
         #endregion

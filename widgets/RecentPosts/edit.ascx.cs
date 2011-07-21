@@ -10,6 +10,7 @@ namespace Widgets.RecentPosts
     using System.Web;
 
     using App_Code.Controls;
+    using BlogEngine.Core;
 
     /// <summary>
     /// The widgets_ recent posts_edit.
@@ -28,7 +29,7 @@ namespace Widgets.RecentPosts
             settings["showcomments"] = this.cbShowComments.Checked.ToString();
             settings["showrating"] = this.cbShowRating.Checked.ToString();
             this.SaveSettings(settings);
-            HttpRuntime.Cache.Remove("widget_recentposts");
+            Blog.CurrentInstance.Cache.Remove("widget_recentposts");
         }
 
         #endregion

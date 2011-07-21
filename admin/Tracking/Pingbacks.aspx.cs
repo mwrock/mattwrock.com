@@ -21,6 +21,8 @@
         [WebMethod]
         public static IEnumerable LoadComments(int page)
         {
+            Security.DemandUserHasRight(BlogEngine.Core.Rights.AccessAdminPages, true);
+
             var commentList = JsonComments.GetComments(CommentType.Pingback, page);
             CommentCounter = commentList.Count;
             return commentList;
@@ -29,6 +31,8 @@
         [WebMethod]
         public static string LoadPager(int page)
         {
+            Security.DemandUserHasRight(BlogEngine.Core.Rights.AccessAdminPages, true);
+
             return JsonComments.GetPager(page);
         }
     }

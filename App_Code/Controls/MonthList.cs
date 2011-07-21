@@ -249,14 +249,14 @@ namespace App_Code.Controls
 		/// </returns>
 		private static SortedDictionary<DateTime, int> GetPostsPerMonth(bool theSortDesc)
 		{
-			var months = HttpRuntime.Cache[CacheKey] as SortedDictionary<DateTime, int>;
+			var months = Blog.CurrentInstance.Cache[CacheKey] as SortedDictionary<DateTime, int>;
 			IComparer<DateTime> aComparer = theSortDesc ? ourComparer_Desc : ourComparer_Asc;
 
 			if (months != null)
 			{
 				if (months.Comparer != aComparer)
 				{
-					HttpRuntime.Cache.Remove(CacheKey);
+                    Blog.CurrentInstance.Cache.Remove(CacheKey);
 					months = null;
 				}
 			}
@@ -266,7 +266,7 @@ namespace App_Code.Controls
 				months = new SortedDictionary<DateTime, int>(aComparer);
 
 				// let dictionary expire after 1 hour
-				HttpRuntime.Cache.Insert(
+				Blog.CurrentInstance.Cache.Insert(
 						CacheKey, months, null, DateTime.Now.AddHours(CacheTimeoutInHours), Cache.NoSlidingExpiration);
 
 				foreach (
@@ -293,7 +293,7 @@ namespace App_Code.Controls
 		private static void Handler_Post_Saved(object sender, SavedEventArgs e)
 		{
 			// invalidate cache whenever a post is modified
-			HttpRuntime.Cache.Remove(CacheKey);
+			Blog.CurrentInstance.Cache.Remove(CacheKey);
 		}
 		
 		#region Rendering Methods
@@ -353,7 +353,7 @@ namespace App_Code.Controls
 					Utils.RelativeWebRoot,
 					theDate.Year,
 					theDate.ToString("MM"),
-					BlogSettings.Instance.FileExtension
+					BlogConfig.FileExtension
 				);
 				theWriter.AddAttribute("href", aHref);
 				theWriter.RenderBeginTag(HtmlTextWriterTag.A);

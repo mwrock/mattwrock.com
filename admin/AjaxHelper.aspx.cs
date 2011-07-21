@@ -1,5 +1,4 @@
-﻿using System.Collections.Specialized;
-using System.IO;
+﻿using BlogEngine.Core.Packaging;
 
 namespace Admin
 {
@@ -9,30 +8,92 @@ namespace Admin
     using System.Web;
     using System.Collections.Generic;
     using System.Linq;
+    using System.IO;
 
     using BlogEngine.Core;
     using BlogEngine.Core.Json;
+    using BlogEngine.Core.Web.Extensions;
+    using App_Code;
 
     public partial class AjaxHelper : System.Web.UI.Page
-    {    
+    {
+        [WebMethod]
+        public static IEnumerable LoadBlogs(int page, int pageSize)
+        {
+            if (!WebUtils.CheckRightsForAdminPostPages(false)) { return null; }
+            if (!WebUtils.CheckIfPrimaryBlog(false)) { return null; }
+
+            return JsonBlogs.GetBlogs(page, pageSize);
+        }
+
+        [WebMethod]
+        public static string LoadBlogsPager(int page, int pageSize, string type)
+        {
+            if (!WebUtils.CheckRightsForAdminPostPages(false)) { return null; }
+            if (!WebUtils.CheckIfPrimaryBlog(false)) { return null; }
+
+            return JsonBlogs.GetPager(page, pageSize);
+        }
+
+        [WebMethod]
+        public static JsonResponse<IEnumerable<KeyValuePair<string, string>>> GetCopyFromBlogs()
+        {
+            if (!WebUtils.CheckRightsForAdminPostPages(false)) { return null; }
+            if (!WebUtils.CheckIfPrimaryBlog(false)) { return null; }
+
+            return new JsonResponse<IEnumerable<KeyValuePair<string, string>>>()
+            {
+                Success = true,
+                Data = Blog.Blogs.Select(b => new KeyValuePair<string, string>(b.Id.ToString(), b.Name))
+            };
+        }
+
+        [WebMethod]
+        public static JsonResponse<JsonBlog> GetBlog(string blogId)
+        {
+            if (!WebUtils.CheckRightsForAdminPostPages(false)) { return null; }
+            if (!WebUtils.CheckIfPrimaryBlog(false)) { return null; }
+
+            if (string.IsNullOrWhiteSpace(blogId) || blogId.Length != 36)
+            {
+                return new JsonResponse<JsonBlog>()
+                {
+                    Success = false,
+                    Message = "Blog not found."
+                };
+            }
+
+            Blog blog = Blog.GetBlog(new Guid(blogId));
+            if (blog == null)
+            {
+                return new JsonResponse<JsonBlog>()
+                {
+                    Success = false,
+                    Message = "Blog not found."
+                };
+            }
+
+            return new JsonResponse<JsonBlog>()
+            {
+                Success = true,
+                Data = JsonBlogs.CreateJsonBlog(blog)
+            };
+        }
+
 
         [WebMethod]
         public static JsonComment GetComment(string id)
         {
-            if (!Security.IsAuthorizedTo(Rights.ModerateComments))
-            {
-                return null;
-            }
+            WebUtils.CheckRightsForAdminCommentsPages(false);
+
             return JsonComments.GetComment(new Guid(id));
         }
 
         [WebMethod]
         public static JsonComment SaveComment(string[] vals)
         {
-            if (!Security.IsAuthorizedTo(Rights.ModerateComments))
-            {
-                return null;
-            }
+            WebUtils.CheckRightsForAdminCommentsPages(false);
+
             var gId = new Guid(vals[0]);
             string author = vals[1];
             string email = vals[2];
@@ -48,7 +109,7 @@ namespace Admin
                         c.Author = author;
                         c.Email = email;
                         c.Website = string.IsNullOrEmpty(website) ? null : new Uri(website);
-                        c.Content = cont;
+                        c.Content = HttpUtility.HtmlEncode(cont);
 
                         // need to mark post as "dirty"
                         p.DateModified = DateTime.Now;
@@ -63,20 +124,26 @@ namespace Admin
         }
 
         [WebMethod]
-        public static IEnumerable LoadPosts(int page, string  type, string filter, string title)
+        public static IEnumerable LoadPosts(int page, string  type, string filter, string title, int pageSize)
         {
-            return JsonPosts.GetPosts(page, type, filter, title);
+            if (!WebUtils.CheckRightsForAdminPostPages(false)) { return null; }
+
+            return JsonPosts.GetPosts(page, pageSize, type, filter, title);
         }
 
         [WebMethod]
         public static IEnumerable LoadPages(string type)
         {
+            WebUtils.CheckRightsForAdminPagesPages(false);
+
             return JsonPages.GetPages(type);
         }
 
         [WebMethod]
         public static IEnumerable LoadTags(int page)
         {
+            if (!WebUtils.CheckRightsForAdminPostPages(false)) { return null; }
+
             var tags = new List<JsonTag>();
             foreach (var p in Post.Posts)
             {
@@ -97,9 +164,11 @@ namespace Admin
         }
 
         [WebMethod]
-        public static string LoadPostPager(int page)
+        public static string LoadPostPager(int page, int pageSize, string type)
         {
-            return JsonPosts.GetPager(page);
+            if (!WebUtils.CheckRightsForAdminPostPages(false)) { return null; }
+
+            return JsonPosts.GetPager(page, pageSize);
         }
 
         [WebMethod]
@@ -117,6 +186,8 @@ namespace Admin
             string date,
             string time)
         {
+            if (!WebUtils.CheckRightsForAdminPostPages(false)) { return null; }
+
             var response = new JsonResponse { Success = false };
             var settings = BlogSettings.Instance;
 
@@ -127,7 +198,7 @@ namespace Admin
             }
 
             try
-            {
+            {   
                 var post = string.IsNullOrEmpty(id) ? new BlogEngine.Core.Post() : BlogEngine.Core.Post.GetPost(new Guid(id));
                 if (post == null)
                 {
@@ -140,7 +211,9 @@ namespace Admin
                     return response;
                 }
 
-                if (!post.IsPublished && isPublished)
+                bool isSwitchingToPublished = isPublished && (post.New || !post.IsPublished);
+
+                if (isSwitchingToPublished)
                 {
                     if (!post.CanPublish(author))
                     {
@@ -192,7 +265,13 @@ namespace Admin
                 }
                
                 post.Save();
-                response.Data = post.RelativeLink;
+
+                // If this is an unpublished post and the user does not have rights to
+                // view unpublished posts, then redirect to the Posts list.
+                if (post.IsVisible)
+                    response.Data = post.RelativeLink;
+                else
+                    response.Data = string.Format("{0}admin/Posts/Posts.aspx", Utils.RelativeWebRoot);
 
                 HttpContext.Current.Session.Remove("content");
                 HttpContext.Current.Session.Remove("title");
@@ -226,6 +305,8 @@ namespace Admin
             bool isPublished,
             string parent)
         {
+            WebUtils.CheckRightsForAdminPagesPages(false);
+
             var response = new JsonResponse { Success = false };
             var settings = BlogSettings.Instance;
 
@@ -250,7 +331,9 @@ namespace Admin
                     return response;
                 }
 
-                if (!page.IsPublished && isPublished)
+                bool isSwitchingToPublished = isPublished && (page.New || !page.IsPublished);
+
+                if (isSwitchingToPublished)
                 {
                     if (!page.CanPublish())
                     {
@@ -282,13 +365,20 @@ namespace Admin
                     page.Slug = Utils.RemoveIllegalCharacters(slug.Trim());
                 }
 
-                if (parent == string.Format("-- {0} --", Resources.labels.noParent))
+                if(string.IsNullOrEmpty(parent) || (parent.StartsWith("-- ") && parent.EndsWith(" --")))
                     page.Parent = Guid.Empty;
                 else
                     page.Parent = new Guid(parent);
 
                 page.Save();
-                response.Data = page.RelativeLink;
+
+                // If this is an unpublished page and the user does not have rights to
+                // view unpublished pages, then redirect to the Pages list.
+                if (page.IsVisible)
+                    response.Data = page.RelativeLink;
+                else
+                    response.Data = string.Format("{0}admin/Pages/Pages.aspx", Utils.RelativeWebRoot);
+
             }
             catch (Exception ex)
             {
@@ -300,6 +390,134 @@ namespace Admin
             response.Success = true;
             response.Message = "Page saved";
             return response;
+        }
+
+        [WebMethod]
+        public static JsonResponse ResetCounters(string filterName)
+        {
+            if (!Security.IsAuthorizedTo(Rights.AccessAdminSettingsPages))
+            {
+                return new JsonResponse { Success = false, Message = Resources.labels.notAuthorized };
+            }
+            return JsonCustomFilterList.ResetCounters(filterName);
+        }
+
+        [WebMethod]
+        public static bool ChangePriority(int priority, string ext)
+        {
+            if (!WebUtils.CheckRightsForAdminSettingsPage(false)) { return false; }
+            if (!WebUtils.CheckIfPrimaryBlog(false)) { return false; }
+
+            try
+            {
+                var x = ExtensionManager.GetExtension(ext);
+                if (x != null)
+                {
+                    x.Priority = priority;
+                    ExtensionManager.SaveToStorage(x);
+                    return true;
+                }
+            }
+            catch (Exception ex)
+            {
+                Utils.Log("Error changing priority: " + ex.Message);
+            }
+            return false;
+        }
+
+        [WebMethod]
+        public static bool UpdateExtensionSourceCode(string sourceCode, string extensionName)
+        {
+            if (!WebUtils.CheckRightsForAdminSettingsPage(false)) { return false; }
+            if (!WebUtils.CheckIfPrimaryBlog(false)) { return false; }
+
+            if (string.IsNullOrWhiteSpace(extensionName))
+                return false;
+
+            var ext = ExtensionManager.GetExtension(extensionName);
+            if (ext == null)
+                return false;
+
+            string extensionFilename = ext.GetPathAndFilename(true);
+            if (string.IsNullOrWhiteSpace(extensionFilename))
+                return false;
+
+            try
+            {
+                using (var f = File.CreateText(extensionFilename))
+                {
+                    f.Write(sourceCode);
+                    f.Close();
+                    return true;
+                }
+            }
+            catch (Exception ex)
+            {
+                Utils.Log("Error saving source code: " + ex.Message);
+                return false;
+            }
+        }
+
+        [WebMethod]
+        public static bool SetCurrentTheme(string theme, bool mobile)
+        {
+            if (!WebUtils.CheckRightsForAdminSettingsPage(false)) { return false; }
+
+            try
+            {
+                if(mobile) 
+                    BlogSettings.Instance.MobileTheme = theme;
+                else
+                    BlogSettings.Instance.Theme = theme;
+
+                BlogSettings.Instance.Save();
+
+                // reset cache
+                Blog.CurrentInstance.Cache.Remove("Installed-Themes");
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Utils.Log("Error setting current theme: " + ex.Message);
+            }
+            return false;
+        }
+
+        [WebMethod]
+        public static IEnumerable LoadGalleryPage(string pkgType, int page, PackageManager.OrderType sortOrder, string searchVal)
+        {
+            if (!WebUtils.CheckRightsForAdminSettingsPage(false)) { return null; }
+            if (!WebUtils.CheckIfPrimaryBlog(false)) { return null; }
+
+            return JsonPackages.GetPage(pkgType, page, sortOrder, searchVal);
+        }
+
+        [WebMethod]
+        public static IEnumerable LoadGalleryPager()
+        {
+            if (!WebUtils.CheckRightsForAdminSettingsPage(false)) { return null; }
+            if (!WebUtils.CheckIfPrimaryBlog(false)) { return null; }
+
+            return PackageManager.GalleryPager == null ? null : PackageManager.GalleryPager.PageItems;
+        }
+
+        [WebMethod]
+        public static JsonResponse InstallPackage(string pkgId)
+        {
+            if (!WebUtils.CheckRightsForAdminSettingsPage(false)) { return null; }
+            if (!WebUtils.CheckIfPrimaryBlog(false)) { return null; }
+
+            return PackageManager.InstallPackage(pkgId);
+        }
+
+        [WebMethod]
+        public static JsonResponse UninstallPackage(string pkgId)
+        {   
+            if (!WebUtils.CheckRightsForAdminSettingsPage(false)) { return null; }
+            if (!WebUtils.CheckIfPrimaryBlog(false)) { return null; }
+
+            return PackageManager.UninstallPackage(pkgId);
         }
 
     }

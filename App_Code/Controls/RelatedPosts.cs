@@ -13,7 +13,7 @@ namespace App_Code.Controls
     using System.Web.UI;
 
     using BlogEngine.Core;
-
+    
     using Resources;
 
     /// <summary>
@@ -26,7 +26,7 @@ namespace App_Code.Controls
         /// <summary>
         /// The cache.
         /// </summary>
-        private static readonly Dictionary<Guid, string> Cache = new Dictionary<Guid, string>();
+        private static readonly Dictionary<Guid, Dictionary<Guid, string>> _RelatedPostsCache = new Dictionary<Guid, Dictionary<Guid, string>>();
 
         /// <summary>
         /// The description max length.
@@ -58,6 +58,27 @@ namespace App_Code.Controls
         #endregion
 
         #region Properties
+
+        private readonly static object _SyncRoot = new object();
+        private static Dictionary<Guid, string> RelatedPostsCache
+        {
+            get
+            { 
+                Blog currentInstance = Blog.CurrentInstance;
+                if (!_RelatedPostsCache.ContainsKey(currentInstance.Id))
+                {
+                    lock (_SyncRoot)
+                    {
+                        if (!_RelatedPostsCache.ContainsKey(currentInstance.Id))
+                        {
+                            _RelatedPostsCache[currentInstance.Id] = new Dictionary<Guid, string>();
+                        }
+                    }
+                }
+
+                return _RelatedPostsCache[currentInstance.Id];
+            }
+        }
 
         /// <summary>
         /// Gets or sets DescriptionMaxLength.
@@ -134,7 +155,7 @@ namespace App_Code.Controls
                 return;
             }
 
-            if (!Cache.ContainsKey(this.Item.Id))
+            if (!RelatedPostsCache.ContainsKey(this.Item.Id))
             {
                 var relatedPosts = Search.FindRelatedItems(this.Item);
                 if (relatedPosts.Count <= 1)
@@ -145,7 +166,7 @@ namespace App_Code.Controls
                 this.CreateList(relatedPosts);
             }
 
-            writer.Write(Cache[this.Item.Id].Replace("+++", this.Headline));
+            writer.Write(RelatedPostsCache[this.Item.Id].Replace("+++", this.Headline));
         }
 
         #endregion
@@ -165,9 +186,9 @@ namespace App_Code.Controls
             }
 
             var post = (Post)sender;
-            if (Cache.ContainsKey(post.Id))
+            if (RelatedPostsCache.ContainsKey(post.Id))
             {
-                Cache.Remove(post.Id);
+                RelatedPostsCache.Remove(post.Id);
             }
         }
 
@@ -184,7 +205,7 @@ namespace App_Code.Controls
             const string LinkFormat = "<a href=\"{0}\">{1}</a>";
             const string DescriptionFormat = "<span>{0}</span>";
             sb.Append("<div id=\"relatedPosts\">");
-            sb.Append("<p>+++</p>");
+            sb.Append("<h3>+++</h3>");
             sb.Append("<div>");
 
             var count = 0;
@@ -223,7 +244,7 @@ namespace App_Code.Controls
 
             sb.Append("</div>");
             sb.Append("</div>");
-            Cache.Add(this.Item.Id, sb.ToString());
+            RelatedPostsCache.Add(this.Item.Id, sb.ToString());
         }
 
 

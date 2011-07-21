@@ -90,7 +90,7 @@ namespace Widgets.MostComments
         /// </summary>
         static Widget()
         {
-            Post.CommentAdded += (sender, args) => HttpRuntime.Cache.Remove("most_comments");
+            Post.CommentAdded += (sender, args) => Blog.CurrentInstance.Cache.Remove("most_comments");
         }
 
         #endregion
@@ -134,12 +134,12 @@ namespace Widgets.MostComments
         {
             this.LoadSettings();
 
-            if (this.Cache["most_comments"] == null)
+            if (Blog.CurrentInstance.Cache["most_comments"] == null)
             {
                 this.BuildList();
             }
 
-            var visitors = (List<Visitor>)this.Cache["most_comments"];
+            var visitors = (List<Visitor>)Blog.CurrentInstance.Cache["most_comments"];
 
             this.rep.ItemDataBound += this.RepItemDataBound;
             this.rep.DataSource = visitors;
@@ -243,7 +243,7 @@ namespace Widgets.MostComments
                 }
             }
 
-            this.Cache.Insert("most_comments", list);
+            Blog.CurrentInstance.Cache.Insert("most_comments", list);
         }
 
         /// <summary>

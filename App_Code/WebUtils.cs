@@ -120,5 +120,32 @@
 
             return true;
         }
+
+        /// <summary>
+        /// Checks to see if the current blog is the primary blog.
+        /// </summary>
+        /// <param name="checkOnly">
+        /// If true, check only. If false and is not the primary blog, user
+        /// will be redirected to the login page.
+        /// </param>
+        /// <returns>True if user has sufficient rights</returns>
+        public static bool CheckIfPrimaryBlog(bool checkOnly)
+        {
+            if (checkOnly)
+            {
+                return Blog.CurrentInstance.IsPrimary;
+            }
+            else
+            {
+                if (!Blog.CurrentInstance.IsPrimary)
+                {
+                    Security.RedirectForUnauthorizedRequest();
+                    return false;
+                }
+            }
+
+            return true;
+        }
+    
     }
 }

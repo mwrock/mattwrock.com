@@ -1,4 +1,4 @@
-﻿namespace Admin.Comments
+﻿namespace admin.Comments
 {
     using System;
     using System.Data;
@@ -33,6 +33,7 @@
             cbEnableComments.Checked = BlogSettings.Instance.IsCommentsEnabled;
             cbEnableCommentNesting.Checked = BlogSettings.Instance.IsCommentNestingEnabled;
             cbEnableCountryInComments.Checked = BlogSettings.Instance.EnableCountryInComments;
+            cbEnableWebsiteInComments.Checked = BlogSettings.Instance.EnableWebsiteInComments;
             cbEnableCoComment.Checked = BlogSettings.Instance.IsCoCommentEnabled;
             cbShowLivePreview.Checked = BlogSettings.Instance.ShowLivePreview;
             cbShowPingBacks.Checked = BlogSettings.Instance.ShowPingBacks;
@@ -60,6 +61,7 @@
             BlogSettings.Instance.IsCommentsEnabled = cbEnableComments.Checked;
             BlogSettings.Instance.IsCommentNestingEnabled = cbEnableCommentNesting.Checked;
             BlogSettings.Instance.EnableCountryInComments = cbEnableCountryInComments.Checked;
+            BlogSettings.Instance.EnableWebsiteInComments = cbEnableWebsiteInComments.Checked;
             BlogSettings.Instance.IsCoCommentEnabled = cbEnableCoComment.Checked;
             BlogSettings.Instance.ShowLivePreview = cbShowLivePreview.Checked;
             BlogSettings.Instance.ShowPingBacks = cbShowPingBacks.Checked;

@@ -8,20 +8,8 @@
 <asp:Content ID="Content1" ContentPlaceHolderID="cphAdmin" runat="Server">
 	<div class="content-box-outer">
 		<div class="content-box-full">
-            <h1>Add/edit post</h1>
-           <%--<div id="divDrafts" runat="server" visible="False" enableviewstate="False" style="margin-bottom: 10px">
-                <a id="aDrafts" runat="server" href="javascript:void(ToggleVisibility());" />
-                <ul id="ulDrafts" runat="server" style="display: none; list-style-type: circle" />
-            </div>
-                                                                                                                                                                                                                                                                                                                                                                                                   <script type="text/javascript">
-                function ToggleVisibility() {
-                    var element = document.getElementById('<%=ulDrafts.ClientID%>');
-                    if (element.style.display == "none")
-                        element.style.display = "block";
-                    else
-                        element.style.display = "none";
-                }--%>
-        <script type="text/javascript">
+            <h1><%=Resources.labels.addEditPost %></h1>
+            <script type="text/javascript">
                 function GetSlug() {
                     var title = document.getElementById('<%=txtTitle.ClientID %>').value;
                     WebForm_DoCallback('__Page', title, ApplySlug, 'slug', null, false)
@@ -127,11 +115,12 @@
                     //alert(JSON.stringify(dto));
 
                     $.ajax({
-                        url: "../AjaxHelper.aspx/SavePost",
+                        url: SiteVars.ApplicationRelativeWebRoot + "admin/AjaxHelper.aspx/SavePost",
                         type: "POST",
                         dataType: "json",
                         contentType: "application/json; charset=utf-8",
                         data: JSON.stringify(dto),
+                        beforeSend: onAjaxBeforeSend,
                         success: function (result) {
                             var rt = result.d;
                             if (rt.Success) {
@@ -150,7 +139,6 @@
                     return false;
                 }
             </script>
-
             <script type="text/javascript" src="../jquery.colorbox.js"></script>
             <script type="text/javascript">
                 $(document).ready(function () {
@@ -167,47 +155,47 @@
 
             <div runat="server" style="visibility:hidden;height:1px">
                 <div id="uploadVideoPanel" class="overlaypanel">
-                    <h2>Insert video</h2>
+                    <h2><%=Resources.labels.insertVideo %></h2>
                     <ul class="fl" style="margin:0;">
                         <li>
-                            <asp:Label ID="lblVideoUpload" CssClass="lbl" AssociatedControlID="txtUploadVideo" runat="server" Text='Choose video (MP4, WMV, FLV, OGG, WebM) or audio (MP3) file you wish to upload ' />
+                            <asp:Label ID="lblVideoUpload" CssClass="lbl" AssociatedControlID="txtUploadVideo" runat="server" Text='<%$ Resources:labels, uploadVideo %>' />
                             <asp:FileUpload runat="server" ID="txtUploadVideo" Width="400" size="50" ValidationGroup="imageupload" />
                             <asp:RequiredFieldValidator ID="txtUploadVideoValidator" runat="Server" ControlToValidate="txtUploadVideo" ErrorMessage="<%$ Resources:labels, required %>"
                                 ValidationGroup="videoupload" />
                         </li>
                         <li style="margin:0;">
                             <asp:Button runat="server" ID="btnUploadVideo" Text="<%$Resources:labels,upload %>"
-                                ValidationGroup="videoupload" CssClass="btn primary" OnClientClick="colorboxDialogSubmitClicked('videoupload', 'uploadVideoPanel');" /> or <a href="#" onclick="return closeOverlay();">Cancel</a>
+                                ValidationGroup="videoupload" CssClass="btn primary" OnClientClick="colorboxDialogSubmitClicked('videoupload', 'uploadVideoPanel');" /> <%=Resources.labels.or %> <a href="#" onclick="return closeOverlay();"><%=Resources.labels.cancel %></a>
                         </li>
                     </ul>
                 </div>
                 <div id="uploadImagePanel" class="overlaypanel">
-                    <h2>Insert image</h2>
+                    <h2><%=Resources.labels.insertImage %></h2>
                     <ul class="fl" style="margin:0;">
                         <li>
-                            <asp:Label ID="lblFileUpload" CssClass="lbl" AssociatedControlID="txtUploadImage" runat="server" Text='Choose image you wish to upload' />
+                            <asp:Label ID="lblFileUpload" CssClass="lbl" AssociatedControlID="txtUploadImage" runat="server" Text='<%$ Resources:labels, uploadImage %>' />
                             <asp:FileUpload runat="server" ID="txtUploadImage" Width="400" size="50" ValidationGroup="imageupload" />
                             <asp:RequiredFieldValidator ID="RequiredFieldValidator3" runat="Server" ControlToValidate="txtUploadImage" ErrorMessage="<%$ Resources:labels, required %>"
                                 ValidationGroup="imageupload" />
                         </li>
                         <li style="margin:0;">
                             <asp:Button runat="server" ID="btnUploadImage" Text="<%$Resources:labels,upload %>"
-                                ValidationGroup="imageupload" CssClass="btn primary" OnClientClick="colorboxDialogSubmitClicked('imageupload', 'uploadImagePanel');" /> or <a href="#" onclick="return closeOverlay();">Cancel</a>
+                                ValidationGroup="imageupload" CssClass="btn primary" OnClientClick="colorboxDialogSubmitClicked('imageupload', 'uploadImagePanel');" /> <%=Resources.labels.or %> <a href="#" onclick="return closeOverlay();"><%=Resources.labels.cancel %></a>
                         </li>
                     </ul>
                 </div>
                 <div id="uploadFilePanel" class="overlaypanel">
-                    <h2>Attach file</h2>
+                    <h2><%=Resources.labels.attachFile %></h2>
                     <ul class="fl" style="margin:0;">
                         <li>
-                            <asp:Label ID="Label1" CssClass="lbl" AssociatedControlID="txtUploadFile" runat="server" Text='Choose image you wish to upload' />
+                            <asp:Label ID="Label1" CssClass="lbl" AssociatedControlID="txtUploadFile" runat="server" Text='<%$ Resources:labels, uploadFile %>' />
                             <asp:FileUpload runat="server" ID="txtUploadFile" Width="400" size="50" />
                             <asp:RequiredFieldValidator ID="RequiredFieldValidator4" runat="server" ControlToValidate="txtUploadFile" ErrorMessage="<%$ Resources:labels, required %>"
                                 ValidationGroup="fileUpload" />
                         </li>
                         <li style="margin:0;">
                             <asp:Button runat="server" ID="btnUploadFile" Text="<%$Resources:labels,upload %>"
-                                ValidationGroup="fileUpload" CssClass="btn primary" OnClientClick="colorboxDialogSubmitClicked('fileUpload', 'uploadFilePanel');" /> or <a href="#" onclick="return closeOverlay();">Cancel</a>
+                                ValidationGroup="fileUpload" CssClass="btn primary" OnClientClick="colorboxDialogSubmitClicked('fileUpload', 'uploadFilePanel');" /> <%=Resources.labels.or %> <a href="#" onclick="return closeOverlay();"><%=Resources.labels.cancel %></a>
                         </li>
                     </ul>
                 </div>
@@ -225,46 +213,40 @@
                             </li>
                             <li>
                                 <div class="editToolbar">
-                                    <asp:CheckBox runat="server" ID="cbUseRaw" Text="<%$Resources:labels,useRawHtmlEditor %>"
-                                        AutoPostBack="true" />
-                                    <a href="#" id="uploadImage" class="image">Insert image</a>
-                                    <a href="#" id="uploadVideo" class="video">Insert video</a>
-                                    <a href="#" id="uploadFile" class="file">Attach file</a>
+                                    <asp:CheckBox runat="server" ID="cbUseRaw" Text="<%$Resources:labels,useRawHtmlEditor %>" AutoPostBack="true" />
+                                    <a href="#" id="uploadImage" class="image"><%=Resources.labels.insertImage %></a>
+                                    <a href="#" id="uploadVideo" class="video"><%=Resources.labels.insertVideo %></a>
+                                    <a href="#" id="uploadFile" class="file"><%=Resources.labels.attachFile %></a>
                                 </div>
                                 <Blog:TextEditor runat="server" id="txtContent" />
-                                <asp:TextBox runat="server" ID="txtRawContent" Width="98%" TextMode="multiLine"
-                                    Height="400px" Visible="false" />
+                                <asp:TextBox runat="server" ID="txtRawContent" Width="98%" TextMode="multiLine" Height="400px" Visible="false" />
                             </li>
                             <li>
                                 <asp:Label ID="Label2" CssClass="lbl" AssociatedControlID="txtSlug" runat="server" Text='<%$Resources:labels,slug %>' />
                                 <asp:TextBox runat="server" ID="txtSlug" Width="600" />
-                                <a href="javascript:void(GetSlug());">
-                                    <%=Resources.labels.extractFromTitle %></a>
+                                <a href="javascript:void(GetSlug());"><%=Resources.labels.extractFromTitle %></a>
                             </li>
                             <li>
-                                <asp:Label ID="Label3" CssClass="lbl" AssociatedControlID="txtDescription" runat="server" Text='Excerpt (optional)' />
-                                <asp:TextBox runat="server" ID="txtDescription" TextMode="multiLine" Columns="50"
-                                    Rows="3" Width="600" Height="80" />
+                                <asp:Label ID="Label3" CssClass="lbl" AssociatedControlID="txtDescription" runat="server" Text='<%$Resources:labels, excerpt %>' />
+                                <asp:TextBox runat="server" ID="txtDescription" TextMode="multiLine" Columns="50" Rows="3" Width="600" Height="80" />
                             </li>
                             <li>
-                                <label class="lbl">Options</label>
-                                <asp:CheckBox runat="server" ID="cbEnableComments" Text="<%$ Resources:labels, enableComments %>"
-                                    Checked="true" />
+                                <label class="lbl"><%=Resources.labels.options %></label>
+                                <asp:CheckBox runat="server" ID="cbEnableComments" Text="<%$ Resources:labels, enableComments %>" Checked="true" />
                             </li>
                             <li>
-                                 <asp:CheckBox runat="server" ID="cbPublish" Text="<%$ Resources:labels, publish %>"
-                                    Checked="true" />
+                                 <asp:CheckBox runat="server" ID="cbPublish" Text="<%$ Resources:labels, publish %>" Checked="true" />
                            </li>
                         </ul>
                         <div class="action_buttons">
-                            <input type="button" id="btnSave" value="Save post" class="btn primary rounded" onclick="return SavePost()" /> or 
+                            <input type="button" id="btnSave" value="<%=Resources.labels.savePost %>" class="btn primary rounded" onclick="return SavePost()" /> <%=Resources.labels.or %>
                             <% if (!string.IsNullOrEmpty(Request.QueryString["id"]))
                                { %>
-                            <a href="<%=PostUrl %>" title="Go to page">Go to post</a>
+                            <a href="<%=PostUrl %>" title="<%=Resources.labels.goToPost %>"><%=Resources.labels.goToPost %></a>
                             <%}
                                else
                                {%>
-                            <a href="Posts.aspx" title="Cancel"><%=Resources.labels.cancel %></a>
+                            <a href="Posts.aspx" title="<%=Resources.labels.cancel %>"><%=Resources.labels.cancel %></a>
                             <%} %>
                             <span id="autoSaveLabel" style="display:none;"></span>
                         </div>
@@ -276,9 +258,9 @@
                                 <asp:DropDownList runat="Server" ID="ddlAuthor" />
                             </li>
                             <li>
-                                <asp:Label CssClass="lbl" AssociatedControlID="txtDate" runat="server" Text='Set publish date' />
-                                <input type="radio" name="PublishDate" id="rbtAuto" onclick="toggleAutomaticDate()" checked="checked" /><label for="rbtAuto">Automatically</label>
-                                <input type="radio" name="PublishDate" id="rbtManual" onclick="toggleAutomaticDate()" /><label for="rbtManual">Manually</label>
+                                <asp:Label CssClass="lbl" AssociatedControlID="txtDate" runat="server" Text='<%$ Resources:labels, setPublishDate %>' />
+                                <input type="radio" name="PublishDate" id="rbtAuto" onclick="toggleAutomaticDate()" checked="checked" /><label for="rbtAuto"><%=Resources.labels.automatically %></label>
+                                <input type="radio" name="PublishDate" id="rbtManual" onclick="toggleAutomaticDate()" /><label for="rbtManual"><%=Resources.labels.manually %></label>
                                 <div id="datePanel" style="display:none;">
                                     <asp:TextBox runat="server" ID="txtDate" Width="170" />
                                     <asp:TextBox runat="server" ID="txtTime" Width="50" />
@@ -294,8 +276,8 @@
                                     <span id="cblCategories" runat="server" class="cblCategories"></span>
                                 </div>
                                 <div style="">
-                                    <label for="<%=txtCategory.ClientID %>" style="margin-bottom:5px;">Quick add new category</label>
-                                    <asp:TextBox runat="server" ID="txtCategory" ValidationGroup="category" Width="180" />
+                                    <label for="<%=txtCategory.ClientID %>" style="margin-bottom:5px; display:block;"><%=Resources.labels.quickAddNewCategory %></label>
+                                    <asp:TextBox runat="server" ID="txtCategory" ValidationGroup="category" Width="150" />
                                     <asp:Button runat="server" ID="btnCategory" Text="<%$ Resources:labels, add %>" ValidationGroup="category" CssClass="btn" style="min-width:0px; margin:0;" />
                                     <asp:CustomValidator runat="Server" ID="valExist" ValidationGroup="category" ControlToValidate="txtCategory"
                                         ErrorMessage="<%$ Resources:labels, categoryAlreadyExists %>" Display="dynamic" />
@@ -306,12 +288,12 @@
                             <li style="position:relative;">
                                 <label class="lbl"><%=Resources.labels.tags%></label>
                                 <asp:TextBox runat="server" ID="txtTags" TextMode="MultiLine" Rows="3" />
-                                <span><%=Resources.labels.separateTagsWitComma %></span> or 
+                                <span><%=Resources.labels.separateTagsWitComma %></span> <%=Resources.labels.or %>
                                 
-                                <a href="javascript:void(ToggleTagSelector())">Choose from existing tags</a>
+                                <a href="javascript:void(ToggleTagSelector())"><%=Resources.labels.chooseFromExistingTags %></a>
                                 <div id="tagselector" class="rounded" style="display: none;">
                                     <a class="close" onclick="ToggleTagSelector()"></a>
-                                    <span>Click a tag:</span>
+                                    <span><%=Resources.labels.clickTag %></span>
                                     <div class="clear"></div>
                                     <div style="max-height:150px; overflow-y:auto;">
                                         <asp:PlaceHolder runat="server" ID="phTags" />

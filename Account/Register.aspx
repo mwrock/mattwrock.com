@@ -1,7 +1,7 @@
-﻿<%@ Page Title="Register" Language="C#" MasterPageFile="Account.master" AutoEventWireup="true"
-    CodeFile="Register.aspx.cs" Inherits="Account.Register" %>
+﻿<%@ Page Title="Register" Language="C#" MasterPageFile="account.master" AutoEventWireup="true"
+    CodeFile="register.aspx.cs" Inherits="Account.Register" %>
 
-<%@ MasterType VirtualPath="~/Account/Account.master" %>
+<%@ MasterType VirtualPath="~/Account/account.master" %>
 <asp:Content ID="HeaderContent" runat="server" ContentPlaceHolderID="HeadContent">
 </asp:Content>
 <asp:Content ID="BodyContent" runat="server" ContentPlaceHolderID="MainContent">
@@ -13,8 +13,7 @@
                     <p><span id="CreateHdr">
                         <%=Resources.labels.createAccount %></span> <span>
                             <%=Resources.labels.alreadyHaveAccount %>
-                            <a href="~/Account/Login.aspx" id="HeadLoginStatus" runat="server">
-                                <%=Resources.labels.loginNow %></a> </span></p>
+                            <a id="HeadLoginStatus" runat="server"><%=Resources.labels.loginNow %></a></span></p>
                     <div class="accountInfo">
                         <div class="login">
                             <p>

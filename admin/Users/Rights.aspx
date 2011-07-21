@@ -3,8 +3,8 @@
 
 <asp:Content ID="Content1" ContentPlaceHolderID="cphAdmin" runat="Server">
     <script type="text/javascript">
-        var rights = <%=this.GetRightsJson()%>;
-        var role = "<%=this.RoleName %>";
+        var rights = <%=GetRightsJson()%>;
+        var role = "<%=RoleName %>";
 
         var rightsControls = {};
 
@@ -75,11 +75,12 @@
             };
 
             $.ajax({
-                url: "../../api/RoleService.asmx/SaveRights",
+                url: SiteVars.ApplicationRelativeWebRoot + "api/RoleService.asmx/SaveRights",
                 data: JSON.stringify(dto),
                 type: "POST",
                 contentType: "application/json; charset=utf-8",
                 dataType: "json",
+                beforeSend: onAjaxBeforeSend,
                 success: function (result) {
                     var rt = result.d;
                     if(rt.Success) {
@@ -110,7 +111,7 @@
             }
 
             $.ajax({
-                url: "../../api/RoleService.asmx/" + serviceName,
+                url: SiteVars.ApplicationRelativeWebRoot + "api/RoleService.asmx/" + serviceName,
                 data: JSON.stringify({ roleName: roleName }),
                 type: "POST",
                 contentType: "application/json; charset=utf-8",
@@ -169,21 +170,21 @@
             <div class="topRightTools">
                 <ul class="rowTools">
                     <li>
-                        <a href="#" class="toolsAction"><span class="">Copy Rights From</span></a>
+                        <a href="#" class="toolsAction"><span class=""><%=Resources.labels.copyRightsFrom %></span></a>
                         <ul class="rowToolsMenu assignDefaultRoles">
                             <%= RolesForLoading %>
-                            <li style="border-top:1px solid #ccc;"><a href="#" onclick="return setDefaultRoleRights('Anonymous',this)">default Anonymous role</a></li>
-                            <li><a href="#" onclick="return setDefaultRoleRights('Editors',this)">default Editors role</a></li>
+                            <li style="border-top:1px solid #ccc;"><a href="#" onclick="return setDefaultRoleRights('Anonymous',this)"><%=Resources.labels.defaultAnonymousRole %></a></li>
+                            <li><a href="#" onclick="return setDefaultRoleRights('Editors',this)"><%=Resources.labels.defaultEditorsRole %></a></li>
                         </ul>
                     </li>
                 </ul>
             </div>
 
-            <h1>Editing Rights for Role <%=Server.HtmlEncode(this.RoleName) %></h1>
+            <h1><%=Resources.labels.editingRightsForRole %> <%=Server.HtmlEncode(RoleName) %></h1>
             <div id="rightsHolder"></div>
             <div style="clear:both">&nbsp;</div>
-            <input type="submit" class="btn primary rounded" value="Save rights" onclick="return SaveRights();" />
-            or <a href="Roles.aspx"><%=Resources.labels.cancel %></a>
+            <input type="submit" class="btn primary rounded" value="<%=Resources.labels.save %>" onclick="return SaveRights();" />
+            <%=Resources.labels.or %> <a href="Roles.aspx"><%=Resources.labels.cancel %></a>
         </div>
     </div>
 </asp:Content>

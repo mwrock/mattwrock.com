@@ -7,14 +7,16 @@
         LoadTags(1);
         function LoadTags(page) {
             $.ajax({
-                url: "../AjaxHelper.aspx/LoadTags",
+                url: SiteVars.ApplicationRelativeWebRoot + "admin/AjaxHelper.aspx/LoadTags",
                 data: "{'page':'" + page + "'}",
                 type: "POST",
                 contentType: "application/json; charset=utf-8",
                 dataType: "json",
+                beforeSend: onAjaxBeforeSend,
                 success: function (msg) {
                     $('#Container').setTemplateURL('../../Templates/tags.htm', null, { filter_data: false });
                     $('#Container').processTemplate(msg);
+                    SaveOriginalIdValues('#Container tr', '.editable');
                 }
             });
             return false;
@@ -34,7 +36,7 @@
 			<menu:TabMenu ID="TabMenu" runat="server" />
 		</div>
 		<div class="content-box-left">
-            <h1>Tags</h1>
+            <h1><%=Resources.labels.tags %></h1>
             <div class="tableToolBox">
                 <div class="Pager"></div>
             </div>

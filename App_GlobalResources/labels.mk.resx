@@ -493,6 +493,12 @@
 	<data name="showCountryChooserDescription" xml:space="preserve">
 		<value>Ако не се избере земја, нема да се прикаже знаме на коментарите</value>
 	</data>
+  <data name="showEnableWebsiteInComments" xml:space="preserve">
+    <value>Need Translation:Enable Website in Comments</value>
+  </data>
+  <data name="showEnableWebsiteInCommentsDescription" xml:space="preserve">
+    <value>Need Translation:Choose whether to allow Website to be published in Comments</value>
+  </data>
 	<data name="showDescriptionInPostList" xml:space="preserve">
 		<value>Прикажи само опис на постовите</value>
 	</data>

@@ -17,6 +17,7 @@ namespace Admin.Pages
     using Resources;
 
     using Page = System.Web.UI.Page;
+    using App_Code;
 
     public partial class EditPage : Page, ICallbackEventHandler
     {
@@ -76,7 +77,7 @@ namespace Admin.Pages
         /// <param name="e">An <see cref="T:System.EventArgs"/> that contains the event data.</param>
         protected override void OnInit(EventArgs e)
         {
-            Security.DemandUserHasRight(BlogEngine.Core.Rights.AccessAdminPages, true);
+            WebUtils.CheckRightsForAdminPagesPages(false);
             this.MaintainScrollPositionOnPostBack = true;
 
             if (!String.IsNullOrEmpty(this.Request.QueryString["id"]) && this.Request.QueryString["id"].Length == 36)
@@ -100,6 +101,7 @@ namespace Admin.Pages
                 }
 
                 this.BindParents(Guid.Empty);
+                this.cbPublished.Checked = Security.IsAuthorizedTo(Rights.PublishOwnPages);
             }
 
             this.btnUploadFile.Click += this.BtnUploadFileClick;
@@ -360,7 +362,7 @@ namespace Admin.Pages
         {
             var relativeFolder = DateTime.Now.Year.ToString() + Path.DirectorySeparatorChar + DateTime.Now.Month +
                                  Path.DirectorySeparatorChar;
-            var folder = BlogSettings.Instance.StorageLocation + "files" + Path.DirectorySeparatorChar;
+            var folder = Blog.CurrentInstance.StorageLocation + "files" + Path.DirectorySeparatorChar;
             var fileName = this.txtUploadFile.FileName;
             this.Upload(folder + relativeFolder, this.txtUploadFile, fileName);
 
@@ -379,7 +381,7 @@ namespace Admin.Pages
         {
             var relativeFolder = DateTime.Now.Year.ToString() + Path.DirectorySeparatorChar + DateTime.Now.Month +
                                  Path.DirectorySeparatorChar;
-            var folder = string.Format("{0}files{1}", BlogSettings.Instance.StorageLocation, Path.DirectorySeparatorChar);
+            var folder = string.Format("{0}files{1}", Blog.CurrentInstance.StorageLocation, Path.DirectorySeparatorChar);
             var fileName = this.txtUploadImage.FileName;
             this.Upload(folder + relativeFolder, this.txtUploadImage, fileName);
 

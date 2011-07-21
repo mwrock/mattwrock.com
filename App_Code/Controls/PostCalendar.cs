@@ -124,7 +124,7 @@ namespace App_Code.Controls
                             {
                                 InnerHtml = day.DayNumberText,
                                 HRef =
-                                    string.Format("{0}{1}/{2}/{3}/default{4}", Utils.RelativeWebRoot, day.Date.Year, day.Date.ToString("MM"), day.Date.ToString("dd"), BlogSettings.Instance.FileExtension)
+                                    string.Format("{0}{1}/{2}/{3}/default{4}", Utils.RelativeWebRoot, day.Date.Year, day.Date.ToString("MM"), day.Date.ToString("dd"), BlogConfig.FileExtension)
                             };
                         a.Attributes["class"] = "exist";
                         cell.Controls.Add(a);

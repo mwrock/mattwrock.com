@@ -65,7 +65,7 @@ public partial class page : BlogBasePage
             return; // WLF: ReSharper is stupid and doesn't know that redirect returns this method.... or does it not...?
         }
 
-        this.h1Title.InnerHtml = pg.Title;
+        this.h1Title.InnerHtml = System.Web.HttpContext.Current.Server.HtmlEncode(pg.Title);
 
         var arg = new ServingEventArgs(pg.Content, ServingLocation.SinglePage);
         BlogEngine.Core.Page.OnServing(pg, arg);
@@ -122,7 +122,7 @@ public partial class page : BlogBasePage
 
         page.Delete();
         page.Save();
-        this.Response.Redirect("~/", true);
+        this.Response.Redirect(Utils.RelativeWebRoot, true);
     }
 
  

@@ -7,7 +7,7 @@ using System.Web;
 
 using BlogEngine.Core;
 using BlogEngine.Core.Web.Controls;
-
+using BlogEngine.Core.Web.Extensions;
 using Resources;
 
 #endregion
@@ -115,10 +115,11 @@ public class BreakPost
     /// <param name="e">The <see cref="BlogEngine.Core.ServingEventArgs"/> instance containing the event data.</param>
     private static void PostServing(object sender, ServingEventArgs e)
     {
-        if (!e.Body.Contains("[more]"))
-        {
+        if (!ExtensionManager.ExtensionEnabled("BreakPost"))
             return;
-        }
+
+        if (!e.Body.Contains("[more]"))
+            return;
 
         switch (e.Location)
         {

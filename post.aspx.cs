@@ -20,7 +20,7 @@ public partial class post : BlogEngine.Core.Web.Controls.BlogBasePage
 
         if (!Security.IsAuthorizedTo(Rights.ViewPublicPosts))
         {
-            Response.Redirect("~/");
+            Response.Redirect(Utils.RelativeWebRoot);
         }
 
         bool shouldThrow404 = false;
@@ -56,7 +56,8 @@ public partial class post : BlogEngine.Core.Web.Controls.BlogBasePage
                 }
                 else if (!post.IsVisible)
                 {
-                    shouldThrow404 = true;
+                    Response.Redirect(Utils.RelativeWebRoot + "default.aspx", true);
+                    //shouldThrow404 = true;
                 }
                 else
                 {
@@ -64,7 +65,7 @@ public partial class post : BlogEngine.Core.Web.Controls.BlogBasePage
 
                     var settings = BlogSettings.Instance;
                     string encodedPostTitle = Server.HtmlEncode(Post.Title);
-                    string path = Utils.RelativeWebRoot + "themes/" + settings.Theme + "/PostView.ascx";
+                    string path = Utils.ApplicationRelativeWebRoot + "themes/" + BlogSettings.Instance.GetThemeWithAdjustments(null) + "/PostView.ascx";
 
                     PostViewBase postView = (PostViewBase)LoadControl(path);
                     postView.Post = Post;

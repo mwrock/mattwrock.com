@@ -45,16 +45,16 @@ namespace App_Code.Controls
                     AddBlog((BlogRollItem)sender);
                     break;
                 case SaveAction.Delete:
-                    var affected = items.FirstOrDefault(req => req.RollItem.Equals(sender));
-                    items.Remove(affected);
+                    var affected = Items.FirstOrDefault(req => req.RollItem.Equals(sender));
+                    Items.Remove(affected);
                     break;
             }
 
             if (((e.Action == SaveAction.Insert || e.Action == SaveAction.Delete) || e.Action == SaveAction.Update) &&
-                items.Count > 0)
+                Items.Count > 0)
             {
                 // Re-sort _Items collection in case sorting of blogroll items was changed.
-                items.Sort((br1, br2) => br1.RollItem.CompareTo(br2.RollItem));
+                Items.Sort((br1, br2) => br1.RollItem.CompareTo(br2.RollItem));
             }
         }
 
@@ -86,16 +86,62 @@ namespace App_Code.Controls
         /// <summary>
         /// The last updated.
         /// </summary>
-        private static DateTime lastUpdated = DateTime.Now;
+        private static Dictionary<Guid, DateTime> blogsLastUpdated = new Dictionary<Guid, DateTime>();
 
         /// <summary>
         /// The items.
         /// </summary>
-        private static List<BlogRequest> items;
+        private static Dictionary<Guid, List<BlogRequest>> blogsItems = new Dictionary<Guid, List<BlogRequest>>();
 
         #endregion
 
         #region Properties
+
+        private static DateTime LastUpdated
+        {
+            get
+            {
+                Guid blogId = Blog.CurrentInstance.Id;
+
+                if (!blogsLastUpdated.ContainsKey(blogId))
+                {
+                    lock (SyncRoot)
+                    {
+                        if (!blogsLastUpdated.ContainsKey(blogId))
+                        {
+                            blogsLastUpdated[blogId] = DateTime.Now;
+                        }
+                    }
+                }
+
+                return blogsLastUpdated[blogId];
+            }
+            set
+            {
+                blogsLastUpdated[Blog.CurrentInstance.Id] = value;
+            }
+        }
+
+        private static List<BlogRequest> Items
+        {
+            get
+            {
+                Guid blogId = Blog.CurrentInstance.Id;
+
+                if (!blogsItems.ContainsKey(blogId))
+                {
+                    lock (SyncRoot)
+                    {
+                        if (!blogsItems.ContainsKey(blogId))
+                        {
+                            blogsItems[blogId] = new List<BlogRequest>();
+                        }
+                    }
+                }
+
+                return blogsItems[blogId];
+            }
+        }
 
         /// <summary>
         ///     Determines whether the RSS icon is displayed (default true)
@@ -124,20 +170,19 @@ namespace App_Code.Controls
         /// </returns>
         private HtmlGenericControl DisplayBlogroll()
         {
-            if (DateTime.Now > lastUpdated.AddMinutes(BlogSettings.Instance.BlogrollUpdateMinutes) &&
+            if (DateTime.Now > LastUpdated.AddMinutes(BlogSettings.Instance.BlogrollUpdateMinutes) &&
                 BlogSettings.Instance.BlogrollVisiblePosts > 0)
             {
-                items = null;
-                lastUpdated = DateTime.Now;
+                Items.Clear();
+                LastUpdated = DateTime.Now;
             }
 
-            if (items == null)
+            if (Items.Count == 0)
             {
                 lock (SyncRoot)
                 {
-                    if (items == null)
+                    if (Items.Count == 0)
                     {
-                        items = new List<BlogRequest>();
                         foreach (var roll in BlogRollItem.BlogRolls)
                         {
                             AddBlog(roll);
@@ -159,7 +204,7 @@ namespace App_Code.Controls
         {
             var ul = new HtmlGenericControl("ul");
             ul.Attributes.Add("class", "xoxo");
-            foreach (var item in items)
+            foreach (var item in Items)
             {
                 HtmlAnchor feedAnchor = null;
 
@@ -169,7 +214,7 @@ namespace App_Code.Controls
 
                     using (var image = new HtmlImage
                         {
-                            Src = string.Format("{0}pics/rssButton.png", Utils.RelativeWebRoot), Alt = string.Format("RSS feed for {0}", item.RollItem.Title)
+                            Src = string.Format("{0}pics/rssButton.png", Utils.ApplicationRelativeWebRoot), Alt = string.Format("RSS feed for {0}", item.RollItem.Title)
                         })
                     {
                         feedAnchor.Controls.Add(image);
@@ -270,7 +315,7 @@ namespace App_Code.Controls
         /// </param>
         private static void AddBlog(BlogRollItem br)
         {
-            var affected = items.FirstOrDefault(r => r.RollItem.Equals(br));
+            var affected = Items.FirstOrDefault(r => r.RollItem.Equals(br));
             if (affected != null)
             {
                 return;
@@ -280,8 +325,15 @@ namespace App_Code.Controls
             req.Credentials = CredentialCache.DefaultNetworkCredentials;
 
             var blogRequest = new BlogRequest(br, req);
-            items.Add(blogRequest);
-            req.BeginGetResponse(ProcessResponse, blogRequest);
+            Items.Add(blogRequest);
+
+            GetRequestData data = new GetRequestData()
+            {
+                BlogInstanceId = Blog.CurrentInstance.Id,
+                BlogRequest = blogRequest
+            };
+
+            req.BeginGetResponse(ProcessResponse, data);
         }
 
         /// <summary>
@@ -292,7 +344,10 @@ namespace App_Code.Controls
         /// </param>
         private static void ProcessResponse(IAsyncResult async)
         {
-            var blogReq = (BlogRequest)async.AsyncState;
+            GetRequestData data = (GetRequestData)async.AsyncState;
+            Blog.InstanceIdOverride = data.BlogInstanceId;
+            var blogReq = data.BlogRequest;
+
             try
             {
                 using (var response = (HttpWebResponse)blogReq.Request.EndGetResponse(async))
@@ -330,12 +385,22 @@ namespace App_Code.Controls
                     }
                 }
             }
-            catch
+            catch (Exception ex)
             {
+                Utils.Log("App_Code.Controls.Blogroll.ProcessRequest", ex);
             }
         }
 
         #endregion
+
+        /// <summary>
+        /// Data used during the async HTTP request for blogrolls.
+        /// </summary>
+        private class GetRequestData
+        {
+            public Guid BlogInstanceId { get; set; }
+            public BlogRequest BlogRequest { get; set; }
+        }
     }
 
     /// <summary>

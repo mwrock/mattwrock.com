@@ -6,6 +6,9 @@ using System.Threading;
 using BlogEngine.Core;
 using BlogEngine.Core.Ping;
 using BlogEngine.Core.Web.Controls;
+using BlogEngine.Core.Web.Extensions;
+using System.Collections.Specialized;
+using BlogEngine.Core.Providers;
 
 #endregion
 
@@ -80,19 +83,30 @@ public class SendPings
     /// <param name="e">The <see cref="BlogEngine.Core.SavedEventArgs"/> instance containing the event data.</param>
     private static void PostSaved(object sender, SavedEventArgs e)
     {
-        if (e.Action == SaveAction.None || e.Action == SaveAction.Delete)
-        {
+        if (!ExtensionManager.ExtensionEnabled("SendPings"))
             return;
-        }
+
+        if (e.Action == SaveAction.None || e.Action == SaveAction.Delete)
+            return;
 
         var item = (IPublishable)sender;
         if (!item.IsVisibleToPublic)
-        {
             return;
-        }
         
         var url = item.AbsoluteLink;
-        ThreadPool.QueueUserWorkItem(state => Ping(item, url));
+
+        // Need blogSettings to pass to Ping since the current blog instance won't
+        // be detectable once in a BG thread.
+        Guid blogId = Blog.CurrentInstance.Id;
+        ThreadPool.QueueUserWorkItem(state =>
+            {
+                // because HttpContext is not available within this BG thread
+                // needed to determine the current blog instance,
+                // set override value here.
+                Blog.InstanceIdOverride = blogId;
+
+                Ping(item, url);
+            });
     }
 
     #endregion

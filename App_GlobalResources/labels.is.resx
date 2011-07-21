@@ -493,6 +493,12 @@
   <data name="showCountryChooserDescription" xml:space="preserve">
     <value>Ef valmynd yfir lönd er ekki sýndur er ekki hægt að sýna fána lands við athugasemdir</value>
   </data>
+  <data name="showEnableWebsiteInComments" xml:space="preserve">
+    <value>Need Translation:Enable Website in Comments</value>
+  </data>
+  <data name="showEnableWebsiteInCommentsDescription" xml:space="preserve">
+    <value>Need Translation:Choose whether to allow Website to be published in Comments</value>
+  </data>
   <data name="showDescriptionInPostList" xml:space="preserve">
     <value>Aðeins sýna lýsingu á færslu</value>
   </data>

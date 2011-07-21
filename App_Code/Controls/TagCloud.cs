@@ -29,9 +29,14 @@ namespace App_Code.Controls
         private const string Link = "<a href=\"{0}\" class=\"{1}\" title=\"{2}\">{3}</a> ";
 
         /// <summary>
+        ///     The sync root.
+        /// </summary>
+        private static readonly object SyncRoot = new object();
+
+        /// <summary>
         /// The weighted list.
         /// </summary>
-        private static Dictionary<string, string> weightedList;
+        private static Dictionary<Guid, Dictionary<string, string>> weightedList = new Dictionary<Guid, Dictionary<string, string>>();
 
         /// <summary>
         /// The minimum posts.
@@ -80,19 +85,30 @@ namespace App_Code.Controls
         }
 
         /// <summary>
-        /// Gets WeightedList.
+        ///     Gets WeightedList.
         /// </summary>
         private Dictionary<string, string> WeightedList
         {
             get
             {
-                if (weightedList == null)
+                Dictionary<string, string> list = null;
+                Guid blogId = Blog.CurrentInstance.Id;
+
+                if (!weightedList.TryGetValue(blogId, out list))
                 {
-                    weightedList = new Dictionary<string, string>();
-                    this.SortList();
+                    lock (SyncRoot)
+                    {
+                        if (!weightedList.TryGetValue(blogId, out list))
+                        {
+                            list = new Dictionary<string, string>();
+                            weightedList.Add(blogId, list);
+
+                            this.SortList();
+                        }
+                    }
                 }
 
-                return weightedList;
+                return list;
             }
         }
 
@@ -176,23 +192,23 @@ namespace App_Code.Controls
                 var weight = ((double)dic[key] / max) * 100;
                 if (weight >= 99)
                 {
-                    weightedList.Add(key, "biggest");
+                    WeightedList.Add(key, "biggest");
                 }
                 else if (weight >= 70)
                 {
-                    weightedList.Add(key, "big");
+                    WeightedList.Add(key, "big");
                 }
                 else if (weight >= 40)
                 {
-                    weightedList.Add(key, "medium");
+                    WeightedList.Add(key, "medium");
                 }
                 else if (weight >= 20)
                 {
-                    weightedList.Add(key, "small");
+                    WeightedList.Add(key, "small");
                 }
                 else if (weight >= 3)
                 {
-                    weightedList.Add(key, "smallest");
+                    WeightedList.Add(key, "smallest");
                 }
             }
         }

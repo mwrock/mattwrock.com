@@ -7,17 +7,10 @@
 namespace Admin.Pages
 {
     using System;
-    using System.IO;
-    using System.Linq;
-    using System.Web.UI;
-    using System.Web.UI.HtmlControls;
-    using System.Web.UI.WebControls;
-
-    using BlogEngine.Core;
-
     using Resources;
 
     using Page = System.Web.UI.Page;
+    using App_Code;
 
     /// <summary>
     /// The admin pages pages.
@@ -32,10 +25,10 @@ namespace Admin.Pages
         /// <param name="e">An <see cref="T:System.EventArgs"/> that contains the event data.</param>
         protected override void OnInit(EventArgs e)
         {
-            Security.DemandUserHasRight(BlogEngine.Core.Rights.AccessAdminPages, true);
-            this.MaintainScrollPositionOnPostBack = true;
+            WebUtils.CheckRightsForAdminPagesPages(false);
+            MaintainScrollPositionOnPostBack = true;
           
-            this.Page.Title = labels.pages;
+            Page.Title = labels.pages;
 
             base.OnInit(e);
         }

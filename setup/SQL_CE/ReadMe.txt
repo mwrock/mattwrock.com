@@ -1,38 +1,9 @@
 Running BlogEngine.NET using SQL CE 4.0
 
 If you wish to use SQL CE to store all your blog data, this folder has all the information you'll 
-likely need.
-
-
-ASP.NET Runtime Requirement for SQL CE 4.0
------------------------------------------------------------
-ASP.NET 4.0
-- or -
-ASP.NET 3.5 with Full Trust
-- or -
-ASP.NET 3.5 Medium Trust if web hoster has made configuration changes to allow SQL CE 4.0 to run.
-
-
-SQL CE 4.0 .SDF File
------------------------------------------------------------
-The SQL CE .SDF file was created under the SQL CE version 4.0.8435.1 engine.  Although version 
-4.0.8435.1 is a CTP version of SQL CE 4.0, this .SDF file should work with the final release of 
-SQL CE 4.0.  If there are any compability issues, we will update the .SDF file to work with the 
-final release.  The BlogEngine.sql file is for reference, but not needed to run SQL CE with 
-BlogEngine.NET.  Only the .SDF file is needed.
-
-The .SDF file is already configured with the necessary tables and initial data setup.
-
-
-Sample Web.config files
------------------------------------------------------------
-There are 2 sample web.config files in this folder.
- (1) SQL_CE_for_ASP.NET_4.0_Web.Config
- (2) SQL_CE_for_ASP.NET_3.5_Web.Config
-
-If your website runs in a ASP.NET 3.5 environment, please review the "ASP.NET Runtime 
-Requirement" above.
-
+likely need.  The BlogEngine.sdf is already setup with the DB tables and initial data needed
+to get started with BlogEngine.NET.  Although not needed, SQL_CE_Setup_2.5.sql is provided
+for reference.  This was the setup script used to create the BlogEngine.sdf file.
 
 Instructions for New Setup
 -----------------------------------------------------------
@@ -77,13 +48,32 @@ After copying these files and folders, your /BIN directory will look like this:
    sqlceqp40.dll 
    sqlcese40.dll 
 
-3. Rename the correct sample web.config file above to web.config and copy it to your blog's root 
+3. Rename the SQL_CE_Web.Config file to web.config and copy it to your blog's root 
 folder.  (This will overwrite your existing web.config file.  If this is not a new installation, 
 make sure you have a backup.)
 4. Copy the BlogEngine.sdf file into the App_Data folder.
 5. Surf out to your Blog and see the welcome post.
 6. Login with the username admin and password admin.  Change the password.
 
+Upgrading from 2.0
+-----------------------------------------------------------
+
+There is an upgrade script to update your SDF file so it is compliant with BlogEngine.NET 2.5.
+The upgrade script name is SQL_CE_UpgradeFrom2.0to2.5.sql.  This script will need to be
+run against your BlogEngine.NET 2.0 SDF file.  A recommended tool is to use the
+SQL Server Compact Toolbox utility found at:
+
+http://sqlcetoolbox.codeplex.com/
+
+An add-in for Visual Studio 2010 can be downloaded, or a standalone version of the toolbox
+can be downloaded.  This utility will allow you to run a SQL CE script against a SDF
+file.  You would want to run the script contained in SQL_CE_UpgradeFrom2.0to2.5.sql
+against your BlogEngine.NET 2.0 SDF file.  Once the script has been run, your BlogEngine.SDF
+file will be ready to use in a BlogEngine.NET 2.5 website.
+
+Additionally, the web.config file has changed from 2.0 to 2.5.  It will likely be easiest to start
+with the sample web.config file as described above, but if you have other changes in it, 
+you'll need to merge them.  Don't forget to move your connectionString over.
 
 Troubleshooting
 -----------------------------------------------------------

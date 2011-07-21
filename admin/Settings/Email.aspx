@@ -31,11 +31,12 @@
 			};
 			
             $.ajax({
-                url: "Email.aspx/Save",
+                url: SiteVars.ApplicationRelativeWebRoot + "admin/Settings/Email.aspx/Save",
                 type: "POST",
                 dataType: "json",
                 contentType: "application/json; charset=utf-8",
                 data: JSON.stringify(dto),
+                beforeSend: onAjaxBeforeSend,
                 success: function (result) {
                     var rt = result.d;
                     if (rt.Success)
@@ -61,11 +62,12 @@
             };
 
             $.ajax({
-                url: "Email.aspx/TestSmtp",
+                url: SiteVars.ApplicationRelativeWebRoot + "admin/Settings/Email.aspx/TestSmtp",
                 type: "POST",
                 dataType: "json",
                 contentType: "application/json; charset=utf-8",
                 data: JSON.stringify(dto),
+                beforeSend: onAjaxBeforeSend,
                 success: function (result) {
                     var rt = result.d;
                     if (rt.Success)
@@ -92,7 +94,7 @@
                         <asp:TextBox CssClass="w300 email" runat="server" ID="txtEmail" />
                     </li>
                     <li>
-                        <label class="lbl" for="<%=txtSmtpServer.ClientID %>">SMTP server</label>
+                        <label class="lbl" for="<%=txtSmtpServer.ClientID %>"><%=Resources.labels.smtpServer%></label>
                         <asp:TextBox runat="server" ID="txtSmtpServer" CssClass="w300" />
                     </li>
                     <li>
@@ -113,7 +115,7 @@
                         <asp:TextBox runat="server" ID="txtEmailSubjectPrefix" Width="300" />
                     </li>
                     <li>
-                        <label class="lbl">Other settings</label>
+                        <label class="lbl"><%=Resources.labels.otherSettings %></label>
                         <asp:CheckBox runat="Server" ID="cbEnableSsl" />
                         <label for="<%=cbEnableSsl.ClientID %>"><%=Resources.labels.enableSsl%></label>
                     </li>
@@ -124,8 +126,8 @@
                     </li>
                 </ul>
             <div class="action_buttons">
-                <input type="submit" id="btnSave" class="btn primary" value="Save settings" />
-                <input type="submit" class="btn" value="Test E-mail account" onclick="return TestEmail();" />
+                <input type="submit" id="btnSave" class="btn primary" value="<%=Resources.labels.saveSettings %>" />
+                <input type="submit" class="btn" value="<%=Resources.labels.testEmailSettings %>" onclick="return TestEmail();" />
                 <asp:Label runat="Server" ID="lbSmtpStatus" />
             </div>
         </div>

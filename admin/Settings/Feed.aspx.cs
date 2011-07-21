@@ -3,7 +3,6 @@
     using System;
     using System.Globalization;
     using System.Web.Services;
-    using System.Threading;
     using Resources;
     using BlogEngine.Core;
     using BlogEngine.Core.Json;
@@ -52,13 +51,14 @@
             txtAlternateFeedUrl.Text = BlogSettings.Instance.AlternateFeedUrl;
             cbEnableEnclosures.Checked = BlogSettings.Instance.EnableEnclosures;
         }
-		
+
         /// <summary>
         /// Save settings
         /// </summary>
         /// <param name="syndicationFormat"></param>
         /// <param name="postsPerFeed"></param>
         /// <param name="dublinCoreCreator"></param>
+        /// <param name="feedemail"></param>
         /// <param name="dublinCoreLanguage"></param>
         /// <param name="geocodingLatitude"></param>
         /// <param name="geocodingLongitude"></param>
@@ -66,7 +66,7 @@
         /// <param name="alternateFeedUrl"></param>
         /// <param name="enableEnclosures"></param>
         /// <returns></returns>
-		[WebMethod]
+        [WebMethod]
         public static JsonResponse Save(
 			string syndicationFormat, 
 			string postsPerFeed,

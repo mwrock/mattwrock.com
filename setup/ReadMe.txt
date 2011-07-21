@@ -1,4 +1,4 @@
-BlogEngine.NET 2.0 supports a variety of data storage options out of the box.  By
+BlogEngine.NET 2.5 supports a variety of data storage options out of the box.  By
 default, it will store all data in XML files in your App_Data folder.  If you wish to
 use a database to store your data, we have folders inside the setup folder to help you
 get started with SQL Server, SQL CE, MySQL or SQLite.  Any database that has an 

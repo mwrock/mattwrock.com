@@ -105,13 +105,25 @@ namespace Admin
         {
             if (!Security.IsAuthenticated)
             {
-                this.Response.Redirect(Utils.RelativeWebRoot);
+                Security.RedirectForUnauthorizedRequest();
+                return;
+            }
+
+            if (Security.IsAuthenticated)
+            {
+                aLogin.InnerText = Resources.labels.logoff;
+                aLogin.HRef = Utils.RelativeWebRoot + "Account/login.aspx?logoff";
+            }
+            else
+            {
+                aLogin.HRef = Utils.RelativeWebRoot + "Account/login.aspx";
+                aLogin.InnerText = Resources.labels.login;
             }
 
             phRecycleBin.Visible = Security.IsAuthorizedTo(Rights.AccessAdminPages);
 
             Utils.AddFolderJavaScripts(this.Page, "Scripts", false);
-            Utils.AddJavaScriptInclude(this.Page, string.Format("{0}admin/admin.js", Utils.RelativeWebRoot), false, false);
+            Utils.AddJavaScriptInclude(this.Page, string.Format("{0}admin/admin.js", Utils.ApplicationRelativeWebRoot), false, false);
 
             base.OnInit(e);
         }

@@ -10,6 +10,7 @@ namespace Widgets.RecentComments
     using System.Web;
 
     using App_Code.Controls;
+    using BlogEngine.Core;
 
     /// <summary>
     /// The edit.
@@ -26,7 +27,7 @@ namespace Widgets.RecentComments
             var settings = this.GetSettings();
             settings["numberofcomments"] = this.txtNumberOfPosts.Text;
             this.SaveSettings(settings);
-            HttpRuntime.Cache.Remove("widget_recentcomments");
+            Blog.CurrentInstance.Cache.Remove("widget_recentcomments");
         }
 
         #endregion

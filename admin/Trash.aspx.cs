@@ -23,6 +23,8 @@
         [WebMethod]
         public static IEnumerable LoadTrash(string trashType)
         {
+            Security.DemandUserHasRight(BlogEngine.Core.Rights.AccessAdminPages, true);
+
             var tType = TrashType.All;
             switch (trashType)
             {
@@ -46,6 +48,8 @@
         [WebMethod]
         public static JsonResponse ProcessTrash(string action, string[] vals)
         {
+            Security.DemandUserHasRight(BlogEngine.Core.Rights.AccessAdminPages, true);
+
             return JsonTrashList.Process(action, vals);
         }
     }

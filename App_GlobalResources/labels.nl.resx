@@ -493,6 +493,12 @@
   <data name="showCountryChooserDescription" xml:space="preserve">
     <value>Als de landkeuze niet getoond wordt, dan kan er geen vlag getoond worden bij de reacties.</value>
   </data>
+  <data name="showEnableWebsiteInComments" xml:space="preserve">
+    <value>Need Translation:Enable Website in Comments</value>
+  </data>
+  <data name="showEnableWebsiteInCommentsDescription" xml:space="preserve">
+    <value>Need Translation:Choose whether to allow Website to be published in Comments</value>
+  </data>
   <data name="showDescriptionInPostList" xml:space="preserve">
     <value>Toon alleen beschrijving van berichten</value>
   </data>
@@ -570,5 +576,8 @@
   </data>
   <data name="youAlreadyRated" xml:space="preserve">
     <value>U heeft dit bericht al gewaardeerd</value>
+  </data>
+  <data name="notifiedPublished" xml:space="preserve">
+    <value>Krijg een E-mail als een nieuwe post gepubliceerd wordt</value>
   </data>
 </root>

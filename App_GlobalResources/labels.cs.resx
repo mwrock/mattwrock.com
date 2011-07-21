@@ -112,10 +112,10 @@
     <value>2.0</value>
   </resheader>
   <resheader name="reader">
-    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <resheader name="writer">
-    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="add" xml:space="preserve">
     <value>Přidat</value>
@@ -139,7 +139,7 @@
     <value>Pokročilé nastavení</value>
   </data>
   <data name="alternateFeedUrl" xml:space="preserve">
-    <value>Alternativní URL feedu</value>
+    <value>Alternativní URL feed</value>
   </data>
   <data name="approve" xml:space="preserve">
     <value>Schválit</value>
@@ -183,7 +183,7 @@
   <data name="category" xml:space="preserve">
     <value>Kategorie</value>
   </data>
-<data name="changePassword" xml:space="preserve">
+  <data name="changePassword" xml:space="preserve">
     <value>Změnit heslo</value>
   </data>
   <data name="chooseOtherName" xml:space="preserve">
@@ -262,7 +262,7 @@
     <value>Zapnout přílohy</value>
   </data>
   <data name="enableCoComments" xml:space="preserve">
-    <value>Zapnout coComments</value>
+    <value>Zapnout ko-komentáře</value>
   </data>
   <data name="enableComments" xml:space="preserve">
     <value>Zapnout komentáře</value>
@@ -298,7 +298,7 @@
     <value>Zapnout hodnocení příspěvků</value>
   </data>
   <data name="enableReferrerTracking" xml:space="preserve">
-    <value>Sledovat odkud přišli</value>
+    <value>Zapnout sledování příchozích</value>
   </data>
   <data name="enableSearchHighlight" xml:space="preserve">
     <value>Zapnout zvýrazňování při vyhledávání</value>
@@ -313,18 +313,18 @@
     <value>Zapnout trackbacks</value>
   </data>
   <data name="endorsment" xml:space="preserve">
-    <value>Endorsment (bLink)</value>
+    <value>Dodatek (bLink)</value>
   </data>
   <data name="enforce" xml:space="preserve">
     <value>Vynutit</value>
   </data>
-    <data name="enterValidEmail" xml:space="preserve">
+  <data name="enterValidEmail" xml:space="preserve">
     <value>Prosím vložte platný e-mail</value>
   </data>
   <data name="enterValidUrl" xml:space="preserve">
     <value>Prosím vložte platné URL</value>
   </data>
-<data name="export" xml:space="preserve">
+  <data name="export" xml:space="preserve">
     <value>Export</value>
   </data>
   <data name="formMessage" xml:space="preserve">
@@ -377,10 +377,10 @@
     <value>Zpráva</value>
   </data>
   <data name="mobileTheme" xml:space="preserve">
-    <value>Mobilní motiv</value>
+    <value>Mobilní téma</value>
   </data>
   <data name="themeCookieName" xml:space="preserve">
-    <value>Jméno cookie motivu</value>
+    <value>Jméno cookie tématu</value>
   </data>
   <data name="more" xml:space="preserve">
     <value>Více</value>
@@ -388,7 +388,7 @@
   <data name="name" xml:space="preserve">
     <value>Jméno</value>
   </data>
-    <data name="nextPost" xml:space="preserve">
+  <data name="nextPost" xml:space="preserve">
     <value>Následující příspěvek</value>
   </data>
   <data name="nextPosts" xml:space="preserve">
@@ -538,6 +538,12 @@
   <data name="showCountryChooserDescription" xml:space="preserve">
     <value>Umožňuje zobrazovat vlajky států u komentářů</value>
   </data>
+  <data name="showEnableWebsiteInComments" xml:space="preserve">
+    <value>Povolit web server v komentářích</value>
+  </data>
+  <data name="showEnableWebsiteInCommentsDescription" xml:space="preserve">
+    <value>Zvolte, zdali se má web server publikovat v komentářích</value>
+  </data>
   <data name="showDescriptionInPostList" xml:space="preserve">
     <value>Zobrazovat pouze popis</value>
   </data>
@@ -569,7 +575,7 @@
     <value>komentář</value>
   </data>
   <data name="theme" xml:space="preserve">
-    <value>Motiv</value>
+    <value>Téma</value>
   </data>
   <data name="thePost" xml:space="preserve">
     <value>příspěvek</value>
@@ -746,7 +752,7 @@
     <value>Zapnout vnořené komentáře</value>
   </data>
   <data name="enableCommentNestingDescription" xml:space="preserve">
-    <value>Je funkční pouze pokud to podporuje zvolený motiv.</value>
+    <value>Je funkční pouze pokud to podporuje zvolené téma.</value>
   </data>
   <data name="replyTo" xml:space="preserve">
     <value>Reakce na</value>
@@ -1198,7 +1204,7 @@
   </data>
   <data name="trackingScriptDescription" xml:space="preserve">
     <value>Sledovací skript návštěvníků&lt;br /&gt;&lt;br /&gt;JavaScript kód např. z Google Analytics.&lt;br /&gt;&lt;br /&gt;
-          Bude přidán na konec každé stránky nezávisle na motivu.&lt;br /&gt;&lt;br /&gt;(nezapomeňte přidat &amp;lt;skript&amp;gt;)</value>
+          Bude přidán na konec každé stránky nezávisle na tématu.&lt;br /&gt;&lt;br /&gt;(nezapomeňte přidat &amp;lt;skript&amp;gt;)</value>
   </data>
   <data name="upload" xml:space="preserve">
     <value>Upload</value>
@@ -1210,7 +1216,7 @@
     <value>Nechte si zasílat upozornění po vložení nového příspěvku.</value>
   </data>
   <data name="pendingApproval" xml:space="preserve">
-    <value>Komentáře budou přiřazeny ke schválení administrátorem</value>
+    <value>Komentáře přiřazené ke schválení administrátorem</value>
   </data>
   <data name="Referrers_BindTable_Total" xml:space="preserve">
     <value>Celkem</value>
@@ -1263,5 +1269,482 @@
   </data>
   <data name="blacklistIpOnCommentRejection" xml:space="preserve">
     <value>Automaticky přidat IP adresu z komentářů, které odmítnete, na black list.</value>
+  </data>
+  <data name="dashboard" xml:space="preserve">
+    <value>Kontrolní panel</value>
+  </data>
+  <data name="groupByYear" xml:space="preserve">
+    <value>Seskupit po roce</value>
+  </data>
+  <data name="recentDatesAtTop" xml:space="preserve">
+    <value>Aktuální datum nahoře</value>
+  </data>
+  <data name="confirmPasswordIsRequired" xml:space="preserve">
+    <value>Je vyžadováno potvrzovací heslo</value>
+  </data>
+  <data name="emailIsInvalid" xml:space="preserve">
+    <value>E-mail je neplatný</value>
+  </data>
+  <data name="emailIsRequired" xml:space="preserve">
+    <value>E-mail je povinný</value>
+  </data>
+  <data name="minPassLengthInChars" xml:space="preserve">
+    <value>Minimální délka hesla je {0} znaků</value>
+  </data>
+  <data name="newAndConfirmPasswordMismatch" xml:space="preserve">
+    <value>Nové a potvrzovací heslo nejsou stejné</value>
+  </data>
+  <data name="newPasswordIsRequired" xml:space="preserve">
+    <value>Je vyžadováno nové heslo</value>
+  </data>
+  <data name="oldPasswordIsRequired" xml:space="preserve">
+    <value>Je vyžadováno původní heslo</value>
+  </data>
+  <data name="passwordAndConfirmPasswordMismatch" xml:space="preserve">
+    <value>Heslo a potvrzovací heslo nejsou stejné</value>
+  </data>
+  <data name="passwordIsRequried" xml:space="preserve">
+    <value>Je vyžadováno heslo</value>
+  </data>
+  <data name="passwordAndConfirmPasswordIsMatch" xml:space="preserve">
+    <value>Nové a potvrzovací heslo nejsou stejné</value>
+  </data>
+  <data name="userNameIsRequired" xml:space="preserve">
+    <value>Je vyžadováno uživatelské jméno</value>
+  </data>
+  <data name="tracking" xml:space="preserve">
+    <value>Sledování</value>
+  </data>
+  <data name="welcome" xml:space="preserve">
+    <value>Přihlášen</value>
+  </data>
+  <data name="addNewPage" xml:space="preserve">
+    <value>Přidat novou stránku</value>
+  </data>
+  <data name="admin" xml:space="preserve">
+    <value>Admin</value>
+  </data>
+  <data name="draftPages" xml:space="preserve">
+    <value>Rozepsané stránky</value>
+  </data>
+  <data name="draftPosts" xml:space="preserve">
+    <value>Rozepsané příspěvky</value>
+  </data>
+  <data name="emptyTrash" xml:space="preserve">
+    <value>Vysypat koš</value>
+  </data>
+  <data name="recentPendingComments" xml:space="preserve">
+    <value>Poslední komentáře ke schválení</value>
+  </data>
+  <data name="stats" xml:space="preserve">
+    <value>Statistiky</value>
+  </data>
+  <data name="trash" xml:space="preserve">
+    <value>Koš</value>
+  </data>
+  <data name="unapproved" xml:space="preserve">
+    <value>Neschválené</value>
+  </data>
+  <data name="viewAll" xml:space="preserve">
+    <value>Zobrazit vše</value>
+  </data>
+  <data name="writeNewPost" xml:space="preserve">
+    <value>Psát nový příspěvek</value>
+  </data>
+  <data name="youDontHaveAnyDraftPages" xml:space="preserve">
+    <value>Nemáte žádné rozepsané stránky.</value>
+  </data>
+  <data name="youDontHaveAnyDraftPosts" xml:space="preserve">
+    <value>Nemáte žádné rozepsané příspěvky.</value>
+  </data>
+  <data name="notAuthorized" xml:space="preserve">
+    <value>Neoprávněn.</value>
+  </data>
+  <data name="userAlreadyExists" xml:space="preserve">
+    <value>Uživatel "{0}" již existuje.</value>
+  </data>
+  <data name="commentsDeleted" xml:space="preserve">
+    <value>Komentáře smazány</value>
+  </data>
+  <data name="couldNotCreateRole" xml:space="preserve">
+    <value>Nelze vytvořit roli: {0}</value>
+  </data>
+  <data name="couldNotCreateUser" xml:space="preserve">
+    <value>Nelze vytvořit uživatele: {0} : {1}</value>
+  </data>
+  <data name="couldNotDeleteComment" xml:space="preserve">
+    <value>Nelze smazat komentář: {0}</value>
+  </data>
+  <data name="couldNotDeleteComments" xml:space="preserve">
+    <value>Nelze smazat všechny komentáře: {0}</value>
+  </data>
+  <data name="couldNotDeletePage" xml:space="preserve">
+    <value>Nelze smazat stránku: {0}</value>
+  </data>
+  <data name="couldNotDeletePost" xml:space="preserve">
+    <value>Nelze smazat příspěvek: {0}</value>
+  </data>
+  <data name="couldNotDeleteRole" xml:space="preserve">
+    <value>Nelze smazat roli: {0}</value>
+  </data>
+  <data name="couldNotDeleteTag" xml:space="preserve">
+    <value>Nelze smazat štítek: {0}</value>
+  </data>
+  <data name="couldNotDeleteUser" xml:space="preserve">
+    <value>Nelze smazat uživatele: {0}</value>
+  </data>
+  <data name="couldNotUpdateProfile" xml:space="preserve">
+    <value>Nelze aktualizovat profil: {0}</value>
+  </data>
+  <data name="couldNotUpdateRole" xml:space="preserve">
+    <value>Nelze aktualizovat roli: {0}</value>
+  </data>
+  <data name="couldNotUpdateTag" xml:space="preserve">
+    <value>Nelze aktualizovat štítek: {0}</value>
+  </data>
+  <data name="couldNotUpdateUser" xml:space="preserve">
+    <value>Nelze aktualizovat uživatele: {0}</value>
+  </data>
+  <data name="displayNameIsRequired" xml:space="preserve">
+    <value>Zobrazované jméno je povinné pole</value>
+  </data>
+  <data name="doNotPassRightsWithFalseValue" xml:space="preserve">
+    <value>Neposílat práva, která mají chybné hodnoty.</value>
+  </data>
+  <data name="emailArgumentInvalid" xml:space="preserve">
+    <value>Argument e-mailová adresa je neplatný.</value>
+  </data>
+  <data name="errorApprovingComment" xml:space="preserve">
+    <value>Chyba při schvalování komentáře: {0}</value>
+  </data>
+  <data name="errorRejectingComment" xml:space="preserve">
+    <value>Chyba při zamítnutí komentáře</value>
+  </data>
+  <data name="idArgumentNull" xml:space="preserve">
+    <value>Argument ID je nulový.</value>
+  </data>
+  <data name="invalidPageId" xml:space="preserve">
+    <value>Neplatné ID stránky</value>
+  </data>
+  <data name="invalidPostId" xml:space="preserve">
+    <value>Neplatné ID příspěvku</value>
+  </data>
+  <data name="invalidRoleName" xml:space="preserve">
+    <value>Neplatný název role</value>
+  </data>
+  <data name="noRightExists" xml:space="preserve">
+    <value>Takové právo neexistuje: {0}</value>
+  </data>
+  <data name="pageDeleted" xml:space="preserve">
+    <value>Stránka smazána</value>
+  </data>
+  <data name="pageIdRequired" xml:space="preserve">
+    <value>Je požadováno ID stránky</value>
+  </data>
+  <data name="passwordArgumentInvalid" xml:space="preserve">
+    <value>Argument heslo je neplatný.</value>
+  </data>
+  <data name="postDeleted" xml:space="preserve">
+    <value>Příspěvek smazán</value>
+  </data>
+  <data name="profileUpdated" xml:space="preserve">
+    <value>Profil {0} aktulizován</value>
+  </data>
+  <data name="rightsCanNotBeNull" xml:space="preserve">
+    <value>Argument kolekce práv nemůže být nulový.</value>
+  </data>
+  <data name="rightsUpdatedForRole" xml:space="preserve">
+    <value>Práva aktualizována pro roli "{0}"</value>
+  </data>
+  <data name="roleAlreadyExists" xml:space="preserve">
+    <value>Role "{0}" již existuje</value>
+  </data>
+  <data name="roleHasBeenCreated" xml:space="preserve">
+    <value>Role "{0}" byla vytvořena</value>
+  </data>
+  <data name="roleHasBeenDeleted" xml:space="preserve">
+    <value>Role "{0}" byla smazána</value>
+  </data>
+  <data name="roleNameArgumentNull" xml:space="preserve">
+    <value>Argument název role je nulový.</value>
+  </data>
+  <data name="roleNameIsRequired" xml:space="preserve">
+    <value>Název role je požadované pole.</value>
+  </data>
+  <data name="roleUpdatedFromTo" xml:space="preserve">
+    <value>Role aktualizována z "{0}" na "{1}"</value>
+  </data>
+  <data name="selectedCommentDeleted" xml:space="preserve">
+    <value>Zvolené komentáře smazány</value>
+  </data>
+  <data name="selectedCommentRejected" xml:space="preserve">
+    <value>Zvolené komentáře zamítnuty</value>
+  </data>
+  <data name="selectedCommentRestored" xml:space="preserve">
+    <value>Zvolené komentáře obnoveny</value>
+  </data>
+  <data name="tagChangedFromTo" xml:space="preserve">
+    <value>Štítek aktualizán z "{0}" na "{1}"</value>
+  </data>
+  <data name="tagHasBeenDeleted" xml:space="preserve">
+    <value>Štítek "{0}" byl smazán</value>
+  </data>
+  <data name="tagIsRequired" xml:space="preserve">
+    <value>Štítek je požadované pole.</value>
+  </data>
+  <data name="userArgumentInvalid" xml:space="preserve">
+    <value>Argument uživatel je neplatný.</value>
+  </data>
+  <data name="userHasBeenCreated" xml:space="preserve">
+    <value>Uživatel "{0}" byl vytvořen</value>
+  </data>
+  <data name="userHasBeenDeleted" xml:space="preserve">
+    <value>Uživatel "{0}" byl smazán</value>
+  </data>
+  <data name="userUpdated" xml:space="preserve">
+    <value>Uživatel "{0}" aktualizován</value>
+  </data>
+  <data name="userWithEmailExists" xml:space="preserve">
+    <value>Uživatel s tímto e-mailem již existuje</value>
+  </data>
+  <data name="valsArgumentNull" xml:space="preserve">
+    <value>vals argument je nulový.</value>
+  </data>
+  <data name="addEditPost" xml:space="preserve">
+    <value>Přidat/upravit příspěvek</value>
+  </data>
+  <data name="addNewCategory" xml:space="preserve">
+    <value>Přidat novou kategorii</value>
+  </data>
+  <data name="insertImage" xml:space="preserve">
+    <value>Vložit obrázek</value>
+  </data>
+  <data name="insertVideo" xml:space="preserve">
+    <value>Vložit video</value>
+  </data>
+  <data name="published" xml:space="preserve">
+    <value>Publikované</value>
+  </data>
+  <data name="show" xml:space="preserve">
+    <value>Zobrazit</value>
+  </data>
+  <data name="automatically" xml:space="preserve">
+    <value>Automaticky</value>
+  </data>
+  <data name="chooseFromExistingTags" xml:space="preserve">
+    <value>Vybrat z existujících štítků</value>
+  </data>
+  <data name="clickTag" xml:space="preserve">
+    <value>Klikněte na štítek:</value>
+  </data>
+  <data name="editPage" xml:space="preserve">
+    <value>Přidat/upravit stránku</value>
+  </data>
+  <data name="excerpt" xml:space="preserve">
+    <value>Výňatek (volitelně)</value>
+  </data>
+  <data name="goToPage" xml:space="preserve">
+    <value>Přejít na stránku</value>
+  </data>
+  <data name="goToPost" xml:space="preserve">
+    <value>Přejít na příspěvek</value>
+  </data>
+  <data name="manually" xml:space="preserve">
+    <value>Manuálně</value>
+  </data>
+  <data name="options" xml:space="preserve">
+    <value>Volby</value>
+  </data>
+  <data name="quickAddNewCategory" xml:space="preserve">
+    <value>Rychlé přidání nové kategorie</value>
+  </data>
+  <data name="setPublishDate" xml:space="preserve">
+    <value>Nastavit datum publikování</value>
+  </data>
+  <data name="uploadVideo" xml:space="preserve">
+    <value>Zvolte video (MP4, WMV, FLV, OGG, WebM) nebo audio (MP3) soubor, který chcete nahrát</value>
+  </data>
+  <data name="enablePasswordReset" xml:space="preserve">
+    <value>Povolit reset hesel</value>
+  </data>
+  <data name="addNewBlog" xml:space="preserve">
+    <value>Přidat nový blog</value>
+  </data>
+  <data name="approvedComments" xml:space="preserve">
+    <value>Schválené komentáře</value>
+  </data>
+  <data name="commonControls" xml:space="preserve">
+    <value>Společné prvky</value>
+  </data>
+  <data name="disable" xml:space="preserve">
+    <value>Zakázat</value>
+  </data>
+  <data name="drafts" xml:space="preserve">
+    <value>Rozpracované</value>
+  </data>
+  <data name="enable" xml:space="preserve">
+    <value>Povolit</value>
+  </data>
+  <data name="pending" xml:space="preserve">
+    <value>Ke schválení</value>
+  </data>
+  <data name="pingbacksAndTrackbacks" xml:space="preserve">
+    <value>Pingbacks &amp;amp; Trackbacks</value>
+  </data>
+  <data name="viewSource" xml:space="preserve">
+    <value>Zobrazit zdroj</value>
+  </data>
+  <data name="addNewUser" xml:space="preserve">
+    <value>Přidat nového uživatele</value>
+  </data>
+  <data name="appearance" xml:space="preserve">
+    <value>Vzhled</value>
+  </data>
+  <data name="commentSettings" xml:space="preserve">
+    <value>Nastavení komentářů</value>
+  </data>
+  <data name="copyRightsFrom" xml:space="preserve">
+    <value>Kopírovat práva z</value>
+  </data>
+  <data name="customCode" xml:space="preserve">
+    <value>Uživatelský kód</value>
+  </data>
+  <data name="defaultAnonymousRole" xml:space="preserve">
+    <value>implicitní Anonymní role</value>
+  </data>
+  <data name="defaultEditorsRole" xml:space="preserve">
+    <value>implicitní Editor role</value>
+  </data>
+  <data name="editingRightsForRole" xml:space="preserve">
+    <value>Úprava práv pro roli</value>
+  </data>
+  <data name="feed" xml:space="preserve">
+    <value>Feed</value>
+  </data>
+  <data name="newUserRoles" xml:space="preserve">
+    <value>Role nového uživatele</value>
+  </data>
+  <data name="otherSettings" xml:space="preserve">
+    <value>Další nastavení</value>
+  </data>
+  <data name="smtpServer" xml:space="preserve">
+    <value>SMTP server</value>
+  </data>
+  <data name="turnDisqusOnOff" xml:space="preserve">
+    <value>Disqus zapnout/vypnout</value>
+  </data>
+  <data name="useDisqusAsCommentProvider" xml:space="preserve">
+    <value>Použít Disqus jako správce komentářů</value>
+  </data>
+  <data name="antiSpamServices" xml:space="preserve">
+    <value>Anti-spamové služby</value>
+  </data>
+  <data name="exportIntoBlogML" xml:space="preserve">
+    <value>Exportovat obsah vašeho blogu do XML souboru (BlogML)</value>
+  </data>
+  <data name="importFromFile" xml:space="preserve">
+    <value>Importovat ze souboru</value>
+  </data>
+  <data name="importWithClickOnce" xml:space="preserve">
+    <value>Importovat na jedno kliknutí</value>
+  </data>
+  <data name="pingServiceUrl" xml:space="preserve">
+    <value>URL ping služby</value>
+  </data>
+  <data name="runClickOnceApplicationToImport" xml:space="preserve">
+    <value>Spusťte aplikaci na jedno kliknutí pro import obsahu uloženého jako BlogML nebo RSS 2.0 do vašeho blogu. &lt;i&gt;pouze Internet Explorer.&lt;/i&gt;</value>
+  </data>
+  <data name="selectSavedBlogMlFle" xml:space="preserve">
+    <value>Zvolte uložený BlogML soubor  a naimportujte do vašeho blogu. Pro jakýkoliv prohlížeč, pouze BlogML.</value>
+  </data>
+  <data name="toDisableSetTo0" xml:space="preserve">
+    <value>Pro vypnutí nastavte "0"</value>
+  </data>
+  <data name="cannotDeleteLastAdmin" xml:space="preserve">
+    <value>Nemůžete smazat posledního uživatele, který má právo vytvářet nebo měnit uživatele. Udělte nejprve tato práva jinému uživateli před smazáním tohoto uživatele.</value>
+  </data>
+  <data name="forceMainTheme" xml:space="preserve">
+    <value>Hlavní téma</value>
+  </data>
+  <data name="allowMobileTheme" xml:space="preserve">
+    <value>Mobilní téma</value>
+  </data>
+  <data name="blogs" xml:space="preserve">
+    <value>Blogy</value>
+  </data>
+  <data name="itemsPerPage" xml:space="preserve">
+    <value>Položek/stránka</value>
+  </data>
+  <data name="couldNotDeleteBlog" xml:space="preserve">
+    <value>Nelze smazat blog: {0}</value>
+  </data>
+  <data name="blogDeleted" xml:space="preserve">
+    <value>Blog "{0}" byl smazán</value>
+  </data>
+  <data name="blogAdded" xml:space="preserve">
+    <value>Blog "{0}" byl přidán</value>
+  </data>
+  <data name="invalidBlogId" xml:space="preserve">
+    <value>Neplatné ID blogu</value>
+  </data>
+  <data name="editExistingBlog" xml:space="preserve">
+    <value>Upravit blog</value>
+  </data>
+  <data name="storageContainerName" xml:space="preserve">
+    <value>Název úložného kontejneru</value>
+  </data>
+  <data name="virtualPath" xml:space="preserve">
+    <value>Virtuální cesta</value>
+  </data>
+  <data name="active" xml:space="preserve">
+    <value>Aktivní</value>
+  </data>
+  <data name="existingBlogToCreateNewBlogFrom" xml:space="preserve">
+    <value>Vytvořit nový blog z již existujícího</value>
+  </data>
+  <data name="hostName" xml:space="preserve">
+    <value>Host Name (volitelně)</value>
+  </data>
+  <data name="acceptAnyTextBeforeHostname" xml:space="preserve">
+    <value>Akceptovat jakýkoliv text před Host Name</value>
+  </data>
+  <data name="latestFromTheGallery" xml:space="preserve">
+    <value>Nejnovější z galerie</value>
+  </data>
+  <data name="savedByAtTime" xml:space="preserve">
+    <value>Uložil {0} v {1}</value>
+  </data>
+  <data name="available" xml:space="preserve">
+    <value>Dostupné</value>
+  </data>
+  <data name="currentTheme" xml:space="preserve">
+    <value>Aktuální téma</value>
+  </data>
+  <data name="gallery" xml:space="preserve">
+    <value>Galerie</value>
+  </data>
+  <data name="installed" xml:space="preserve">
+    <value>Nainstalované</value>
+  </data>
+  <data name="setAsCurrentTheme" xml:space="preserve">
+    <value>Nastavit jako aktuální téma</value>
+  </data>
+  <data name="setAsMobileTheme" xml:space="preserve">
+    <value>Nastavit jako mobilní téma</value>
+  </data>
+  <data name="themes" xml:space="preserve">
+    <value>Témata</value>
+  </data>
+  <data name="alphaNumeric" xml:space="preserve">
+    <value>abecedy</value>
+  </data>
+  <data name="downloads" xml:space="preserve">
+    <value>počtu stažení</value>
+  </data>
+  <data name="newest" xml:space="preserve">
+    <value>data</value>
+  </data>
+  <data name="orderBy" xml:space="preserve">
+    <value>Řadit dle</value>
   </data>
 </root>

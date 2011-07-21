@@ -23,36 +23,47 @@
 	<span id="status"></span>
 
 	<div class="commentForm">
-	  <p id="addcomment"><%=Resources.labels.addComment %></p>
+	  <h3 id="addcomment"><%=Resources.labels.addComment %></h3>
 
 	  <% if (NestingSupported){ %>
 		<asp:HiddenField runat="Server" ID="hiddenReplyTo"  />
 		<p id="cancelReply" style="display:none;"><a href="javascript:void(0);" onclick="BlogEngine.cancelReply();"><%=Resources.labels.cancelReply %></a></p>
 	  <%} %>
+      <p>
+	      <label for="<%=this.NameInputId %>" class="lbl-user"><%=Resources.labels.name %>*</label>
+	      <input type="text" class="txt-user" name="<%= this.NameInputId %>" id="<%= this.NameInputId %>" tabindex="2" value="<%= this.DefaultName %>" />
+	      <span id="spnNameRequired" style="color:Red;display:none;"> <asp:Literal ID="Literal1" runat="server" Text="<%$Resources:labels, required %>"></asp:Literal></span>
+	      <span id="spnChooseOtherName" style="color:Red;display:none;"> <asp:Literal ID="Literal2" runat="server" Text="<%$Resources:labels, chooseOtherName %>"></asp:Literal></span>
+      </p>
+      <p>
+	      <label for="<%=txtEmail.ClientID %>" class="lbl-email"><%=Resources.labels.email %>*</label>
+	      <asp:TextBox runat="Server" CssClass="lbl-email" ID="txtEmail" TabIndex="3" ValidationGroup="AddComment" />
+	      <span id="gravatarmsg"></span>
+	      <asp:RequiredFieldValidator ID="RequiredFieldValidator2" runat="server" ControlToValidate="txtEmail" ErrorMessage="<%$Resources:labels, required %>" Display="dynamic" ValidationGroup="AddComment" />
+	      <asp:RegularExpressionValidator ID="RegularExpressionValidator1" runat="server" ControlToValidate="txtEmail" ErrorMessage="<%$Resources:labels, enterValidEmail%>" Display="dynamic" ValidationExpression="\w+([-+.']\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*" ValidationGroup="AddComment" />
+      </p>
+      <% if (BlogSettings.Instance.EnableWebsiteInComments){ %>
+	  <p>
+          <label for="<%=txtWebsite.ClientID %>" class="lbl-website"><%=Resources.labels.website%></label>
+	      <asp:TextBox runat="Server" CssClass="txt-website" ID="txtWebsite" TabIndex="4" ValidationGroup="AddComment" />
+	      <asp:RegularExpressionValidator ID="RegularExpressionValidator2" runat="Server" ControlToValidate="txtWebsite" ValidationExpression="(http://|https://|)([\w-]+\.)+[\w-]+(/[\w- ./?%&=;~]*)?" ErrorMessage="<%$Resources:labels, enterValidUrl %>" Display="Dynamic" ValidationGroup="AddComment" />
+	  </p>
+      <%} %>
 
-	  <label for="<%=this.NameInputId %>"><%=Resources.labels.name %>*</label>
-	  <input type="text" name="<%= this.NameInputId %>" id="<%= this.NameInputId %>" tabindex="2" value="<%= this.DefaultName %>" />
-	  <span id="spnNameRequired" style="color:Red;display:none;"> <asp:Literal ID="Literal1" runat="server" Text="<%$Resources:labels, required %>"></asp:Literal></span>
-	  <span id="spnChooseOtherName" style="color:Red;display:none;"> <asp:Literal ID="Literal2" runat="server" Text="<%$Resources:labels, chooseOtherName %>"></asp:Literal></span><br />
-
-	  <label for="<%=txtEmail.ClientID %>"><%=Resources.labels.email %>*</label>
-	  <asp:TextBox runat="Server" ID="txtEmail" TabIndex="3" ValidationGroup="AddComment" />
-	  <span id="gravatarmsg"></span>
-	  <asp:RequiredFieldValidator ID="RequiredFieldValidator2" runat="server" ControlToValidate="txtEmail" ErrorMessage="<%$Resources:labels, required %>" Display="dynamic" ValidationGroup="AddComment" />
-	  <asp:RegularExpressionValidator ID="RegularExpressionValidator1" runat="server" ControlToValidate="txtEmail" ErrorMessage="<%$Resources:labels, enterValidEmail%>" Display="dynamic" ValidationExpression="\w+([-+.']\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*" ValidationGroup="AddComment" /><br />
-
-	  <label for="<%=txtWebsite.ClientID %>"><%=Resources.labels.website %></label>
-	  <asp:TextBox runat="Server" ID="txtWebsite" TabIndex="4" ValidationGroup="AddComment" />
-	  <asp:RegularExpressionValidator ID="RegularExpressionValidator2" runat="Server" ControlToValidate="txtWebsite" ValidationExpression="(http://|https://|)([\w-]+\.)+[\w-]+(/[\w- ./?%&=;~]*)?" ErrorMessage="<%$Resources:labels, enterValidUrl %>" Display="Dynamic" ValidationGroup="AddComment" /><br />
-	  
 	  <% if(BlogSettings.Instance.EnableCountryInComments){ %>
-	  <label for="<%=ddlCountry.ClientID %>"><%=Resources.labels.country %></label>
-	  <asp:DropDownList runat="server" ID="ddlCountry" onchange="BlogEngine.setFlag(this.value)" TabIndex="5" EnableViewState="false" ValidationGroup="AddComment" />&nbsp;
-	  <span class="CommentFlag"><asp:Image runat="server" ID="imgFlag" AlternateText="Country flag" Width="16" Height="11" EnableViewState="false" /></span><br />
-	  <%} %>
+	  <p>
+          <label for="<%=ddlCountry.ClientID %>" class="lbl-country"><%=Resources.labels.country %></label>
+	      <asp:DropDownList runat="server" CssClass="txt-country" ID="ddlCountry" onchange="BlogEngine.setFlag(this.value)" TabIndex="5" EnableViewState="false" ValidationGroup="AddComment" />&nbsp;
+	      <span class="CommentFlag"><asp:Image runat="server" ID="imgFlag" AlternateText="Country flag" Width="16" Height="11" EnableViewState="false" /></span>
+	  </p>
+      <%} %>
 
-	  <span class="bbcode<%= !BlogSettings.Instance.ShowLivePreview ? " bbcodeNoLivePreview" : "" %>" title="BBCode tags"><%=BBCodes() %></span>
-	  <asp:RequiredFieldValidator ID="RequiredFieldValidator3" runat="server" ControlToValidate="txtContent" ErrorMessage="<%$Resources:labels, required %>" Display="dynamic" ValidationGroup="AddComment" /><br />
+      <blog:SimpleCaptchaControl ID="simplecaptcha" runat="server" TabIndex="6" />
+
+      <%if (BlogEngine.Core.Web.Extensions.ExtensionManager.ExtensionEnabled("BBCode")){%>
+	  <span class="bbcode<%=!BlogSettings.Instance.ShowLivePreview ? " bbcodeNoLivePreview" : ""%>" title="BBCode tags"><%=BBCodes()%></span>
+	  <%}%>
+      <asp:RequiredFieldValidator ID="RequiredFieldValidator3" runat="server" ControlToValidate="txtContent" ErrorMessage="<%$Resources:labels, required %>" Display="dynamic" ValidationGroup="AddComment" /><br />
 
 	  <% if (BlogSettings.Instance.ShowLivePreview) { %>  
 	  <ul id="commentMenu">
@@ -61,23 +72,24 @@
 	  </ul>
 	  <% } %>
 	  <div id="commentCompose">
-			<label for="<%=txtContent.ClientID %>" style="display:none"><%=Resources.labels.comment%></label>
-		<asp:TextBox runat="server" ID="txtContent" TextMode="multiLine" Columns="50" Rows="10" TabIndex="6" ValidationGroup="AddComment" />
+		<label for="<%=txtContent.ClientID %>" class="lbl-content" style="display:none"><%=Resources.labels.comment%></label>
+		<asp:TextBox runat="server" CssClass="txt-content" ID="txtContent" TextMode="multiLine" Columns="50" Rows="10" TabIndex="7" ValidationGroup="AddComment" />
 	  </div>
 	  <div id="commentPreview">
 		<img src="<%=Utils.RelativeWebRoot %>pics/ajax-loader.gif" style="display:none" alt="Loading" />  
 	  </div>
 	  
-	  <br />
-	  <input type="checkbox" id="cbNotify" style="width: auto" tabindex="7" />
-	  <label for="cbNotify" style="width:auto;float:none;display:inline;padding-left:5px"><%=Resources.labels.notifyOnNewComments %></label><br />
- 
-	  <blog:RecaptchaControl ID="recaptcha" runat="server" TabIndex="8" />
-     <blog:SimpleCaptchaControl ID="simplecaptcha" runat="server" TabIndex="8" />
+	  <p>
+	      <input type="checkbox" id="cbNotify" class="cmnt-frm-notify" style="width: auto" tabindex="8" />
+	      <label for="cbNotify" style="width:auto;float:none;display:inline;padding-left:5px"><%=Resources.labels.notifyOnNewComments %></label>
+      </p>
+	  <blog:RecaptchaControl ID="recaptcha" runat="server" TabIndex="9" />
+      
 
-	  <input type="button" id="btnSaveAjax" style="margin-top:10px" value="<%=Resources.labels.saveComment %>" onclick="return BlogEngine.validateAndSubmitCommentForm()" tabindex="9" />
-	  <!--<input type="button" id="btnSaveAjax" value="<%=Resources.labels.saveComment %>" onclick="return validateWithRecaptcha()" tabindex="9" />-->
-	  <asp:HiddenField runat="server" ID="hfCaptcha" />
+      <p>
+	    <input type="button" id="btnSaveAjax" class="btn-save" style="margin-top:10px" value="<%=Resources.labels.saveComment %>" onclick="return BlogEngine.validateAndSubmitCommentForm()" tabindex="10" />
+	    <asp:HiddenField runat="server" ID="hfCaptcha" />
+      </p>
 	</div>
 
 </div>

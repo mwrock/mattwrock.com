@@ -4,6 +4,7 @@
     using System.Web;
     using System.Web.Security;
     using System.Web.UI;
+    using System.Web.UI.WebControls;
     using BlogEngine.Core;
 
     using Resources;
@@ -22,13 +23,20 @@
         /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.</param>
         protected void Page_Load(object sender, EventArgs e)
         {
-            this.RegisterHyperLink.NavigateUrl = "Register.aspx?ReturnUrl=" +
+            HyperLink linkForgotPassword = (HyperLink)LoginUser.FindControl("linkForgotPassword");
+            if (linkForgotPassword != null)
+            {
+                linkForgotPassword.NavigateUrl = Utils.RelativeWebRoot + "Account/password-retrieval.aspx";
+            }
+
+            this.RegisterHyperLink.NavigateUrl = Utils.RelativeWebRoot + "Account/register.aspx?ReturnUrl=" +
                                                  HttpUtility.UrlEncode(this.Request.QueryString["ReturnUrl"]);
             this.RegisterHyperLink.Text = labels.createNow;
+            ((PlaceHolder)LoginUser.FindControl("phResetPassword")).Visible = BlogSettings.Instance.EnablePasswordReset;
 
             if (this.Request.QueryString.ToString() == "logoff")
             {
-                FormsAuthentication.SignOut();
+                Security.SignOut();
                 if (this.Request.UrlReferrer != null && this.Request.UrlReferrer != this.Request.Url)
                 {
                     this.Response.Redirect(this.Request.UrlReferrer.ToString(), true);
@@ -47,6 +55,14 @@
             }
 
             this.Master.SetStatus("warning", "Login failed");
+        }
+
+        protected void LoginUser_OnAuthenticate(object sender, AuthenticateEventArgs e)
+        {
+            // always set to false
+            e.Authenticated = false;
+
+            Security.AuthenticateUser(LoginUser.UserName, LoginUser.Password, LoginUser.RememberMeSet);
         }
 
         #endregion

@@ -35,7 +35,7 @@ namespace Widgets.TagCloud
         /// <summary>
         ///     The weighted list.
         /// </summary>
-        private static Dictionary<string, string> weightedList;
+        private static Dictionary<Guid, Dictionary<string, string>> weightedList = new Dictionary<Guid, Dictionary<string, string>>();
 
         /// <summary>
         ///     The minimum posts.
@@ -131,19 +131,24 @@ namespace Widgets.TagCloud
         {
             get
             {
-                if (weightedList == null)
+                Dictionary<string, string> list = null;
+                Guid blogId = Blog.CurrentInstance.Id;
+
+                if (!weightedList.TryGetValue(blogId, out list))
                 {
                     lock (SyncRoot)
                     {
-                        if (weightedList == null)
+                        if (!weightedList.TryGetValue(blogId, out list))
                         {
-                            weightedList = new Dictionary<string, string>();
+                            list = new Dictionary<string, string>();
+                            weightedList.Add(blogId, list);
+
                             this.SortList();
                         }
                     }
                 }
 
-                return weightedList;
+                return list;
             }
         }
 
@@ -156,7 +161,13 @@ namespace Widgets.TagCloud
         /// </summary>
         public static void Reload()
         {
-            weightedList = null;
+            lock (SyncRoot)
+            {
+                if (weightedList.ContainsKey(Blog.CurrentInstance.Id))
+                {
+                    weightedList.Remove(Blog.CurrentInstance.Id);
+                }
+            }
         }
 
         /// <summary>
@@ -228,23 +239,23 @@ namespace Widgets.TagCloud
                 var weight = ((double)dic[key] / max) * 100;
                 if (weight >= 99)
                 {
-                    weightedList.Add(key, "biggest");
+                    WeightedList.Add(key, "biggest");
                 }
                 else if (weight >= 70)
                 {
-                    weightedList.Add(key, "big");
+                    WeightedList.Add(key, "big");
                 }
                 else if (weight >= 40)
                 {
-                    weightedList.Add(key, "medium");
+                    WeightedList.Add(key, "medium");
                 }
                 else if (weight >= 20)
                 {
-                    weightedList.Add(key, "small");
+                    WeightedList.Add(key, "small");
                 }
                 else if (weight >= 3)
                 {
-                    weightedList.Add(key, "smallest");
+                    WeightedList.Add(key, "smallest");
                 }
             }
         }

@@ -5,16 +5,158 @@ using BlogEngine.Core;
 using BlogEngine.Core.Web.Controls;
 using BlogEngine.Core.Web.Extensions;
 using Page=System.Web.UI.Page;
+using System.Collections.Generic;
+using System;
 
 [Extension("Adds <a target=\"_new\" href=\"http://alexgorbatchev.com/wiki/SyntaxHighlighter\">Alex Gorbatchev's</a> source code formatter", "2.5", "<a target=\"_new\" href=\"http://dotnetblogengine.net/\">BlogEngine.NET</a>")]
 public class SyntaxHighlighter
 {
     #region Private members
     private const string ExtensionName = "SyntaxHighlighter";
-    static protected ExtensionSettings _options;
-    static protected ExtensionSettings _brushes;
-    static protected ExtensionSettings _themes;
+    static protected Dictionary<Guid, ExtensionSettings> _blogsOptions = new Dictionary<Guid, ExtensionSettings>();
+    static protected Dictionary<Guid, ExtensionSettings> _blogsBrushes = new Dictionary<Guid, ExtensionSettings>();
+    static protected Dictionary<Guid, ExtensionSettings> _blogsThemes = new Dictionary<Guid, ExtensionSettings>();
     #endregion
+
+    /// <summary>
+    ///     The sync root.
+    /// </summary>
+    private static readonly object syncRoot = new object();
+
+    private static ExtensionSettings Options
+    {
+        get
+        {
+            Guid blogId = Blog.CurrentInstance.Id;
+            ExtensionSettings options = null;
+            _blogsOptions.TryGetValue(blogId, out options);
+
+            if (options == null)
+            {
+                lock (syncRoot)
+                {
+                    _blogsOptions.TryGetValue(blogId, out options);
+
+                    if (options == null)
+                    {
+                        // Initializes
+                        //   (1) Options
+                        //   (2) Brushes
+                        //   (3) Themees
+                        // for the current blog instance.
+
+                        // options
+                        options = new ExtensionSettings("Options");
+                        options.IsScalar = true;
+                        options.Help = OptionsHelp();
+
+                        options.AddParameter("gutter", "Gutter");
+                        options.AddParameter("smart-tabs", "Smart tabs");
+                        options.AddParameter("auto-links", "Auto links");
+                        options.AddParameter("collapse", "Collapse");
+                        options.AddParameter("light", "Light");
+                        options.AddParameter("tab-size", "Tab size");
+                        options.AddParameter("toolbar", "Toolbar");
+                        options.AddParameter("wrap-lines", "Wrap lines");
+
+                        options.AddValue("gutter", true);
+                        options.AddValue("smart-tabs", true);
+                        options.AddValue("auto-links", true);
+                        options.AddValue("collapse", false);
+                        options.AddValue("light", false);
+                        options.AddValue("tab-size", 4);
+                        options.AddValue("toolbar", true);
+                        options.AddValue("wrap-lines", true);
+
+                        _blogsOptions[blogId] = ExtensionManager.InitSettings(ExtensionName, options);
+
+                        // brushes
+                        ExtensionSettings brushes = new ExtensionSettings("Brushes");
+                        brushes.IsScalar = true;
+
+                        brushes.AddParameter("shBrushBash", "Bash (bash, shell)", 100, false);
+                        brushes.AddParameter("shBrushCpp", "C++ (cpp, c)", 100, false);
+                        brushes.AddParameter("shBrushCSharp", "C# (c-sharp, csharp)", 100, false);
+                        brushes.AddParameter("shBrushCss", "Css (css)", 100, false);
+                        brushes.AddParameter("shBrushDelphi", "Delphi (delphi, pas, pascal)", 100, false);
+                        brushes.AddParameter("shBrushDiff", "Diff (diff, patch)", 100, false);
+                        brushes.AddParameter("shBrushGroovy", "Groovy (groovy)", 100, false);
+                        brushes.AddParameter("shBrushJava", "Java (java)", 100, false);
+                        brushes.AddParameter("shBrushJScript", "JScript (js, jscript, javascript)", 100, false);
+                        brushes.AddParameter("shBrushPhp", "PHP (php)", 100, false);
+                        brushes.AddParameter("shBrushPlain", "Plain (plain, text)", 100, false);
+                        brushes.AddParameter("shBrushPython", "Python (py, python)", 100, false);
+                        brushes.AddParameter("shBrushRuby", "Ruby (rails, ror, ruby)", 100, false);
+                        brushes.AddParameter("shBrushScala", "Scala (scala)", 100, false);
+                        brushes.AddParameter("shBrushSql", "SQL (sql)", 100, false);
+                        brushes.AddParameter("shBrushVb", "VB (vb, vbnet)", 100, false);
+                        brushes.AddParameter("shBrushXml", "XML (xml, xhtml, xslt, html, xhtml)", 100, false);
+                        brushes.AddParameter("shBrushColdFusion", "Cold Fusion (cf, coldfusion)", 100, false);
+                        brushes.AddParameter("shBrushErlang", "Erlang (erlang, erl)", 100, false);
+                        brushes.AddParameter("shBrushJavaFX", "JavaFX (jfx, javafx)", 100, false);
+                        brushes.AddParameter("shBrushPerl", "Perl (perl, pl)", 100, false);
+                        brushes.AddParameter("shBrushPowerShell", "PowerSell (ps, powershell)", 100, false);
+
+                        brushes.AddValue("shBrushBash", false);
+                        brushes.AddValue("shBrushCpp", false);
+                        brushes.AddValue("shBrushCSharp", true);
+                        brushes.AddValue("shBrushCss", true);
+                        brushes.AddValue("shBrushDelphi", false);
+                        brushes.AddValue("shBrushDiff", false);
+                        brushes.AddValue("shBrushGroovy", false);
+                        brushes.AddValue("shBrushJava", false);
+                        brushes.AddValue("shBrushJScript", true);
+                        brushes.AddValue("shBrushPhp", false);
+                        brushes.AddValue("shBrushPlain", true);
+                        brushes.AddValue("shBrushPython", false);
+                        brushes.AddValue("shBrushRuby", false);
+                        brushes.AddValue("shBrushScala", false);
+                        brushes.AddValue("shBrushSql", true);
+                        brushes.AddValue("shBrushVb", true);
+                        brushes.AddValue("shBrushXml", true);
+                        brushes.AddValue("shBrushColdFusion", false);
+                        brushes.AddValue("shBrushErlang", false);
+                        brushes.AddValue("shBrushJavaFX", false);
+                        brushes.AddValue("shBrushPerl", false);
+                        brushes.AddValue("shBrushPowerShell", false);
+
+                        _blogsBrushes[blogId] = ExtensionManager.InitSettings(ExtensionName, brushes);
+
+                        // themes
+                        ExtensionSettings themes = new ExtensionSettings("Themes");
+                        themes.IsScalar = true;
+                        themes.AddParameter("SelectedTheme", "Themes", 20, false, false, ParameterType.ListBox);
+                        themes.AddValue("SelectedTheme", new string[] { "Default", "Django", "Eclipse", "Emacs", "FadeToGrey", "MDUltra", "Midnight", "Dark" }, "Default");
+                        _blogsThemes[blogId] = ExtensionManager.InitSettings(ExtensionName, themes);
+                    }
+                }
+            }
+
+            return options;
+        }
+    }
+
+    private static ExtensionSettings Brushes
+    {
+        get
+        {
+            // by invoking the "Options" property getter, we are ensuring
+            // that an entry is put into _blogsBrushes for the current blog instance.
+            ExtensionSettings options = Options;
+            return _blogsBrushes[Blog.CurrentInstance.Id];
+        }
+    }
+
+    private static ExtensionSettings Themes
+    {
+        get
+        {
+            // by invoking the "Options" property getter, we are ensuring
+            // that an entry is put into _blogsThemes for the current blog instance.
+            ExtensionSettings options = Options;
+            return _blogsThemes[Blog.CurrentInstance.Id];
+        }
+    }
 
     static SyntaxHighlighter()
     {
@@ -24,7 +166,11 @@ public class SyntaxHighlighter
 
     private static void AddSyntaxHighlighter(object sender, ServingEventArgs e)
     {
-		if(e.Location == ServingLocation.Feed) return;
+        if (!ExtensionManager.ExtensionEnabled("SyntaxHighlighter"))
+            return;
+
+		if(e.Location == ServingLocation.Feed) 
+            return;
 	
         HttpContext context = HttpContext.Current;
 		
@@ -46,9 +192,9 @@ public class SyntaxHighlighter
     {
         AddStylesheet("shCore.css", page);
 
-        if (_themes != null)
+        if (Themes != null)
         {
-            switch (_themes.GetSingleValue("SelectedTheme"))
+            switch (Themes.GetSingleValue("SelectedTheme"))
             {
                 case "Django":
                     AddStylesheet("shThemeDjango.css", page);
@@ -82,72 +228,72 @@ public class SyntaxHighlighter
     {
         AddJavaScript("shCore.js", page);
 
-        if (_brushes != null)
+        if (Brushes != null)
         {
-            if (_brushes.GetSingleValue("shBrushBash").ToLowerInvariant() == "true")
+            if (Brushes.GetSingleValue("shBrushBash").ToLowerInvariant() == "true")
                 AddJavaScript("shBrushBash.js", page);
 
-            if (_brushes.GetSingleValue("shBrushCpp").ToLowerInvariant() == "true")
+            if (Brushes.GetSingleValue("shBrushCpp").ToLowerInvariant() == "true")
                 AddJavaScript("shBrushCpp.js", page);
 
-            if (_brushes.GetSingleValue("shBrushCSharp").ToLowerInvariant() == "true")
+            if (Brushes.GetSingleValue("shBrushCSharp").ToLowerInvariant() == "true")
                 AddJavaScript("shBrushCSharp.js", page);
 
-            if (_brushes.GetSingleValue("shBrushCss").ToLowerInvariant() == "true")
+            if (Brushes.GetSingleValue("shBrushCss").ToLowerInvariant() == "true")
                 AddJavaScript("shBrushCss.js", page);
 
-            if (_brushes.GetSingleValue("shBrushDelphi").ToLowerInvariant() == "true")
+            if (Brushes.GetSingleValue("shBrushDelphi").ToLowerInvariant() == "true")
                 AddJavaScript("shBrushDelphi.js", page);
 
-            if (_brushes.GetSingleValue("shBrushDiff").ToLowerInvariant() == "true")
+            if (Brushes.GetSingleValue("shBrushDiff").ToLowerInvariant() == "true")
                 AddJavaScript("shBrushDiff.js", page);
 
-            if (_brushes.GetSingleValue("shBrushGroovy").ToLowerInvariant() == "true")
+            if (Brushes.GetSingleValue("shBrushGroovy").ToLowerInvariant() == "true")
                 AddJavaScript("shBrushGroovy.js", page);
 
-            if (_brushes.GetSingleValue("shBrushJava").ToLowerInvariant() == "true")
+            if (Brushes.GetSingleValue("shBrushJava").ToLowerInvariant() == "true")
                 AddJavaScript("shBrushJava.js", page);
 
-            if (_brushes.GetSingleValue("shBrushJScript").ToLowerInvariant() == "true")
+            if (Brushes.GetSingleValue("shBrushJScript").ToLowerInvariant() == "true")
                 AddJavaScript("shBrushJScript.js", page);
 
-            if (_brushes.GetSingleValue("shBrushPhp").ToLowerInvariant() == "true")
+            if (Brushes.GetSingleValue("shBrushPhp").ToLowerInvariant() == "true")
                 AddJavaScript("shBrushPhp.js", page);
 
-            if (_brushes.GetSingleValue("shBrushPlain").ToLowerInvariant() == "true")
+            if (Brushes.GetSingleValue("shBrushPlain").ToLowerInvariant() == "true")
                 AddJavaScript("shBrushPlain.js", page);
 
-            if (_brushes.GetSingleValue("shBrushPython").ToLowerInvariant() == "true")
+            if (Brushes.GetSingleValue("shBrushPython").ToLowerInvariant() == "true")
                 AddJavaScript("shBrushPython.js", page);
 
-            if (_brushes.GetSingleValue("shBrushRuby").ToLowerInvariant() == "true")
+            if (Brushes.GetSingleValue("shBrushRuby").ToLowerInvariant() == "true")
                 AddJavaScript("shBrushRuby.js", page);
 
-            if (_brushes.GetSingleValue("shBrushScala").ToLowerInvariant() == "true")
+            if (Brushes.GetSingleValue("shBrushScala").ToLowerInvariant() == "true")
                 AddJavaScript("shBrushScala.js", page);
 
-            if (_brushes.GetSingleValue("shBrushSql").ToLowerInvariant() == "true")
+            if (Brushes.GetSingleValue("shBrushSql").ToLowerInvariant() == "true")
                 AddJavaScript("shBrushSql.js", page);
 
-            if (_brushes.GetSingleValue("shBrushVb").ToLowerInvariant() == "true")
+            if (Brushes.GetSingleValue("shBrushVb").ToLowerInvariant() == "true")
                 AddJavaScript("shBrushVb.js", page);
 
-            if (_brushes.GetSingleValue("shBrushXml").ToLowerInvariant() == "true")
+            if (Brushes.GetSingleValue("shBrushXml").ToLowerInvariant() == "true")
                 AddJavaScript("shBrushXml.js", page);
 
-            if (_brushes.GetSingleValue("shBrushColdFusion").ToLowerInvariant() == "true")
+            if (Brushes.GetSingleValue("shBrushColdFusion").ToLowerInvariant() == "true")
                 AddJavaScript("shBrushColdFusion.js", page);
 
-            if (_brushes.GetSingleValue("shBrushErlang").ToLowerInvariant() == "true")
+            if (Brushes.GetSingleValue("shBrushErlang").ToLowerInvariant() == "true")
                 AddJavaScript("shBrushErlang.js", page);
 
-            if (_brushes.GetSingleValue("shBrushJavaFX").ToLowerInvariant() == "true")
+            if (Brushes.GetSingleValue("shBrushJavaFX").ToLowerInvariant() == "true")
                 AddJavaScript("shBrushJavaFX.js", page);
 
-            if (_brushes.GetSingleValue("shBrushPerl").ToLowerInvariant() == "true")
+            if (Brushes.GetSingleValue("shBrushPerl").ToLowerInvariant() == "true")
                 AddJavaScript("shBrushPerl.js", page);
 
-            if (_brushes.GetSingleValue("shBrushPowerShell").ToLowerInvariant() == "true")
+            if (Brushes.GetSingleValue("shBrushPowerShell").ToLowerInvariant() == "true")
                 AddJavaScript("shBrushPowerShell.js", page);
         }
     }
@@ -178,7 +324,7 @@ public class SyntaxHighlighter
         sb.AppendLine("\n\n<script type=\"text/javascript\">");
         sb.AppendLine(string.Format("\tSyntaxHighlighter.config.clipboardSwf='{0}';", GetUrl(ScriptsFolder(), "clipboard.swf")));
 
-        if (_options != null)
+        if (Options != null)
         {
             sb.AppendLine(GetOption("gutter"));
             sb.AppendLine(GetOption("smart-tabs"));
@@ -198,7 +344,7 @@ public class SyntaxHighlighter
     private static string GetUrl(string folder, string url)
     {
         string s = HttpContext.Current.Server.UrlPathEncode(string.Format("{0}{1}", folder, url));
-        s = Utils.RelativeWebRoot + s;
+        s = Utils.ApplicationRelativeWebRoot + s;
         return s;
     }
     
@@ -208,89 +354,8 @@ public class SyntaxHighlighter
 
     private static void InitSettings()
     {
-        // options
-        ExtensionSettings options = new ExtensionSettings("Options");
-        options.IsScalar = true;
-        options.Help = OptionsHelp();
-
-        options.AddParameter("gutter", "Gutter");
-        options.AddParameter("smart-tabs", "Smart tabs");
-        options.AddParameter("auto-links", "Auto links");
-        options.AddParameter("collapse", "Collapse");
-        options.AddParameter("light", "Light");
-        options.AddParameter("tab-size", "Tab size");
-        options.AddParameter("toolbar", "Toolbar");
-        options.AddParameter("wrap-lines", "Wrap lines");
-
-        options.AddValue("gutter", true);
-        options.AddValue("smart-tabs", true);
-        options.AddValue("auto-links", true);
-        options.AddValue("collapse", false);
-        options.AddValue("light", false);
-        options.AddValue("tab-size", 4);
-        options.AddValue("toolbar", true);
-        options.AddValue("wrap-lines", true);
-
-        _options = ExtensionManager.InitSettings(ExtensionName, options);
-
-        // brushes
-        ExtensionSettings brushes = new ExtensionSettings("Brushes");
-        brushes.IsScalar = true;
-
-        brushes.AddParameter("shBrushBash", "Bash (bash, shell)", 100, false);
-        brushes.AddParameter("shBrushCpp", "C++ (cpp, c)", 100, false);
-        brushes.AddParameter("shBrushCSharp", "C# (c-sharp, csharp)", 100, false);
-        brushes.AddParameter("shBrushCss", "Css (css)", 100, false);
-        brushes.AddParameter("shBrushDelphi", "Delphi (delphi, pas, pascal)", 100, false);
-        brushes.AddParameter("shBrushDiff", "Diff (diff, patch)", 100, false);
-        brushes.AddParameter("shBrushGroovy", "Groovy (groovy)", 100, false);
-        brushes.AddParameter("shBrushJava", "Java (java)", 100, false);
-        brushes.AddParameter("shBrushJScript", "JScript (js, jscript, javascript)", 100, false);
-        brushes.AddParameter("shBrushPhp", "PHP (php)", 100, false);
-        brushes.AddParameter("shBrushPlain", "Plain (plain, text)", 100, false);
-        brushes.AddParameter("shBrushPython", "Python (py, python)", 100, false);
-        brushes.AddParameter("shBrushRuby", "Ruby (rails, ror, ruby)", 100, false);
-        brushes.AddParameter("shBrushScala", "Scala (scala)", 100, false);
-        brushes.AddParameter("shBrushSql", "SQL (sql)", 100, false);
-        brushes.AddParameter("shBrushVb", "VB (vb, vbnet)", 100, false);
-        brushes.AddParameter("shBrushXml", "XML (xml, xhtml, xslt, html, xhtml)", 100, false);
-        brushes.AddParameter("shBrushColdFusion", "Cold Fusion (cf, coldfusion)", 100, false);
-        brushes.AddParameter("shBrushErlang", "Erlang (erlang, erl)", 100, false);
-        brushes.AddParameter("shBrushJavaFX", "JavaFX (jfx, javafx)", 100, false);
-        brushes.AddParameter("shBrushPerl", "Perl (perl, pl)", 100, false);
-        brushes.AddParameter("shBrushPowerShell", "PowerSell (ps, powershell)", 100, false);
-
-        brushes.AddValue("shBrushBash", false);
-        brushes.AddValue("shBrushCpp", false);
-        brushes.AddValue("shBrushCSharp", true);
-        brushes.AddValue("shBrushCss", true);
-        brushes.AddValue("shBrushDelphi", false);
-        brushes.AddValue("shBrushDiff", false);
-        brushes.AddValue("shBrushGroovy", false);
-        brushes.AddValue("shBrushJava", false);
-        brushes.AddValue("shBrushJScript", true);
-        brushes.AddValue("shBrushPhp", false);
-        brushes.AddValue("shBrushPlain", true);
-        brushes.AddValue("shBrushPython", false);
-        brushes.AddValue("shBrushRuby", false);
-        brushes.AddValue("shBrushScala", false);
-        brushes.AddValue("shBrushSql", true);
-        brushes.AddValue("shBrushVb", true);
-        brushes.AddValue("shBrushXml", true);
-        brushes.AddValue("shBrushColdFusion", false);
-        brushes.AddValue("shBrushErlang", false);
-        brushes.AddValue("shBrushJavaFX", false);
-        brushes.AddValue("shBrushPerl", false);
-        brushes.AddValue("shBrushPowerShell", false);
-
-        _brushes = ExtensionManager.InitSettings(ExtensionName, brushes);
-
-        // themes
-        ExtensionSettings themes = new ExtensionSettings("Themes");
-        themes.IsScalar = true;
-        themes.AddParameter("SelectedTheme", "Themes", 20, false, false, ParameterType.ListBox);
-        themes.AddValue("SelectedTheme", new string[] { "Default", "Django", "Eclipse", "Emacs", "FadeToGrey", "MDUltra", "Midnight", "Dark" }, "Default");
-        _themes = ExtensionManager.InitSettings(ExtensionName, themes);
+        // call Options getter so default settings are loaded on application start.
+        var s = Options;
     }
 
     static string OptionsHelp()
@@ -311,10 +376,10 @@ public class SyntaxHighlighter
 
     static string GetOption(string opt)
     {
-        if (_options != null)
+        if (Options != null)
         {
             string pattern = "\tSyntaxHighlighter.defaults['{0}'] = {1};";
-            string val = _options.GetSingleValue(opt).ToLowerInvariant();
+            string val = Options.GetSingleValue(opt).ToLowerInvariant();
             return string.Format(pattern, opt, val);
         }
         return "";
@@ -322,7 +387,7 @@ public class SyntaxHighlighter
 
     static string ScriptsFolder()
     {
-        if (_options != null)
+        if (Options != null)
         {
             return "Scripts/syntaxhighlighter/";
         }
@@ -331,7 +396,7 @@ public class SyntaxHighlighter
 
     static string StylesFolder()
     {
-        if (_options != null)
+        if (Options != null)
         {
             return "Styles/syntaxhighlighter/";
         }

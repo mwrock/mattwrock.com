@@ -11,7 +11,7 @@
 			<menu:TabMenu ID="TabMenu" runat="server" />
 		</div>
 		<div class="content-box-left">
-            <h1>Approved Comments</h1>
+            <h1><%=Resources.labels.approvedComments %></h1>
             <div class="tableToolBox">
                 <div class="Pager"></div>
             </div>

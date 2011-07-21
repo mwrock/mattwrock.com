@@ -19,6 +19,7 @@ namespace App_Code.Controls
     using BlogEngine.Core.DataStore;
 
     using Resources;
+    using System.Web.Hosting;
 
     /// <summary>
     /// The widget zone.
@@ -28,18 +29,13 @@ namespace App_Code.Controls
         #region Constants and Fields
 
         /// <summary>
-        /// The xml document by zone.
-        /// </summary>
-        private static readonly Dictionary<string, XmlDocument> XmlDocumentByZone =
-            new Dictionary<string, XmlDocument>();
-
-        /// <summary>
         ///     The zone name.
         /// </summary>
         /// <remarks>
         ///     For backwards compatibility or if a ZoneName is omitted, provide a default ZoneName.
         /// </remarks>
         private string zoneName = "be_WIDGET_ZONE";
+        private const string staticZone = "be_WIDGET_ZONE";
 
         #endregion
 
@@ -64,12 +60,12 @@ namespace App_Code.Controls
         {
             get
             {
-                return this.zoneName;
+                return zoneName;
             }
 
             set
             {
-                this.zoneName = Utils.RemoveIllegalCharacters(value);
+                zoneName = Utils.RemoveIllegalCharacters(value);
             }
         }
 
@@ -82,7 +78,7 @@ namespace App_Code.Controls
             get
             {
                 // look up the document by zone name
-                return XmlDocumentByZone.ContainsKey(this.ZoneName) ? XmlDocumentByZone[this.ZoneName] : null;
+                return Blog.CurrentInstance.Cache[ZoneName] == null ? null : (XmlDocument)Blog.CurrentInstance.Cache[ZoneName];
             }
         }
 
@@ -104,7 +100,7 @@ namespace App_Code.Controls
                 var doc = RetrieveXml(this.ZoneName);
                 if (doc != null)
                 {
-                    XmlDocumentByZone[this.ZoneName] = doc;
+                    Blog.CurrentInstance.Cache[ZoneName] = doc;
                 }
             }
 
@@ -128,12 +124,12 @@ namespace App_Code.Controls
             }
 
             // This is for compatibility with older themes that do not have a WidgetContainer control.
-            var widgetContainerExists = WidgetContainer.DoesThemeWidgetContainerExist();
-            var widgetContainerVirtualPath = WidgetContainer.GetThemeWidgetContainerVirtualPath();
+            var widgetContainerExists = WidgetContainer.DoesThemeWidgetContainerExist(true);
+            var widgetContainerVirtualPath = WidgetContainer.GetThemeWidgetContainerVirtualPath(false);
 
             foreach (XmlNode widget in zone)
             {
-                var fileName = string.Format("{0}widgets/{1}/widget.ascx", Utils.RelativeWebRoot, widget.InnerText);
+                var fileName = string.Format("{0}widgets/{1}/widget.ascx", Utils.ApplicationRelativeWebRoot, widget.InnerText);
                 try
                 {
 
@@ -200,7 +196,7 @@ namespace App_Code.Controls
 
             var selectorId = string.Format("widgetselector_{0}", this.zoneName);
             writer.Write("<select id=\"{0}\" class=\"widgetselector\">", selectorId);
-            var di = new DirectoryInfo(this.Page.Server.MapPath(string.Format("{0}widgets", Utils.RelativeWebRoot)));
+            var di = new DirectoryInfo(HostingEnvironment.MapPath(string.Format("{0}widgets", Utils.ApplicationRelativeWebRoot)));
             foreach (var dir in di.GetDirectories().Where(dir => File.Exists(Path.Combine(dir.FullName, "widget.ascx"))))
             {
                 writer.Write("<option value=\"{0}\">{1}</option>", dir.Name, dir.Name);
@@ -219,7 +215,7 @@ namespace App_Code.Controls
         /// </summary>
         private static void OnZonesUpdated()
         {
-            XmlDocumentByZone.Clear();
+            Blog.CurrentInstance.Cache.Remove(staticZone);
         }
 
         /// <summary>

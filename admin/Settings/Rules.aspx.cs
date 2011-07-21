@@ -1,16 +1,17 @@
-﻿namespace Admin.Comments
+﻿namespace admin.Settings
 {
     using System;
-    using System.Data;
+    using System.Collections.Generic;
     using System.Web.UI.WebControls;
     using BlogEngine.Core;
     using BlogEngine.Core.Web.Extensions;
+    using System.Web.Services;
+    using BlogEngine.Core.Json;
     using App_Code;
 
     public partial class Rules : System.Web.UI.Page
     {
-        static protected ExtensionSettings _filters;
-        static protected ExtensionSettings _customFilters;
+        static protected ExtensionSettings Filters;
 
         /// <summary>
         /// Usually filter implemented as extension and can be turned
@@ -24,17 +25,28 @@
             return ext == null ? true : ext.Enabled;
         }
 
+        [WebMethod]
+        public static List<JsonCustomFilter> GetCustomFilters()
+        {
+            if (!Security.IsAuthorizedTo(Rights.AccessAdminSettingsPages))
+                return new List<JsonCustomFilter>();
+
+            var customFilters = JsonCustomFilterList.GetCustomFilters();
+
+            customFilters.Sort((f1, f2) => string.Compare(f1.Name, f2.Name));
+
+            return customFilters;
+        }
+
         protected void Page_Load(object sender, EventArgs e)
         {
             WebUtils.CheckRightsForAdminSettingsPage(false);
 
-            _filters = ExtensionManager.GetSettings("MetaExtension", "BeCommentFilters");
-            _customFilters = ExtensionManager.GetSettings("MetaExtension", "BeCustomFilters");
+            Filters = ExtensionManager.GetSettings("MetaExtension", "BeCommentFilters");
 
             if (!IsPostBack)
             {
                 BindFilters();
-                BindCustomFilters();
             }
 
             Page.MaintainScrollPositionOnPostBack = true;
@@ -46,8 +58,8 @@
 
         protected void BindFilters()
         {
-            gridFilters.DataKeyNames = new string[] { _filters.KeyField };
-            gridFilters.DataSource = _filters.GetDataTable();
+            gridFilters.DataKeyNames = new string[] { Filters.KeyField };
+            gridFilters.DataSource = Filters.GetDataTable();
             gridFilters.DataBind();
 
             // rules
@@ -58,45 +70,6 @@
             cbBlockOnDelete.Checked = BlogSettings.Instance.BlockAuthorOnCommentDelete;
             cbAddIpToWhitelistFilterOnApproval.Checked = BlogSettings.Instance.AddIpToWhitelistFilterOnApproval;
             cbAddIpToBlacklistFilterOnRejection.Checked = BlogSettings.Instance.AddIpToBlacklistFilterOnRejection;
-        }
-
-        protected void BindCustomFilters()
-        {
-            gridCustomFilters.DataKeyNames = new string[] { _customFilters.KeyField };
-
-            DataTable dt = _customFilters.GetDataTable();
-            DataTable unsorted = dt.Clone();
-            DataTable sorted = dt.Clone();
-
-            foreach (DataRow row in dt.Rows)
-            {
-                int i = int.TryParse(row["Priority"].ToString(), out i) ? i : 0;
-
-                if (i > 0)
-                    sorted.ImportRow(row);
-                else
-                    unsorted.ImportRow(row);
-            }
-
-            foreach (DataRow row in unsorted.Rows)
-            {
-                row["Priority"] = sorted.Rows.Count + 1;
-                sorted.ImportRow(row);
-
-                for (int i = 0; i < _customFilters.Parameters[0].Values.Count; i++)
-                {
-                    if (_customFilters.Parameters[0].Values[i] == row["FullName"].ToString())
-                    {
-                        _customFilters.Parameters[5].Values[i] = row["Priority"].ToString();
-                    }
-                }
-            }
-
-            ExtensionManager.SaveSettings("MetaExtension", _customFilters);
-
-            sorted.DefaultView.Sort = "Priority";
-            gridCustomFilters.DataSource = sorted;
-            gridCustomFilters.DataBind();
         }
 
         protected void btnSave_Click(object sender, EventArgs e)
@@ -131,51 +104,12 @@
             if (pageIdx > 0) rowIndex = pageIdx * pageSize + rowIndex;
 
 
-            foreach (ExtensionParameter par in _filters.Parameters)
+            foreach (ExtensionParameter par in Filters.Parameters)
             {
                 par.DeleteValue(rowIndex);
             }
 
-            ExtensionManager.SaveSettings("MetaExtension", _filters);
-            Response.Redirect(Request.RawUrl);
-        }
-
-        protected void btnPriorityUp_click(object sender, EventArgs e)
-        {
-            ImageButton btn = (ImageButton)sender;
-            GridViewRow grdRow = (GridViewRow)btn.Parent.Parent;
-
-            string s = gridCustomFilters.DataKeys[grdRow.RowIndex].Value.ToString();
-            ChangePriority(s, true);
-        }
-
-        protected void btnPriorityDwn_click(object sender, EventArgs e)
-        {
-            ImageButton btn = (ImageButton)sender;
-            GridViewRow grdRow = (GridViewRow)btn.Parent.Parent;
-
-            string s = gridCustomFilters.DataKeys[grdRow.RowIndex].Value.ToString();
-            ChangePriority(s, false);
-        }
-
-        protected void ChangePriority(string filterName, bool up)
-        {
-            for (int i = 0; i < _customFilters.Parameters[0].Values.Count; i++)
-            {
-                if (_customFilters.Parameters[0].Values[i] == filterName)
-                {
-                    int curPriority = int.Parse(_customFilters.Parameters[5].Values[i].ToString());
-
-                    if (up && curPriority > 1)
-                        curPriority--;
-                    else
-                        curPriority++;
-
-                    _customFilters.Parameters[5].Values[i] = curPriority.ToString();
-                }
-            }
-
-            ExtensionManager.SaveSettings("MetaExtension", _customFilters);
+            ExtensionManager.SaveSettings("MetaExtension", Filters);
             Response.Redirect(Request.RawUrl);
         }
 
@@ -196,8 +130,8 @@
                     ddOperator.SelectedValue, 
                     txtFilter.Text };
 
-                _filters.AddValues(f);
-                ExtensionManager.SaveSettings("MetaExtension", _filters);
+                Filters.AddValues(f);
+                ExtensionManager.SaveSettings("MetaExtension", Filters);
                 Response.Redirect(Request.RawUrl);
             }
         }
@@ -231,45 +165,26 @@
 
         }
 
-        public static string Accuracy(object total, object mistakes)
-        {
-            try
-            {
-                double t = double.Parse(total.ToString());
-                double m = double.Parse(mistakes.ToString());
-
-                if (m == 0 || t == 0) return "100";
-
-                double a = 100 - (m / t * 100);
-
-                return String.Format("{0:0.00}", a);
-            }
-            catch (Exception)
-            {
-                return "";
-            }
-        }
-
         protected void gridCustomFilters_RowCommand(object sender, GridViewCommandEventArgs e)
         {
-            string filterName = e.CommandArgument.ToString();
+            //string filterName = e.CommandArgument.ToString();
 
-            if (!string.IsNullOrEmpty(filterName))
-            {
-                // reset statistics for this filter
-                for (int i = 0; i < _customFilters.Parameters[0].Values.Count; i++)
-                {
-                    if (_customFilters.Parameters[0].Values[i] == filterName)
-                    {
-                        _customFilters.Parameters[2].Values[i] = "0";
-                        _customFilters.Parameters[3].Values[i] = "0";
-                        _customFilters.Parameters[4].Values[i] = "0";
-                    }
-                }
+            //if (!string.IsNullOrEmpty(filterName))
+            //{
+            //    // reset statistics for this filter
+            //    for (int i = 0; i < _customFilters.Parameters[0].Values.Count; i++)
+            //    {
+            //        if (_customFilters.Parameters[0].Values[i] == filterName)
+            //        {
+            //            _customFilters.Parameters[2].Values[i] = "0";
+            //            _customFilters.Parameters[3].Values[i] = "0";
+            //            _customFilters.Parameters[4].Values[i] = "0";
+            //        }
+            //    }
 
-                ExtensionManager.SaveSettings("MetaExtension", _customFilters);
-                Response.Redirect(Request.RawUrl);
-            }
+            //    ExtensionManager.SaveSettings("MetaExtension", _customFilters);
+            //    Response.Redirect(Request.RawUrl);
+            //}
         }
     }
 }

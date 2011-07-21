@@ -10,6 +10,7 @@ namespace Widgets.Twitter
     using System.Web;
 
     using App_Code.Controls;
+    using BlogEngine.Core;
 
     /// <summary>
     /// The edit.
@@ -43,7 +44,7 @@ namespace Widgets.Twitter
             // Don't need to clear Feed out of cache because when the Settings are cleared,
             // the last modified date (i.e. TwitterSettings.LastModified) will reset to
             // DateTime.MinValue and Twitter will be re-queried.
-            HttpRuntime.Cache.Remove(TwitterSettingsCacheKey);
+            Blog.CurrentInstance.Cache.Remove(TwitterSettingsCacheKey);
         }
 
         #endregion

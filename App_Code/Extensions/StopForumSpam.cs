@@ -16,7 +16,7 @@
         /// <summary>
         /// The pass through.
         /// </summary>
-        private static bool passThrough = true;
+        private bool passThrough = true;
 
         #endregion
 

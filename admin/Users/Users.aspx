@@ -7,11 +7,6 @@
             var txtPwd2 = $('#txtPassword2').val();
             var txtEmail = $('#txtEmail').val();
 
-            $('#txtUserNameReq').addClass('hidden');
-            $('#txtPasswordReq').addClass('hidden');
-            $('#txtPasswordMatch').addClass('hidden');
-            $('#txtEmailReq').addClass('hidden');
-
             var roles = new Array();
             var cnt = 0;
             $.each($('.chkRole:checked'), function (i, v) {
@@ -42,11 +37,12 @@
             else {
                 var dto = { "user": txtUser, "pwd": txtPwd, "email": txtEmail, "roles": roles };
                 $.ajax({
-                    url: "../../api/UserService.asmx/Add",
+                    url: SiteVars.ApplicationRelativeWebRoot + "api/UserService.asmx/Add",
                     data: JSON.stringify(dto),
                     type: "POST",
                     contentType: "application/json; charset=utf-8",
                     dataType: "json",
+                    beforeSend: onAjaxBeforeSend,
                     success: function (result) {
                         var rt = result.d;
                         if (rt.Success) {
@@ -59,7 +55,7 @@
                     }
                 });
             }
-            $.colorbox.close();
+            closeOverlay();
             return false;
         }
 
@@ -75,6 +71,16 @@
         });
 
         function closeOverlay() {
+            $('#txtUserNameReq').addClass('hidden');
+            $('#txtPasswordReq').addClass('hidden');
+            $('#txtPasswordMatch').addClass('hidden');
+            $('#txtEmailReq').addClass('hidden');
+
+            $('#txtUserName').val('');
+            $('#txtPassword').val('');
+            $('#txtPassword2').val('');
+            $('#txtEmail').val('');
+
             $.colorbox.close();
         }
     </script>
@@ -86,42 +92,43 @@
             </ul>
 		</div>
 		<div class="content-box-left">
-            <h1><%=Resources.labels.users %><a href="#" class="addNew">Add new user</a></h1>
+            <h1><%=Resources.labels.users %><a href="#" class="addNew"><%=Resources.labels.addNewUser %></a></h1>
             <div style="display:none;">
             <div id="frmAddNew" class="overlaypanel" >
-                <h2>Add new user</h2>
+                <h2><%=Resources.labels.addNewUser %></h2>
                 <table class="tblForm">
                     <tr>
                         <td>
-				            <label for="txtUserName" class="lbl">Name</label>
+				            <label for="txtUserName" class="lbl"><%=Resources.labels.name %></label>
 				            <input type="text" id="txtUserName" class="txt200"/>
 				            <span id="txtUserNameReq" class="req hidden">*</span>
 				        </td>
 				        <td>
-				            <label for="txtEmail" class="lbl">Email</label>
+				            <label for="txtEmail" class="lbl"><%=Resources.labels.email %></label>
 				            <input type="text" id="txtEmail" class="txt200"/>
 				            <span id= "txtEmailReq" class="req hidden">*</span>
                         </td>
                     </tr>
                     <tr>
                         <td>
-				                <label for="txtPassword" class="lbl">Password</label>
+				                <label for="txtPassword" class="lbl"><%=Resources.labels.password %></label>
 				                <input type="password" id="txtPassword" class="txt200"/>
                         </td>
                         <td>
-                                <label for="txtPassword2" class="lbl">Confirm password</label>
+                                <label for="txtPassword2" class="lbl"><%=Resources.labels.confirmPassword %></label>
 				                <input type="password" id="txtPassword2" class="txt200"/>
 				                <span  id= "txtPasswordReq" class="req hidden">*</span>
-				                <span  id= "txtPasswordMatch" class="req hidden">Passwords should match</span>
+				                <span  id= "txtPasswordMatch" class="req hidden"><%=Resources.labels.passwordAndConfirmPasswordMismatch %></span>
                         </td>
                     </tr>
                 </table>
                 <asp:PlaceHolder ID="phNewUserRoles" runat="server">
-                    <h2>New user Roles</h2>
+                    <h2><%=Resources.labels.newUserRoles %></h2>
                     <div id="rolelist" style="margin:0 0 20px;"><%=RolesList%></div>
                 </asp:PlaceHolder>
-				<input type="submit" class="btn primary rounded" value="Save" onclick="return AddUser(this);" id="btnNewUser" />
-				or <a href="#" onclick="closeOverlay();">Cancel</a>
+				<input type="submit" class="btn primary rounded" value="<%=Resources.labels.save %>" onclick="return AddUser(this);" id="btnNewUser" />
+				<%=Resources.labels.or %> <a href="#" onclick="closeOverlay();"><%=Resources.labels.cancel %></a>
+                <br /><br />
 			</div>
             </div>
             <div id="Container"></div>

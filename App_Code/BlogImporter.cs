@@ -257,7 +257,7 @@
                     throw new InvalidOperationException("Wrong credentials");
                 }
 
-                var rootPath = string.Format("{0}files/", BlogSettings.Instance.StorageLocation);
+                var rootPath = string.Format("{0}files/", Blog.CurrentInstance.StorageLocation);
                 var serverPath = Server.MapPath(rootPath);
                 var saveFolder = serverPath;
                 var fileName = destination;

@@ -8,6 +8,7 @@ using System.Web;
 
 using BlogEngine.Core;
 using BlogEngine.Core.Web.Controls;
+using BlogEngine.Core.Web.Extensions;
 
 #endregion
 
@@ -39,7 +40,11 @@ public class SendCommentMail
     /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.</param>
     private static void PostCommentAdded(object sender, EventArgs e)
     {
-        if (!BlogSettings.Instance.SendMailOnComment) { return; }
+        if (!ExtensionManager.ExtensionEnabled("SendCommentMail"))
+            return;
+
+        if (!BlogSettings.Instance.SendMailOnComment) 
+            return;
 
         var comment = (Comment)sender;
         if (comment == null) { return; }

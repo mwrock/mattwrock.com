@@ -112,10 +112,10 @@
     <value>2.0</value>
   </resheader>
   <resheader name="reader">
-    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <resheader name="writer">
-    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="add" xml:space="preserve">
     <value>Add</value>
@@ -537,6 +537,12 @@
   </data>
   <data name="showCountryChooserDescription" xml:space="preserve">
     <value>If the country chooser isn't shown, no flag can be shown on each comment.</value>
+  </data>
+  <data name="showEnableWebsiteInComments" xml:space="preserve">
+    <value>Enable Website in Comments</value>
+  </data>
+  <data name="showEnableWebsiteInCommentsDescription" xml:space="preserve">
+    <value>Choose whether to allow Website to be published in Comments</value>
   </data>
   <data name="showDescriptionInPostList" xml:space="preserve">
     <value>Only show description of posts</value>
@@ -1653,5 +1659,95 @@
   </data>
   <data name="toDisableSetTo0" xml:space="preserve">
     <value>To disable, set to "0"</value>
+  </data>
+  <data name="cannotDeleteLastAdmin" xml:space="preserve">
+    <value>You cannot delete the last user with rights to create or edit users. Grant these rights to another user first before deleting this user.</value>
+  </data>
+  <data name="forceMainTheme" xml:space="preserve">
+    <value>Regular Site</value>
+  </data>
+  <data name="allowMobileTheme" xml:space="preserve">
+    <value>Mobile Site</value>
+  </data>
+  <data name="blogs" xml:space="preserve">
+    <value>Blogs</value>
+  </data>
+  <data name="itemsPerPage" xml:space="preserve">
+    <value>Items/Page</value>
+  </data>
+  <data name="couldNotDeleteBlog" xml:space="preserve">
+    <value>Could not delete blog: {0}</value>
+  </data>
+  <data name="blogDeleted" xml:space="preserve">
+    <value>Blog "{0}" has been deleted</value>
+  </data>
+  <data name="blogAdded" xml:space="preserve">
+    <value>Blog "{0}" has been added</value>
+  </data>
+  <data name="invalidBlogId" xml:space="preserve">
+    <value>Invalid blog id</value>
+  </data>
+  <data name="editExistingBlog" xml:space="preserve">
+    <value>Edit blog</value>
+  </data>
+  <data name="storageContainerName" xml:space="preserve">
+    <value>Storage Container Name</value>
+  </data>
+  <data name="virtualPath" xml:space="preserve">
+    <value>Virtual Path</value>
+  </data>
+  <data name="active" xml:space="preserve">
+    <value>Active</value>
+  </data>
+  <data name="existingBlogToCreateNewBlogFrom" xml:space="preserve">
+    <value>Existing Blog to Create New Blog from</value>
+  </data>
+  <data name="hostName" xml:space="preserve">
+    <value>Host Name (optional)</value>
+  </data>
+  <data name="acceptAnyTextBeforeHostname" xml:space="preserve">
+    <value>Accept Any Text before Host Name</value>
+  </data>
+  <data name="latestFromTheGallery" xml:space="preserve">
+    <value>Latest from the gallery</value>
+  </data>
+  <data name="savedByAtTime" xml:space="preserve">
+    <value>Saved by {0} at {1}</value>
+  </data>
+  <data name="available" xml:space="preserve">
+    <value>Available</value>
+  </data>
+  <data name="currentTheme" xml:space="preserve">
+    <value>Current theme</value>
+  </data>
+  <data name="gallery" xml:space="preserve">
+    <value>Gallery</value>
+  </data>
+  <data name="installed" xml:space="preserve">
+    <value>Installed</value>
+  </data>
+  <data name="setAsCurrentTheme" xml:space="preserve">
+    <value>Set as current theme</value>
+  </data>
+  <data name="setAsMobileTheme" xml:space="preserve">
+    <value>Set as mobile theme</value>
+  </data>
+  <data name="themes" xml:space="preserve">
+    <value>Themes</value>
+  </data>
+  <data name="alphaNumeric" xml:space="preserve">
+    <value>Alphanumeric</value>
+  </data>
+  <data name="downloads" xml:space="preserve">
+    <value>Downloads</value>
+  </data>
+  <data name="newest" xml:space="preserve">
+    <value>Newest</value>
+  </data>
+  <data name="orderBy" xml:space="preserve">
+    <value>Order by</value>
+  </data>
+  <data name="activeThemes" xml:space="preserve">
+    <value>Active themes</value>
   </data>
 </root>

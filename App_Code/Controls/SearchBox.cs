@@ -64,14 +64,14 @@ namespace App_Code.Controls
                 BlogSettings.Instance.SearchButtonText,
                 Utils.RelativeWebRoot);
 
-            if (BlogSettings.Instance.EnableCommentSearch)
+            if (BlogSettings.Instance.EnableCommentSearch && BlogSettings.Instance.ShowIncludeCommentsOption)
             {
                 var check = this.Context.Request.QueryString["comment"] != null ? "checked=\"checked\"" : string.Empty;
-                sb.AppendFormat("<br /><input type=\"checkbox\" id=\"searchcomments\" {0} />", check);
+                sb.AppendFormat("<div id=\"search-include-comments\"><input type=\"checkbox\" id=\"searchcomments\" {0} />", check);
                 if (!string.IsNullOrEmpty(BlogSettings.Instance.SearchCommentLabelText))
                 {
                     sb.AppendFormat(
-                        "<label for=\"searchcomments\">{0}</label>", BlogSettings.Instance.SearchCommentLabelText);
+                        "<label for=\"searchcomments\">{0}</label></div>", BlogSettings.Instance.SearchCommentLabelText);
                 }
             }
 

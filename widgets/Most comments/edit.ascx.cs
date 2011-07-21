@@ -9,6 +9,7 @@ namespace Widgets.ModeComments
     using System;
 
     using App_Code.Controls;
+    using BlogEngine.Core;
 
     /// <summary>
     /// Edit widget.
@@ -29,7 +30,7 @@ namespace Widgets.ModeComments
             settings["showcomments"] = this.cbShowComments.Checked.ToString();
             this.SaveSettings(settings);
 
-            this.Cache.Remove("most_comments");
+            Blog.CurrentInstance.Cache.Remove("most_comments");
         }
 
         #endregion

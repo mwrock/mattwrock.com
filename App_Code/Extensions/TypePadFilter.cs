@@ -5,6 +5,8 @@
     using BlogEngine.Core.Web.Extensions;
 
     using Joel.Net;
+    using System.Collections.Generic;
+    using System;
 
     /// <summary>
     /// The type pad filter.
@@ -16,29 +18,34 @@
         #region Constants and Fields
 
         /// <summary>
+        /// The sync root.
+        /// </summary>
+        private static readonly object syncRoot = new object();
+
+        /// <summary>
         /// The Akismet api.
         /// </summary>
-        private static Akismet api;
+        private static Dictionary<Guid, Akismet> blogsApi = new Dictionary<Guid, Akismet>();
 
         /// <summary>
         /// The fall through.
         /// </summary>
-        private static bool fallThrough = true;
+        private bool fallThrough = true;
 
         /// <summary>
         /// The TypePad key.
         /// </summary>
-        private static string key;
+        private static Dictionary<Guid, string> blogsKey = new Dictionary<Guid, string>();
 
         /// <summary>
         /// The settings.
         /// </summary>
-        private static ExtensionSettings settings;
+        private static Dictionary<Guid, ExtensionSettings> blogsSettings = new Dictionary<Guid, ExtensionSettings>();
 
         /// <summary>
         /// The TypePad site.
         /// </summary>
-        private static string site;
+        private static Dictionary<Guid, string> blogsSite = new Dictionary<Guid, string>();
 
         #endregion
 
@@ -49,12 +56,91 @@
         /// </summary>
         public TypePadFilter()
         {
-            this.InitSettings();
+            InitSettings();
         }
 
         #endregion
 
         #region Properties
+
+        private static Akismet Api
+        {
+            get
+            {
+                Akismet akismet = null;
+                blogsApi.TryGetValue(Blog.CurrentInstance.Id, out akismet);
+
+                return akismet;
+            }
+            set
+            {
+                blogsApi[Blog.CurrentInstance.Id] = value;
+            }
+        }
+
+        private static string Key
+        {
+            get
+            {
+                string key = null;
+                blogsKey.TryGetValue(Blog.CurrentInstance.Id, out key);
+
+                return key;
+            }
+            set
+            {
+                blogsKey[Blog.CurrentInstance.Id] = value;
+            }
+        }
+
+        private static string Site
+        {
+            get
+            {
+                string key = null;
+                blogsSite.TryGetValue(Blog.CurrentInstance.Id, out key);
+
+                return key;
+            }
+            set
+            {
+                blogsSite[Blog.CurrentInstance.Id] = value;
+            }
+        }
+
+        private static ExtensionSettings Settings
+        {
+            get
+            {
+                Guid blogId = Blog.CurrentInstance.Id;
+                ExtensionSettings settings = null;
+                blogsSettings.TryGetValue(blogId, out settings);
+
+                if (settings == null)
+                {
+                    lock (syncRoot)
+                    {
+                        blogsSettings.TryGetValue(blogId, out settings);
+
+                        if (settings == null)
+                        {
+                            var extensionSettings = new ExtensionSettings("TypePadFilter") { IsScalar = true };
+
+                            extensionSettings.AddParameter("SiteURL", "Site URL");
+                            extensionSettings.AddParameter("ApiKey", "API Key");
+
+                            extensionSettings.AddValue("SiteURL", "http://example.com/blog");
+                            extensionSettings.AddValue("ApiKey", "123456789");
+
+                            blogsSettings[blogId] = ExtensionManager.InitSettings("TypePadFilter", extensionSettings);
+                            ExtensionManager.SetStatus("TypePadFilter", false);
+                        }
+                    }
+                }
+
+                return settings;
+            }
+        }
 
         /// <summary>
         /// Gets a value indicating whether FallThrough.
@@ -80,13 +166,13 @@
         /// <returns>True if comment is spam</returns>
         public bool Check(Comment comment)
         {
-            if (api == null)
+            if (Api == null)
             {
                 this.Initialize();
             }
 
             var typePadComment = GetAkismetComment(comment);
-            var isspam = api.CommentCheck(typePadComment);
+            var isspam = Api.CommentCheck(typePadComment);
             fallThrough = !isspam;
             return isspam;
         }
@@ -104,11 +190,11 @@
                 return false;
             }
 
-            site = settings.GetSingleValue("SiteURL");
-            key = settings.GetSingleValue("ApiKey");
-            api = new Akismet(key, site, "BlogEngine.net 1.5", "api.antispam.typepad.com");
+            Site = Settings.GetSingleValue("SiteURL");
+            Key = Settings.GetSingleValue("ApiKey");
+            Api = new Akismet(Key, Site, "BlogEngine.NET 1.5", "api.antispam.typepad.com");
 
-            return api.VerifyKey();
+            return Api.VerifyKey();
         }
 
         /// <summary>
@@ -117,7 +203,7 @@
         /// <param name="comment">BlogEngine comment</param>
         public void Report(Comment comment)
         {
-            if (api == null)
+            if (Api == null)
             {
                 this.Initialize();
             }
@@ -127,12 +213,12 @@
             if (comment.IsApproved)
             {
                 Utils.Log(string.Format("TypePad: Reporting NOT spam from \"{0}\" at \"{1}\"", comment.Author, comment.IP));
-                api.SubmitHam(akismetComment);
+                Api.SubmitHam(akismetComment);
             }
             else
             {
                 Utils.Log(string.Format("TypePad: Reporting SPAM from \"{0}\" at \"{1}\"", comment.Author, comment.IP));
-                api.SubmitSpam(akismetComment);
+                Api.SubmitSpam(akismetComment);
             }
         }
 
@@ -151,7 +237,7 @@
         {
             var akismetComment = new AkismetComment
                 {
-                    Blog = settings.GetSingleValue("SiteURL"),
+                    Blog = Settings.GetSingleValue("SiteURL"),
                     UserIp = comment.IP,
                     CommentContent = comment.Content,
                     CommentAuthor = comment.Author,
@@ -165,21 +251,10 @@
             return akismetComment;
         }
 
-        /// <summary>
-        /// Inits the settings.
-        /// </summary>
-        private void InitSettings()
+        public void InitSettings()
         {
-            var extensionSettings = new ExtensionSettings(this) { IsScalar = true };
-
-            extensionSettings.AddParameter("SiteURL", "Site URL");
-            extensionSettings.AddParameter("ApiKey", "API Key");
-
-            extensionSettings.AddValue("SiteURL", "http://example.com/blog");
-            extensionSettings.AddValue("ApiKey", "123456789");
-
-            settings = ExtensionManager.InitSettings("TypePadFilter", extensionSettings);
-            ExtensionManager.SetStatus("TypePadFilter", false);
+            // call Settings getter so default settings are loaded on application start.
+            var s = Settings;
         }
 
         #endregion

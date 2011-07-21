@@ -8,7 +8,7 @@
     <div id="searchpage">
       <input type="text" name="q" id="q" value="<%=Server.HtmlEncode(Request.QueryString["q"]) %>" onkeypress="if(event.keyCode==13) SearchPage()" />
       <input type="button" value="<%=Resources.labels.search %>" onclick="SearchPage()" onkeypress="SearchPage()" />
-      <% if (BlogSettings.Instance.EnableCommentSearch){ %>
+      <% if (BlogSettings.Instance.EnableCommentSearch && BlogSettings.Instance.ShowIncludeCommentsOption){ %>
       <input type="checkbox" name="comment" id="comment" /><label for="comment"><%=BlogSettings.Instance.SearchCommentLabelText %></label>
       <%} %>
     </div>

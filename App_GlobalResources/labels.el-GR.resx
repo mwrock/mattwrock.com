@@ -378,6 +378,12 @@
 	<data name="showCountryChooserDescription" xml:space="preserve">
     <value>Αν η επιλογή χώρας δεν φαίνεται, τότε οι σημαίες δεν μπορούν να εμφανιστούν σε κάθε σχόλιο</value>
   </data>
+  <data name="showEnableWebsiteInComments" xml:space="preserve">
+    <value>Need Translation:Enable Website in Comments</value>
+  </data>
+  <data name="showEnableWebsiteInCommentsDescription" xml:space="preserve">
+    <value>Need Translation:Choose whether to allow Website to be published in Comments</value>
+  </data>
 	<data name="showLivePreview" xml:space="preserve">
     <value>Εμφάνιση προεπισκόπισης</value>
   </data>

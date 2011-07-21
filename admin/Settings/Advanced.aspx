@@ -37,11 +37,12 @@
 			};
 			
             $.ajax({
-                url: "Advanced.aspx/Save",
+                url: SiteVars.ApplicationRelativeWebRoot + "admin/Settings/Advanced.aspx/Save",
                 type: "POST",
                 dataType: "json",
                 contentType: "application/json; charset=utf-8",
                 data: JSON.stringify(dto),
+                beforeSend: onAjaxBeforeSend,
                 success: function (result) {
                     var rt = result.d;
                     if (rt.Success)
@@ -85,7 +86,7 @@
                             </asp:RadioButtonList>
                     </li>
                     <li>
-                        <label class="lbl">Other settings</label>
+                        <label class="lbl"><%=Resources.labels.otherSettings %></label>
                         <asp:CheckBox runat="server" ID="cbEnableCompression" />
                         <label for="<%=cbEnableCompression.ClientID %>"><%=Resources.labels.enableHttpCompression %></label>
                         <span class="insetHelp">(<%=Resources.labels.enableHttpCompressionDescription %>)</span>
@@ -141,7 +142,7 @@
                     </li>
                 </ul>
             <div class="action_buttons">
-                <input type="submit" id="btnSave" class="btn primary rounded" value="Save settings" />
+                <input type="submit" id="btnSave" class="btn primary rounded" value="<%=Resources.labels.saveSettings %>" />
             </div>
 		</div>
 	</div>       

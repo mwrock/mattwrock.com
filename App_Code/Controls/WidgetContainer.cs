@@ -44,7 +44,7 @@ namespace App_Code.Controls
         /// <summary>
         /// Gets a string representing the rendered html for administrative control of this WidgetContainer's child Widget.
         /// </summary>
-        protected string AdminLinks
+        public string AdminLinks
         {
             get
             {
@@ -56,10 +56,9 @@ namespace App_Code.Controls
 
                         var widgetId = this.Widget.WidgetId;
 
-                        sb.AppendFormat("<a class=\"delete\" href=\"#\" onclick=\"BlogEngine.widgetAdmin.removeWidget('{0}');return false\" title=\"{1} widget\">X</a>", widgetId, labels.delete);
-
-                        sb.AppendFormat("<a class=\"edit\" href=\"#\" onclick=\"BlogEngine.widgetAdmin.editWidget('{0}', '{1}');return false\" title=\"{2} widget\">{3}</a>", this.Widget.Name, widgetId, labels.edit, labels.edit);
-                        sb.AppendFormat("<a class=\"move\" href=\"#\" onclick=\"BlogEngine.widgetAdmin.initiateMoveWidget('{0}');return false\" title=\"{1} widget\">{2}</a>", widgetId, labels.move, labels.move);
+                        sb.AppendFormat("<a class=\"delete\" href=\"#\" onclick=\"BlogEngine.widgetAdmin.removeWidget('{0}');return false\" title=\"{1} widget\"><span class=\"widgetImg imgDelete\">&nbsp;</span></a>", widgetId, labels.delete);
+                        sb.AppendFormat("<a class=\"edit\" href=\"#\" onclick=\"BlogEngine.widgetAdmin.editWidget('{0}', '{1}');return false\" title=\"{2} widget\"><span class=\"widgetImg imgEdit\">&nbsp;</span>", this.Widget.Name, widgetId, labels.edit);
+                        sb.AppendFormat("<a class=\"move\" href=\"#\" onclick=\"BlogEngine.widgetAdmin.initiateMoveWidget('{0}');return false\" title=\"{1} widget\"><span class=\"widgetImg imgMove\">&nbsp;</span></a>", widgetId, labels.move);
 
                         return sb.ToString();
                     }
@@ -123,29 +122,53 @@ namespace App_Code.Controls
         }
 
         /// <summary>
+        /// The container will be processed when invoked, rather than waiting
+        /// for the Load event to occur.
+        /// </summary>
+        public virtual void RenderContainer() { }
+
+        /// <summary>
         /// Returns the virtual path of where a theme's widget container would expect to be located.
         /// </summary>
+        /// <param name="existenceCheck">
+        /// When true, the path to the theme folder to check for the WidgetContainer existence
+        /// is returned.  When false, the path to the control that will be loaded is returned.
+        /// If it's a Razor theme, the path will be RazorHost instead of the actual theme folder
+        /// name.
+        /// </param>
         /// <returns></returns>
-        public static string GetThemeWidgetContainerVirtualPath()
+        public static string GetThemeWidgetContainerVirtualPath(bool existenceCheck)
         {
-            return string.Format("~/themes/{0}/WidgetContainer.ascx", BlogSettings.Instance.Theme);
+            if (existenceCheck)
+            {
+                // if it's a Razor theme, check if WidgetContainer.cshtml exists.
+                string filename = BlogSettings.Instance.IsRazorTheme ? "WidgetContainer.cshtml" : "WidgetContainer.ascx";
+                return string.Format("~/themes/{0}/{1}", BlogSettings.Instance.Theme, filename);
+            }
+            else
+            {
+                // when existenceCheck == false, the actual file that will be loaded needs to be
+                // returned.  if it's a Razor theme, we will load WidgetContainer.ascx in the
+                // RazorHost folder.  we assume that the RazorHost folder contains WidgetContainer.ascx.
+                return string.Format("~/themes/{0}/WidgetContainer.ascx", BlogSettings.Instance.GetThemeWithAdjustments(null));
+            }
         }
 
         /// <summary>
         /// Returns the file path of where a theme's widget container would expect to be located.
         /// </summary>
-        public static string GetThemeWidgetContainerFilePath()
+        public static string GetThemeWidgetContainerFilePath(bool existenceCheck)
         {
-            return HostingEnvironment.MapPath(GetThemeWidgetContainerVirtualPath());
+            return HostingEnvironment.MapPath(GetThemeWidgetContainerVirtualPath(existenceCheck));
         }
 
         /// <summary>
         /// Returns whether the theme contains a widget container file.
         /// </summary>
-        public static bool DoesThemeWidgetContainerExist()
+        public static bool DoesThemeWidgetContainerExist(bool existenceCheck)
         {
             // This is for compatibility with older themes that do not have a WidgetContainer control.
-            return File.Exists(GetThemeWidgetContainerFilePath());
+            return File.Exists(GetThemeWidgetContainerFilePath(existenceCheck));
         }
 
         /// <summary>
@@ -174,7 +197,7 @@ namespace App_Code.Controls
         public static WidgetContainer GetWidgetContainer(
             WidgetBase widgetControl)
         {
-            return GetWidgetContainer(widgetControl, DoesThemeWidgetContainerExist(), GetThemeWidgetContainerVirtualPath());
+            return GetWidgetContainer(widgetControl, DoesThemeWidgetContainerExist(true), GetThemeWidgetContainerVirtualPath(false));
         }
     }
 
@@ -226,10 +249,6 @@ namespace App_Code.Controls
             if (this.Widget.ShowTitle)
             {
                 sb.AppendFormat("<h4>{0}</h4>", this.Widget.Title);
-            }
-            else
-            {
-                sb.Append("<br />");
             }
 
             sb.Append("<div class=\"content\">");

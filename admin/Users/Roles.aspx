@@ -11,15 +11,16 @@
                 return false;
             }
             else {
-                $('#txtUserNameReq').addClass('hidden');
+                //$('#txtUserNameReq').addClass('hidden'); //moved to closeOverlay
                 var dto = { "roleName": txtUser };
 
                 $.ajax({
-                    url: "../../api/RoleService.asmx/Add",
+                    url: SiteVars.ApplicationRelativeWebRoot + "api/RoleService.asmx/Add",
                     data: JSON.stringify(dto),
                     type: "POST",
                     contentType: "application/json; charset=utf-8",
                     dataType: "json",
+                    beforeSend: onAjaxBeforeSend,
                     success: function (result) {
                         var rt = result.d;
                         if (rt.Success) {
@@ -47,6 +48,8 @@
         });
 
         function closeOverlay() {
+            $('#txtUserName').val('');
+            $('#txtUserNameReq').addClass('hidden');
             $.colorbox.close();
         }
     </script>
@@ -59,16 +62,17 @@
             </ul>
 		</div>
 		<div class="content-box-left">
-            <h1><%=Resources.labels.roles %><a href="#" class="addNew">Add new role</a></h1>
+            <h1><%=Resources.labels.roles %><a href="#" class="addNew"><%=Resources.labels.addNewRole %></a></h1>
             <div  style="display:none;">
             <div id="frmAddNew" class="overlaypanel">
-                <h2>Add new role</h2>
-		        <label for="txtUserName" class="lbl">Name</label>
+                <h2><%=Resources.labels.addNewRole %></h2>
+		        <label for="txtUserName" class="lbl"><%=Resources.labels.name %></label>
 		        <input type="text" id="txtUserName" class="txt200" />
 		        <span id="txtUserNameReq" class="req hidden">*</span>
 		        <br/><br/>
-		        <input type="submit" class="btn primary rounded" value="Add role" onclick="return AddRole();" />
-		        or <a href="#" onclick="closeOverlay();">Cancel</a>
+		        <input type="submit" class="btn primary rounded" value="<%=Resources.labels.save %>" onclick="return AddRole();" />
+		        <%=Resources.labels.or %> <a href="#" onclick="closeOverlay();"><%=Resources.labels.cancel %></a>
+                <br/><br/>
 	        </div>
             </div>
             <div id="Container"></div>

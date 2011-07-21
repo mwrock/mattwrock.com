@@ -20,6 +20,9 @@ namespace Widgets.Newsletter
 
     using BlogEngine.Core;
     using BlogEngine.Core.Providers;
+    using System.Collections.Specialized;
+    using System.Web.Caching;
+    using System.Threading;
 
     /// <summary>
     /// The widget.
@@ -31,17 +34,37 @@ namespace Widgets.Newsletter
         /// <summary>
         ///     The xml doc.
         /// </summary>
-        private static XmlDocument doc;
+        private static Dictionary<Guid, XmlDocument> docs = new Dictionary<Guid, XmlDocument>();
 
         /// <summary>
         ///     The filename.
         /// </summary>
-        private static string fileName;
+        private static Dictionary<Guid, string> fileNames = new Dictionary<Guid, string>();
+
+        /// <summary>
+        ///     The filename.
+        /// </summary>
+        private static Dictionary<Guid, bool> reloadData = new Dictionary<Guid, bool>();
 
         /// <summary>
         ///     The callback.
         /// </summary>
         private string callback;
+
+        /// <summary>
+        ///     The syncroot.
+        /// </summary>
+        private static readonly object syncRoot = new object();
+
+        /// <summary>
+        ///     Whether emails are sent for posts.
+        /// </summary>
+        private const bool SendEmailsForPosts = true;
+
+        /// <summary>
+        ///     Whether emails are sent for pages.
+        /// </summary>
+        private const bool SendEmailsForPages = false;
 
         #endregion
 
@@ -52,8 +75,10 @@ namespace Widgets.Newsletter
         /// </summary>
         static Widget()
         {
-            Post.Saved += PostSaved;
-            Post.Saving += PostSaving;
+            Post.Saved += PublishableSaved;
+            Post.Saving += PublishableSaving;
+            BlogEngine.Core.Page.Saved += PublishableSaved;
+            BlogEngine.Core.Page.Saving += PublishableSaving;
         }
 
         #endregion
@@ -129,21 +154,23 @@ namespace Widgets.Newsletter
 
         #region Methods
 
+
+
         /// <summary>
         /// Creates the email.
         /// </summary>
-        /// <param name="post">
-        /// The post to mail.
+        /// <param name="publishable">
+        /// The publishable to mail.
         /// </param>
         /// <returns>
         /// The email.
         /// </returns>
-        private static MailMessage CreateEmail(Post post)
+        private static MailMessage CreateEmail(IPublishable publishable)
         {
             var mail = new MailMessage
                 {
-                    Subject = post.Title, 
-                    Body = FormatBodyMail(post), 
+                    Subject = publishable.Title,
+                    Body = FormatBodyMail(publishable), 
                     From = new MailAddress(BlogSettings.Instance.Email, BlogSettings.Instance.Name)
                 };
             return mail;
@@ -160,7 +187,10 @@ namespace Widgets.Newsletter
         /// </returns>
         private static bool DoesEmailExist(string email)
         {
-            return doc.SelectSingleNode(string.Format("emails/email[text()='{0}']", email)) != null;
+            lock (syncRoot)
+            {
+                return docs[Blog.CurrentInstance.Id].SelectSingleNode(string.Format("emails/email[text()='{0}']", email)) != null;
+            }
         }
 
         /// <summary>
@@ -171,13 +201,13 @@ namespace Widgets.Newsletter
         ///     [WebRoot]
         ///     [httpBase]
         /// </summary>
-        /// <param name="post">
-        /// The post to format.
+        /// <param name="publishable">
+        /// The publishable to format.
         /// </param>
         /// <returns>
         /// The format body mail.
         /// </returns>
-        private static string FormatBodyMail(Post post)
+        private static string FormatBodyMail(IPublishable publishable)
         {
             var body = new StringBuilder();
             var urlbase = Path.Combine(
@@ -206,9 +236,9 @@ namespace Widgets.Newsletter
                 }
             }
 
-            body = body.Replace("[TITLE]", post.Title);
-            body = body.Replace("[LINK]", post.AbsoluteLink.AbsoluteUri);
-            body = body.Replace("[LINK_DESCRIPTION]", post.Description);
+            body = body.Replace("[TITLE]", publishable.Title);
+            body = body.Replace("[LINK]", publishable.AbsoluteLink.AbsoluteUri);
+            body = body.Replace("[LINK_DESCRIPTION]", publishable.Description);
             body = body.Replace("[WebRoot]", Utils.AbsoluteWebRoot.AbsoluteUri);
             body = body.Replace("[httpBase]", urlbase);
             return body.ToString();
@@ -241,17 +271,17 @@ namespace Widgets.Newsletter
         /// <summary>
         /// Gets the send send newsletter emails.
         /// </summary>
-        /// <param name="postId">
-        /// The post id.
+        /// <param name="publishableId">
+        /// The publishableId id.
         /// </param>
         /// <returns>
         /// Whether send newsletter emails.
         /// </returns>
-        private static bool GetSendSendNewsletterEmails(Guid postId)
+        private static bool GetSendSendNewsletterEmails(Guid publishableId)
         {
             var data = GetSendNewslettersContextData();
 
-            return data.ContainsKey(postId) && data[postId];
+            return data.ContainsKey(publishableId) && data[publishableId];
         }
 
         /// <summary>
@@ -259,28 +289,64 @@ namespace Widgets.Newsletter
         /// </summary>
         private static void LoadEmails()
         {
-            if (doc != null && fileName != null)
-            {
-                return;
-            }
+            Guid blogId = Blog.CurrentInstance.Id;
 
-            fileName = Path.Combine(BlogSettings.Instance.StorageLocation, "newsletter.xml");
-            fileName = HostingEnvironment.MapPath(fileName);
+            lock (syncRoot)
+            {
+                if (reloadData.ContainsKey(blogId) && reloadData[blogId])
+                {
+                    docs.Remove(blogId);
+                    fileNames.Remove(blogId);
+                    reloadData.Remove(blogId);
+                }
 
-            if (File.Exists(fileName))
-            {
-                doc = new XmlDocument();
-                doc.Load(fileName);
-            }
-            else
-            {
-                doc = new XmlDocument();
-                doc.LoadXml("<emails></emails>");
+                if (docs.ContainsKey(blogId) && fileNames.ContainsKey(blogId)) { return; }
+
+                string filename = Path.Combine(Blog.CurrentInstance.StorageLocation, "newsletter.xml");
+                filename = HostingEnvironment.MapPath(filename);
+
+                fileNames[blogId] = filename;  // store in static dictionary
+
+                XmlDocument doc = null;
+
+                if (File.Exists(filename))
+                {
+                    doc = new XmlDocument();
+                    doc.Load(filename);
+
+                    HttpRuntime.Cache.Insert(filename, Blog.CurrentInstance.Id, new CacheDependency(filename), Cache.NoAbsoluteExpiration, Cache.NoSlidingExpiration, CacheItemPriority.Default, new CacheItemRemovedCallback(FilenameCacheRemoved));
+                }
+                else
+                {
+                    doc = new XmlDocument();
+                    doc.LoadXml("<emails></emails>");
+                }
+
+                docs[blogId] = doc;  // store in static dictionary.
             }
         }
 
         /// <summary>
-        /// Handles the Saved event of the Post control.
+        /// Callback when either the file is modified (which can happen when editing the
+        /// widget), or if the cache item leaves cache.
+        /// </summary>
+        private static void FilenameCacheRemoved(string key, object value, CacheItemRemovedReason removedReason)
+        {
+            Guid blogId = (Guid)value;
+
+            lock (syncRoot)
+            {
+                // instead of clearing the static data (out of docs and fileNames),
+                // mark it as 'reload', so the next time that data is needed, it 
+                // will be reloaded.  want to avoid clearing the data out of the
+                // dictionaries here in case it's in-use by another thread.
+
+                reloadData[blogId] = true;
+            }
+        }
+
+        /// <summary>
+        /// Handles the Saved event of the Publishable.
         /// </summary>
         /// <param name="sender">
         /// The source of the event.
@@ -288,32 +354,60 @@ namespace Widgets.Newsletter
         /// <param name="e">
         /// The <see cref="BlogEngine.Core.SavedEventArgs"/> instance containing the event data.
         /// </param>
-        private static void PostSaved(object sender, SavedEventArgs e)
+        private static void PublishableSaved(object sender, SavedEventArgs e)
         {
-            var post = (Post)sender;
+            var publishable = (IPublishable)sender;
 
-            if (!GetSendSendNewsletterEmails(post.Id))
+            if (!GetSendSendNewsletterEmails(publishable.Id))
             {
                 return;
             }
 
-            LoadEmails();
-            var emails = doc.SelectNodes("emails/email");
-            if (emails == null)
+            XmlNodeList emails = null;
+            lock (syncRoot)
             {
-                return;
+                LoadEmails();
+
+                emails = docs[Blog.CurrentInstance.Id].SelectNodes("emails/email");
             }
 
+            if (emails == null) { return; }
+
+            List<MailMessage> messages = new List<MailMessage>();
             foreach (XmlNode node in emails)
             {
-                var mail = CreateEmail(post);
-                mail.To.Add(node.InnerText);
-                Utils.SendMailMessageAsync(mail);
+                string address = node.InnerText.Trim();
+
+                if (!Utils.StringIsNullOrWhitespace(address) && Utils.IsEmailValid(address))
+                {
+                    MailMessage message = CreateEmail(publishable);
+                    message.To.Add(address);
+                    messages.Add(message);
+                }
             }
+            if (messages.Count == 0) { return; }
+
+            // retrieve the blogId before entering the BG thread.
+            Guid blogId = Blog.CurrentInstance.Id;
+
+            ThreadPool.QueueUserWorkItem(state =>
+            {
+                Thread.Sleep(3000);
+
+                // because HttpContext is not available within this BG thread
+                // needed to determine the current blog instance,
+                // set override value here.
+                Blog.InstanceIdOverride = blogId;
+
+                foreach (MailMessage message in messages)
+                {
+                    Utils.SendMailMessage(message);
+                }
+            });
         }
 
         /// <summary>
-        /// Handles the Saving event of the Post control.
+        /// Handles the Saving event of the Publishable.
         /// </summary>
         /// <param name="sender">
         /// The source of the event.
@@ -321,27 +415,43 @@ namespace Widgets.Newsletter
         /// <param name="e">
         /// The <see cref="BlogEngine.Core.SavedEventArgs"/> instance containing the event data.
         /// </param>
-        private static void PostSaving(object sender, SavedEventArgs e)
+        private static void PublishableSaving(object sender, SavedEventArgs e)
         {
-            // Set SendNewsletterEmails to true whenever a post is changing from an unpublished
-            // state to a published state.  To check the published state of this Post before
-            // it was changed, it's necessary to retrieve the post from the datastore since the
-            // post in memory (via Post.GetPost()) will already have the updated values about
-            // to be saved.
-            var post = (Post)sender;
+            // Set SendNewsletterEmails to true whenever a publishable is changing from an unpublished
+            // state to a published state.  To check the published state of this publishable before
+            // it was changed, it's necessary to retrieve the publishable from the datastore since the
+            // publishable in memory (via Post.GetPost() or Page.GetPage()) will already have the
+            // updated values about to be saved.
 
-            SetSendNewsletterEmails(post.Id, false); // default to not sending
+            var publishable = (IPublishable)sender;
 
-            if (e.Action == SaveAction.Insert && post.IsVisibleToPublic)
+            SetSendNewsletterEmails(publishable.Id, false); // default to not sending
+
+            if (publishable is Post && !SendEmailsForPosts)
+                return;
+            else if (publishable is BlogEngine.Core.Page && !SendEmailsForPages)
+                return;
+
+            if (e.Action == SaveAction.Insert && publishable.IsVisibleToPublic)
             {
-                SetSendNewsletterEmails(post.Id, true);
+                SetSendNewsletterEmails(publishable.Id, true);
             }
-            else if (e.Action == SaveAction.Update && post.IsVisibleToPublic)
+            else if (e.Action == SaveAction.Update && publishable.IsVisibleToPublic)
             {
-                var preUpdatePost = BlogService.SelectPost(post.Id);
-                if (preUpdatePost != null && !preUpdatePost.IsVisibleToPublic)
+                var preUpdatePublishable = (IPublishable)null;
+
+                if (publishable is Post)
+                    preUpdatePublishable = (IPublishable)BlogService.SelectPost(publishable.Id);
+                else
+                    preUpdatePublishable = (IPublishable)BlogService.SelectPage(publishable.Id);
+
+                if (preUpdatePublishable != null && !preUpdatePublishable.IsVisibleToPublic)
                 {
-                    SetSendNewsletterEmails(post.Id, true);
+                    // Note, use publishable.Id below instead of preUpdatePublishable.Id because
+                    // when directly calling BlogService.SelectPage or BlogService.SelectPost,
+                    // the Guid ID is not set, and so will be a random, non-matching Guid ID.
+
+                    SetSendNewsletterEmails(publishable.Id, true);
                 }
             }
         }
@@ -351,11 +461,16 @@ namespace Widgets.Newsletter
         /// </summary>
         private static void SaveEmails()
         {
-            using (var ms = new MemoryStream())
-            using (var fs = File.Open(fileName, FileMode.Create, FileAccess.Write))
+            string filename = fileNames[Blog.CurrentInstance.Id];
+
+            lock (syncRoot)
             {
-                doc.Save(ms);
-                ms.WriteTo(fs);
+                using (var ms = new MemoryStream())
+                using (var fs = File.Open(filename, FileMode.Create, FileAccess.Write))
+                {
+                    docs[Blog.CurrentInstance.Id].Save(ms);
+                    ms.WriteTo(fs);
+                }
             }
         }
 
@@ -384,27 +499,33 @@ namespace Widgets.Newsletter
         {
             try
             {
-                LoadEmails();
-
-                if (!DoesEmailExist(email))
+                lock (syncRoot)
                 {
-                    XmlNode node = doc.CreateElement("email");
-                    node.InnerText = email;
-                    doc.FirstChild.AppendChild(node);
+                    if (!Utils.IsEmailValid(email)) { return; }
+                    email = email.Trim();
 
-                    this.callback = "true";
-                    SaveEmails();
-                }
-                else
-                {
-                    var emailNode = doc.SelectSingleNode(string.Format("emails/email[text()='{0}']", email));
-                    if (emailNode != null)
+                    LoadEmails();
+
+                    if (!DoesEmailExist(email))
                     {
-                        doc.FirstChild.RemoveChild(emailNode);
-                    }
+                        XmlNode node = docs[Blog.CurrentInstance.Id].CreateElement("email");
+                        node.InnerText = email;
+                        docs[Blog.CurrentInstance.Id].FirstChild.AppendChild(node);
 
-                    this.callback = "false";
-                    SaveEmails();
+                        this.callback = "true";
+                        SaveEmails();
+                    }
+                    else
+                    {
+                        var emailNode = docs[Blog.CurrentInstance.Id].SelectSingleNode(string.Format("emails/email[text()='{0}']", email));
+                        if (emailNode != null)
+                        {
+                            docs[Blog.CurrentInstance.Id].FirstChild.RemoveChild(emailNode);
+                        }
+
+                        this.callback = "false";
+                        SaveEmails();
+                    }
                 }
             }
             catch

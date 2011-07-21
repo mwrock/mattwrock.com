@@ -4,7 +4,7 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace Admin.Pages
+namespace admin.Widgets
 {
     using System;
     using System.Globalization;
@@ -27,11 +27,11 @@ namespace Admin.Pages
         {
             WebUtils.CheckRightsForAdminSettingsPage(false);
 
-            this.BindSettings();
+            BindSettings();
 
-            this.btnSave.Click += this.BtnSaveClick;
-            this.btnSave.Text = string.Format("{0} {1}", labels.save, labels.settings);
-            this.Page.Title = labels.controls;
+            btnSave.Click += BtnSaveClick;
+            btnSave.Text = string.Format("{0} {1}", labels.save, labels.settings);
+            Page.Title = labels.controls;
 
             base.OnInit(e);
         }
@@ -41,21 +41,22 @@ namespace Admin.Pages
         /// </summary>
         private void BindSettings()
         {
-            this.txtNumberOfPosts.Text = BlogSettings.Instance.NumberOfRecentPosts.ToString();
-            this.cbDisplayComments.Checked = BlogSettings.Instance.DisplayCommentsOnRecentPosts;
-            this.cbDisplayRating.Checked = BlogSettings.Instance.DisplayRatingsOnRecentPosts;
+            txtNumberOfPosts.Text = BlogSettings.Instance.NumberOfRecentPosts.ToString();
+            cbDisplayComments.Checked = BlogSettings.Instance.DisplayCommentsOnRecentPosts;
+            cbDisplayRating.Checked = BlogSettings.Instance.DisplayRatingsOnRecentPosts;
 
-            this.txtNumberOfComments.Text = BlogSettings.Instance.NumberOfRecentComments.ToString();
+            txtNumberOfComments.Text = BlogSettings.Instance.NumberOfRecentComments.ToString();
 
-            this.txtSearchButtonText.Text = BlogSettings.Instance.SearchButtonText;
-            this.txtCommentLabelText.Text = BlogSettings.Instance.SearchCommentLabelText;
-            this.txtDefaultSearchText.Text = BlogSettings.Instance.SearchDefaultText;
-            this.cbEnableCommentSearch.Checked = BlogSettings.Instance.EnableCommentSearch;
+            txtSearchButtonText.Text = BlogSettings.Instance.SearchButtonText;
+            txtCommentLabelText.Text = BlogSettings.Instance.SearchCommentLabelText;
+            txtDefaultSearchText.Text = BlogSettings.Instance.SearchDefaultText;
+            cbEnableCommentSearch.Checked = BlogSettings.Instance.EnableCommentSearch;
+            cbShowIncludeCommentsOption.Checked = BlogSettings.Instance.ShowIncludeCommentsOption;
 
-            this.txtThankMessage.Text = BlogSettings.Instance.ContactThankMessage;
-            this.txtFormMessage.Text = BlogSettings.Instance.ContactFormMessage;
-            this.cbEnableAttachments.Checked = BlogSettings.Instance.EnableContactAttachments;
-            this.cbEnableRecaptcha.Checked = BlogSettings.Instance.EnableRecaptchaOnContactForm;
+            txtThankMessage.Text = BlogSettings.Instance.ContactThankMessage;
+            txtFormMessage.Text = BlogSettings.Instance.ContactFormMessage;
+            cbEnableAttachments.Checked = BlogSettings.Instance.EnableContactAttachments;
+            cbEnableRecaptcha.Checked = BlogSettings.Instance.EnableRecaptchaOnContactForm;
         }
 
         /// <summary>
@@ -65,22 +66,23 @@ namespace Admin.Pages
         /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.</param>
         private void BtnSaveClick(object sender, EventArgs e)
         {
-            BlogSettings.Instance.NumberOfRecentPosts = int.Parse(this.txtNumberOfPosts.Text, CultureInfo.InvariantCulture);
-            BlogSettings.Instance.DisplayCommentsOnRecentPosts = this.cbDisplayComments.Checked;
-            BlogSettings.Instance.DisplayRatingsOnRecentPosts = this.cbDisplayRating.Checked;
+            BlogSettings.Instance.NumberOfRecentPosts = int.Parse(txtNumberOfPosts.Text, CultureInfo.InvariantCulture);
+            BlogSettings.Instance.DisplayCommentsOnRecentPosts = cbDisplayComments.Checked;
+            BlogSettings.Instance.DisplayRatingsOnRecentPosts = cbDisplayRating.Checked;
 
             BlogSettings.Instance.NumberOfRecentComments = int.Parse(
-                this.txtNumberOfComments.Text, CultureInfo.InvariantCulture);
+                txtNumberOfComments.Text, CultureInfo.InvariantCulture);
 
-            BlogSettings.Instance.SearchButtonText = this.txtSearchButtonText.Text;
-            BlogSettings.Instance.SearchCommentLabelText = this.txtCommentLabelText.Text;
-            BlogSettings.Instance.SearchDefaultText = this.txtDefaultSearchText.Text;
-            BlogSettings.Instance.EnableCommentSearch = this.cbEnableCommentSearch.Checked;
+            BlogSettings.Instance.SearchButtonText = txtSearchButtonText.Text;
+            BlogSettings.Instance.SearchCommentLabelText = txtCommentLabelText.Text;
+            BlogSettings.Instance.SearchDefaultText = txtDefaultSearchText.Text;
+            BlogSettings.Instance.EnableCommentSearch = cbEnableCommentSearch.Checked;
+            BlogSettings.Instance.ShowIncludeCommentsOption = cbShowIncludeCommentsOption.Checked;
 
-            BlogSettings.Instance.ContactFormMessage = this.txtFormMessage.Text;
-            BlogSettings.Instance.ContactThankMessage = this.txtThankMessage.Text;
-            BlogSettings.Instance.EnableContactAttachments = this.cbEnableAttachments.Checked;
-            BlogSettings.Instance.EnableRecaptchaOnContactForm = this.cbEnableRecaptcha.Checked;
+            BlogSettings.Instance.ContactFormMessage = txtFormMessage.Text;
+            BlogSettings.Instance.ContactThankMessage = txtThankMessage.Text;
+            BlogSettings.Instance.EnableContactAttachments = cbEnableAttachments.Checked;
+            BlogSettings.Instance.EnableRecaptchaOnContactForm = cbEnableRecaptcha.Checked;
 
             BlogSettings.Instance.Save();
         }

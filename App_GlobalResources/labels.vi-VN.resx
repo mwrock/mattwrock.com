@@ -868,6 +868,12 @@
     <value>Nếu không chọn hiển thị quốc gia, quốc kỳ sẽ không được hiển thị trên mỗi bình luận.</value>
     <comment>If the country chooser isn't shown, no flag can be shown on each comment.</comment>
   </data>
+  <data name="showEnableWebsiteInComments" xml:space="preserve">
+    <value>Need Translation:Enable Website in Comments</value>
+  </data>
+  <data name="showEnableWebsiteInCommentsDescription" xml:space="preserve">
+    <value>Need Translation:Choose whether to allow Website to be published in Comments</value>
+  </data>
   <data name="showDescriptionInPostList" xml:space="preserve">
     <value>Hiển thị danh sách trong mô tả bài viết</value>
     <comment>Only show description of posts</comment>

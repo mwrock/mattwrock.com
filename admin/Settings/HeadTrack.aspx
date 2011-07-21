@@ -11,11 +11,12 @@
             var dto = { "hdr": hdr, "ftr": ftr };
 
             $.ajax({
-                url: "HeadTrack.aspx/Save",
+                url: SiteVars.ApplicationRelativeWebRoot + "admin/Settings/HeadTrack.aspx/Save",
                 type: "POST",
                 dataType: "json",
                 contentType: "application/json; charset=utf-8",
-                data: JSON.stringify(dto),                
+                data: JSON.stringify(dto),
+                beforeSend: onAjaxBeforeSend,
                 success: function (result) {
                     var rt = result.d;
                     if (rt.Success)
@@ -50,7 +51,7 @@
                 </ul>
 
              <div class="action_buttons">
-                <input type="submit" class="btn primary" value="Save settings" onclick="return SaveSettings();" />
+                <input type="submit" class="btn primary" value="<%=Resources.labels.saveSettings %>" onclick="return SaveSettings();" />
             </div>
         </div>
     </div>

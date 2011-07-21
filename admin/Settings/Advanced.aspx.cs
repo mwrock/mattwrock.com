@@ -2,7 +2,6 @@
 {
     using System;
     using System.Web.Services;
-    using System.Threading;
     using Resources;
     using BlogEngine.Core;
     using BlogEngine.Core.Json;

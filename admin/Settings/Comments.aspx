@@ -1,4 +1,4 @@
-﻿<%@ Page Title="" Language="C#" MasterPageFile="~/admin/admin.master" AutoEventWireup="true" CodeFile="Comments.aspx.cs" Inherits="Admin.Comments.Settings" %>
+﻿<%@ Page Title="" Language="C#" MasterPageFile="~/admin/admin.master" AutoEventWireup="true" CodeFile="Comments.aspx.cs" Inherits="admin.Comments.Settings" %>
 <%@ Import Namespace="Resources"%>
 <%@ Register src="Menu.ascx" tagname="TabMenu" tagprefix="menu" %>
 
@@ -15,8 +15,8 @@
 			<menu:TabMenu ID="TabMenu1" runat="server" />
 		</div>
 		<div class="content-box-left">
-            <h1 style="border:none;"><%=labels.comments %><%=labels.settings %></h1>
-            <h2>General</h2>
+            <h1 style="border:none;"><%=labels.commentSettings %></h1>
+            <h2><%=labels.basic %></h2>
             <ul class="fl leftaligned">
                 <li>
                     <label class="lbl" for="<%=ddlCloseComments.ClientID %>"> <%=labels.closeCommetsAfter %></label>
@@ -62,7 +62,7 @@
                 </li>
             </ul>
 
-            <h2>Appearance</h2>
+            <h2><%=labels.appearance %></h2>
             <ul class="fl leftaligned">
                 <li>
                     <label class="lbl" for="<%=rblAvatar.ClientID %>"><%=labels.avatars %></label>
@@ -93,6 +93,12 @@
                 </li>
                 <li>
                     <span class="filler"></span>
+                    <asp:CheckBox runat="server" ID="cbEnableWebsiteInComments" />
+                    <label for="<%=cbEnableWebsiteInComments.ClientID %>"><%=labels.showEnableWebsiteInComments %></label>
+                    <span class="insetHelp">(<%=labels.showEnableWebsiteInCommentsDescription %>)</span>
+                </li>
+                <li>
+                    <span class="filler"></span>
                     <asp:CheckBox runat="server" ID="cbShowLivePreview" />
                     <label for="<%=cbShowLivePreview.ClientID %>"><%=labels.showLivePreview %></label>
                 </li>
@@ -109,9 +115,9 @@
             </div>  
             <ul class="fl leftaligned">
                 <li>
-                    <label class="lbl">Turn Disqus on or off</label>
+                    <label class="lbl"><%=labels.turnDisqusOnOff %></label>
                     <asp:CheckBox runat="server" ID="cbEnableDisqus" />
-                    <label for="<%=cbEnableDisqus.ClientID %>">Use Disqus as a comment provider</label>
+                    <label for="<%=cbEnableDisqus.ClientID %>"><%=labels.useDisqusAsCommentProvider %></label>
                 </li>
                 <li>
                     <label class="lbl" for="<%=txtDisqusName.ClientID %>"><%=labels.disqusShortName %></label>
@@ -133,7 +139,7 @@
             <div class="clear"></div>
     
             <div class="action_buttons">
-                <asp:Button runat="server" class="btn primary" ID="btnSave" Text="Save settings" />&nbsp;
+                <asp:Button runat="server" class="btn primary" ID="btnSave" Text="<%$Resources:labels, saveSettings %>" />&nbsp;
                 <span class="loader">&nbsp;</span>
             </div>
             

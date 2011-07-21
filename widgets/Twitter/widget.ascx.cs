@@ -54,7 +54,7 @@ namespace Widgets.Twitter
         /// <summary>
         /// The last feed data file name.
         /// </summary>
-        private static string lastFeedDataFileName;
+        private static Dictionary<Guid, string> lastFeedDataFileName = new Dictionary<Guid, string>();
 
         #endregion
 
@@ -125,18 +125,18 @@ namespace Widgets.Twitter
                 return;
             }
             
-            if (HttpRuntime.Cache[TwitterFeedsCacheKey] == null)
+            if (Blog.CurrentInstance.Cache[TwitterFeedsCacheKey] == null)
             {
                 var doc = GetLastFeed();
                 if (doc != null)
                 {
-                    HttpRuntime.Cache[TwitterFeedsCacheKey] = doc.OuterXml;
+                    Blog.CurrentInstance.Cache[TwitterFeedsCacheKey] = doc.OuterXml;
                 }
             }
 
-            if (HttpRuntime.Cache[TwitterFeedsCacheKey] != null)
+            if (Blog.CurrentInstance.Cache[TwitterFeedsCacheKey] != null)
             {
-                var xml = (string)HttpRuntime.Cache[TwitterFeedsCacheKey];
+                var xml = (string)Blog.CurrentInstance.Cache[TwitterFeedsCacheKey];
                 var doc = new XmlDocument();
                 doc.LoadXml(xml);
                 this.BindFeed(doc, settings.MaxItems);
@@ -181,13 +181,12 @@ namespace Widgets.Twitter
         /// </returns>
         private static string GetLastFeedDataFileName()
         {
-            if (string.IsNullOrEmpty(lastFeedDataFileName))
+            if (!lastFeedDataFileName.ContainsKey(Blog.CurrentInstance.Id))
             {
-                lastFeedDataFileName =
-                    HostingEnvironment.MapPath(Path.Combine(BlogSettings.Instance.StorageLocation, "twitter_feeds.xml"));
+                lastFeedDataFileName[Blog.CurrentInstance.Id] = HostingEnvironment.MapPath(Path.Combine(Blog.CurrentInstance.StorageLocation, "twitter_feeds.xml"));
             }
 
-            return lastFeedDataFileName;
+            return lastFeedDataFileName[Blog.CurrentInstance.Id];
         }
 
         /// <summary>
@@ -219,7 +218,14 @@ namespace Widgets.Twitter
             {
                 var request = (HttpWebRequest)WebRequest.Create(url);
                 request.Credentials = CredentialCache.DefaultNetworkCredentials;
-                request.BeginGetResponse(EndGetResponse, request);
+
+                GetRequestData data = new GetRequestData()
+                {
+                    BlogInstanceId = Blog.CurrentInstance.Id,
+                    HttpWebRequest = request
+                };
+
+                request.BeginGetResponse(EndGetResponse, data);
             }
             catch (Exception ex)
             {
@@ -307,8 +313,10 @@ namespace Widgets.Twitter
         {
             try
             {
-                var request = (HttpWebRequest)result.AsyncState;
-                using (var response = (HttpWebResponse)request.GetResponse())
+                GetRequestData data = (GetRequestData)result.AsyncState;
+                Blog.InstanceIdOverride = data.BlogInstanceId;
+
+                using (var response = (HttpWebResponse)data.HttpWebRequest.GetResponse())
                 {
                     var doc = new XmlDocument();
                     var responseStream = response.GetResponseStream();
@@ -317,7 +325,7 @@ namespace Widgets.Twitter
                         doc.Load(responseStream);
                     }
 
-                    HttpRuntime.Cache[TwitterFeedsCacheKey] = doc.OuterXml;
+                    Blog.CurrentInstance.Cache[TwitterFeedsCacheKey] = doc.OuterXml;
                     SaveLastFeed(doc);
                 }
             }
@@ -364,7 +372,7 @@ namespace Widgets.Twitter
         /// </returns>
         private TwitterSettings GetTwitterSettings()
         {
-            var twitterSettings = HttpRuntime.Cache[TwitterSettingsCacheKey] as TwitterSettings;
+            var twitterSettings = Blog.CurrentInstance.Cache[TwitterSettingsCacheKey] as TwitterSettings;
 
             if (twitterSettings != null)
             {
@@ -427,7 +435,7 @@ namespace Widgets.Twitter
                                                ? settings["followmetext"]
                                                : FollowMeText;
 
-            HttpRuntime.Cache[TwitterSettingsCacheKey] = twitterSettings;
+            Blog.CurrentInstance.Cache[TwitterSettingsCacheKey] = twitterSettings;
 
             return twitterSettings;
         }
@@ -447,6 +455,15 @@ namespace Widgets.Twitter
         }
 
         #endregion
+
+        /// <summary>
+        /// Data used during the async HTTP request for tweets.
+        /// </summary>
+        private class GetRequestData
+        {
+            public Guid BlogInstanceId { get; set; }
+            public HttpWebRequest HttpWebRequest { get; set; }
+        }
 
         /// <summary>
         /// The tweet.

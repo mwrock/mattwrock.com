@@ -5,6 +5,8 @@ BlogEngine = {
     }
 	,
     webRoot: '',
+    applicationWebRoot: '',
+    blogInstanceId: '',
     // internationalization (injected into the <head> by BlogBasePage)
     i18n: {
         hasRated: '',
@@ -97,13 +99,14 @@ BlogEngine = {
 
         var author = BlogEngine.comments.nameBox.value;
         var email = BlogEngine.comments.emailBox.value;
-        var website = BlogEngine.comments.websiteBox.value;
-        var country = BlogEngine.comments.countryDropDown ? BlogEngine.comments.countryDropDown.value : "";
         var content = BlogEngine.comments.contentBox.value;
-        var notify = BlogEngine.$("cbNotify").checked;
         var captcha = BlogEngine.comments.captchaField.value;
-        var replyToId = BlogEngine.comments.replyToId ? BlogEngine.comments.replyToId.value : "";
 
+        var website = BlogEngine.comments.websiteBox ? BlogEngine.comments.websiteBox.value : "";
+        var country = BlogEngine.comments.countryDropDown ? BlogEngine.comments.countryDropDown.value : "";
+        var notify = BlogEngine.$("cbNotify") ? BlogEngine.$("cbNotify").checked : false;
+        var replyToId = BlogEngine.comments.replyToId ? BlogEngine.comments.replyToId.value : "";
+                
         var recaptchaResponseField = document.getElementById('recaptcha_response_field');
         var recaptchaResponse = recaptchaResponseField ? recaptchaResponseField.value : "";
 
@@ -154,7 +157,7 @@ BlogEngine = {
             if (replies == null) {
                 replies = document.createElement('div');
                 replies.className = 'comment-replies';
-                replies.setAttribute('id') = 'replies_' + id;
+                replies.id = 'replies_' + id;
                 parentComment.appendChild(replies);
             }
             replies.style.display = '';

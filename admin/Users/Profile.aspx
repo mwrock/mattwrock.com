@@ -61,11 +61,12 @@
             var dto = { "id": Querystring('id'), "vals" : vals, "roles" : roles };
 
             $.ajax({
-                url: "../../api/Profile.asmx/Save",
+                url: SiteVars.ApplicationRelativeWebRoot + "api/Profile.asmx/Save",
                 data: JSON.stringify(dto),
                 type: "POST",
                 contentType: "application/json; charset=utf-8",
                 dataType: "json",
+                beforeSend: onAjaxBeforeSend,
                 success: function (result) {
                     var rt = result.d;
                     if (rt.Success) {
@@ -95,13 +96,13 @@
             <div id="Container"></div>
 
             <asp:PlaceHolder ID="phRoles" runat="server">
-                <h2>Roles</h2>
+                <h2><%=Resources.labels.roles %></h2>
                 <div id="rolelist" style="margin:0 0 20px;"><%=RolesList%></div>
             </asp:PlaceHolder>
 
             <div id="Container2"></div>
             <div class="action_buttons">
-                <input type="submit" class="btn primary rounded" value="Save profile" onclick="return SaveProfile()" />
+                <input type="submit" class="btn primary rounded" value="<%=Resources.labels.saveProfile %>" onclick="return SaveProfile()" />
 		        or <a href="Users.aspx"><%=Resources.labels.cancel %></a>
             </div>
 		</div>

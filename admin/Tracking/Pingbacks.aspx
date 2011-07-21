@@ -11,7 +11,7 @@
 			<menu:TabMenu ID="TabMenu" runat="server" />
 		</div>
 		<div class="content-box-left">
-            <h1>Pingbacks &amp; Trackbacks</h1>
+            <h1><%=Resources.labels.pingbacksAndTrackbacks %></h1>
             <div class="tableToolBox">
                 <div class="Pager"></div>
             </div>

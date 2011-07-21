@@ -7,6 +7,7 @@
     using BlogEngine.Core;
 
     using Page = System.Web.UI.Page;
+    using System.Web.UI.HtmlControls;
 
     /// <summary>
     /// The account register.
@@ -22,6 +23,12 @@
         /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.</param>
         protected void Page_Load(object sender, EventArgs e)
         {
+            HtmlAnchor HeadLoginStatus = RegisterUser.CreateUserStep.ContentTemplateContainer.FindControl("HeadLoginStatus") as HtmlAnchor;
+            if (HeadLoginStatus != null)
+            {
+                HeadLoginStatus.HRef = Utils.RelativeWebRoot + "Account/login.aspx";
+            }
+
             this.RegisterUser.ContinueDestinationPageUrl = this.Request.QueryString["ReturnUrl"];
             this.hdnPassLength.Value = Membership.MinRequiredPasswordLength.ToString();
 
@@ -29,10 +36,7 @@
             // navigate to register page, redirect to login
             if (!BlogSettings.Instance.EnableSelfRegistration)
             {
-                if (!Security.IsAuthenticated)
-                {
-                    this.Response.Redirect(string.Format("~/Account/login.aspx?ReturnUrl={0}", this.Request.QueryString["ReturnUrl"]));
-                }
+                Response.Redirect(Utils.RelativeWebRoot + "Account/login.aspx");
             }
         }
 
@@ -57,7 +61,7 @@
             var continueUrl = this.RegisterUser.ContinueDestinationPageUrl;
             if (String.IsNullOrEmpty(continueUrl))
             {
-                continueUrl = "~/";
+                continueUrl = Utils.RelativeWebRoot;
             }
 
             this.Response.Redirect(continueUrl);

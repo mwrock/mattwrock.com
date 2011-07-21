@@ -9,7 +9,7 @@ TODO: resources
 Blogroll
 	XFN tags
 TinyMCE
-	create CULTURE.js translated as per en.js file located at /editors/tiny_mce_3_3_9_2/langs
+	create CULTURE.js translated as per en.js file located at /editors/tiny_mce_3_4_3_1/langs
 
 Verify all javascripts across the application and change english hardcoded message with resource strings
 

@@ -26,9 +26,14 @@ namespace App_Code.Controls
         #region Constants and Fields
 
         /// <summary>
+        /// The sync root.
+        /// </summary>
+        private static readonly object syncRoot = new object();
+
+        /// <summary>
         /// The comments.
         /// </summary>
-        private static readonly List<Comment> Comments = new List<Comment>();
+        private static readonly Dictionary<Guid, List<Comment>> blogsComments = new Dictionary<Guid, List<Comment>>();
 
         #endregion
 
@@ -45,6 +50,31 @@ namespace App_Code.Controls
             Post.Saved += PostSaved;
             Comment.Approved += (sender, args) => BindComments();
             BlogSettings.Changed += (sender, args) => BindComments();
+        }
+
+        #endregion
+
+        #region Properties
+
+        private static List<Comment> Comments
+        {
+            get
+            {
+                Guid blogId = Blog.CurrentInstance.Id;
+
+                if (!blogsComments.ContainsKey(blogId))
+                {
+                    lock (syncRoot)
+                    {
+                        if (!blogsComments.ContainsKey(blogId))
+                        {
+                            blogsComments[blogId] = new List<Comment>();
+                        }
+                    }
+                }
+
+                return blogsComments[blogId];
+            }
         }
 
         #endregion

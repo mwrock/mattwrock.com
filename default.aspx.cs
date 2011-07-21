@@ -41,7 +41,7 @@ public partial class _default : BlogEngine.Core.Web.Controls.BlogBasePage
 		{
 			DisplayApmlFiltering();
 		}
-		else if (Request.QueryString.Count == 0 || !string.IsNullOrEmpty(Request.QueryString["page"]) || !string.IsNullOrEmpty(Request.QueryString["theme"]) || !string.IsNullOrEmpty(Request.QueryString["blog"]))
+		else
 		{
             PostList1.ContentBy = ServingContentBy.AllContent;
 			PostList1.Posts = Post.Posts.ConvertAll(new Converter<Post, IPublishable>(delegate(Post p) { return p as IPublishable; }));
@@ -104,11 +104,6 @@ public partial class _default : BlogEngine.Core.Web.Controls.BlogBasePage
 			divError.InnerHtml = "<h1 style=\"text-align:center\">The URL could not be resolved</h1><br /><br />";
 			Page.Title = "APML not found";
 		}
-	}
-
-	private void InvalidateCache()
-	{
-		HttpResponse.RemoveOutputCacheItem(Utils.RelativeWebRoot + "default.aspx");
 	}
 	
 	/// <summary>
@@ -254,22 +249,4 @@ public partial class _default : BlogEngine.Core.Web.Controls.BlogBasePage
 			Title = Server.HtmlEncode(Resources.labels.calendar);
 		}
 	}
-
-	//private void DisplayDateRange(string year, string month, string day)
-	//{
-	//  if (string.IsNullOrEmpty(day))
-	//  {
-	//    DateTime dateFrom = DateTime.Parse(year + "-" + month + "-01", CultureInfo.InvariantCulture);
-	//    DateTime dateTo = dateFrom.AddMonths(1).AddMilliseconds(-1);
-	//    PostList1.Posts = Post.GetPostsByDate(dateFrom, dateTo);
-	//    Title = BlogSettings.Instance.Name + " - " + dateFrom.ToString("MMMM yyyy");
-	//  }
-	//  else
-	//  {
-	//    DateTime date = DateTime.Parse(year + "-" + month + "-" + day, CultureInfo.InvariantCulture);
-	//    PostList1.Posts = Post.GetPostsByDate(date, date);
-	//    Title = BlogSettings.Instance.Name + " - " + date.ToString("MMMM d. yyyy");
-	//  }
-	//}
-
 }

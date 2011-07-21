@@ -38,7 +38,7 @@ namespace Admin
 
             var li = new HtmlGenericControl("li");
             li.Controls.Add(a);
-            this.ulMenu.Controls.Add(li);
+            ulMenu.Controls.Add(li);
         }
 
         #endregion
@@ -55,9 +55,9 @@ namespace Admin
         {
             base.OnLoad(e);
 
-            if (!this.Page.IsCallback)
+            if (!Page.IsCallback)
             {
-                this.BindMenu();
+                BindMenu();
             }
         }
 
@@ -70,8 +70,11 @@ namespace Admin
         /// <returns>
         /// The sub-url.
         /// </returns>
-        private static string SubUrl(string url)
+        private static string SubUrl(string url, bool isFromCurrentHttpRequest)
         {
+            if (isFromCurrentHttpRequest && Blog.CurrentInstance.IsSubfolderOfApplicationWebRoot)
+                url = Utils.ApplicationRelativeWebRoot + url.Substring(Blog.CurrentInstance.RelativeWebRoot.Length);
+
             var i = url.LastIndexOf("/");
 
             return (i > 0) ? url.Substring(0, i) : string.Empty;
@@ -85,8 +88,7 @@ namespace Admin
             var sitemap = SiteMap.Providers["SecuritySiteMap"];
             if (sitemap != null)
             {
-                bool canAccessAdminPages = Security.IsAuthorizedTo(Rights.AccessAdminPages);
-                bool canAccessAdminSettingsPages = Security.IsAuthorizedTo(Rights.AccessAdminSettingsPages);
+                string adminRootFolder = string.Format("{0}admin", Utils.RelativeWebRoot);
 
                 var root = sitemap.RootNode;
                 if (root != null)
@@ -96,66 +98,51 @@ namespace Admin
                             root.ChildNodes.Cast<SiteMapNode>().Where(
                                 adminNode => adminNode.IsAccessibleToUser(HttpContext.Current)).Where(
                                     adminNode =>
-                                    this.Request.RawUrl.ToUpperInvariant().Contains("/ADMIN/") ||
+                                    Request.RawUrl.ToUpperInvariant().Contains("/ADMIN/") ||
                                     (!adminNode.Url.Contains("xmanager") && !adminNode.Url.Contains("PingServices"))))
                     {
-                        // Exclude admin pages if the user does not have
-                        // the AccessAdminPages right.  This would typically be
-                        // users who registered thru self-registration.
-
-                        if (!canAccessAdminPages &&
-                            adminNode.Url.IndexOf("/admin/", StringComparison.OrdinalIgnoreCase) != -1)
-                        {
-                            continue;
-                        }
-
-                        // Roles such as an Editor can access the admin pages, but (by default)
-                        // is not allowed to access the Settings related pages.
-
-                        if (!canAccessAdminSettingsPages)
-                        {
-                            if (adminNode.Url.IndexOf("/admin/widgets/", StringComparison.OrdinalIgnoreCase) != -1 ||
-                                adminNode.Url.IndexOf("/admin/settings/", StringComparison.OrdinalIgnoreCase) != -1)
-                            {
-                                continue;
-                            }
-                        }
 
                         var a = new HtmlAnchor
                             {
-                                HRef = adminNode.Url, 
+                                // replace the RelativeWebRoot in adminNode.Url with the RelativeWebRoot of the current
+                                // blog instance.  So a URL like /admin/Dashboard.aspx becomes /blog/admin/Dashboard.aspx.
+                                HRef = Utils.RelativeWebRoot + adminNode.Url.Substring(Utils.ApplicationRelativeWebRoot.Length), 
                                 InnerHtml =
                                     string.Format("<span>{0}</span>", Utils.Translate(adminNode.Title, adminNode.Title))
                             };
 
                         // "<span>" + Utils.Translate(info.Name.Replace(".aspx", string.Empty)) + "</span>";
-                        if (this.Request.RawUrl.IndexOf(adminNode.Url, StringComparison.OrdinalIgnoreCase) != -1)
+                        var startIndx = adminNode.Url.LastIndexOf("/admin/") > 0 ? adminNode.Url.LastIndexOf("/admin/") : 0;
+                        var endIndx = adminNode.Url.LastIndexOf(".") > 0 ? adminNode.Url.LastIndexOf(".") : adminNode.Url.Length;
+                        var nodeDir = adminNode.Url.Substring(startIndx, endIndx - startIndx);
+
+                        if (Request.RawUrl.IndexOf(nodeDir, StringComparison.OrdinalIgnoreCase) != -1)
                         {
                             a.Attributes["class"] = "current";
                         }
 
                         // if "page" has its own subfolder (comments, extensions) should 
                         // select parent tab when navigating through child tabs
-                        if (adminNode.Url.IndexOf("/admin/pagesxx/", StringComparison.OrdinalIgnoreCase) == -1 &&
-                            SubUrl(this.Request.RawUrl) == SubUrl(adminNode.Url))
+                        if (!SubUrl(Request.RawUrl, true).Equals(adminRootFolder, StringComparison.OrdinalIgnoreCase) &&
+                            SubUrl(Request.RawUrl, true) == SubUrl(adminNode.Url, false))
                         {
                             a.Attributes["class"] = "current";
                         }
 
                         var li = new HtmlGenericControl("li");
                         li.Controls.Add(a);
-                        this.ulMenu.Controls.Add(li);
+                        ulMenu.Controls.Add(li);
                     }
                 }
             }
 
-            if (!this.Request.RawUrl.ToUpperInvariant().Contains("/ADMIN/"))
+            if (!Request.RawUrl.ToUpperInvariant().Contains("/ADMIN/"))
             {
-                this.AddItem(
-                    labels.myProfile, string.Format("{0}admin/Users/Profile.aspx?id={1}", Utils.RelativeWebRoot, HttpUtility.UrlEncode(Security.CurrentUser.Identity.Name)));
+                AddItem(
+                    labels.myProfile, string.Format("{0}admin/Users/Profile.aspx?id={1}", Utils.RelativeWebRoot, HttpUtility.UrlPathEncode(Security.CurrentUser.Identity.Name)));
 
-                this.AddItem(
-                    labels.changePassword, string.Format("{0}Account/ChangePassword.aspx", Utils.RelativeWebRoot));
+                AddItem(
+                    labels.changePassword, string.Format("{0}Account/change-password.aspx", Utils.RelativeWebRoot));
             }
         }
 

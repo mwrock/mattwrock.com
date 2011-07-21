@@ -4,6 +4,8 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
+using BlogEngine.Core;
+
 namespace App_Code.Controls
 {
     using System;
@@ -69,14 +71,14 @@ namespace App_Code.Controls
         /// </returns>
         public StringDictionary GetSettings()
         {
-            var cacheId = string.Format("be_widget_{0}", this.WidgetId);
-            if (this.Cache[cacheId] == null)
+            var cacheId = string.Format("be_widget_{0}", WidgetId);
+            if (Blog.CurrentInstance.Cache[cacheId] == null)
             {
-                var ws = new WidgetSettings(this.WidgetId.ToString());
-                this.Cache[cacheId] = ws.GetSettings();
+                var ws = new WidgetSettings(WidgetId.ToString());
+                Blog.CurrentInstance.Cache[cacheId] = ws.GetSettings();
             }
 
-            return (StringDictionary)this.Cache[cacheId];
+            return (StringDictionary)Blog.CurrentInstance.Cache[cacheId];
         }
 
         /// <summary>
@@ -96,12 +98,12 @@ namespace App_Code.Controls
         /// </param>
         protected virtual void SaveSettings(StringDictionary settings)
         {
-            var cacheId = string.Format("be_widget_{0}", this.WidgetId);
+            var cacheId = string.Format("be_widget_{0}", WidgetId);
 
-            var ws = new WidgetSettings(this.WidgetId.ToString());
+            var ws = new WidgetSettings(WidgetId.ToString());
             ws.SaveSettings(settings);
 
-            this.Cache[cacheId] = settings;
+            Blog.CurrentInstance.Cache[cacheId] = settings;
         }
 
         #endregion

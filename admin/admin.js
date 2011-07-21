@@ -1,6 +1,4 @@
 ﻿
-var pageSize = 10;
-
 $(document).ready(function () {
    $('.editButton').live("click", function () { return EditRow(this); });
    $('.deleteButton').live("click", function () { return DeleteRow(this); });
@@ -33,8 +31,8 @@ function EditRow(obj) {
         cancelButton.unbind('click');
         saveButton.unbind('click');
 
-        cancelButton.bind("click", function () { CancelChanges(this, revert); });
-        saveButton.bind("click", function () { SaveChanges(this, revert); });
+        cancelButton.bind("click", function () { return CancelChanges(this, revert); });
+        saveButton.bind("click", function () { return SaveChanges(this, revert); });
     }
    return false;
 }
@@ -43,7 +41,7 @@ function SaveChanges(obj, str) {
 
    var jQobj = $(obj);
    var row = jQobj.closest("tr");
-   var id = row.attr("id");
+   var id = row.data("recordId");
    var srv = jQobj.closest("table").attr("id");
    var editVals = [];
    var bg = ((row.prevAll().length + 1) % 2 === 0) ? 'fefefe' : 'fff';
@@ -57,8 +55,9 @@ function SaveChanges(obj, str) {
        type: "post",
        contentType: "application/json; charset=utf-8",
        dataType: "json",
-       url: "../../api/" + srv + ".asmx/Edit",
+       url: SiteVars.ApplicationRelativeWebRoot + "api/" + srv + ".asmx/Edit",
        data: JSON.stringify(dto),
+       beforeSend: onAjaxBeforeSend,
        success: function (result) {
            var rt = result.d;
            if (rt.Success) {
@@ -75,6 +74,8 @@ function SaveChanges(obj, str) {
            }
        }
    });
+
+   return false;
 }
 
 
@@ -84,29 +85,33 @@ function CancelChanges(obj, str) {
 }
 
 function DeleteRow(obj) {
-   var id = $(obj).closest("tr").attr("id");
+   var row = $(obj).closest("tr")
+   var id = row.data("recordId");
    var srv = $(obj).closest("table").attr("id");
-   var that = $("[id$='" + id + "']");
    var dto = { "id": id };
 
    $.ajax({
-      url: "../../api/" + srv + ".asmx/Delete",
-      data: JSON.stringify(dto),
-      type: "POST",
-      contentType: "application/json; charset=utf-8",
-      dataType: "json",
-      success: function (result) {
-         var rt = result.d;
-         if(rt.Success) {
-            $(that).fadeOut(500, function () {
-               $(that).remove();
-            });
-            ShowStatus("success", rt.Message);
-         }
-         else {
-            ShowStatus("warning", rt.Message);
-         }
-      }
+       url: SiteVars.ApplicationRelativeWebRoot + "api/" + srv + ".asmx/Delete",
+       data: JSON.stringify(dto),
+       type: "POST",
+       contentType: "application/json; charset=utf-8",
+       dataType: "json",
+       beforeSend: onAjaxBeforeSend,
+       success: function (result) {
+           var rt = result.d;
+           if (rt.Success) {
+               row.fadeOut(500, function () {
+                   var tbody = row.closest('tbody');
+                   row.remove();
+                   $('tr:odd', tbody).addClass('alt');
+                   $('tr:even', tbody).removeClass('alt');
+               });
+               ShowStatus("success", rt.Message);
+           }
+           else {
+               ShowStatus("warning", rt.Message);
+           }
+       }
    });
    return false;
 }
@@ -123,16 +128,15 @@ function LoadComments(page) {
         pg = $.cookie('CommentPagerCurrentPage');
     }
     $.cookie('CommentPagerCurrentPage', pg, { expires: 7 });
-
     var srvs = CommentPage();
-   $.ajax({
+    $.ajax({
       url: srvs + "/LoadComments",
       data: "{'page':'" + pg + "'}",
       type: "POST",
-      contentType: "application/json; charset=utf-8",
-      dataType: "json",
+      contentType: "application/json",
+      beforeSend: onAjaxBeforeSend,
       success: function (msg) {
-         $('#Container').setTemplateURL('../../Templates/comments.htm', null, { filter_data: false });
+         $('#Container').setTemplateURL(SiteVars.ApplicationRelativeWebRoot + 'Templates/comments.htm', null, { filter_data: false });
          $('#Container').processTemplate(msg);
          LoadPager();
       }
@@ -149,6 +153,7 @@ function LoadPager() {
       type: "POST",
       contentType: "application/json; charset=utf-8",
       dataType: "json",
+      beforeSend: onAjaxBeforeSend,
       success: function (msg) {
          $('.Pager').html(msg.d);
       }
@@ -157,43 +162,48 @@ function LoadPager() {
 }
 
 function CommentPage() {
-    var page = 'Approved.aspx';
-    if (location.href.indexOf('Comments\/Spam.aspx') > 0) { page = 'Spam.aspx'; }
-    if (location.href.indexOf('Comments\/Pending.aspx') > 0) { page = 'Pending.aspx'; }
-    if (location.href.indexOf('Tracking\/Pingbacks.aspx') > 0) { page = 'Pingbacks.aspx'; }
+    var page = SiteVars.ApplicationRelativeWebRoot + 'admin/Comments/Approved.aspx';
+    if (location.href.indexOf('Comments\/Spam.aspx') > 0) { page = SiteVars.ApplicationRelativeWebRoot + 'admin/Comments/Spam.aspx'; }
+    if (location.href.indexOf('Comments\/Pending.aspx') > 0) { page = SiteVars.ApplicationRelativeWebRoot + 'admin/Comments/Pending.aspx'; }
+    if (location.href.indexOf('Tracking\/Pingbacks.aspx') > 0) { page = SiteVars.ApplicationRelativeWebRoot + 'admin/Tracking/Pingbacks.aspx'; }
     return page;
 }
 
-function LoadRoles() {
-   $.ajax({
-      url: "Roles.aspx/GetRoles",
-      data: "{ }",
-      type: "POST",
-      contentType: "application/json; charset=utf-8",
-      dataType: "json",
-      success: function (msg) {
-         $('#Container').setTemplateURL('../../Templates/roles.htm', null, { filter_data: false });
-         $('#Container').processTemplate(msg);
+function SaveOriginalIdValues(containerSelector, recordIdSelector) {
+    $(containerSelector).each(function () {
+        var val = $(recordIdSelector, $(this)).html();
+        $(this).data("recordId", val);
+    });
+}
 
-         $('.editButton').live("click", function () { return EditRow(this); });
-         $('.deleteButton').live("click", function () { return DeleteRow(this); });
-      }
-   });
+function LoadRoles() {
+    $.ajax({
+        url: SiteVars.ApplicationRelativeWebRoot + "admin/Users/Roles.aspx/GetRoles",
+        data: "{ }",
+        type: "POST",
+        contentType: "application/json; charset=utf-8",
+        dataType: "json",
+        beforeSend: onAjaxBeforeSend,
+        success: function (msg) {
+            $('#Container').setTemplateURL(SiteVars.ApplicationRelativeWebRoot + 'Templates/roles.htm', null, { filter_data: false });
+            $('#Container').processTemplate(msg);
+            SaveOriginalIdValues('#Container tr', '.editable');
+        }
+    });
 }
 
 function LoadUsers() {
    $.ajax({
-      url: "Users.aspx/GetUsers",
+      url: SiteVars.ApplicationRelativeWebRoot + "admin/Users/Users.aspx/GetUsers",
       data: "{ }",
       type: "POST",
       contentType: "application/json; charset=utf-8",
       dataType: "json",
+      beforeSend: onAjaxBeforeSend,
       success: function (msg) {
-         $('#Container').setTemplateURL('../../Templates/users.htm', null, { filter_data: false });
+         $('#Container').setTemplateURL(SiteVars.ApplicationRelativeWebRoot + 'Templates/users.htm', null, { filter_data: false });
          $('#Container').processTemplate(msg);
-
-         $('.editButton').live("click", function () { return EditRow(this); });
-         $('.deleteButton').live("click", function () { return DeleteRow(this); });
+         SaveOriginalIdValues('#Container tr', '.username');
       }
    });
 }
@@ -201,19 +211,35 @@ function LoadUsers() {
 function LoadProfile() {
    var dto = { "id": Querystring('id') };
    $.ajax({
-      url: "Profile.aspx/GetProfile",
+      url: SiteVars.ApplicationRelativeWebRoot + "admin/Users/Profile.aspx/GetProfile",
       data: JSON.stringify(dto),
       type: "POST",
       contentType: "application/json; charset=utf-8",
       dataType: "json",
+      beforeSend: onAjaxBeforeSend,
       success: function (msg) {
-         $('#Container').setTemplateURL('../../Templates/profile.htm', null, { filter_data: false });
+         $('#Container').setTemplateURL(SiteVars.ApplicationRelativeWebRoot + 'Templates/profile.htm', null, { filter_data: false });
          $('#Container').processTemplate(msg);
 
-         $('#Container2').setTemplateURL('../../Templates/profile2.htm', null, { filter_data: false });
+         $('#Container2').setTemplateURL(SiteVars.ApplicationRelativeWebRoot + 'Templates/profile2.htm', null, { filter_data: false });
          $('#Container2').processTemplate(msg);
       }
    });
+}
+
+function LoadCustomFilters() {
+    $.ajax({
+        url: SiteVars.ApplicationRelativeWebRoot + "admin/Settings/Rules.aspx/GetCustomFilters",
+        data: { },
+        type: "POST",
+        contentType: "application/json; charset=utf-8",
+        dataType: "json",
+        beforeSend: onAjaxBeforeSend,
+        success: function (msg) {
+            $('#Container').setTemplateURL(SiteVars.ApplicationRelativeWebRoot + 'Templates/customfilters.htm', null, { filter_data: false });
+            $('#Container').processTemplate(msg);
+        }
+    });
 }
 
 //--------------    TRASH
@@ -228,13 +254,14 @@ function LoadTrash(obj) {
         type = $(obj).attr("id");
     }
     $.ajax({
-        url: "Trash.aspx/LoadTrash",
+        url: SiteVars.ApplicationRelativeWebRoot + "admin/Trash.aspx/LoadTrash",
         data: "{'trashType':'" + type + "'}",
         type: "POST",
         contentType: "application/json; charset=utf-8",
         dataType: "json",
+        beforeSend: onAjaxBeforeSend,
         success: function (msg) {
-            $('#Container').setTemplateURL('../Templates/trash.htm', null, { filter_data: false });
+            $('#Container').setTemplateURL(SiteVars.ApplicationRelativeWebRoot + 'Templates/trash.htm', null, { filter_data: false });
             $('#Container').processTemplate(msg);
         }
     });
@@ -266,11 +293,12 @@ function ProcessTrash(action, scope) {
 
     var dto = { "action": action, "vals": vals };
     $.ajax({
-        url: "Trash.aspx/ProcessTrash",
+        url: SiteVars.ApplicationRelativeWebRoot + "admin/Trash.aspx/ProcessTrash",
         data: JSON.stringify(dto),
         type: "post",
         contentType: "application/json; charset=utf-8",
         dataType: "json",
+        beforeSend: onAjaxBeforeSend,
         success: function (result) {
             var rt = result.d;
             if (rt.Success) {
@@ -296,7 +324,7 @@ function ProcessSelected(action, page) {
    // store the rows so they don't need to be queried for again.
    var commentsAndRows = [];
    // action: approve, reject, restore or delete
-   var srv = "../../api/Comments.asmx/" + action;
+   var srv = SiteVars.ApplicationRelativeWebRoot + "api/Comments.asmx/" + action;
 
    // Gets all checkboxes inside the #Comments table to prevent selecting
    // checkboxes that aren't part of the comments list.
@@ -331,6 +359,7 @@ function ProcessSelected(action, page) {
               type: "post",
               contentType: "application/json; charset=utf-8",
               dataType: "json",
+              beforeSend: onAjaxBeforeSend,
               success: function (result) {
 
                   var rt = result.d;
@@ -425,13 +454,14 @@ function EditComment(id) {
 
    var dto = { "id": id };
    $.ajax({
-      url: "../AjaxHelper.aspx/GetComment",
+      url: SiteVars.ApplicationRelativeWebRoot + "admin/AjaxHelper.aspx/GetComment",
       data: JSON.stringify(dto),
       type: "POST",
       contentType: "application/json; charset=utf-8",
       dataType: "json",
+      beforeSend: onAjaxBeforeSend,
       success: function (result) {
-         oRow.setTemplateURL('../../Templates/editcomment.htm', null, { filter_data: false });
+         oRow.setTemplateURL(SiteVars.ApplicationRelativeWebRoot + 'Templates/editcomment.htm', null, { filter_data: false });
          oRow.processTemplate(result);
       }
    });
@@ -472,13 +502,14 @@ function SaveComment(obj) {
 
    var dto = { "vals": vals };
    $.ajax({
-       url: "../AjaxHelper.aspx/SaveComment",
+      url: SiteVars.ApplicationRelativeWebRoot + "admin/AjaxHelper.aspx/SaveComment",
       data: JSON.stringify(dto),
       type: "POST",
       contentType: "application/json; charset=utf-8",
       dataType: "json",
+      beforeSend: onAjaxBeforeSend,
       success: function (result) {
-         oRow.setTemplateURL('../../Templates/commentrow.htm', null, { filter_data: false });
+         oRow.setTemplateURL(SiteVars.ApplicationRelativeWebRoot + 'Templates/commentrow.htm', null, { filter_data: false });
          oRow.processTemplate(result);
          ShowStatus("success", "Updated");
       }
@@ -503,11 +534,12 @@ function CommentAction(act, id) {
    vals[0] = id;
    var dto = { "vals": vals };
    $.ajax({
-       url: "../../api/Comments.asmx/" + act,
+       url: SiteVars.ApplicationRelativeWebRoot + "api/Comments.asmx/" + act,
        data: JSON.stringify(dto),
        type: "POST",
        contentType: "application/json; charset=utf-8",
        dataType: "json",
+       beforeSend: onAjaxBeforeSend,
        success: function (result) {
            var rt = result.d;
            if (rt.Success) {
@@ -557,11 +589,12 @@ function CommentAction(act, id) {
 function DeleteAllSpam() {
    $('.loader').show();
    $.ajax({
-       url: "../../api/Comments.asmx/DeleteAll",
+       url: SiteVars.ApplicationRelativeWebRoot + "api/Comments.asmx/DeleteAll",
        data: "{ }",
        type: "POST",
        contentType: "application/json; charset=utf-8",
        dataType: "json",
+       beforeSend: onAjaxBeforeSend,
        success: function (result) {
            var rt = result.d;
            if (rt.Success) {
@@ -587,6 +620,14 @@ function DeleteAllSpam() {
 
 //--------------  POSTS AND PAGES
 
+function ChangePostPageSize(select) {
+    var pageSize = $(select).val();
+    $.cookie('postPageSize', pageSize, { expires: 7 });
+    $.cookie('postCurrentPage', 1, { expires: 7 });
+    LoadPosts();
+    return false;
+}
+
 // All, Draft or Published
 function ChangePostFilterType(type) {
     $.cookie('postMainFilter', type, { expires: 7 });
@@ -595,6 +636,7 @@ function ChangePostFilterType(type) {
     $.cookie('postSecondaryFilterTitle', null, { expires: 7 });
     $.cookie('postCurrentPage', 1, { expires: 7 });
     LoadPosts();
+    return false;
 }
 // Category, Tag or Author
 function ChangePostFilter(filter, id, title) {
@@ -611,6 +653,7 @@ function LoadPostsForPage(page) {
 
     $.cookie('postCurrentPage', page, { expires: 7 });
     LoadPosts();
+    return false;
 }
 
 function LoadPosts() {
@@ -629,23 +672,32 @@ function LoadPosts() {
     if ($.cookie('postCurrentPage') == null) {
         $.cookie('postCurrentPage', 1, { expires: 7 });
     }
+    if ($.cookie('postPageSize') == null) {
+        $.cookie('postPageSize', $("#pageSizeTop").val(), { expires: 7 });
+    }
     var ftr1 = $.cookie('postMainFilter');
     var ftr2 = $.cookie('postSecondaryFilter');
     var ftr2id = $.cookie('postSecondaryFilterId');
     var ftr2title = $.cookie('postSecondaryFilterTitle');
     var pg = $.cookie('postCurrentPage');
-    
+    var pageSize = $.cookie('postPageSize');
+
+    // sync both dropdown lists.
+    $("#pageSizeTop").val(pageSize);
+    $("#pageSizeBottom").val(pageSize);
+
     $.ajax({
-        url: "../AjaxHelper.aspx/LoadPosts",
-        data: "{'page':'" + pg + "' , 'type':'" + ftr1 + "', 'filter':'" + ftr2 + "', 'title': '" + ftr2id + "'}",
+        url: SiteVars.ApplicationRelativeWebRoot + "admin/AjaxHelper.aspx/LoadPosts",
+        data: "{'page':'" + pg + "' , 'type':'" + ftr1 + "', 'filter':'" + ftr2 + "', 'title': '" + ftr2id + "', pageSize: '" + pageSize + "'}",
         type: "POST",
         contentType: "application/json; charset=utf-8",
         dataType: "json",
+        beforeSend: onAjaxBeforeSend,
         success: function (msg) {
-            $('#Container').setTemplateURL('../../Templates/posts.htm', null, { filter_data: false });
+            $('#Container').setTemplateURL(SiteVars.ApplicationRelativeWebRoot + 'Templates/posts.htm', null, { filter_data: false });
             $('#Container').processTemplate(msg);
 
-            LoadPostsPager(pg, ftr1);
+            LoadPostsPager(pg, pageSize, ftr1);
 
             var prefx = ftr1 + ' posts';
             if (ftr2 == "Category") {
@@ -672,26 +724,28 @@ function LoadPosts() {
 
 function LoadPages(type) {
     $.ajax({
-        url: "../AjaxHelper.aspx/LoadPages",
+        url: SiteVars.ApplicationRelativeWebRoot + "admin/AjaxHelper.aspx/LoadPages",
         data: "{'type':'" + type + "'}",
         type: "POST",
         contentType: "application/json; charset=utf-8",
         dataType: "json",
+        beforeSend: onAjaxBeforeSend,
         success: function (msg) {
-            $('#Container').setTemplateURL('../../Templates/pages.htm', null, { filter_data: false });
+            $('#Container').setTemplateURL(SiteVars.ApplicationRelativeWebRoot + 'Templates/pages.htm', null, { filter_data: false });
             $('#Container').processTemplate(msg);
         }
     });
     return false;
 }
 
-function LoadPostsPager(pg, type) {
+function LoadPostsPager(pg, pageSize, type) {
     $.ajax({
-        url: "../AjaxHelper.aspx/LoadPostPager",
+        url: SiteVars.ApplicationRelativeWebRoot + "admin/AjaxHelper.aspx/LoadPostPager",
         data: "{'pageSize':'" + pageSize + "', 'page':'" + pg + "' , 'type':'" + type + "'}",
         type: "POST",
         contentType: "application/json; charset=utf-8",
         dataType: "json",
+        beforeSend: onAjaxBeforeSend,
         success: function (msg) {
             $('.Pager').html(msg.d);
         }
@@ -707,11 +761,12 @@ function DeletePost(obj) {
     var currPage = $('#PagerCurrentPage').html();
 
     $.ajax({
-        url: "../../Api/Posts.asmx/DeletePost",
+        url: SiteVars.ApplicationRelativeWebRoot + "Api/Posts.asmx/DeletePost",
         data: JSON.stringify(dto),
         type: "POST",
         contentType: "application/json; charset=utf-8",
         dataType: "json",
+        beforeSend: onAjaxBeforeSend,
         success: function (result) {
             var rt = result.d;
             if (rt.Success) {
@@ -736,11 +791,12 @@ function DeletePage(obj) {
     var dto = { "id": id };
 
     $.ajax({
-        url: "../../Api/Posts.asmx/DeletePage",
+        url: SiteVars.ApplicationRelativeWebRoot + "Api/Posts.asmx/DeletePage",
         data: JSON.stringify(dto),
         type: "POST",
         contentType: "application/json; charset=utf-8",
         dataType: "json",
+        beforeSend: onAjaxBeforeSend,
         success: function (result) {
             var rt = result.d;
             if (rt.Success) {
@@ -758,7 +814,296 @@ function DeletePage(obj) {
     return false;
 }
 
+function ChangePriority() {
+    var dto = { "priority": $('#txtPriority').val(), "ext": $('#hdnExtensionName').val() };
+    $.ajax({
+        url: SiteVars.ApplicationRelativeWebRoot + "admin/AjaxHelper.aspx/ChangePriority",
+        data: JSON.stringify(dto),
+        type: "POST",
+        contentType: "application/json; charset=utf-8",
+        dataType: "json",
+        beforeSend: onAjaxBeforeSend,
+        success: function (result) {
+            var rt = result.d;
+            if (rt == true) {
+                window.location.reload();
+            }
+            else {
+                closeOverlay();
+                ShowStatus("warning", "Error changing priority");
+            }
+        }
+    });
+    return false;
+}
+
+
+//--------------  BLOGS
+
+function ChangeBlogsPage(select) {
+    var pageSize = $(select).val();
+    $.cookie('blogsPageSize', pageSize, { expires: 7 });
+    $.cookie('blogsCurrentPage', 1, { expires: 7 });
+    LoadBlogs();
+    return false;
+}
+
+function LoadBlogsForPage(page) {
+    if (page == null || page == 0)
+        page = 1;
+
+    $.cookie('blogsCurrentPage', page, { expires: 7 });
+    LoadBlogs();
+    return false;
+}
+
+function LoadBlogs() {
+    if ($.cookie('blogsCurrentPage') == null) {
+        $.cookie('blogsCurrentPage', 1, { expires: 7 });
+    }
+    if ($.cookie('blogsPageSize') == null) {
+        $.cookie('blogsPageSize', $("#pageSizeTop").val(), { expires: 7 });
+    }
+    var pg = $.cookie('blogsCurrentPage');
+    var pageSize = $.cookie('blogsPageSize');
+
+    // sync both dropdown lists.
+    $("#pageSizeTop").val(pageSize);
+    $("#pageSizeBottom").val(pageSize);
+
+    // remove any select options from the dropdown list.
+    $('#existingBlogToCreateNewBlogFrom').empty();
+
+    var data = { page: pg, pageSize: pageSize };
+
+    $.ajax({
+        url: SiteVars.ApplicationRelativeWebRoot + "admin/AjaxHelper.aspx/LoadBlogs",
+        data: JSON.stringify(data),
+        type: "POST",
+        contentType: "application/json; charset=utf-8",
+        dataType: "json",
+        beforeSend: onAjaxBeforeSend,
+        success: function (msg) {
+            $('#Container').setTemplateURL(SiteVars.ApplicationRelativeWebRoot + 'Templates/blogs.htm?v=2', null, { filter_data: false });
+            $('#Container').processTemplate(msg);
+
+            LoadBlogsPager(pg, pageSize);
+
+            $(".tipsyhelp").tipsy({ gravity: 's' });
+
+        }
+    });
+    return false;
+}
+
+function GetBlog(blogId, callback) {
+
+    if (!blogId || blogId.length !== 36) {
+        ShowStatus('warning', 'Invalid Blog ID.');
+        return false;
+    }
+
+    var data = { blogId: blogId };
+
+    $.ajax({
+        url: SiteVars.ApplicationRelativeWebRoot + "admin/AjaxHelper.aspx/GetBlog",
+        data: JSON.stringify(data),
+        type: "POST",
+        contentType: "application/json; charset=utf-8",
+        dataType: "json",
+        beforeSend: onAjaxBeforeSend,
+        success: function (result) {
+            callback(result.d);
+        }
+    });
+    return false;
+}
+
+function LoadBlogsPager(pg, pageSize, type) {
+    $.ajax({
+        url: SiteVars.ApplicationRelativeWebRoot + "admin/AjaxHelper.aspx/LoadBlogsPager",
+        data: "{'pageSize':'" + pageSize + "', 'page':'" + pg + "' , 'type':'" + type + "'}",
+        type: "POST",
+        contentType: "application/json; charset=utf-8",
+        dataType: "json",
+        beforeSend: onAjaxBeforeSend,
+        success: function (msg) {
+            $('.Pager').html(msg.d);
+        }
+    });
+    return false;
+}
+
+function DeleteBlog(obj) {
+    var id = $(obj).closest("tr").attr("id");
+    var srv = $(obj).closest("table").attr("id");
+    var that = $("[id$='" + id + "']");
+    
+    var deleteStorageContainer =
+        confirm(
+            'Also delete the storage container (files, tables, etc) for this blog?\n\n' +
+            'Click OK to also delete the storage container.\n' +
+            'Click Cancel to delete the blog without deleting the storage container.\n\n' +
+            'Note, after you choose OK/Cancel, you will have an final opportunity to confirm ' +
+            'the blog deletion.');
+
+    if (!confirm("Final Confirmation: Delete the blog?")) { return false; }
+
+    var dto = { "id": id, "deleteStorageContainer": deleteStorageContainer };
+
+    $.ajax({
+        url: SiteVars.ApplicationRelativeWebRoot + "Api/Blogs.asmx/DeleteBlog",
+        data: JSON.stringify(dto),
+        type: "POST",
+        contentType: "application/json; charset=utf-8",
+        dataType: "json",
+        beforeSend: onAjaxBeforeSend,
+        success: function (result) {
+            var rt = result.d;
+            if (rt.Success) {
+                $(that).fadeOut(500, function () {
+                    $(that).remove();
+                });
+                ShowStatus("success", rt.Message);
+                LoadBlogs();
+            }
+            else {
+                ShowStatus("warning", rt.Message);
+            }
+        }
+    });
+    return false;
+}
+
+//--------------GALLERY
+
+function SetCurrentTheme(theme, mobile) {
+    var dto = { "theme": theme, "mobile": mobile };
+    $.ajax({
+        url: SiteVars.ApplicationRelativeWebRoot + "admin/AjaxHelper.aspx/SetCurrentTheme",
+        data: JSON.stringify(dto),
+        type: "POST",
+        contentType: "application/json; charset=utf-8",
+        dataType: "json",
+        beforeSend: onAjaxBeforeSend,
+        success: function (result) {
+            var rt = result.d;
+            if (rt == true) {
+                window.location.reload();
+            }
+            else {
+                ShowStatus("warning", "Error setting current theme");
+            }
+        }
+    });
+    return false;
+}
+
+function GalleryGetPackages(pg) {
+    $('.page-loader').show();
+    var srt = $("#gallery-sort-order").val();
+    var srch = $("#searchGallery").val();
+    //var pg = Querystring('p').length > 0 ? Querystring('p') : 1;
+    var dto = { "pkgType": "Theme", "page": pg, "sortOrder": srt, "searchVal": srch };
+    $.ajax({
+        url: SiteVars.ApplicationRelativeWebRoot + "admin/AjaxHelper.aspx/LoadGalleryPage",
+        data: JSON.stringify(dto),
+        type: "POST",
+        contentType: "application/json; charset=utf-8",
+        dataType: "json",
+        beforeSend: onAjaxBeforeSend,
+        success: function (msg) {
+            $('#Container').setTemplateURL(SiteVars.ApplicationRelativeWebRoot + 'Templates/packages.htm', null, { filter_data: false });
+            $('#Container').processTemplate(msg);
+            GalleryGetPager();
+            $('.page-loader').hide();
+        }
+    });
+    return false;
+}
+
+function GalleryGetPager() {
+    var dto = { };
+    $.ajax({
+        url: SiteVars.ApplicationRelativeWebRoot + "admin/AjaxHelper.aspx/LoadGalleryPager",
+        data: JSON.stringify(dto),
+        type: "POST",
+        contentType: "application/json; charset=utf-8",
+        dataType: "json",
+        beforeSend: onAjaxBeforeSend,
+        success: function (msg) {
+            $('#Pager').setTemplateURL(SiteVars.ApplicationRelativeWebRoot + 'Templates/pager.htm', null, { filter_data: false });
+            $('#Pager').processTemplate(msg);
+        }
+    });
+    return false;
+}
+
+function InstallPackage(pkgId) {
+    var dto = { "pkgId": pkgId };
+    $("[id$='" + pkgId + "']").show();
+    $.ajax({
+        url: SiteVars.ApplicationRelativeWebRoot + "admin/AjaxHelper.aspx/InstallPackage",
+        data: JSON.stringify(dto),
+        type: "POST",
+        contentType: "application/json; charset=utf-8",
+        dataType: "json",
+        beforeSend: onAjaxBeforeSend,
+        success: function (result) {
+            var rt = result.d;
+            if (rt.Success) {
+                ShowStatus("success", rt.Message);
+            }
+            else {
+                ShowStatus("warning", rt.Message);
+            }
+            $("[id$='" + pkgId + "']").hide();
+        }
+    });
+    return false;
+}
+
+function UninstallPackage(pkgId) {
+    $('.loader2').show();
+    var li = $("[id$='" + pkgId + "']");
+    var dto = { "pkgId": pkgId };
+    $.ajax({
+        url: SiteVars.ApplicationRelativeWebRoot + "admin/AjaxHelper.aspx/UninstallPackage",
+        data: JSON.stringify(dto),
+        type: "POST",
+        contentType: "application/json; charset=utf-8",
+        dataType: "json",
+        beforeSend: onAjaxBeforeSend,
+        success: function (result) {
+            var rt = result.d;
+            if (rt.Success) {
+                $(li).fadeOut(500, function () {
+                    $(li).remove();
+                });
+                ShowStatus("success", rt.Message);
+            }
+            else {
+                ShowStatus("warning", rt.Message);
+            }
+        }
+    });
+    $('.loader2').hide();
+    return false;
+}
+
 //--------------HELPERS AND MISC
+
+function onAjaxBeforeSend(jqXHR, settings) {
+
+    // AJAX calls need to be made directly to the real physical location of the
+    // web service/page method.  For this, SiteVars.ApplicationRelativeWebRoot is used.
+    // If an AJAX call is made to a virtual URL (for a blog instance), although
+    // the URL rewriter will rewrite these URLs, we end up with a "405 Method Not Allowed"
+    // error by the web service.  Here we set a request header so the call to the server
+    // is done under the correct blog instance ID.
+
+    jqXHR.setRequestHeader('x-blog-instance', SiteVars.BlogInstanceId);
+}
 
 function colorboxDialogSubmitClicked(validationGroup, panelId) {
 

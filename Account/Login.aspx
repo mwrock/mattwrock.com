@@ -1,15 +1,15 @@
-﻿<%@ Page Language="C#" MasterPageFile="Account.master" AutoEventWireup="true"
-    CodeFile="Login.aspx.cs" Inherits="Account.Login" %>
+﻿<%@ Page Language="C#" MasterPageFile="account.master" AutoEventWireup="true"
+    CodeFile="login.aspx.cs" Inherits="Account.Login" %>
 
-<%@ MasterType VirtualPath="~/Account/Account.master" %>
+<%@ MasterType VirtualPath="~/Account/account.master" %>
 <asp:Content ID="HeaderContent" runat="server" ContentPlaceHolderID="HeadContent">
 </asp:Content>
 <asp:Content ID="BodyContent" runat="server" ContentPlaceHolderID="MainContent">
-    <asp:Login ID="LoginUser" runat="server" EnableViewState="false" RenderOuterTable="false">
+    <asp:Login ID="LoginUser" runat="server" EnableViewState="false" RenderOuterTable="false" OnAuthenticate="LoginUser_OnAuthenticate">
         <LayoutTemplate>
             <div class="accountInfo">
                 <div class="login">
-                    <h1>Login</h1>
+                    <h1><asp:Label runat="server" ID="lblTitle" Text="<%$Resources:labels,login %>"></asp:Label></h1>
                     <div class="field">
                         <asp:Label ID="UserNameLabel" runat="server" AssociatedControlID="UserName"><%=Resources.labels.userName %>:</asp:Label>
                         <div class="boxRound">
@@ -27,11 +27,12 @@
                         <asp:Label ID="RememberMeLabel" runat="server" AssociatedControlID="RememberMe" CssClass="inline"><%=Resources.labels.rememberMe %></asp:Label>
                     </div>
                     <div class="submitButton">
-                        <asp:Button ID="LoginButton" runat="server" CommandName="Login" Text="Login" OnClientClick="return ValidateLogin();" />
-                        <span>
-                            <asp:HyperLink runat="server" ID="linkForgotPassword" NavigateUrl="~/Account/PasswordRetrieval.aspx"
-                                Text="<%$ Resources:labels,forgotPassword %>" />
-                        </span>
+                        <asp:Button ID="LoginButton" runat="server" CommandName="Login" Text="<%$Resources:labels,login %>" OnClientClick="return ValidateLogin();" />
+                        <asp:PlaceHolder ID="phResetPassword" runat="server">
+                            <span>
+                                <asp:HyperLink runat="server" ID="linkForgotPassword" Text="<%$ Resources:labels,forgotPassword %>" />
+                            </span>
+                        </asp:PlaceHolder>
                     </div>
                 </div>
             </div>

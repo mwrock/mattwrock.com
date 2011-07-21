@@ -4,6 +4,8 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
+using BlogEngine.Core;
+
 namespace App_Code.Controls
 {
     using System;
@@ -80,13 +82,13 @@ namespace App_Code.Controls
         public StringDictionary GetSettings()
         {
             var cacheId = string.Format("be_widget_{0}", this.WidgetId);
-            if (this.Cache[cacheId] == null)
+            if (Blog.CurrentInstance.Cache[cacheId] == null)
             {
                 var ws = new WidgetSettings(this.WidgetId.ToString());
-                this.Cache[cacheId] = ws.GetSettings();
+                Blog.CurrentInstance.Cache[cacheId] = ws.GetSettings();
             }
 
-            return (StringDictionary)this.Cache[cacheId];
+            return (StringDictionary)Blog.CurrentInstance.Cache[cacheId];
         }
 
         /// <summary>

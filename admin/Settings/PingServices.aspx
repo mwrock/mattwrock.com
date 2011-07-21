@@ -1,5 +1,5 @@
 ﻿<%@ Page Language="C#" MasterPageFile="~/admin/admin.master" AutoEventWireup="true"
-    CodeFile="PingServices.aspx.cs" Inherits="admin_Pages_PingServices" Title="Ping services" %>
+    CodeFile="PingServices.aspx.cs" Inherits="admin.Settings.PingServices" Title="Ping services" %>
 <%@ Register src="Menu.ascx" tagname="TabMenu" tagprefix="menu" %>
 
 <asp:Content ID="Content1" ContentPlaceHolderID="cphAdmin" runat="Server">
@@ -11,11 +11,12 @@
             <h1><%=Resources.labels.pingService %></h1>
             <ul class="fl">
                 <li>
-                    <label for="<%=txtNewCategory.ClientID %>" class="lbl">Ping service URL</label>
+                    <label for="<%=txtNewCategory.ClientID %>" class="lbl"><%=Resources.labels.pingServiceUrl %></label>
                     <asp:TextBox runat="Server" ID="txtNewCategory" Width="300" MaxLength="255" />
-                    <asp:Button runat="server" ID="btnAdd" ValidationGroup="new" CssClass="btn" Text="Add ping service" />
+                    <asp:Button runat="server" ID="btnAdd" ValidationGroup="new" CssClass="btn" Text="<%$Resources:labels, add %>" />
                     <asp:RequiredFieldValidator ID="RequiredFieldValidator1" runat="Server" ValidationGroup="new"
-                        ControlToValidate="txtNewCategory" ErrorMessage="<%$Resources:labels,specifyPingService %>" /><br />
+                        ControlToValidate="txtNewCategory" ErrorMessage="<%$Resources:labels,specifyPingService %>" />
+                    <br />
                 </li>
             </ul>
             <asp:GridView runat="server" ID="grid" BorderColor="#f8f8f8" BorderStyle="solid"

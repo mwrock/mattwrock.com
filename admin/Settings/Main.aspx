@@ -2,13 +2,33 @@
 <%@ Register src="Menu.ascx" tagname="TabMenu" tagprefix="menu" %>
 
 <asp:Content ID="Content1" ContentPlaceHolderID="cphAdmin" Runat="Server"> 
-    <script type="text/javascript" src="http://ajax.microsoft.com/ajax/jquery.validate/1.7/jquery.validate.min.js"></script>
     <script type="text/javascript">
+
+        var oShowDescChkBox;
+        var oShowDescTagCatChkBox;
+        var oDescCharContainer;
+        var oDescCharTagCatContainer;
+
+        function syncCharCountBox(oChkBox,oCharContainer) {
+
+            var isChecked = oChkBox.is(":checked");
+            if (isChecked) {
+                oCharContainer.show();
+            } else {
+                oCharContainer.hide();
+            }
+        }
+
         $(document).ready(function () {
             var frm = document.forms.aspnetForm;
             $(frm).validate({
                 onsubmit: false
             });
+
+            oShowDescChkBox = $("#<%=cbShowDescriptionInPostList.ClientID %>");
+            oShowDescTagCatChkBox = $("#<%=cbShowDescriptionInPostListForPostsByTagOrCategory.ClientID %>");
+            oDescCharContainer = $("#DescriptionCharacters");
+            oDescCharTagCatContainer = $("#DescriptionCharactersForPostsByTagOrCategory");
 
             $("#btnSave").click(function (evt) {
                 if ($(frm).valid())
@@ -17,50 +37,48 @@
                 evt.preventDefault();
             });
 
-            $("#<%=cbShowDescriptionInPostListForPostsByTagOrCategory.ClientID %>").change(function () {
-                $("#DescriptionCharactersForPostsByTagOrCategory").toggle();
+            oShowDescTagCatChkBox.change(function () {
+                syncCharCountBox(oShowDescTagCatChkBox, oDescCharTagCatContainer);
             });
 
-            $("#<%=cbShowDescriptionInPostList.ClientID %>").change(function () {
-                $("#DescriptionCharacters").toggle();
+            oShowDescChkBox.change(function () {
+                syncCharCountBox(oShowDescChkBox, oDescCharContainer);
             });
+
+            syncCharCountBox(oShowDescChkBox, oDescCharContainer);
+            syncCharCountBox(oShowDescTagCatChkBox, oDescCharTagCatContainer);
 
         });
-        function PreviewTheme() {
-            var theme = document.getElementById('<%=ddlTheme.ClientID %>').value;
-            var path = '../../?theme=' + theme;
-            window.open(path);
-        }
         function SaveSettings() {
             $('.loader').show();
             var dto = { 
 				"name": $("[id$='_txtName']").val(),
 				"desc": $("[id$='_txtDescription']").val(),
 				"postsPerPage": $("[id$='_txtPostsPerPage']").val(),
-				"theme": $("[id$='_ddlTheme']").val(),
-				"mobileTheme": $("[id$='_ddlMobileTheme']").val(),
 				"themeCookieName": $("[id$='_txtThemeCookieName']").val(),
 				"useBlogNameInPageTitles": $("[id$='_cbUseBlogNameInPageTitles']").attr('checked'),
 				"enableRelatedPosts": $("[id$='_cbShowRelatedPosts']").attr('checked'),
 				"enableRating": $("[id$='_cbEnableRating']").attr('checked'),
-				"showDescriptionInPostList": $("[id$='_cbShowDescriptionInPostList']").attr('checked'),
-				"descriptionCharacters": $("[id$='_txtDescriptionCharacters']").val(),
-				"showDescriptionInPostListForPostsByTagOrCategory": $("[id$='_cbShowDescriptionInPostListForPostsByTagOrCategory']").attr('checked'),
-				"descriptionCharactersForPostsByTagOrCategory": $("[id$='_txtDescriptionCharactersForPostsByTagOrCategory']").val(),
+				"showDescriptionInPostList": oShowDescChkBox.attr('checked'),
+				"descriptionCharacters": $("input", oDescCharContainer).val(),
+				"showDescriptionInPostListForPostsByTagOrCategory": oShowDescTagCatChkBox.attr('checked'),
+				"descriptionCharactersForPostsByTagOrCategory": $("input", oDescCharTagCatContainer).val(),
 				"timeStampPostLinks": $("[id$='_cbTimeStampPostLinks']").attr('checked'),
 				"showPostNavigation": $("[id$='_cbShowPostNavigation']").attr('checked'),
 				"culture": $("[id$='_ddlCulture']").val(),
 				"timezone": $("[id$='_txtTimeZone']").val(),
+				"enablePasswordReset": $("[id$='cbEnablePasswordReset']").attr('checked'),
 				"enableSelfRegistration": $("[id$='_cbEnableSelfRegistration']").attr('checked'),
 				"selfRegistrationInitialRole": $("[id$='_ddlSelfRegistrationInitialRole']").val()
 			};
 			
             $.ajax({
-                url: "Main.aspx/Save",
+                url: SiteVars.ApplicationRelativeWebRoot + "admin/Settings/Main.aspx/Save",
                 type: "POST",
                 dataType: "json",
                 contentType: "application/json; charset=utf-8",
                 data: JSON.stringify(dto),
+                beforeSend: onAjaxBeforeSend,
                 success: function (result) {
                     var rt = result.d;
                     if (rt.Success)
@@ -91,15 +109,6 @@
                         <asp:TextBox width="300" runat="server" ID="txtDescription" />
                     </li>
                     <li>
-                        <label class="lbl" for="<%=ddlTheme.ClientID %>"><%=Resources.labels.theme %></label>
-                        <asp:DropDownList CssClass="txt" Width="212" runat="server" ID="ddlTheme" />
-                        <a href="javascript:void(PreviewTheme());"><%=Resources.labels.preview %></a> | <a href="http://www.dotnetblogengine.net/page/themes.aspx" target="_blank"><%=Resources.labels.download %></a>
-                    </li>
-                    <li>
-                        <label class="lbl" for="<%=ddlMobileTheme.ClientID %>"><%=Resources.labels.mobileTheme %></label>
-                        <asp:DropDownList CssClass="txt" Width="212" runat="server" ID="ddlMobileTheme" />
-                    </li>
-                    <li>
                         <label class="lbl" for="<%=txtThemeCookieName.ClientID %>"><%=Resources.labels.themeCookieName %></label>
                         <asp:TextBox CssClass="w300" runat="server" ID="txtThemeCookieName" />
                     </li>
@@ -120,11 +129,11 @@
                         <asp:TextBox runat="server" ID="txtPostsPerPage" Width="50" MaxLength="4" CssClass="required number" />
                     </li>
                     <li>
-                        <label class="lbl">Appearance</label>
+                        <label class="lbl"><%=Resources.labels.appearance %></label>
                         <asp:CheckBox runat="server" ID="cbShowDescriptionInPostList" />
                         <label for="<%=cbShowDescriptionInPostList.ClientID %>"><%=Resources.labels.showDescriptionInPostList %></label>
                         <div class="insetForm" id="DescriptionCharacters" style=" display:none;">
-                            <label for="<%=txtDescriptionCharacters.ClientID %>"><%=Resources.labels.numberOfCharacters %></label>
+                            <label class="lbl" for="<%=txtDescriptionCharacters.ClientID %>"><%=Resources.labels.numberOfCharacters %></label>
                             <asp:TextBox runat="server" ID="txtDescriptionCharacters" Width="40" CssClass="number" />      
                         </div>
                     </li>
@@ -133,7 +142,7 @@
                         <asp:CheckBox runat="server" ID="cbShowDescriptionInPostListForPostsByTagOrCategory" />
                         <label for="<%=cbShowDescriptionInPostListForPostsByTagOrCategory.ClientID %>"><%=Resources.labels.showDescriptionInPostListForPostsByTagOrCategory %></label>
                         <div class="insetForm" id="DescriptionCharactersForPostsByTagOrCategory" style=" display:none;">
-                            <label for="<%=txtDescriptionCharactersForPostsByTagOrCategory.ClientID %>" style="float: none; position: relative; top: -2px;"><%=Resources.labels.numberOfCharacters %></label>
+                            <label class="lbl" for="<%=txtDescriptionCharactersForPostsByTagOrCategory.ClientID %>" ><%=Resources.labels.numberOfCharacters %></label>
                             <asp:TextBox runat="server" ID="txtDescriptionCharactersForPostsByTagOrCategory" Width="40" CssClass="number" />
                         </div>
                     </li>
@@ -148,7 +157,7 @@
                         <label for="<%=cbShowPostNavigation.ClientID %>"><%=Resources.labels.showPostNavigation %></label>
                     </li>
                     <li>
-                        <label class="lbl">Other settings</label>
+                        <label class="lbl"><%=Resources.labels.otherSettings %></label>
                         <asp:CheckBox runat="server" ID="cbUseBlogNameInPageTitles" />
                         <label for="<%=cbUseBlogNameInPageTitles.ClientID %>"><%=Resources.labels.useBlogNameInPageTitles%></label>
                         <span class="insetHelp">(<%=Resources.labels.useBlogNameInPageTitlesDescription%>)</span>
@@ -165,6 +174,11 @@
                     </li>
                     <li>
                         <span class="filler"></span>
+                        <asp:CheckBox runat="server" ID="cbEnablePasswordReset" />
+                        <label for="<%=cbEnablePasswordReset.ClientID %>"><%=Resources.labels.enablePasswordReset %></label>
+                    </li>
+                    <li>
+                        <span class="filler"></span>
                         <asp:CheckBox runat="server" ID="cbEnableSelfRegistration" />
                         <label for="<%=cbEnableSelfRegistration.ClientID %>"><%=Resources.labels.enableSelfRegistration %></label>
                     </li>
@@ -177,7 +191,7 @@
                 </ul>
 
             <div class="action_buttons">
-                <input type="submit" id="btnSave" class="btn primary" value="Save settings" />
+                <input type="submit" id="btnSave" class="btn primary" value="<%=Resources.labels.saveSettings %>" />
             </div>
 		</div>
 	</div>    

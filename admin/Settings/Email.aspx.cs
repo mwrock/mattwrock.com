@@ -1,14 +1,10 @@
-﻿using System.Globalization;
-using System.Net;
-using System.Text;
-using System.Web;
-using System.Web.UI;
-
+﻿
 namespace admin.Settings
 {
     using System;
+    using System.Text;
+    using System.Web;
     using System.Web.Services;
-    using System.Threading;
     using Resources;
     using System.Net.Mail;
     using BlogEngine.Core;
@@ -121,7 +117,7 @@ namespace admin.Settings
         {
             var response = new JsonResponse { Success = false };
 
-            StringBuilder errorMsg = new StringBuilder();
+            var errorMsg = new StringBuilder();
 
             if (!WebUtils.CheckRightsForAdminSettingsPage(true))
             {
@@ -169,7 +165,7 @@ namespace admin.Settings
 
             if (errorMsg.Length > 0)
             {
-                response.Message = string.Format("Error: {0}", errorMsg.ToString());
+                response.Message = string.Format("Error: {0}", errorMsg);
                 return response;
             }
 

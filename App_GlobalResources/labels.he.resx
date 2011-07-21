@@ -496,6 +496,12 @@
   <data name="showCountryChooserDescription" xml:space="preserve">
     <value>אם אפשרות בחירה של מדינות לא מוצגת, שום דגל לא יוצג ליד כל תגובה</value>
   </data>
+  <data name="showEnableWebsiteInComments" xml:space="preserve">
+    <value>Need Translation:Enable Website in Comments</value>
+  </data>
+  <data name="showEnableWebsiteInCommentsDescription" xml:space="preserve">
+    <value>Need Translation:Choose whether to allow Website to be published in Comments</value>
+  </data>
   <data name="showDescriptionInPostList" xml:space="preserve">
     <value>הצג רק תיאור של הודעות</value>
   </data>

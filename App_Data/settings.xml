@@ -1,8 +1,14 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <settings>
-  <allowservertodownloadremotefiles>False</allowservertodownloadremotefiles>
-  <themecookiename>theme</themecookiename>
-  <administratorrole>Administrators</administratorrole>
+  <displayratingsonrecentposts>False</displayratingsonrecentposts>
+  <authorname>Matt Wrock</authorname>
+  <email>matt@mattwrock.com</email>
+  <mobiletheme>Mobile</mobiletheme>
+  <postsperfeed>10</postsperfeed>
+  <postsperpage>10</postsperpage>
+  <htmlheader />
+  <contactthankmessage>&lt;h1&gt;Thank you&lt;/h1&gt;&lt;p&gt;The message was sent.&lt;/p&gt;</contactthankmessage>
+  <emailsubjectprefix>Weblog</emailsubjectprefix>
   <trackingscript>&lt;script type="text/javascript"&gt;
 var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
 document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
@@ -11,98 +17,92 @@ document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.
 try {
 var pageTracker = _gat._getTracker("UA-10685042-1");
 pageTracker._trackPageview();
-} catch(err) {}&lt;/script&gt;</trackingscript>
-  <numberofreferrerdays>0</numberofreferrerdays>
+} catch(err) {}&lt;/script&gt;
+&lt;script type="text/javascript" defer="defer" src="/blog/js.axd?path=/themes/Boldy/js/ddsmoothmenu.js"&gt;&lt;/script&gt;</trackingscript>
   <showdescriptioninpostlist>False</showdescriptioninpostlist>
-  <theme>newspaper</theme>
-  <blockauthoroncommentdelete>False</blockauthoroncommentdelete>
-  <mobiletheme>Mobile</mobiletheme>
-  <blogrollvisibleposts>3</blogrollvisibleposts>
-  <dayscommentsareenabled>0</dayscommentsareenabled>
-  <descriptioncharacters>300</descriptioncharacters>
-  <searchbuttontext>Search</searchbuttontext>
-  <editorsrole>Editors</editorsrole>
-  <remotefiledownloadtimeout>30000</remotefiledownloadtimeout>
-  <enablecontactattachments>True</enablecontactattachments>
-  <enableselfregistration>False</enableselfregistration>
-  <endorsement>http://www.dotnetblogengine.net/syndication.axd</endorsement>
-  <enabletrackbacksend>True</enabletrackbacksend>
-  <emailsubjectprefix>Weblog</emailsubjectprefix>
-  <enablepasswordreset>True</enablepasswordreset>
-  <smtpusername>matt@mattwrock.com</smtpusername>
-  <disqusdevmode>False</disqusdevmode>
-  <enablerating>True</enablerating>
   <commentsperpage>10</commentsperpage>
-  <iscommentsenabled>True</iscommentsenabled>
-  <description>matt wrock's observations and comments on software engineering</description>
-  <moderationtype>Auto</moderationtype>
-  <displaycommentsonrecentposts>False</displaycommentsonrecentposts>
-  <storagelocation>~/App_Data/</storagelocation>
-  <name>wrock::blog</name>
-  <email>matt@mattwrock.com</email>
-  <anonymousrole>Anonymous</anonymousrole>
-  <descriptioncharactersforpostsbytagorcategory>0</descriptioncharactersforpostsbytagorcategory>
-  <sendmailoncomment>True</sendmailoncomment>
-  <showdescriptioninpostlistforpostsbytagorcategory>False</showdescriptioninpostlistforpostsbytagorcategory>
-  <commentwhitelistcount>0</commentwhitelistcount>
-  <htmlheader />
-  <postsperfeed>10</postsperfeed>
-  <useblognameinpagetitles>True</useblognameinpagetitles>
-  <enablepingbackreceive>True</enablepingbackreceive>
-  <enablehttpcompression>True</enablehttpcompression>
-  <authorname>Matt Wrock</authorname>
-  <numberofrecentposts>10</numberofrecentposts>
-  <culture>Auto</culture>
-  <enablerecaptchaoncontactform>False</enablerecaptchaoncontactform>
-  <enablereferrertracking>True</enablereferrertracking>
-  <enablerelatedposts>True</enablerelatedposts>
-  <smtpserverport>25</smtpserverport>
-  <showlivepreview>True</showlivepreview>
   <enablepingbacksend>True</enablepingbacksend>
-  <blogrollupdateminutes>60</blogrollupdateminutes>
-  <enabletrackbackreceive>True</enabletrackbackreceive>
-  <avatar>monster</avatar>
-  <addiptoblacklistfilteronrejection>False</addiptoblacklistfilteronrejection>
-  <smtpserver>smtp.mattwrock.com</smtpserver>
-  <enableenclosures>False</enableenclosures>
-  <trustauthenticatedusers>False</trustauthenticatedusers>
-  <enableopensearch>True</enableopensearch>
-  <displayratingsonrecentposts>False</displayratingsonrecentposts>
-  <disquswebsitename />
-  <searchdefaulttext>Enter search term or APML url</searchdefaulttext>
-  <enablecommentsearch>True</enablecommentsearch>
-  <commentreportmistakes>False</commentreportmistakes>
-  <geocodinglatitude>0</geocodinglatitude>
-  <syndicationformat>Rss</syndicationformat>
-  <geocodinglongitude>0</geocodinglongitude>
-  <timezone>9</timezone>
-  <contactformmessage>&lt;p&gt;I'll answer the mail as soon as I can.&lt;/p&gt;</contactformmessage>
-  <showpostnavigation>True</showpostnavigation>
-  <searchcommentlabeltext>Include comments in search</searchcommentlabeltext>
-  <postsperpage>10</postsperpage>
-  <enablecountryincomments>True</enablecountryincomments>
-  <timestamppostlinks>True</timestamppostlinks>
-  <remotemaxfilesize>524288</remotemaxfilesize>
-  <iscommentnestingenabled>True</iscommentnestingenabled>
-  <numberofrecentcomments>10</numberofrecentcomments>
-  <language>en-US</language>
-  <showpingbacks>False</showpingbacks>
-  <addiptowhitelistfilteronapproval>False</addiptowhitelistfilteronapproval>
-  <compresswebresource>True</compresswebresource>
-  <alternatefeedurl>http://feeds.feedburner.com/Wrockblog</alternatefeedurl>
+  <showdescriptioninpostlistforpostsbytagorcategory>False</showdescriptioninpostlistforpostsbytagorcategory>
   <commentblacklistcount>1</commentblacklistcount>
-  <requiresslmetaweblogapi>False</requiresslmetaweblogapi>
-  <removewhitespaceinstylesheets>True</removewhitespaceinstylesheets>
-  <selfregistrationinitialrole>Select</selfregistrationinitialrole>
-  <feedauthor>matt@mattwrock.com</feedauthor>
-  <disqusaddcommentstopages>False</disqusaddcommentstopages>
-  <smtppassword>1055fell</smtppassword>
-  <enablecommentsmoderation>True</enablecommentsmoderation>
-  <handlewwwsubdomain />
-  <contactthankmessage>&lt;h1&gt;Thank you&lt;/h1&gt;&lt;p&gt;The message was sent.&lt;/p&gt;</contactthankmessage>
-  <fileextension>.aspx</fileextension>
   <iscocommentenabled>False</iscocommentenabled>
-  <enablessl>False</enablessl>
-  <enableerrorlogging>False</enableerrorlogging>
+  <compresswebresource>True</compresswebresource>
+  <addiptowhitelistfilteronapproval>False</addiptowhitelistfilteronapproval>
+  <themecookiename>theme</themecookiename>
+  <trustauthenticatedusers>False</trustauthenticatedusers>
+  <enablecountryincomments>False</enablecountryincomments>
+  <contactformmessage>&lt;p&gt;I'll answer the mail as soon as I can.&lt;/p&gt;</contactformmessage>
+  <searchbuttontext>Search</searchbuttontext>
+  <showincludecommentsoption>False</showincludecommentsoption>
+  <israzortheme>False</israzortheme>
+  <enablewebsiteincomments>False</enablewebsiteincomments>
+  <enablecontactattachments>True</enablecontactattachments>
   <blogrollmaxlength>23</blogrollmaxlength>
+  <showpingbacks>False</showpingbacks>
+  <searchdefaulttext>Enter search term</searchdefaulttext>
+  <language>en-US</language>
+  <smtpserver>smtp.mattwrock.com</smtpserver>
+  <disqusdevmode>False</disqusdevmode>
+  <showpostnavigation>True</showpostnavigation>
+  <displaycommentsonrecentposts>False</displaycommentsonrecentposts>
+  <enabletrackbackreceive>True</enabletrackbackreceive>
+  <enableopensearch>True</enableopensearch>
+  <dayscommentsareenabled>0</dayscommentsareenabled>
+  <useblognameinpagetitles>True</useblognameinpagetitles>
+  <smtpusername>matt@mattwrock.com</smtpusername>
+  <enableerrorlogging>False</enableerrorlogging>
+  <enablehttpcompression>True</enablehttpcompression>
+  <enablepasswordreset>True</enablepasswordreset>
+  <disqusaddcommentstopages>False</disqusaddcommentstopages>
+  <alternatefeedurl>http://feeds.feedburner.com/Wrockblog</alternatefeedurl>
+  <enablecommentsmoderation>True</enablecommentsmoderation>
+  <enabletrackbacksend>True</enabletrackbacksend>
+  <timezone>9</timezone>
+  <feedauthor>matt@mattwrock.com</feedauthor>
+  <allowservertodownloadremotefiles>False</allowservertodownloadremotefiles>
+  <culture>Auto</culture>
+  <disquswebsitename />
+  <handlewwwsubdomain>add</handlewwwsubdomain>
+  <theme>Boldy</theme>
+  <sendmailoncomment>True</sendmailoncomment>
+  <description>Matt Wrock's blog on software engineering</description>
+  <blogrollvisibleposts>3</blogrollvisibleposts>
+  <geocodinglatitude>0</geocodinglatitude>
+  <numberofreferrerdays>10</numberofreferrerdays>
+  <iscommentsenabled>True</iscommentsenabled>
+  <syndicationformat>Rss</syndicationformat>
+  <smtpserverport>25</smtpserverport>
+  <blockauthoroncommentdelete>False</blockauthoroncommentdelete>
+  <iscommentnestingenabled>False</iscommentnestingenabled>
+  <timestamppostlinks>True</timestamppostlinks>
+  <enablereferrertracking>True</enablereferrertracking>
+  <avatar>monster</avatar>
+  <smtppassword>1055fell</smtppassword>
+  <numberofrecentcomments>10</numberofrecentcomments>
+  <enablerecaptchaoncontactform>False</enablerecaptchaoncontactform>
+  <enablessl>False</enablessl>
+  <name>Matt Wrock's Blog</name>
+  <moderationtype>Auto</moderationtype>
+  <enablepingbackreceive>True</enablepingbackreceive>
+  <showlivepreview>True</showlivepreview>
+  <galleryfeedurl>http://dnbegallery.org/feed/FeedService.svc</galleryfeedurl>
+  <remotemaxfilesize>524288</remotemaxfilesize>
+  <enablerelatedposts>True</enablerelatedposts>
+  <remotefiledownloadtimeout>30000</remotefiledownloadtimeout>
+  <enableenclosures>False</enableenclosures>
+  <endorsement>http://www.dotnetblogengine.net/syndication.axd</endorsement>
+  <removewhitespaceinstylesheets>False</removewhitespaceinstylesheets>
+  <commentwhitelistcount>0</commentwhitelistcount>
+  <descriptioncharacters>300</descriptioncharacters>
+  <addiptoblacklistfilteronrejection>False</addiptoblacklistfilteronrejection>
+  <descriptioncharactersforpostsbytagorcategory>0</descriptioncharactersforpostsbytagorcategory>
+  <commentreportmistakes>False</commentreportmistakes>
+  <searchcommentlabeltext>Include comments in search</searchcommentlabeltext>
+  <numberofrecentposts>10</numberofrecentposts>
+  <selfregistrationinitialrole>Select</selfregistrationinitialrole>
+  <enableselfregistration>False</enableselfregistration>
+  <blogrollupdateminutes>60</blogrollupdateminutes>
+  <geocodinglongitude>0</geocodinglongitude>
+  <requiresslmetaweblogapi>False</requiresslmetaweblogapi>
+  <enablerating>True</enablerating>
+  <enablecommentsearch>True</enablecommentsearch>
 </settings>

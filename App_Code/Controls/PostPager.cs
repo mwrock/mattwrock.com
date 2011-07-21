@@ -183,6 +183,8 @@ namespace App_Code.Controls
         /// <returns>The pager tag.</returns>
         private string PagerTag()
         {
+            if (this.Posts == null) return "";
+
             var retValue = string.Empty;
             var link = string.Format("<li class=\"PagerLink\"><a href=\"{0}\">{{1}}</a></li>", PageUrl());
             const string LinkCurrent = "<li class=\"PagerLinkCurrent\">{0}</li>";

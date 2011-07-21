@@ -5,6 +5,7 @@ using System.Text.RegularExpressions;
 
 using BlogEngine.Core;
 using BlogEngine.Core.Web.Controls;
+using BlogEngine.Core.Web.Extensions;
 
 #endregion
 
@@ -77,10 +78,11 @@ public class ResolveLinks
     /// <param name="e">The <see cref="BlogEngine.Core.ServingEventArgs"/> instance containing the event data.</param>
     private static void PostCommentServing(object sender, ServingEventArgs e)
     {
-        if (string.IsNullOrEmpty(e.Body))
-        {
+        if (!ExtensionManager.ExtensionEnabled("ResolveLinks"))
             return;
-        }
+
+        if (string.IsNullOrEmpty(e.Body))
+            return;
 
         e.Body = LinkRegex.Replace(e.Body, new MatchEvaluator(Evaluator));
     }

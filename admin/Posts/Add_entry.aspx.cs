@@ -4,7 +4,6 @@
     using System.Collections.Generic;
     using System.IO;
     using System.Linq;
-    using System.Threading;
     using System.Web;
     using System.Web.Security;
     using System.Web.UI;
@@ -16,6 +15,7 @@
     using Resources;
 
     using Page = System.Web.UI.Page;
+    using App_Code;
 
     /// <summary>
     /// The AddEntry.
@@ -41,10 +41,10 @@
         {
             get
             {
-                if (!String.IsNullOrEmpty(this.Request.QueryString["id"]) && this.Request.QueryString["id"].Length == 36)
+                if (!String.IsNullOrEmpty(Request.QueryString["id"]) && Request.QueryString["id"].Length == 36)
                 {
-                    var id = new Guid(this.Request.QueryString["id"]);
-                    BlogEngine.Core.Post p = BlogEngine.Core.Post.GetPost(id);
+                    var id = new Guid(Request.QueryString["id"]);
+                    var p = Post.GetPost(id);
                     return p.RelativeLink;
                 }
                 return string.Empty;
@@ -119,7 +119,7 @@
         /// </param>
         protected override void OnInit(EventArgs e)
         {
-            Security.DemandUserHasRight(BlogEngine.Core.Rights.AccessAdminPages, true);
+            WebUtils.CheckRightsForAdminPostPages(false);
             MaintainScrollPositionOnPostBack = true;
 
             BindTags();
@@ -142,6 +142,7 @@
                 txtDate.Text = DateTime.Now.AddHours(BlogSettings.Instance.Timezone).ToString("yyyy-MM-dd");
                 txtTime.Text = DateTime.Now.AddHours(BlogSettings.Instance.Timezone).ToString("HH\\:mm");
                 cbEnableComments.Checked = BlogSettings.Instance.IsCommentsEnabled;
+                cbPublish.Checked = Security.IsAuthorizedTo(Rights.PublishOwnPosts);
                 if (Session["content"] != null)
                 {
                     txtContent.Text = Session["content"].ToString();
@@ -155,7 +156,7 @@
                 BindBookmarklet();
             }
 
-            if (!Security.IsAuthorizedTo(Rights.EditOtherUsers))
+            if (!Security.IsAuthorizedTo(Rights.EditOtherUsersPosts))
             {
                 ddlAuthor.Enabled = false;
             }
@@ -217,48 +218,6 @@
         }
 
         /// <summary>
-        /// The bind drafts.
-        /// </summary>
-        //private void BindDrafts()
-        //{
-        //    var id = Guid.Empty;
-        //    if (!String.IsNullOrEmpty(this.Request.QueryString["id"]) && this.Request.QueryString["id"].Length == 36)
-        //    {
-        //        id = new Guid(this.Request.QueryString["id"]);
-        //    }
-
-        //    var counter = 0;
-
-        //    foreach (var post in Post.Posts)
-        //    {
-        //        if (post.IsPublished || post.Id == id)
-        //        {
-        //            continue;
-        //        }
-
-        //        var li = new HtmlGenericControl("li");
-        //        var a = new HtmlAnchor { HRef = string.Format("?id={0}", post.Id), InnerHtml = post.Title };
-
-        //        var text =
-        //            new LiteralControl(
-        //                string.Format(" by {0} ({1})", post.Author, post.DateCreated.ToString("yyyy-dd-MM HH\\:mm")));
-
-        //        li.Controls.Add(a);
-        //        li.Controls.Add(text);
-        //        this.ulDrafts.Controls.Add(li);
-        //        counter++;
-        //    }
-
-        //    if (counter <= 0)
-        //    {
-        //        return;
-        //    }
-
-        //    this.divDrafts.Visible = true;
-        //    this.aDrafts.InnerHtml = string.Format(labels.thereAreXDrafts, counter);
-        //}
-
-        /// <summary>
         /// The bind post.
         /// </summary>
         /// <param name="postId">
@@ -273,24 +232,27 @@
                 Response.Redirect(Request.Path);
             }
 
-            txtTitle.Text = post.Title;
-            txtContent.Text = post.Content;
-            txtRawContent.Text = post.Content;
-            txtDescription.Text = post.Description;
-            txtDate.Text = post.DateCreated.ToString("yyyy-MM-dd");
-            txtTime.Text = post.DateCreated.ToString("HH\\:mm");
-            cbEnableComments.Checked = post.HasCommentsEnabled;
-            cbPublish.Checked = post.IsPublished;
-            txtSlug.Text = Utils.RemoveIllegalCharacters(post.Slug);
-            PreSelectAuthor(post.Author);
-
-            var tags = new string[post.Tags.Count];
-            for (var i = 0; i < post.Tags.Count; i++)
+            if (post != null)
             {
-                tags[i] = post.Tags[i];
-            }
+                txtTitle.Text = post.Title;
+                txtContent.Text = post.Content;
+                txtRawContent.Text = post.Content;
+                txtDescription.Text = post.Description;
+                txtDate.Text = post.DateCreated.ToString("yyyy-MM-dd");
+                txtTime.Text = post.DateCreated.ToString("HH\\:mm");
+                cbEnableComments.Checked = post.HasCommentsEnabled;
+                cbPublish.Checked = post.IsPublished;
+                txtSlug.Text = Utils.RemoveIllegalCharacters(post.Slug);
+                PreSelectAuthor(post.Author);
 
-            txtTags.Text = string.Join(",", tags);
+                var tags = new string[post.Tags.Count];
+                for (var i = 0; i < post.Tags.Count; i++)
+                {
+                    tags[i] = post.Tags[i];
+                }
+
+                txtTags.Text = string.Join(",", tags);
+            }
         }
 
         /// <summary>
@@ -417,7 +379,7 @@
             catHtml += string.Format("<label>{0}</label><br/>", Server.HtmlEncode(cat.Title));
             cblCategories.InnerHtml += catHtml;
 
-            string postId = this.Request.QueryString["id"];
+            string postId = Request.QueryString["id"];
             Post post = null;
 
 
@@ -452,7 +414,7 @@
         {
             var relativeFolder = DateTime.Now.Year.ToString() + Path.DirectorySeparatorChar + DateTime.Now.Month +
                                  Path.DirectorySeparatorChar;
-            var folder = BlogSettings.Instance.StorageLocation + "files" + Path.DirectorySeparatorChar;
+            var folder = Blog.CurrentInstance.StorageLocation + "files" + Path.DirectorySeparatorChar;
             var fileName = txtUploadFile.FileName;
             Upload(folder + relativeFolder, txtUploadFile, fileName);
 
@@ -473,7 +435,7 @@
         {
             var relativeFolder = DateTime.Now.Year.ToString() + Path.DirectorySeparatorChar + DateTime.Now.Month +
                                  Path.DirectorySeparatorChar;
-            var folder = string.Format("{0}files{1}", BlogSettings.Instance.StorageLocation, Path.DirectorySeparatorChar);
+            var folder = string.Format("{0}files{1}", Blog.CurrentInstance.StorageLocation, Path.DirectorySeparatorChar);
             var fileName = txtUploadImage.FileName;
             Upload(folder + relativeFolder, txtUploadImage, fileName);
 
@@ -500,7 +462,7 @@
 			var mediaPlayerExtension = BlogEngine.Core.Web.Extensions.ExtensionManager.GetExtension("MediaElementPlayer");
 			mediaFolder = mediaPlayerExtension.Settings[0].GetSingleValue("folder");
 
-			var folder = "~/" + mediaFolder + "/";
+			var folder = Utils.RelativeWebRoot + mediaFolder + "/";
 			var fileName = txtUploadVideo.FileName;
 
 			Upload(folder, txtUploadVideo, fileName);

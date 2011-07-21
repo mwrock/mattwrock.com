@@ -4,7 +4,7 @@
   <p><%=Resources.labels.notifiedPublished %></p>
 
   <label for="<%=txtEmail.ClientID %>" style="font-weight:bold">Enter your e-mail</label><br />
-  <asp:TextBox runat="server" ID="txtEmail" Width="100%" />
+  <asp:TextBox runat="server" ID="txtEmail" Width="98%" />
   <asp:RequiredFieldValidator 
     runat="server" 
     ControlToValidate="txtEmail" 
@@ -20,8 +20,6 @@
     Display="dynamic" 
     ValidationGroup="newsletter" />
     
-    <br />
-
   <div style="text-align:center">
     <asp:Button runat="server" ID="btnSave" ValidationGroup="newsletter" Text="Notify me" OnClientClick="return beginAddEmail()" />
   </div>

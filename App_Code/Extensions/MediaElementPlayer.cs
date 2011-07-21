@@ -24,7 +24,8 @@ public class MediaElementPlayer
 
     #region Private members
     private const string _extensionName = "MediaElementPlayer";
-    static protected ExtensionSettings _settings;
+    private static readonly object _syncRoot = new object();
+    static protected Dictionary<Guid, ExtensionSettings> _blogsSettings = new Dictionary<Guid, ExtensionSettings>();
     #endregion
 
     private const int _widthDefault = 480;
@@ -41,10 +42,35 @@ public class MediaElementPlayer
         BlogEngine.Core.Page.Serving += Publishable_Serving;
         InitSettings();
     }
-    
+
     private static void InitSettings()
     {
+        // call Settings getter so default settings are loaded on application start.
+        var s = Settings;
+    }
 
+    private static ExtensionSettings Settings
+    {
+        get
+        {
+            Guid blogId = Blog.CurrentInstance.Id;
+            if (!_blogsSettings.ContainsKey(blogId))
+            {
+                lock (_syncRoot)
+                {
+                    if (!_blogsSettings.ContainsKey(blogId))
+                    {
+                        _blogsSettings[blogId] = LoadExtensionSettingsForBlogInstance();
+                    }
+                }
+            }
+
+            return _blogsSettings[blogId];
+        }
+    }
+
+    private static ExtensionSettings LoadExtensionSettingsForBlogInstance()
+    {
         ExtensionSettings initialSettings = new ExtensionSettings(_extensionName);
         initialSettings.Help = @"
 <p>Build on <a href=""http://mediaelement.js.com/"">MediaElement.js</a>, the HTML5 video/audio player.</p>
@@ -82,21 +108,24 @@ public class MediaElementPlayer
 ";
         initialSettings.IsScalar = true;
 
-		
+
         initialSettings.AddParameter("width", "Default Width");
         initialSettings.AddValue("width", _widthDefault.ToString());
 
         initialSettings.AddParameter("height", "Default Height");
-        initialSettings.AddValue("height", _heightDefault.ToString());	
+        initialSettings.AddValue("height", _heightDefault.ToString());
 
         initialSettings.AddParameter("folder", "Folder for Media (MP4, MP3, WMV, Ogg, WebM, etc.)");
-        initialSettings.AddValue("folder", _folderDefault);     
-        
-        _settings = ExtensionManager.InitSettings(_extensionName, initialSettings);        
+        initialSettings.AddValue("folder", _folderDefault);
+
+        return ExtensionManager.InitSettings(_extensionName, initialSettings);
     }
 
     private static void Publishable_Serving(object sender, ServingEventArgs e)
     {
+        if (!ExtensionManager.ExtensionEnabled("MediaElementPlayer"))
+            return;
+
         if (e.Location == ServingLocation.PostList || e.Location == ServingLocation.SinglePost || e.Location == ServingLocation.Feed || e.Location == ServingLocation.SinglePage) {
 	
 			HttpContext context = HttpContext.Current;			
@@ -120,7 +149,7 @@ public class MediaElementPlayer
 
     private static void AddHeader(Page page)
     {
-		string path = Utils.RelativeWebRoot + "Scripts/mediaelement/";
+		string path = Utils.ApplicationRelativeWebRoot + "Scripts/mediaelement/";
 		
 		AddJavaScript(path + "mediaelement.min.js", page);
         AddJavaScript(path + "mediaelementplayer.min.js", page);
@@ -148,11 +177,11 @@ public class MediaElementPlayer
     {
 
 		int width = 0;
-		int height = 0;		
+		int height = 0;
 
-		if (!Int32.TryParse(_settings.GetSingleValue("width"), out width))
+        if (!Int32.TryParse(Settings.GetSingleValue("width"), out width))
 			width = _widthDefault;
-		if (!Int32.TryParse(_settings.GetSingleValue("height"), out height))
+        if (!Int32.TryParse(Settings.GetSingleValue("height"), out height))
 			height = _heightDefault;      
 
 		string startupScript = @"
@@ -170,7 +199,7 @@ jQuery(document).ready(function($) {
     {
 	
 		// path to media
-		string folder = _settings.GetSingleValue("folder");			
+        string folder = Settings.GetSingleValue("folder");			
 		string path = Utils.RelativeWebRoot + folder.TrimEnd(new char[] {'/'}) + "/";
 		
 		// override for feed
@@ -208,8 +237,6 @@ jQuery(document).ready(function($) {
 			
 		}	
 	}		
-	
-	
 	
 	public static List<ShortCode> GetShortCodes(string input)
     {

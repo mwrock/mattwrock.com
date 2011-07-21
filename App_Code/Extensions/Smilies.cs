@@ -2,6 +2,7 @@
 
 using BlogEngine.Core;
 using BlogEngine.Core.Web.Controls;
+using BlogEngine.Core.Web.Extensions;
 
 #endregion
 
@@ -20,7 +21,7 @@ public class Smilies
     /// The link string.
     /// </summary>
     private const string Link =
-        "<img src=\"{0}editors/tiny_mce_3_3_9_2/plugins/emotions/img/smiley-{1}.gif\" class=\"flag\" alt=\"{2}\" />";
+        "<img src=\"{0}editors/tiny_mce_3_4_3_1/plugins/emotions/img/smiley-{1}.gif\" class=\"flag\" alt=\"{2}\" />";
 
     #endregion
 
@@ -56,10 +57,11 @@ public class Smilies
     /// <param name="e">The <see cref="BlogEngine.Core.ServingEventArgs"/> instance containing the event data.</param>
     private static void PostCommentServing(object sender, ServingEventArgs e)
     {
-        if (string.IsNullOrEmpty(e.Body))
-        {
+        if (!ExtensionManager.ExtensionEnabled("Smilies"))
             return;
-        }
+
+        if (string.IsNullOrEmpty(e.Body))
+            return;
 
         e.Body = e.Body.Replace("(H)", Convert("cool", "Cool"));
         e.Body = e.Body.Replace(":'(", Convert("cry", "Cry"));

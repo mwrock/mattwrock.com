@@ -409,7 +409,7 @@ using (var scope = sessionManager.CreateTransactionScope())
       <avatar />
       <content>Thank you for the auspicious writeup. It in fact was a amusement account it. Look advanced to more added agreeable from you! By the way, how could we communicate?</content>
     </comment>
-    <comment id="7b8bb6db-f3e4-4705-b0bb-53b27096ffab" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="False" deleted="False">
+    <comment id="7b8bb6db-f3e4-4705-b0bb-53b27096ffab" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="False" deleted="True">
       <date>2011-01-26 14:45:26</date>
       <author>buy silkroad gold</author>
       <email>Macdonnell15@gmail.com</email>
@@ -419,7 +419,7 @@ using (var scope = sessionManager.CreateTransactionScope())
       <avatar />
       <content>thank you for posting this! I really enjoy it! </content>
     </comment>
-    <comment id="0e4ee997-9218-480f-ba58-dd2ae04dc977" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="False">
+    <comment id="0e4ee997-9218-480f-ba58-dd2ae04dc977" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="True">
       <date>2011-01-27 09:22:05</date>
       <author>buy silkroad gold</author>
       <email>Eastwood@ymail.com</email>
@@ -430,7 +430,7 @@ using (var scope = sessionManager.CreateTransactionScope())
       <avatar />
       <content>great blog! keep up the great work!</content>
     </comment>
-    <comment id="0b10d625-9f2d-4a5f-83e0-a48364a59bd4" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="False">
+    <comment id="0b10d625-9f2d-4a5f-83e0-a48364a59bd4" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="True">
       <date>2011-01-28 05:21:16</date>
       <author>What is Rent to Own</author>
       <email>Zamorano@restumail.com</email>
@@ -441,7 +441,7 @@ using (var scope = sessionManager.CreateTransactionScope())
       <avatar />
       <content>I like this data shown and it has given me some sort of commitment to succeed for some reason, so thanks.</content>
     </comment>
-    <comment id="bfb88c1f-3cfa-45bf-a854-13605e0983ce" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="False">
+    <comment id="bfb88c1f-3cfa-45bf-a854-13605e0983ce" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="True">
       <date>2011-01-29 08:03:54</date>
       <author>how to get rich easily</author>
       <email>Spurling230@hotmail.com</email>
@@ -452,7 +452,7 @@ using (var scope = sessionManager.CreateTransactionScope())
       <avatar />
       <content>good read thanks :)</content>
     </comment>
-    <comment id="8367d3b9-0837-4fd1-ba0f-3ef0ceb57cad" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="False" deleted="False">
+    <comment id="8367d3b9-0837-4fd1-ba0f-3ef0ceb57cad" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="False" deleted="True">
       <date>2011-01-30 08:26:36</date>
       <author>buy silkroad gold</author>
       <email>Melia13@gmail.com</email>
@@ -462,7 +462,7 @@ using (var scope = sessionManager.CreateTransactionScope())
       <avatar />
       <content>Really enjoyed reading your articles!</content>
     </comment>
-    <comment id="db7ff8f4-a3c1-4a4a-99c4-fc738d9bf7f2" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="False">
+    <comment id="db7ff8f4-a3c1-4a4a-99c4-fc738d9bf7f2" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="True">
       <date>2011-01-30 21:09:27</date>
       <author>buy silkroad gold</author>
       <email>Hanken2@gmail.com</email>
@@ -473,7 +473,7 @@ using (var scope = sessionManager.CreateTransactionScope())
       <avatar />
       <content>Thats a very nice info. Thank you for sharing it! </content>
     </comment>
-    <comment id="91d793b5-5de0-49db-bd9e-92c9cc045ef9" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="False">
+    <comment id="91d793b5-5de0-49db-bd9e-92c9cc045ef9" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="True">
       <date>2011-02-01 08:17:45</date>
       <author>silkroad online gold</author>
       <email>Tennent@ymail.com</email>
@@ -484,7 +484,7 @@ using (var scope = sessionManager.CreateTransactionScope())
       <avatar />
       <content>Really enjoyed reading your articles!</content>
     </comment>
-    <comment id="e31d625d-23ac-4ce4-a521-91e4a38eee5f" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="False">
+    <comment id="e31d625d-23ac-4ce4-a521-91e4a38eee5f" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="True">
       <date>2011-02-02 16:53:17</date>
       <author>dentist in doncaster</author>
       <email>Laugen@yahoo.com</email>
@@ -495,7 +495,7 @@ using (var scope = sessionManager.CreateTransactionScope())
       <avatar />
       <content>Good post, a tad above my head except for certain some-thing to take into consideration. Thank-you</content>
     </comment>
-    <comment id="59f79ffc-7533-488e-af67-abb9db5b96e3" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="False">
+    <comment id="59f79ffc-7533-488e-af67-abb9db5b96e3" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="True">
       <date>2011-02-04 18:35:08</date>
       <author>Al Landor</author>
       <email>Guittennez243@Hotmail.com</email>
@@ -506,7 +506,7 @@ using (var scope = sessionManager.CreateTransactionScope())
       <avatar />
       <content>totally amazing site!</content>
     </comment>
-    <comment id="eb4c0d97-9350-4599-bb4d-6120dcae73a8" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="False" deleted="False">
+    <comment id="eb4c0d97-9350-4599-bb4d-6120dcae73a8" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="False" deleted="True">
       <date>2011-02-09 23:37:32</date>
       <author>trustedCPAnetwork</author>
       <email>dwaynewilliamsma@GMAIL.COM</email>
@@ -516,7 +516,7 @@ using (var scope = sessionManager.CreateTransactionScope())
       <avatar />
       <content>It absolutely agree with the previous message</content>
     </comment>
-    <comment id="628b01c6-8104-4769-95f0-d111bbdac554" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="False" deleted="False">
+    <comment id="628b01c6-8104-4769-95f0-d111bbdac554" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="False" deleted="True">
       <date>2011-02-10 01:25:58</date>
       <author>and</author>
       <email>Hoeke_Burnie18@gmail.com</email>
@@ -526,7 +526,7 @@ using (var scope = sessionManager.CreateTransactionScope())
       <avatar />
       <content>commenting usually isnt my thing, but ive spent an hour on the site, so thanks for the info</content>
     </comment>
-    <comment id="26a1cc16-eb5b-4ab9-91e1-291eda1556b9" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="False" deleted="False">
+    <comment id="26a1cc16-eb5b-4ab9-91e1-291eda1556b9" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="False" deleted="True">
       <date>2011-02-11 08:19:57</date>
       <author>Loan</author>
       <email>Ameling@gmail.com</email>
@@ -536,7 +536,7 @@ using (var scope = sessionManager.CreateTransactionScope())
       <avatar />
       <content>This is my 1st moment i see here. I located so a lot of entertaining stuff in your blog site, especially its conversation. From the tons of responses on your content, I think I am not the simply one having all the enjoyment here! Keep up the good job.</content>
     </comment>
-    <comment id="5327b0b2-adab-4c7d-9c5b-b7295cdc1b54" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="False">
+    <comment id="5327b0b2-adab-4c7d-9c5b-b7295cdc1b54" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="True">
       <date>2011-02-15 13:57:23</date>
       <author>and</author>
       <email>Pituch_Bednarik19@mail.com</email>
@@ -547,7 +547,7 @@ using (var scope = sessionManager.CreateTransactionScope())
       <avatar />
       <content>wow, hot outcome close to this good topic. could wish to let me know how long period of time that will take? just because i am going to do the destination dissertation or probably it will be better to find the dissertation writing. thank you.</content>
     </comment>
-    <comment id="4c6c7880-3483-43ca-a783-cff057f86ea3" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="False">
+    <comment id="4c6c7880-3483-43ca-a783-cff057f86ea3" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="True">
       <date>2011-02-17 13:17:43</date>
       <author>and</author>
       <email>Leda_Wehby36@email.com</email>
@@ -558,7 +558,7 @@ using (var scope = sessionManager.CreateTransactionScope())
       <avatar />
       <content>@ahmad you just need to go sign up for a wordpress account. they are free, you will receive an api key when you do that.</content>
     </comment>
-    <comment id="71e945ae-4a9b-4f4d-a990-e60cf52370f9" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="False" deleted="False">
+    <comment id="71e945ae-4a9b-4f4d-a990-e60cf52370f9" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="False" deleted="True">
       <date>2011-02-20 21:50:53</date>
       <author>patrice catanzaro</author>
       <email>malika@yahoo.com</email>
@@ -568,7 +568,7 @@ using (var scope = sessionManager.CreateTransactionScope())
       <avatar />
       <content>Incroyable, ce sujet est plus que jamais d'actualit&amp;#233;! Bravo</content>
     </comment>
-    <comment id="0c6e39cf-f5d3-4200-a9a3-9326abe18ae6" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="False">
+    <comment id="0c6e39cf-f5d3-4200-a9a3-9326abe18ae6" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="True">
       <date>2011-02-21 22:02:59</date>
       <author>Tyisha Emfinger</author>
       <email>Wojnicki@gmail.com</email>
@@ -579,7 +579,7 @@ using (var scope = sessionManager.CreateTransactionScope())
       <avatar />
       <content>Thanks for the information!</content>
     </comment>
-    <comment id="625f1867-475f-4d76-ab18-e62296db091b" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="False">
+    <comment id="625f1867-475f-4d76-ab18-e62296db091b" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="True">
       <date>2011-02-23 10:31:59</date>
       <author>buy silkroad gold</author>
       <email>Pangilinan@ymail.com</email>
@@ -590,7 +590,7 @@ using (var scope = sessionManager.CreateTransactionScope())
       <avatar />
       <content>Thats a very nice info. Thank you for sharing it! </content>
     </comment>
-    <comment id="ecba3b52-26cb-434d-b4d9-348d935a87cf" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="False">
+    <comment id="ecba3b52-26cb-434d-b4d9-348d935a87cf" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="True">
       <date>2011-02-23 12:05:45</date>
       <author>how to make your voice deeper</author>
       <email>Donelly98@yahoo.com</email>
@@ -601,7 +601,7 @@ using (var scope = sessionManager.CreateTransactionScope())
       <avatar />
       <content>Just about all of what you point out happens to be supprisingly appropriate and it makes me ponder why I hadn't looked at this in this light before. This article truly did turn the light on for me as far as this particular issue goes. However at this time there is actually 1 position I am not too comfy with and whilst I try to reconcile that with the actual central theme of your issue, let me see what all the rest of your visitors have to say.Very well done.</content>
     </comment>
-    <comment id="cfaa43ce-1bc1-4253-bf77-f0dddb615cb0" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="False">
+    <comment id="cfaa43ce-1bc1-4253-bf77-f0dddb615cb0" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="True">
       <date>2011-02-26 17:36:59</date>
       <author>rift gold</author>
       <email>Melia13@gmail.com</email>
@@ -612,7 +612,7 @@ using (var scope = sessionManager.CreateTransactionScope())
       <avatar />
       <content>Extremely useful and informative article! Thanks a lot for those tips!</content>
     </comment>
-    <comment id="9a057eb5-5c3b-4699-a436-2ea6d265773c" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="False">
+    <comment id="9a057eb5-5c3b-4699-a436-2ea6d265773c" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="True">
       <date>2011-02-27 14:52:13</date>
       <author>P90X</author>
       <email>Breehl@ymail.com</email>
@@ -623,7 +623,7 @@ using (var scope = sessionManager.CreateTransactionScope())
       <avatar />
       <content>distrustful</content>
     </comment>
-    <comment id="939793f8-dfec-45aa-9507-90fe6c3f0b4f" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="False">
+    <comment id="939793f8-dfec-45aa-9507-90fe6c3f0b4f" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="True">
       <date>2011-02-28 01:36:57</date>
       <author>annuaire article</author>
       <email>Braccia46@gmail.com</email>
@@ -634,7 +634,7 @@ using (var scope = sessionManager.CreateTransactionScope())
       <avatar />
       <content>Proposez-vous une newsletter &amp;#224; ce sujet? Je suis &amp;#224; la recherche de nouvelles infos concernant certains points que vous abordez ici... Si quelqu'un peut m'aider, je l'en remercie d'avance!Bonjour, actuellement &amp;#233;tudiant en Licence pro, je suis &amp;#224; la recherche d'informations pertinentes concernant les points que vous abordez ici... Pourriez-vous citer certaines sources que vous avez utilis&amp;#233;es ici, merci d'avance!</content>
     </comment>
-    <comment id="d74da480-ddce-4744-ae04-d82c2d16fd52" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="False">
+    <comment id="d74da480-ddce-4744-ae04-d82c2d16fd52" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="True">
       <date>2011-02-28 10:35:15</date>
       <author>lingerie sexy</author>
       <email>Morles@yahoo.fr</email>
@@ -645,7 +645,7 @@ using (var scope = sessionManager.CreateTransactionScope())
       <avatar />
       <content>Is there other websites related to this topic that are compliant with your current point of view. Thank you.</content>
     </comment>
-    <comment id="ec704659-9979-428c-a96f-483b813a53f5" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="False">
+    <comment id="ec704659-9979-428c-a96f-483b813a53f5" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="True">
       <date>2011-02-28 22:57:55</date>
       <author>rift gold</author>
       <email>Townsend@ymail.com</email>
@@ -656,7 +656,7 @@ using (var scope = sessionManager.CreateTransactionScope())
       <avatar />
       <content>Pretty good post. thanks so much for sharing.</content>
     </comment>
-    <comment id="d76c8672-b269-4481-80a9-843d71e838fb" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="False">
+    <comment id="d76c8672-b269-4481-80a9-843d71e838fb" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="True">
       <date>2011-03-01 23:25:08</date>
       <author>plans for sheds</author>
       <email>cooperativemish@orange.com</email>
@@ -667,7 +667,7 @@ using (var scope = sessionManager.CreateTransactionScope())
       <avatar />
       <content>Love your blog I'm going to subscribe</content>
     </comment>
-    <comment id="a63442c8-61df-4a38-8248-042c97d0654e" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="False">
+    <comment id="a63442c8-61df-4a38-8248-042c97d0654e" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="True">
       <date>2011-03-02 16:50:13</date>
       <author>farmville cheats</author>
       <email>fearlessjunk75@vodafone.com</email>
@@ -678,7 +678,7 @@ using (var scope = sessionManager.CreateTransactionScope())
       <avatar />
       <content>Love your blog I'm going to subscribe</content>
     </comment>
-    <comment id="45bc8c4a-4007-46f1-b106-fa4e70b289d0" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="False">
+    <comment id="45bc8c4a-4007-46f1-b106-fa4e70b289d0" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="True">
       <date>2011-03-02 17:05:55</date>
       <author>farmville cheats</author>
       <email>tallfinances35@hotmail.com</email>
@@ -689,7 +689,7 @@ using (var scope = sessionManager.CreateTransactionScope())
       <avatar />
       <content>I should really be working</content>
     </comment>
-    <comment id="35fecca2-a568-4091-935a-52c35c471e27" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="False" deleted="False">
+    <comment id="35fecca2-a568-4091-935a-52c35c471e27" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="False" deleted="True">
       <date>2011-03-03 19:21:24</date>
       <author>John Sonmez</author>
       <email>john.sonmez@gmail.com</email>
@@ -703,7 +703,7 @@ Any luck getting this to work with nested scopes?  The code I am working in has 
 
 I know NHibernate doesn't really support nested transactions, so I was wondering if you had encountered this and have a solution?</content>
     </comment>
-    <comment id="1cfc5b1d-6d4b-4d13-9894-65a95de6f6b9" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="False">
+    <comment id="1cfc5b1d-6d4b-4d13-9894-65a95de6f6b9" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="True">
       <date>2011-03-04 08:05:13</date>
       <author>vigrx plus</author>
       <email>fsadfsa@gmail.com</email>
@@ -714,7 +714,7 @@ I know NHibernate doesn't really support nested transactions, so I was wondering
       <avatar />
       <content>thank you for this.. by the way, your layout is great.</content>
     </comment>
-    <comment id="975bd8d8-6240-4227-a5d3-2c248de83c31" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="False">
+    <comment id="975bd8d8-6240-4227-a5d3-2c248de83c31" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="True">
       <date>2011-03-04 10:48:39</date>
       <author>buy rift gold</author>
       <email>slieysey@gmail.com</email>
@@ -725,7 +725,7 @@ I know NHibernate doesn't really support nested transactions, so I was wondering
       <avatar />
       <content>I'm lovin' the blog. Alot of interesting information here.</content>
     </comment>
-    <comment id="b07ff12e-153d-4b1b-95d0-278b8f0b8580" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="False">
+    <comment id="b07ff12e-153d-4b1b-95d0-278b8f0b8580" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="True">
       <date>2011-03-04 14:57:58</date>
       <author>John Sonmez</author>
       <email>john.sonmez@gmail.com</email>
@@ -736,7 +736,7 @@ I know NHibernate doesn't really support nested transactions, so I was wondering
       <avatar />
       <content>Have you tried getting this to work using nested transactions?  Your implementation doesn't seem to handle nesting transaction scopes.</content>
     </comment>
-    <comment id="5bf444e4-87b2-4b0f-8664-db62c2b37b38" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="False" deleted="False">
+    <comment id="5bf444e4-87b2-4b0f-8664-db62c2b37b38" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="False" deleted="True">
       <date>2011-03-05 20:03:56</date>
       <author>Cleotilde Goldeman</author>
       <email>Artus@gmail.com</email>
@@ -746,7 +746,7 @@ I know NHibernate doesn't really support nested transactions, so I was wondering
       <avatar />
       <content>Thank you for this, it is actually great to come across a internet site which truly gives excellent information rather than posting rubbish. </content>
     </comment>
-    <comment id="a5fa9b4f-b046-457d-8d64-423b9aa7b3f2" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="False">
+    <comment id="a5fa9b4f-b046-457d-8d64-423b9aa7b3f2" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="True">
       <date>2011-03-06 14:27:18</date>
       <author>vigrx plus</author>
       <email>fsadfsa@gmail.com</email>
@@ -757,7 +757,7 @@ I know NHibernate doesn't really support nested transactions, so I was wondering
       <avatar />
       <content>thank you for this.. by the way, your layout is great.</content>
     </comment>
-    <comment id="a18851ea-52c9-4035-94cd-7ef0e9dcfa90" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="False">
+    <comment id="a18851ea-52c9-4035-94cd-7ef0e9dcfa90" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="True">
       <date>2011-03-07 19:06:45</date>
       <author>buy rift gold</author>
       <email>Laborin1@gmail.com</email>
@@ -768,7 +768,7 @@ I know NHibernate doesn't really support nested transactions, so I was wondering
       <avatar />
       <content>Really enjoyed reading your articles!</content>
     </comment>
-    <comment id="2226b98b-00a5-49db-ae04-cab527ba9a2b" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="False">
+    <comment id="2226b98b-00a5-49db-ae04-cab527ba9a2b" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="True">
       <date>2011-03-08 19:53:39</date>
       <author>vigrx plus</author>
       <email>fsadfsa@gmail.com</email>
@@ -779,7 +779,7 @@ I know NHibernate doesn't really support nested transactions, so I was wondering
       <avatar />
       <content>thank you for this.. by the way, your layout is great.</content>
     </comment>
-    <comment id="1c80d76d-e617-468c-90eb-d5ba0c1ba481" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="False">
+    <comment id="1c80d76d-e617-468c-90eb-d5ba0c1ba481" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="True">
       <date>2011-03-09 02:46:31</date>
       <author>dissolution societe</author>
       <email>Mcgath59@gmail.com</email>
@@ -790,7 +790,7 @@ I know NHibernate doesn't really support nested transactions, so I was wondering
       <avatar />
       <content>I'm preparing a lesson about this topic for next week, could I use your example to provide accurate information to my students? Regards, Clara.</content>
     </comment>
-    <comment id="0759061d-d3ef-4011-8141-6b4f9923c94f" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="False">
+    <comment id="0759061d-d3ef-4011-8141-6b4f9923c94f" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="True">
       <date>2011-03-09 16:00:53</date>
       <author>vigrx plus</author>
       <email>fsadfsa@gmail.com</email>
@@ -801,7 +801,7 @@ I know NHibernate doesn't really support nested transactions, so I was wondering
       <avatar />
       <content>this post was very well said... thanks</content>
     </comment>
-    <comment id="ca4d07ce-7495-4067-96e8-d0a515b9630b" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="False" deleted="False">
+    <comment id="ca4d07ce-7495-4067-96e8-d0a515b9630b" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="False" deleted="True">
       <date>2011-03-10 10:09:50</date>
       <author>rift gold</author>
       <email>Kriz@ymail.com</email>
@@ -811,7 +811,7 @@ I know NHibernate doesn't really support nested transactions, so I was wondering
       <avatar />
       <content>Thats a very nice info. Thank you for sharing it! </content>
     </comment>
-    <comment id="80add6b7-9e77-4412-affe-647ae005b0b6" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="False">
+    <comment id="80add6b7-9e77-4412-affe-647ae005b0b6" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="True">
       <date>2011-03-10 19:24:13</date>
       <author>rift online gold</author>
       <email>Rm6@gmail.com</email>
@@ -822,7 +822,7 @@ I know NHibernate doesn't really support nested transactions, so I was wondering
       <avatar />
       <content>I'm lovin' the blog. Alot of interesting information here.</content>
     </comment>
-    <comment id="97cdeac2-69c8-4bf9-b69f-c8d293150466" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="False">
+    <comment id="97cdeac2-69c8-4bf9-b69f-c8d293150466" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="True">
       <date>2011-03-12 09:50:44</date>
       <author>rift gold</author>
       <email>Parco5@gmail.com</email>
@@ -833,7 +833,7 @@ I know NHibernate doesn't really support nested transactions, so I was wondering
       <avatar />
       <content>thank you for posting this! I really enjoy it! </content>
     </comment>
-    <comment id="afcb38bc-216c-49d6-9aeb-fe6f98911f20" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="False">
+    <comment id="afcb38bc-216c-49d6-9aeb-fe6f98911f20" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="True">
       <date>2011-03-12 19:22:33</date>
       <author>rift online gold</author>
       <email>Fulenwider@ymail.com</email>
@@ -844,7 +844,7 @@ I know NHibernate doesn't really support nested transactions, so I was wondering
       <avatar />
       <content>Really enjoyed reading your articles!</content>
     </comment>
-    <comment id="f25fcb58-a1a0-4943-9b99-573dd7b21b35" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="False">
+    <comment id="f25fcb58-a1a0-4943-9b99-573dd7b21b35" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="True">
       <date>2011-03-13 23:59:26</date>
       <author>lunettes</author>
       <email>Rebeiro69@gmail.com</email>
@@ -855,7 +855,7 @@ I know NHibernate doesn't really support nested transactions, so I was wondering
       <avatar />
       <content>Ce sujet n'est-il pas deja d&amp;#233;mod&amp;#233;? Il serait peut etre temps de proposer une nouvelle version...</content>
     </comment>
-    <comment id="c2fe985d-067b-4b4e-ad36-fec1098f6d30" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="False">
+    <comment id="c2fe985d-067b-4b4e-ad36-fec1098f6d30" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="True">
       <date>2011-03-14 08:08:04</date>
       <author>lunettes ordinateur</author>
       <email>Chriswell1@gmail.com</email>
@@ -866,7 +866,7 @@ I know NHibernate doesn't really support nested transactions, so I was wondering
       <avatar />
       <content>Je cherchais un article sur ce sujet depuis quelques mois, vous traitez les points que j'attendais. Puis-je m'inscrire &amp;#224; une liste de diffusion de vos mises a jour s'il vous plait? Comment faire?</content>
     </comment>
-    <comment id="30826451-385e-4b90-a487-527e99323f4d" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="False">
+    <comment id="30826451-385e-4b90-a487-527e99323f4d" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="True">
       <date>2011-03-15 03:07:15</date>
       <author>lunettes ordinateur</author>
       <email>Tinnon93@gmail.com</email>
@@ -877,7 +877,7 @@ I know NHibernate doesn't really support nested transactions, so I was wondering
       <avatar />
       <content>I was looking for an article about this subject and this is the most informative I've ever found.</content>
     </comment>
-    <comment id="151f6798-cf48-4fc3-bf79-90ce52af6cdf" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="False">
+    <comment id="151f6798-cf48-4fc3-bf79-90ce52af6cdf" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="True">
       <date>2011-03-17 19:47:56</date>
       <author>cheese sites</author>
       <email>Deberg_Waldo33@hotmail.com</email>
@@ -888,18 +888,7 @@ I know NHibernate doesn't really support nested transactions, so I was wondering
       <avatar />
       <content>hi! its looks great here in your site,.  you give many information here thanks a lot,. i learn a lot here....</content>
     </comment>
-    <comment id="354c6f09-7ffc-4860-90a3-22689d1c7b38" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="False">
-      <date>2011-03-17 20:50:43</date>
-      <author>forex</author>
-      <email>Destephano_Morena810@email.com</email>
-      <country>jp</country>
-      <ip>64.111.221.42</ip>
-      <website>http://www.forexgroups.com/</website>
-      <moderatedby>Rule:black list</moderatedby>
-      <avatar />
-      <content>gracias por el comentario hector. en efecto, es material introductorio, pero no hace mal a nadie. el recurso principal que se maneja es</content>
-    </comment>
-    <comment id="d99937d7-db06-42e5-84a3-7729579d77e8" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="False">
+    <comment id="d99937d7-db06-42e5-84a3-7729579d77e8" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="True">
       <date>2011-03-17 20:50:43</date>
       <author>forex</author>
       <email>Iorio_Saether110@myspace.com</email>
@@ -910,7 +899,18 @@ I know NHibernate doesn't really support nested transactions, so I was wondering
       <avatar />
       <content>jacks life � getting lots of .edu backlink to your website.</content>
     </comment>
-    <comment id="77484202-55eb-448e-8fb3-8b64814883b8" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="False">
+    <comment id="354c6f09-7ffc-4860-90a3-22689d1c7b38" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="True">
+      <date>2011-03-17 20:50:43</date>
+      <author>forex</author>
+      <email>Destephano_Morena810@email.com</email>
+      <country>jp</country>
+      <ip>64.111.221.42</ip>
+      <website>http://www.forexgroups.com/</website>
+      <moderatedby>Rule:black list</moderatedby>
+      <avatar />
+      <content>gracias por el comentario hector. en efecto, es material introductorio, pero no hace mal a nadie. el recurso principal que se maneja es</content>
+    </comment>
+    <comment id="77484202-55eb-448e-8fb3-8b64814883b8" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="True">
       <date>2011-03-18 11:04:58</date>
       <author>ufo videos</author>
       <email>Eustache_Cambi101@hotmail.com</email>
@@ -921,7 +921,7 @@ I know NHibernate doesn't really support nested transactions, so I was wondering
       <avatar />
       <content>stop entering spam comments.. all spam comments will be deleted promptly..</content>
     </comment>
-    <comment id="46451df5-8e36-4d47-ab6e-3f0f5128238f" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="False">
+    <comment id="46451df5-8e36-4d47-ab6e-3f0f5128238f" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="True">
       <date>2011-03-18 19:22:01</date>
       <author>St. Louis Wedding Dresses</author>
       <email>Darakjy@gmail.com</email>
@@ -932,7 +932,7 @@ I know NHibernate doesn't really support nested transactions, so I was wondering
       <avatar />
       <content>You presented some good suggestions there. I did a searching on the niche and uncovered the majority of people should agree having your blog.</content>
     </comment>
-    <comment id="3bd46282-2af4-4d44-8635-9ab0bb99239e" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="False">
+    <comment id="3bd46282-2af4-4d44-8635-9ab0bb99239e" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="True">
       <date>2011-03-21 12:58:56</date>
       <author>Top Dating</author>
       <email>Fulenwider@ymail.com</email>
@@ -943,7 +943,7 @@ I know NHibernate doesn't really support nested transactions, so I was wondering
       <avatar />
       <content>While searching on Dating I found your blog, there are some good posts here and I'll be checking back</content>
     </comment>
-    <comment id="59aedc16-f1d2-46c6-a26d-934ff7d62eee" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="False">
+    <comment id="59aedc16-f1d2-46c6-a26d-934ff7d62eee" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="True">
       <date>2011-03-23 15:40:27</date>
       <author>Floyd Genta</author>
       <email>Tannahill3745@yahoo.com</email>
@@ -954,7 +954,7 @@ I know NHibernate doesn't really support nested transactions, so I was wondering
       <avatar />
       <content>We are getting ready to go to Hong Kong in the winter, I really enjoy reading about it,  I want to know more about the people of Hong Kong how they live and where they live</content>
     </comment>
-    <comment id="0f9c0d4f-b3f7-41e7-bc5d-6d705de729a0" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="False">
+    <comment id="0f9c0d4f-b3f7-41e7-bc5d-6d705de729a0" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="True">
       <date>2011-03-26 12:56:41</date>
       <author>winnipeg computer repair</author>
       <email>bill@freePCrepairnotes.net</email>
@@ -965,7 +965,7 @@ I know NHibernate doesn't really support nested transactions, so I was wondering
       <avatar />
       <content>Hey Thank You For Sharing! Good Information To Know. Good Site, Great Info, Good Blog And Keep Up The Good Work! btw, I Tried Adding Your RSS To Feed To My Feed Reader But It Says RSS Is Disabled And To Contact The Website Adminstrator!? Your End? My End? Please Reply Thanks!</content>
     </comment>
-    <comment id="0433e60b-4652-4177-962c-8d4bc8230d4b" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="False">
+    <comment id="0433e60b-4652-4177-962c-8d4bc8230d4b" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="True">
       <date>2011-03-26 13:03:21</date>
       <author>Issac Maneton</author>
       <email>Macdonnell15@gmail.com</email>
@@ -976,7 +976,7 @@ I know NHibernate doesn't really support nested transactions, so I was wondering
       <avatar />
       <content>I'll wait for your next post :)</content>
     </comment>
-    <comment id="ec1c3e11-d965-4ff5-a915-e3a15631bb07" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="False">
+    <comment id="ec1c3e11-d965-4ff5-a915-e3a15631bb07" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="True">
       <date>2011-03-31 09:22:45</date>
       <author>Melody Deem</author>
       <email>Berezny@gmail.com</email>
@@ -987,7 +987,7 @@ I know NHibernate doesn't really support nested transactions, so I was wondering
       <avatar />
       <content>fantastic site ill be back for sure !wicked! </content>
     </comment>
-    <comment id="be515bda-5a77-4009-a735-c3542bc11dde" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="False">
+    <comment id="be515bda-5a77-4009-a735-c3542bc11dde" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="True">
       <date>2011-04-02 23:54:30</date>
       <author>Hipolito M. Wiseman</author>
       <email>Fariss@yahoo.com</email>
@@ -998,7 +998,7 @@ I know NHibernate doesn't really support nested transactions, so I was wondering
       <avatar />
       <content>Well, interesting thoughts. I can't say that I agree with you completely but your arguement is well thought out.</content>
     </comment>
-    <comment id="802588d9-fbb4-44d0-8ea6-d0f403b1a6ef" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="False">
+    <comment id="802588d9-fbb4-44d0-8ea6-d0f403b1a6ef" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="True">
       <date>2011-04-03 15:08:59</date>
       <author>SEO R�f�rencement</author>
       <email>selda.miriani@gmail.com</email>
@@ -1009,7 +1009,7 @@ I know NHibernate doesn't really support nested transactions, so I was wondering
       <avatar />
       <content>Thanks for this, just one word +1&amp;quot; (like the new google service ^^ )</content>
     </comment>
-    <comment id="65b5e29f-cb7d-4cbe-b58a-9d5e2a61b89c" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="False" deleted="False">
+    <comment id="65b5e29f-cb7d-4cbe-b58a-9d5e2a61b89c" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="False" deleted="True">
       <date>2011-04-04 18:23:41</date>
       <author>Ask Pinoy</author>
       <email>Siona@gmail.com</email>
@@ -1019,7 +1019,7 @@ I know NHibernate doesn't really support nested transactions, so I was wondering
       <avatar />
       <content>Stressed is Desserts spelled backwards.</content>
     </comment>
-    <comment id="af2991c7-976b-4540-9ed7-7fbb0480334d" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="False">
+    <comment id="af2991c7-976b-4540-9ed7-7fbb0480334d" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="True">
       <date>2011-04-05 16:50:08</date>
       <author>Angeleena</author>
       <email>Ashraf@gmail.com</email>
@@ -1030,7 +1030,7 @@ I know NHibernate doesn't really support nested transactions, so I was wondering
       <avatar />
       <content>Great post... Good Luck</content>
     </comment>
-    <comment id="397c382e-c6b0-48be-ba72-ffbd7a76d5d9" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="False" deleted="False">
+    <comment id="397c382e-c6b0-48be-ba72-ffbd7a76d5d9" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="False" deleted="True">
       <date>2011-04-06 12:10:12</date>
       <author>Custom Software Developer</author>
       <email>sethczerepak@gmail.com</email>
@@ -1040,7 +1040,7 @@ I know NHibernate doesn't really support nested transactions, so I was wondering
       <avatar />
       <content>Thanks, Matt, for this great post.  I'll be coming back and reading some more of your posts in the near future.</content>
     </comment>
-    <comment id="715637e0-75a1-4ddc-8739-a03787988f9a" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="False">
+    <comment id="715637e0-75a1-4ddc-8739-a03787988f9a" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="True">
       <date>2011-04-07 00:25:33</date>
       <author>Ask Pinoy</author>
       <email>Barba@gmail.com</email>
@@ -1051,7 +1051,7 @@ I know NHibernate doesn't really support nested transactions, so I was wondering
       <avatar />
       <content>Mary Stuart became Queen of Scotland when she was only six days old.</content>
     </comment>
-    <comment id="62c8af29-0252-404e-84bc-da1927c56d79" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="False">
+    <comment id="62c8af29-0252-404e-84bc-da1927c56d79" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="True">
       <date>2011-04-08 15:56:39</date>
       <author>Pinay Scandal</author>
       <email>Quintal@gmail.com</email>
@@ -1062,7 +1062,7 @@ I know NHibernate doesn't really support nested transactions, so I was wondering
       <avatar />
       <content>Dueling is legal in Paraguay as long as both parties are registered blood donors.</content>
     </comment>
-    <comment id="195b6100-cfad-4fd3-a1e1-175168e1363c" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="False">
+    <comment id="195b6100-cfad-4fd3-a1e1-175168e1363c" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="True">
       <date>2011-04-13 19:23:03</date>
       <author>science</author>
       <email>Gale_Eun108@myspace.com</email>
@@ -1073,7 +1073,7 @@ I know NHibernate doesn't really support nested transactions, so I was wondering
       <avatar />
       <content>i got it to work for all of you who come from google. you can read my solution at my blog (that now works)</content>
     </comment>
-    <comment id="1d3b5877-d783-4f40-8743-db9d27b20ac2" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="False">
+    <comment id="1d3b5877-d783-4f40-8743-db9d27b20ac2" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="True">
       <date>2011-04-15 05:29:17</date>
       <author>David Downy</author>
       <email>Fabus90@gmail.com</email>
@@ -1084,7 +1084,7 @@ I know NHibernate doesn't really support nested transactions, so I was wondering
       <avatar />
       <content>Hiya! You some form of professional? Nice message. Can you inform me the right way to subscribe your blog?</content>
     </comment>
-    <comment id="238f6fb5-04b3-4f17-975a-ce725064ad76" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="False">
+    <comment id="238f6fb5-04b3-4f17-975a-ce725064ad76" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="True">
       <date>2011-04-17 01:23:26</date>
       <author>buy a home</author>
       <email>Sha_Boisselle37@yahoo.com</email>
@@ -1095,7 +1095,7 @@ I know NHibernate doesn't really support nested transactions, so I was wondering
       <avatar />
       <content>hi. i just noticed that your site looks like it has a few code problems at the very top of your websites page. is it an older version of blog engine?��im not sure if everybody is getting this same bugginess when browsing your blog? i am using a totally different browser than most people, referred to as lynx, so that is what might be causing it? i just wanted to make sure you know. thanks for posting some great postings and i will try to return back with a completely different browser to check things out!</content>
     </comment>
-    <comment id="74a8735a-bb8b-48e0-8dfe-f1a6ac9630b2" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="False">
+    <comment id="74a8735a-bb8b-48e0-8dfe-f1a6ac9630b2" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="True">
       <date>2011-04-19 21:06:33</date>
       <author>wirerope</author>
       <email>Schoffstall_Adalberto1010@myspace.com</email>
@@ -1106,7 +1106,7 @@ I know NHibernate doesn't really support nested transactions, so I was wondering
       <avatar />
       <content>n most occassions i don't post comments on articles, but i want to say that this article really inspired me to do it. amazingly nice post</content>
     </comment>
-    <comment id="49147ada-06bf-43a4-84f3-0af1f08d4cbb" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="False">
+    <comment id="49147ada-06bf-43a4-84f3-0af1f08d4cbb" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="True">
       <date>2011-04-21 02:30:07</date>
       <author>buy rift platinum</author>
       <email>friendlinzh@qq.com</email>
@@ -1117,7 +1117,7 @@ I know NHibernate doesn't really support nested transactions, so I was wondering
       <avatar />
       <content>I began talking about the charr in terms of being not dudes with cat heads but as chimera-like monsters that joined several animals together</content>
     </comment>
-    <comment id="53ef1adf-713b-4f87-8b2e-92355a5a57ec" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="False">
+    <comment id="53ef1adf-713b-4f87-8b2e-92355a5a57ec" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="True">
       <date>2011-04-21 15:16:35</date>
       <author>Berta Teague</author>
       <email>27Cantoni@hotmail.com</email>
@@ -1128,7 +1128,7 @@ I know NHibernate doesn't really support nested transactions, so I was wondering
       <avatar />
       <content>Hey there, I'm brand new here combined with still discovering the ropes. This can be a perfect blog after some help from experts. Anxious about interacting with network here. </content>
     </comment>
-    <comment id="0b6cab94-a5b3-4549-8b2e-5d602bf89a26" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="False">
+    <comment id="0b6cab94-a5b3-4549-8b2e-5d602bf89a26" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="True">
       <date>2011-04-23 15:00:38</date>
       <author>buy rift platinum</author>
       <email>friendlinzh@qq.com</email>
@@ -1139,7 +1139,7 @@ I know NHibernate doesn't really support nested transactions, so I was wondering
       <avatar />
       <content>Pau Gasol finally found his inner aggressiveness with an assist from Derek Fisher</content>
     </comment>
-    <comment id="8e08d880-a29e-489f-a74b-9f25a5380d43" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="False">
+    <comment id="8e08d880-a29e-489f-a74b-9f25a5380d43" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="True">
       <date>2011-05-04 00:28:17</date>
       <author>birth defects</author>
       <email>ynah211989@gmail.com</email>
@@ -1150,7 +1150,7 @@ I know NHibernate doesn't really support nested transactions, so I was wondering
       <avatar />
       <content>I’ve just sent a link to this publish to a friend, as I am aware they’ll find it intriguing.</content>
     </comment>
-    <comment id="4515c20f-be68-4618-8710-2abf8399a187" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="False" deleted="False">
+    <comment id="4515c20f-be68-4618-8710-2abf8399a187" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="False" deleted="True">
       <date>2011-05-05 04:27:23</date>
       <author>adesivou</author>
       <email>Steenrod@gmail.com</email>
@@ -1160,7 +1160,7 @@ I know NHibernate doesn't really support nested transactions, so I was wondering
       <avatar />
       <content>great post! blog favorited (:</content>
     </comment>
-    <comment id="efe53e28-7a7b-443c-b2e5-ca1a1909746a" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="False">
+    <comment id="efe53e28-7a7b-443c-b2e5-ca1a1909746a" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="True">
       <date>2011-05-05 07:27:33</date>
       <author>accutane lawyer</author>
       <email>asd12@gmail.com</email>
@@ -1171,7 +1171,7 @@ I know NHibernate doesn't really support nested transactions, so I was wondering
       <avatar />
       <content>wow! this is very awesome..i like it,</content>
     </comment>
-    <comment id="19da4289-1635-4fae-8823-b195e36c90e2" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="False">
+    <comment id="19da4289-1635-4fae-8823-b195e36c90e2" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="True">
       <date>2011-05-05 10:43:49</date>
       <author>solar hot water systems</author>
       <email>kintarusheen@gmail.com</email>
@@ -1182,7 +1182,7 @@ I know NHibernate doesn't really support nested transactions, so I was wondering
       <avatar />
       <content>hey just wanna say thank you for this great blog..nice topic keep it up</content>
     </comment>
-    <comment id="6d7653d9-9bd2-4482-a47a-bc555e4fdcee" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="False">
+    <comment id="6d7653d9-9bd2-4482-a47a-bc555e4fdcee" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="True">
       <date>2011-05-07 14:57:49</date>
       <author>some free stuff</author>
       <email>Canders_Galentine1965@mymail.com</email>
@@ -1193,7 +1193,7 @@ I know NHibernate doesn't really support nested transactions, so I was wondering
       <avatar />
       <content>i read a lot of blogs on a daily basis and for the most part just wanted to make a quick comment to say i�m glad i found your blog. thanks.</content>
     </comment>
-    <comment id="ec142c2a-ff11-4ff1-a9a0-2f368320d467" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="False">
+    <comment id="ec142c2a-ff11-4ff1-a9a0-2f368320d467" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="True">
       <date>2011-05-09 20:50:53</date>
       <author>fighter tube</author>
       <email>Hieatt_Myra1994@mymail.com</email>
@@ -1204,7 +1204,7 @@ I know NHibernate doesn't really support nested transactions, so I was wondering
       <avatar />
       <content>i have the same problem with the print on the keys disappearing quite quickly when it is heavily used. its definitely the biggest problem with every keyboard i have had.</content>
     </comment>
-    <comment id="783e5f80-356b-44ed-bf1a-bce0c093826d" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="False">
+    <comment id="783e5f80-356b-44ed-bf1a-bce0c093826d" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="True">
       <date>2011-05-12 12:57:53</date>
       <author>buy choppers</author>
       <email>Billiot_Alverta2010@hotmail.com</email>
@@ -1215,7 +1215,7 @@ I know NHibernate doesn't really support nested transactions, so I was wondering
       <avatar />
       <content>Where can i find your rss? I cant find it</content>
     </comment>
-    <comment id="d0e3efaf-7dea-49f1-99dc-b2b5a23e8615" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="False">
+    <comment id="d0e3efaf-7dea-49f1-99dc-b2b5a23e8615" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="True">
       <date>2011-05-12 14:36:17</date>
       <author>wing</author>
       <email>Whisted_Duitscher1960@fastmail.com</email>
@@ -1226,7 +1226,7 @@ I know NHibernate doesn't really support nested transactions, so I was wondering
       <avatar />
       <content>We have the Very best complimentary hot sauce in addition to hot wing marinade recipes, as well as the Most delicious hot wing gravies on the planet, come to investigate this fun and also informative website all about the Hottest hot salsas and the best Warm Wing eating challenges and hot sauce recipes.</content>
     </comment>
-    <comment id="f0cb6af8-4a99-4007-a983-b53d3afd1f30" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="False">
+    <comment id="f0cb6af8-4a99-4007-a983-b53d3afd1f30" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="True">
       <date>2011-05-12 22:15:42</date>
       <author>chicken pox</author>
       <email>Thornbrugh_Silvana1983@mymail.com</email>
@@ -1237,7 +1237,7 @@ I know NHibernate doesn't really support nested transactions, so I was wondering
       <avatar />
       <content>Oh i really envy the way you post topics, how i wish i could write like that.:::~</content>
     </comment>
-    <comment id="6e3b79f5-8db9-4595-a23a-066f8c480c11" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="False">
+    <comment id="6e3b79f5-8db9-4595-a23a-066f8c480c11" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="True">
       <date>2011-05-18 09:40:24</date>
       <author>get free pics</author>
       <email>Madlyn_Leffert2000@myspace.com</email>
@@ -1248,7 +1248,7 @@ I know NHibernate doesn't really support nested transactions, so I was wondering
       <avatar />
       <content>FYI, the MediumTrust trace issue was fixed in SVN just after SubSonic Beta 2 rolled... It will be included in Beta 3....</content>
     </comment>
-    <comment id="e28a60b5-5723-49e8-ad0d-2c788c7c8a7c" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="False">
+    <comment id="e28a60b5-5723-49e8-ad0d-2c788c7c8a7c" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="True">
       <date>2011-05-21 00:57:43</date>
       <author>wnba</author>
       <email>Genzel_Malcom1954@yahoo.com</email>
@@ -1259,7 +1259,7 @@ I know NHibernate doesn't really support nested transactions, so I was wondering
       <avatar />
       <content>runs pmdepartment skilled isoneworld still appartment trendsbut executed humans utterance felony</content>
     </comment>
-    <comment id="d4146e2a-937e-446a-ae52-77ecd04dfaaa" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="False">
+    <comment id="d4146e2a-937e-446a-ae52-77ecd04dfaaa" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="True">
       <date>2011-05-21 08:34:26</date>
       <author>doctor</author>
       <email>Schmith_Meloan1995@msn.com</email>
@@ -1270,7 +1270,7 @@ I know NHibernate doesn't really support nested transactions, so I was wondering
       <avatar />
       <content>I had been originally treated using Intense pulsed light which often is not the best method to get hair removal. I started off with complete leg laser hair removal. I visited a good Dr . that applied a strong older fractionated laser machine however was left with spotty spots. And then I made a decision to get a</content>
     </comment>
-    <comment id="4788b278-245d-44cb-8372-7fa8122c583d" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="False">
+    <comment id="4788b278-245d-44cb-8372-7fa8122c583d" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="True">
       <date>2011-05-21 21:22:57</date>
       <author>shirts</author>
       <email>Growell_Nembhard1951@yahoo.com</email>
@@ -1281,7 +1281,7 @@ I know NHibernate doesn't really support nested transactions, so I was wondering
       <avatar />
       <content>I would like to show some thanks to you for bailing me out of this particular instance. As a result of surfing around throughout the online world and seeing advice that were not productive, I figured my life was gone. Being alive without the answers to the issues youve resolved by way of your entire short post is a critical case, as well as those that might have negatively damaged my career if I hadnt discovered your web site. Your understanding and kindness in controlling every aspect was useful. I dont know what I wouldve done if I had not discovered such a solution like this. Im able to at this moment look ahead to my future. Thanks very much for your expert and result oriented help. I will not think twice to recommend your site to any person who needs and wants guidelines on this topic.</content>
     </comment>
-    <comment id="28532eb4-470d-4370-8a80-2ebabdb5373f" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="False">
+    <comment id="28532eb4-470d-4370-8a80-2ebabdb5373f" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="True">
       <date>2011-05-24 00:51:36</date>
       <author>wing</author>
       <email>Schreuder_Goetze1987@hotmail.com</email>
@@ -1292,7 +1292,7 @@ I know NHibernate doesn't really support nested transactions, so I was wondering
       <avatar />
       <content>Maybe I should go &amp;amp; shout some right wing stuff so they can throw me out, just for fun.</content>
     </comment>
-    <comment id="9446ad4b-94d2-48a6-83c2-f03b63e6e48a" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="False">
+    <comment id="9446ad4b-94d2-48a6-83c2-f03b63e6e48a" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="True">
       <date>2011-05-24 00:54:33</date>
       <author>chicken pox</author>
       <email>Kayastha_Magan1987@gmail.com</email>
@@ -1303,7 +1303,7 @@ I know NHibernate doesn't really support nested transactions, so I was wondering
       <avatar />
       <content>It's pretty interesting that the mainstream media has changed the way it looks at this recently dont you think? What used to neve be brought up or discussed has changed. Frankly it is about time we see a change.</content>
     </comment>
-    <comment id="dcf6cd9e-6d7e-4cc5-9f73-14b9b3d18eaf" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="False">
+    <comment id="dcf6cd9e-6d7e-4cc5-9f73-14b9b3d18eaf" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="True">
       <date>2011-05-24 12:32:41</date>
       <author>snooker</author>
       <email>Tameka_Demler1999@yahoo.com</email>
@@ -1314,7 +1314,7 @@ I know NHibernate doesn't really support nested transactions, so I was wondering
       <avatar />
       <content>I would like to thank you for the efforts you have made in writing this post. I am hoping the same best work from you in the future as well. In fact your creative writing abilities has inspired me to start my own BlogEngine blog now. Really the blogging is spreading its wings rapidly. Your write up is a fine example of it.</content>
     </comment>
-    <comment id="3afa675d-fc57-4f29-b3f3-d9b6bdbe8c30" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="False">
+    <comment id="3afa675d-fc57-4f29-b3f3-d9b6bdbe8c30" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="True">
       <date>2011-05-25 10:35:16</date>
       <author>aa</author>
       <email>Tonnessen_Hafferkamp1952@yahoo.com</email>
@@ -1325,7 +1325,7 @@ I know NHibernate doesn't really support nested transactions, so I was wondering
       <avatar />
       <content>I would like to thanks for the efforts you have contributed in writing this blog. I am hoping the same top-quality blog post from you in the future as well. In fact your creative writing skill has inspired me to get my own blog now. Really the blogging is spreading its wings quickly. Your write up is a good model of it.</content>
     </comment>
-    <comment id="88f3fb5d-f441-445c-b064-9343d89af2e0" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="False">
+    <comment id="88f3fb5d-f441-445c-b064-9343d89af2e0" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="True">
       <date>2011-05-27 11:34:48</date>
       <author>hosting companies</author>
       <email>Tapian_Nazzaro2004@msn.com</email>
@@ -1336,7 +1336,7 @@ I know NHibernate doesn't really support nested transactions, so I was wondering
       <avatar />
       <content>Excellent blog here! Also your web site loads up very fast! What web host are you using? Can I get your affiliate link to your host? I wish my site loaded up as fast as yours lol</content>
     </comment>
-    <comment id="5fcfd829-042f-4f4f-a302-929fdae976d9" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="False">
+    <comment id="5fcfd829-042f-4f4f-a302-929fdae976d9" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="True">
       <date>2011-05-27 16:13:18</date>
       <author>african foods</author>
       <email>Elia_Hutchen2008@mails.com</email>
@@ -1347,7 +1347,7 @@ I know NHibernate doesn't really support nested transactions, so I was wondering
       <avatar />
       <content>Last month, when i visited your blog i got an error on the mysql server of yours.-*,-</content>
     </comment>
-    <comment id="6d0c1e8a-bcec-46ee-bcd8-2d05215e07a1" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="False">
+    <comment id="6d0c1e8a-bcec-46ee-bcd8-2d05215e07a1" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="True">
       <date>2011-05-29 20:14:08</date>
       <author>new york</author>
       <email>Kalehuawehe_Deroin1976@hotmail.com</email>
@@ -1358,7 +1358,7 @@ I know NHibernate doesn't really support nested transactions, so I was wondering
       <avatar />
       <content>Last month, when i visited your blog i got an error on the mysql server of yours.,:**'</content>
     </comment>
-    <comment id="ea3f7e49-a5ca-41c8-9090-f09fab7457a2" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="False" deleted="False">
+    <comment id="ea3f7e49-a5ca-41c8-9090-f09fab7457a2" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="False" deleted="True">
       <date>2011-06-02 19:08:40</date>
       <author>Michaela Mallek</author>
       <email>Sevier4786@gmail.com</email>
@@ -1368,7 +1368,7 @@ I know NHibernate doesn't really support nested transactions, so I was wondering
       <avatar />
       <content>It seems like daily NATO is exceeding the UN Mandate in Libya. I sure hope this doesn't turn into another Afghanistan. I wish the unfortunate did not always suffer in these situations.</content>
     </comment>
-    <comment id="e63dffbb-adfc-44d8-9256-ca0ee625f488" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="False">
+    <comment id="e63dffbb-adfc-44d8-9256-ca0ee625f488" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="True">
       <date>2011-06-02 23:05:40</date>
       <author>Leagal Weed</author>
       <email>Stange90@legalnugs.com</email>
@@ -1379,7 +1379,7 @@ I know NHibernate doesn't really support nested transactions, so I was wondering
       <avatar />
       <content>At Least 1 – 1.5 Million Americans are Legal Medical Marijuana Patients. Market for these patients in sixteen states and D.C. estimated at between $2 – $6 billion annually.</content>
     </comment>
-    <comment id="49531e8d-b697-4d3c-912a-420ea58240a7" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="False">
+    <comment id="49531e8d-b697-4d3c-912a-420ea58240a7" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="True">
       <date>2011-06-03 12:08:42</date>
       <author>Leagal Weed</author>
       <email>Vannortwick53@legalnugs.com</email>
@@ -1390,7 +1390,7 @@ I know NHibernate doesn't really support nested transactions, so I was wondering
       <avatar />
       <content>At Least 1 – 1.5 Million Americans are Legal Medical Marijuana Patients. Market for these patients in sixteen states and D.C. estimated at between $2 – $6 billion annually.</content>
     </comment>
-    <comment id="b2e576e2-714d-4424-8144-d3208fec2fab" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="False">
+    <comment id="b2e576e2-714d-4424-8144-d3208fec2fab" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="True">
       <date>2011-06-12 00:32:24</date>
       <author />
       <email>dsk.nafissatou@gmail.com</email>
@@ -1400,7 +1400,7 @@ I know NHibernate doesn't really support nested transactions, so I was wondering
       <avatar />
       <content>I would like to tweet this article but i could clic on twitter button... :(</content>
     </comment>
-    <comment id="91247bfd-85d1-49e1-8e57-9159c9c0d107" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="False">
+    <comment id="91247bfd-85d1-49e1-8e57-9159c9c0d107" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="True">
       <date>2011-06-12 02:04:35</date>
       <author>my cool site</author>
       <email>Sook_Sheller1974@mymail.com</email>
@@ -1411,7 +1411,7 @@ I know NHibernate doesn't really support nested transactions, so I was wondering
       <avatar />
       <content>Just thought i would comment and say good articles! I want to learn better english because I want to study in the US soon. Your blog is fantastic for learning the engslish language. You have good style and I learn alot! Best, Markus</content>
     </comment>
-    <comment id="ac11a266-0da5-4a12-a4cd-4ada0225e6a7" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="False">
+    <comment id="ac11a266-0da5-4a12-a4cd-4ada0225e6a7" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="True">
       <date>2011-06-23 07:19:28</date>
       <author>Movies, Games, Software, encyclopedia</author>
       <email>levan.kipshidze@gmail.com</email>
@@ -1422,7 +1422,7 @@ I know NHibernate doesn't really support nested transactions, so I was wondering
       <avatar />
       <content>Please Click</content>
     </comment>
-    <comment id="c786daa5-98af-4591-b0fb-ef8536f24e3a" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="False">
+    <comment id="c786daa5-98af-4591-b0fb-ef8536f24e3a" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="True">
       <date>2011-07-11 04:51:34</date>
       <author>Easy Website Builder</author>
       <email>Higbee@googlemail.com</email>
@@ -1433,7 +1433,7 @@ I know NHibernate doesn't really support nested transactions, so I was wondering
       <avatar />
       <content>Howdy We're very delighted We came across the weblog wrock::blog | Getting TransactionScope to play nice with NHibernate My partner and I truly found you simply by accident, when I was researching on Askjeeve to get something else entirely, Nonetheless We're here now and I would just want to say many thanks for the incredible posting plus a complete entertaining web log By the way my prayers go with those at atomic plant hopefully you are healthy plus safe  !!!</content>
     </comment>
-    <comment id="628c5e4b-b747-438e-938b-07296413a934" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="False">
+    <comment id="628c5e4b-b747-438e-938b-07296413a934" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="True">
       <date>2011-07-16 19:20:46</date>
       <author>painting contractor</author>
       <email>Melia13@gmail.com</email>
