@@ -568,45 +568,8 @@ line-height:140%;
 	text-indent:-9999px;
 }
 
-#footerActionsInner #twitter {
-	float:left;
-	overflow:hidden;
-	width:315px;
-	background:url(images/twitter_ill.png) 0 0 no-repeat;
-	padding-left:85px;
-	position:relative;
-}
-
 #footerActionsInner #twitter #latest {
 	width:293px;
-}
-
-#footerActionsInner #twitter #latest #tweet {
-	background:url(images/bk_latest_tweet.png) 0 0 no-repeat;
-	padding:10px 10px 0 20px;
-	font-size:12px;
-	font-family:Georgia, "Times New Roman", Times, serif;
-	font-style:italic;
-	line-height:125%;
-	height:65px;
-	
-}
-
-#footerActionsInner #twitter #latest #tweetBottom{
-	height:26px;
-	background:url(images/bl_latesttweet_bottom.png) 0 0 no-repeat;
-}
-
-#footerActionsInner #twitter a.action {
-	position:absolute;
-	display:block;
-	width:81px;
-	height:23px;
-	background:url(images/but_actions.png) 0 0 no-repeat;
-	text-align:center;
-	font-size:12px;
-	color:#fff;
-	padding-top:2px;
 }
 
 #footerActionsInner #twitter a.action:hover {
@@ -622,7 +585,7 @@ line-height:140%;
 	float:right;
 	overflow:hidden;
 	width:435px;
-	background:url(images/quick_contact_ill.png) 0 0 no-repeat;
+	background:none;
 	padding-left:85px;
 	position:relative;
 	margin-left:30px;

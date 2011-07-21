@@ -10,14 +10,18 @@
   <contactthankmessage>&lt;h1&gt;Thank you&lt;/h1&gt;&lt;p&gt;The message was sent.&lt;/p&gt;</contactthankmessage>
   <emailsubjectprefix>Weblog</emailsubjectprefix>
   <trackingscript>&lt;script type="text/javascript"&gt;
-var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
-document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-10685042-1']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
 &lt;/script&gt;
-&lt;script type="text/javascript"&gt;
-try {
-var pageTracker = _gat._getTracker("UA-10685042-1");
-pageTracker._trackPageview();
-} catch(err) {}&lt;/script&gt;
 &lt;script type="text/javascript" defer="defer" src="/blog/js.axd?path=/themes/Boldy/js/ddsmoothmenu.js"&gt;&lt;/script&gt;</trackingscript>
   <showdescriptioninpostlist>False</showdescriptioninpostlist>
   <commentsperpage>10</commentsperpage>
@@ -50,7 +54,7 @@ pageTracker._trackPageview();
   <useblognameinpagetitles>True</useblognameinpagetitles>
   <smtpusername>matt@mattwrock.com</smtpusername>
   <enableerrorlogging>False</enableerrorlogging>
-  <enablehttpcompression>True</enablehttpcompression>
+  <enablehttpcompression>False</enablehttpcompression>
   <enablepasswordreset>True</enablepasswordreset>
   <disqusaddcommentstopages>False</disqusaddcommentstopages>
   <alternatefeedurl>http://feeds.feedburner.com/Wrockblog</alternatefeedurl>

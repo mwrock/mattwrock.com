@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <SerializableStringDictionary>
   <SerializableStringDictionary>
-    <DictionaryEntry Key="content" Value="&lt;p&gt;&lt;img class=&quot;myface&quot; src=&quot;/themes/Boldy/images/trans.gif&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;&#xD;&#xA;&lt;p&gt;I'm &lt;a href=&quot;mailto:matt@mattwrock.com&quot;&gt;&lt;strong&gt;Matt Wrock&lt;/strong&gt;&lt;/a&gt; with over ten years of experience architecting scalable, distributed, high traffic web applications. I currently live in Woodinville, WA with my wife, two daughters, three dogs and cat. I work for Microsoft as a Sr. Software Engineer working on MSDN and Technet Gallery platform including the Visual Studio Gallery, MSDN Code Samples gallery and more.&lt;/p&gt;" />
+    <DictionaryEntry Key="content" Value="&lt;p&gt;&lt;img class=&quot;myface&quot; src=&quot;/themes/Boldy/images/trans.gif&quot; alt=&quot;Hey thats me!&quot; width=&quot;1&quot; height=&quot;1&quot; /&gt;&lt;/p&gt;&#xD;&#xA;&lt;p&gt;I'm &lt;a href=&quot;mailto:matt@mattwrock.com&quot;&gt;&lt;strong&gt;Matt Wrock&lt;/strong&gt;&lt;/a&gt; with over ten years of experience architecting scalable, distributed, high traffic web applications. I currently live in Woodinville, WA with my wife, two daughters, three dogs and cat. I work for Microsoft as a Sr. Software Engineer working on MSDN and Technet Gallery platform including the Visual Studio Gallery, MSDN Code Samples gallery and more.&lt;/p&gt;" />
   </SerializableStringDictionary>
 </SerializableStringDictionary>
