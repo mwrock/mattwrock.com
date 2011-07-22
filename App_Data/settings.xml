@@ -54,7 +54,7 @@
   <useblognameinpagetitles>True</useblognameinpagetitles>
   <smtpusername>matt@mattwrock.com</smtpusername>
   <enableerrorlogging>False</enableerrorlogging>
-  <enablehttpcompression>False</enablehttpcompression>
+  <enablehttpcompression>True</enablehttpcompression>
   <enablepasswordreset>True</enablepasswordreset>
   <disqusaddcommentstopages>False</disqusaddcommentstopages>
   <alternatefeedurl>http://feeds.feedburner.com/Wrockblog</alternatefeedurl>

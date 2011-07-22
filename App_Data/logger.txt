@@ -758,3 +758,7 @@ Error retrieving Twitter feed. The 'meta' start tag on line 4 position 6 does no
 Date: 7/20/2011 3:41:46 AM
 Contents Below
 PackageManager.InstallPackage: The file 'C:\mattwrock.com\themes\Boldy\css\ddsmoothmenu.css' already exists.
+*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
+Date: 7/22/2011 3:22:14 AM
+Contents Below
+admin.Settings.Advanced.Save(): The process cannot access the file 'c:\mattwrock.com\App_Data\settings.xml' because it is being used by another process.
