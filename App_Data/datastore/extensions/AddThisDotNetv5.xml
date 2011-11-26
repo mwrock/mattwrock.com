@@ -1,0 +1,887 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ManagedExtension xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" Name="AddThisDotNetv5">
+  <AdminPage />
+  <Author>&lt;a href="http://www.mbaldinger.com" target="_blank"&gt;Mattia Baldinger&lt;/a&gt;</Author>
+  <Description>AddThis.NET, the extensible Social Bookmarking Extension</Description>
+  <Enabled>true</Enabled>
+  <Priority>0</Priority>
+  <Settings>
+    <Delimiter>44</Delimiter>
+    <Help />
+    <Hidden>false</Hidden>
+    <Index>0</Index>
+    <IsScalar>true</IsScalar>
+    <KeyField>HidePostList</KeyField>
+    <Name>Bookmark.NET Global Settings</Name>
+    <Parameters>
+      <KeyField>false</KeyField>
+      <Label>Hide all buttons in post list</Label>
+      <MaxLength>50</MaxLength>
+      <Name>HidePostList</Name>
+      <ParamType>Boolean</ParamType>
+      <Required>false</Required>
+      <SelectedValue />
+      <Values>False</Values>
+    </Parameters>
+    <ShowAdd>true</ShowAdd>
+    <ShowDelete>true</ShowDelete>
+    <ShowEdit>true</ShowEdit>
+  </Settings>
+  <Settings>
+    <Delimiter>44</Delimiter>
+    <Help>&lt;span  style="font-weight: bold;"&gt;AddThis&lt;/span&gt; (http://www.addthis.com) is a bookmarking button provider. The button can only be displayed in various versions. It can be used in RSS feeds. &lt;br/&gt;&lt;br/&gt;With the input box 'Small Button List' you can customize the buttons which should be shown next to the main AddThis button. You will find a complete list at of possible buttons and their keys at http://www.addthis.com/services/list. Per default the preferred (if there are no preferred, the most famous ones) buttons will be used. To set a fix list, enter the keys from the AddThis service list. &lt;br/&gt;&lt;br/&gt;If you enter a AddThis Id the clicks will be tracked (default is &amp;lt;anonymous&amp;gt;), so you can analyze it. You can create a AddThis user account at http://www.addthis.com/.&lt;br/&gt;&lt;br/&gt;If you want to add the button only in some posts, simply add the HTML comment &amp;lt;!--[AddThis]--&amp;gt; to the your post in the HTML view. &lt;br/&gt;&lt;br/&gt;&lt;span  style="font-weight: bold;"&gt;Know Issue with Safari and Chrome:&lt;/span&gt; When a style other than plus or counter is used, the first item of the small button list will be displayed in a seperate row.</Help>
+    <Hidden>false</Hidden>
+    <Index>1</Index>
+    <IsScalar>true</IsScalar>
+    <KeyField>AddThisID</KeyField>
+    <Name>AddThis</Name>
+    <Parameters>
+      <KeyField>false</KeyField>
+      <Label>AddThis ID</Label>
+      <MaxLength>50</MaxLength>
+      <Name>AddThisID</Name>
+      <ParamType>String</ParamType>
+      <Required>false</Required>
+      <SelectedValue />
+      <Values>ra-4ecfd81b0dada7b7</Values>
+    </Parameters>
+    <Parameters>
+      <KeyField>false</KeyField>
+      <Label>Small Button List (comma separated)</Label>
+      <MaxLength>300</MaxLength>
+      <Name>Buttons</Name>
+      <ParamType>String</ParamType>
+      <Required>false</Required>
+      <SelectedValue />
+      <Values>preferred_1, preferred_2, preferred_3, preferred_4, preferred_5</Values>
+    </Parameters>
+    <Parameters>
+      <KeyField>false</KeyField>
+      <Label>Style</Label>
+      <MaxLength>50</MaxLength>
+      <Name>Style</Name>
+      <ParamType>DropDown</ParamType>
+      <Required>false</Required>
+      <SelectedValue>plus</SelectedValue>
+      <Values>plus</Values>
+      <Values>counter</Values>
+      <Values>share</Values>
+      <Values>bookmark</Values>
+      <Values>share large</Values>
+    </Parameters>
+    <Parameters>
+      <KeyField>false</KeyField>
+      <Label>Static Style</Label>
+      <MaxLength>50</MaxLength>
+      <Name>StaticStyle</Name>
+      <ParamType>DropDown</ParamType>
+      <Required>false</Required>
+      <SelectedValue>share</SelectedValue>
+      <Values>plus</Values>
+      <Values>share</Values>
+      <Values>bookmark</Values>
+      <Values>share large</Values>
+    </Parameters>
+    <Parameters>
+      <KeyField>false</KeyField>
+      <Label>Alignment</Label>
+      <MaxLength>30</MaxLength>
+      <Name>Alignment</Name>
+      <ParamType>DropDown</ParamType>
+      <Required>false</Required>
+      <SelectedValue>BottomLeft</SelectedValue>
+      <Values>BottomLeft</Values>
+      <Values>BottomRight</Values>
+      <Values>TopLeft</Values>
+      <Values>TopRight</Values>
+    </Parameters>
+    <Parameters>
+      <KeyField>false</KeyField>
+      <Label>Order Number</Label>
+      <MaxLength>5</MaxLength>
+      <Name>OrderNumber</Name>
+      <ParamType>Integer</ParamType>
+      <Required>false</Required>
+      <SelectedValue />
+      <Values>0</Values>
+    </Parameters>
+    <Parameters>
+      <KeyField>false</KeyField>
+      <Label>Enabled</Label>
+      <MaxLength>30</MaxLength>
+      <Name>Enabled</Name>
+      <ParamType>Boolean</ParamType>
+      <Required>false</Required>
+      <SelectedValue />
+      <Values>True</Values>
+    </Parameters>
+    <Parameters>
+      <KeyField>false</KeyField>
+      <Label>Hide in post list</Label>
+      <MaxLength>30</MaxLength>
+      <Name>HidePostList</Name>
+      <ParamType>Boolean</ParamType>
+      <Required>false</Required>
+      <SelectedValue />
+      <Values>False</Values>
+    </Parameters>
+    <Parameters>
+      <KeyField>false</KeyField>
+      <Label>Show in feed</Label>
+      <MaxLength>30</MaxLength>
+      <Name>ShowFeed</Name>
+      <ParamType>Boolean</ParamType>
+      <Required>false</Required>
+      <SelectedValue />
+      <Values>True</Values>
+    </Parameters>
+    <ShowAdd>true</ShowAdd>
+    <ShowDelete>true</ShowDelete>
+    <ShowEdit>true</ShowEdit>
+  </Settings>
+  <Settings>
+    <Delimiter>44</Delimiter>
+    <Help>&lt;span  style="font-weight: bold;"&gt;DotNetKicks&lt;/span&gt; (http://www.dotnetkicks.com) counter and publishing service for .NET articles. The button can only be displayed in one version. It can be used in RSS feeds.&lt;br/&gt;&lt;br/&gt;If you want to add the button only in some posts, simply add the HTML comment &amp;lt;!--[DotnetKicks]--&amp;gt; to the your post in the HTML view.</Help>
+    <Hidden>false</Hidden>
+    <Index>10</Index>
+    <IsScalar>true</IsScalar>
+    <KeyField>Alignment</KeyField>
+    <Name>DotnetKicks</Name>
+    <Parameters>
+      <KeyField>false</KeyField>
+      <Label>Alignment</Label>
+      <MaxLength>30</MaxLength>
+      <Name>Alignment</Name>
+      <ParamType>DropDown</ParamType>
+      <Required>false</Required>
+      <SelectedValue>BottomLeft</SelectedValue>
+      <Values>BottomLeft</Values>
+      <Values>BottomRight</Values>
+      <Values>TopLeft</Values>
+      <Values>TopRight</Values>
+    </Parameters>
+    <Parameters>
+      <KeyField>false</KeyField>
+      <Label>Order Number</Label>
+      <MaxLength>5</MaxLength>
+      <Name>OrderNumber</Name>
+      <ParamType>Integer</ParamType>
+      <Required>false</Required>
+      <SelectedValue />
+      <Values>100</Values>
+    </Parameters>
+    <Parameters>
+      <KeyField>false</KeyField>
+      <Label>Enabled</Label>
+      <MaxLength>30</MaxLength>
+      <Name>Enabled</Name>
+      <ParamType>Boolean</ParamType>
+      <Required>false</Required>
+      <SelectedValue />
+      <Values>True</Values>
+    </Parameters>
+    <Parameters>
+      <KeyField>false</KeyField>
+      <Label>Hide in post list</Label>
+      <MaxLength>30</MaxLength>
+      <Name>HidePostList</Name>
+      <ParamType>Boolean</ParamType>
+      <Required>false</Required>
+      <SelectedValue />
+      <Values>False</Values>
+    </Parameters>
+    <Parameters>
+      <KeyField>false</KeyField>
+      <Label>Show in feed</Label>
+      <MaxLength>30</MaxLength>
+      <Name>ShowFeed</Name>
+      <ParamType>Boolean</ParamType>
+      <Required>false</Required>
+      <SelectedValue />
+      <Values>True</Values>
+    </Parameters>
+    <ShowAdd>true</ShowAdd>
+    <ShowDelete>true</ShowDelete>
+    <ShowEdit>true</ShowEdit>
+  </Settings>
+  <Settings>
+    <Delimiter>44</Delimiter>
+    <Help>&lt;span  style="font-weight: bold;"&gt;DotNet-Kicks&lt;/span&gt; (http://www.dotnet-kicks.de) is a GERMAN counter and publishing service for .NET articles. The button can only be displayed in one version. It can be used in RSS feeds.&lt;br/&gt;&lt;br/&gt;If you want to add the button only in some posts, simply add the HTML comment &amp;lt;!--[DotnetKicksDe]--&amp;gt; to the your post in the HTML view.</Help>
+    <Hidden>false</Hidden>
+    <Index>11</Index>
+    <IsScalar>true</IsScalar>
+    <KeyField>Alignment</KeyField>
+    <Name>DotnetKicksDe</Name>
+    <Parameters>
+      <KeyField>false</KeyField>
+      <Label>Alignment</Label>
+      <MaxLength>30</MaxLength>
+      <Name>Alignment</Name>
+      <ParamType>DropDown</ParamType>
+      <Required>false</Required>
+      <SelectedValue>BottomLeft</SelectedValue>
+      <Values>BottomLeft</Values>
+      <Values>BottomRight</Values>
+      <Values>TopLeft</Values>
+      <Values>TopRight</Values>
+    </Parameters>
+    <Parameters>
+      <KeyField>false</KeyField>
+      <Label>Order Number</Label>
+      <MaxLength>5</MaxLength>
+      <Name>OrderNumber</Name>
+      <ParamType>Integer</ParamType>
+      <Required>false</Required>
+      <SelectedValue />
+      <Values>100</Values>
+    </Parameters>
+    <Parameters>
+      <KeyField>false</KeyField>
+      <Label>Enabled</Label>
+      <MaxLength>30</MaxLength>
+      <Name>Enabled</Name>
+      <ParamType>Boolean</ParamType>
+      <Required>false</Required>
+      <SelectedValue />
+      <Values>False</Values>
+    </Parameters>
+    <Parameters>
+      <KeyField>false</KeyField>
+      <Label>Hide in post list</Label>
+      <MaxLength>30</MaxLength>
+      <Name>HidePostList</Name>
+      <ParamType>Boolean</ParamType>
+      <Required>false</Required>
+      <SelectedValue />
+      <Values>False</Values>
+    </Parameters>
+    <Parameters>
+      <KeyField>false</KeyField>
+      <Label>Show in feed</Label>
+      <MaxLength>30</MaxLength>
+      <Name>ShowFeed</Name>
+      <ParamType>Boolean</ParamType>
+      <Required>false</Required>
+      <SelectedValue />
+      <Values>False</Values>
+    </Parameters>
+    <ShowAdd>true</ShowAdd>
+    <ShowDelete>true</ShowDelete>
+    <ShowEdit>true</ShowEdit>
+  </Settings>
+  <Settings>
+    <Delimiter>44</Delimiter>
+    <Help>&lt;span  style="font-weight: bold;"&gt;DotNetShoutout&lt;/span&gt; (http://dotnetshoutout.com/) counter and publishing service for .NET articles. The button can only be displayed in one version. It can be used in RSS feeds.&lt;br/&gt;&lt;br/&gt;If you want to add the button only in some posts, simply add the HTML comment &amp;lt;!--[DotNetShoutout]--&amp;gt; to the your post in the HTML view.</Help>
+    <Hidden>false</Hidden>
+    <Index>12</Index>
+    <IsScalar>true</IsScalar>
+    <KeyField>Alignment</KeyField>
+    <Name>DotNetShoutout</Name>
+    <Parameters>
+      <KeyField>false</KeyField>
+      <Label>Alignment</Label>
+      <MaxLength>30</MaxLength>
+      <Name>Alignment</Name>
+      <ParamType>DropDown</ParamType>
+      <Required>false</Required>
+      <SelectedValue>BottomLeft</SelectedValue>
+      <Values>BottomLeft</Values>
+      <Values>BottomRight</Values>
+      <Values>TopLeft</Values>
+      <Values>TopRight</Values>
+    </Parameters>
+    <Parameters>
+      <KeyField>false</KeyField>
+      <Label>Order Number</Label>
+      <MaxLength>5</MaxLength>
+      <Name>OrderNumber</Name>
+      <ParamType>Integer</ParamType>
+      <Required>false</Required>
+      <SelectedValue />
+      <Values>100</Values>
+    </Parameters>
+    <Parameters>
+      <KeyField>false</KeyField>
+      <Label>Enabled</Label>
+      <MaxLength>30</MaxLength>
+      <Name>Enabled</Name>
+      <ParamType>Boolean</ParamType>
+      <Required>false</Required>
+      <SelectedValue />
+      <Values>False</Values>
+    </Parameters>
+    <Parameters>
+      <KeyField>false</KeyField>
+      <Label>Hide in post list</Label>
+      <MaxLength>30</MaxLength>
+      <Name>HidePostList</Name>
+      <ParamType>Boolean</ParamType>
+      <Required>false</Required>
+      <SelectedValue />
+      <Values>False</Values>
+    </Parameters>
+    <Parameters>
+      <KeyField>false</KeyField>
+      <Label>Show in feed</Label>
+      <MaxLength>30</MaxLength>
+      <Name>ShowFeed</Name>
+      <ParamType>Boolean</ParamType>
+      <Required>false</Required>
+      <SelectedValue />
+      <Values>False</Values>
+    </Parameters>
+    <ShowAdd>true</ShowAdd>
+    <ShowDelete>true</ShowDelete>
+    <ShowEdit>true</ShowEdit>
+  </Settings>
+  <Settings>
+    <Delimiter>44</Delimiter>
+    <Help>&lt;span  style="font-weight: bold;"&gt;Tweetmeme&lt;/span&gt; (http://www.tweetmeme.com/) is a Twitter counter and publishing service. The button can be displayed in a small and a large version, a static version with counter isn't supported.&lt;br/&gt;&lt;br/&gt;If you enter a username is entered this user will be @ mentioned in the suggested Tweet (leave &amp;lt;anonymous&amp;gt; if you don't want to mention someone).&lt;br/&gt;&lt;br/&gt;If you want to add the button only in some posts, simply add the HTML comment &amp;lt;!--[TweetMeme]--&amp;gt; to the your post in the HTML view.</Help>
+    <Hidden>false</Hidden>
+    <Index>2</Index>
+    <IsScalar>true</IsScalar>
+    <KeyField>TwitterName</KeyField>
+    <Name>TweetMeme</Name>
+    <Parameters>
+      <KeyField>false</KeyField>
+      <Label>Twitter Name</Label>
+      <MaxLength>50</MaxLength>
+      <Name>TwitterName</Name>
+      <ParamType>String</ParamType>
+      <Required>false</Required>
+      <SelectedValue />
+      <Values>&lt;anonymous&gt;</Values>
+    </Parameters>
+    <Parameters>
+      <KeyField>false</KeyField>
+      <Label>Style</Label>
+      <MaxLength>50</MaxLength>
+      <Name>Style</Name>
+      <ParamType>DropDown</ParamType>
+      <Required>false</Required>
+      <SelectedValue>compact</SelectedValue>
+      <Values>compact</Values>
+      <Values>large</Values>
+    </Parameters>
+    <Parameters>
+      <KeyField>false</KeyField>
+      <Label>Alignment</Label>
+      <MaxLength>30</MaxLength>
+      <Name>Alignment</Name>
+      <ParamType>DropDown</ParamType>
+      <Required>false</Required>
+      <SelectedValue>TopRight</SelectedValue>
+      <Values>BottomLeft</Values>
+      <Values>BottomRight</Values>
+      <Values>TopLeft</Values>
+      <Values>TopRight</Values>
+    </Parameters>
+    <Parameters>
+      <KeyField>false</KeyField>
+      <Label>Order Number</Label>
+      <MaxLength>5</MaxLength>
+      <Name>OrderNumber</Name>
+      <ParamType>Integer</ParamType>
+      <Required>false</Required>
+      <SelectedValue />
+      <Values>98</Values>
+    </Parameters>
+    <Parameters>
+      <KeyField>false</KeyField>
+      <Label>Enabled</Label>
+      <MaxLength>30</MaxLength>
+      <Name>Enabled</Name>
+      <ParamType>Boolean</ParamType>
+      <Required>false</Required>
+      <SelectedValue />
+      <Values>False</Values>
+    </Parameters>
+    <Parameters>
+      <KeyField>false</KeyField>
+      <Label>Hide in post list</Label>
+      <MaxLength>30</MaxLength>
+      <Name>HidePostList</Name>
+      <ParamType>Boolean</ParamType>
+      <Required>false</Required>
+      <SelectedValue />
+      <Values>False</Values>
+    </Parameters>
+    <ShowAdd>true</ShowAdd>
+    <ShowDelete>true</ShowDelete>
+    <ShowEdit>true</ShowEdit>
+  </Settings>
+  <Settings>
+    <Delimiter>44</Delimiter>
+    <Help>&lt;span  style="font-weight: bold;"&gt;Twitter&lt;/span&gt; (http://www.twitter.com/) provides counter and publishing service. The button can be displayed in a small and a large version, a static version with counter isn't supported by Twitter. &lt;br/&gt;&lt;br/&gt;If you enter a username is entered this user will be @ mentioned in the suggested Tweet (leave &amp;lt;anonymous&amp;gt; if you don't want to mention someone).&lt;br/&gt;&lt;br/&gt;If you want to add the button only in some posts, simply add the HTML comment &amp;lt;!--[Twitter]--&amp;gt; to the your post in the HTML view.</Help>
+    <Hidden>false</Hidden>
+    <Index>3</Index>
+    <IsScalar>true</IsScalar>
+    <KeyField>TwitterName</KeyField>
+    <Name>Twitter</Name>
+    <Parameters>
+      <KeyField>false</KeyField>
+      <Label>Twitter Name</Label>
+      <MaxLength>50</MaxLength>
+      <Name>TwitterName</Name>
+      <ParamType>String</ParamType>
+      <Required>false</Required>
+      <SelectedValue />
+      <Values>&lt;anonymous&gt;</Values>
+    </Parameters>
+    <Parameters>
+      <KeyField>false</KeyField>
+      <Label>Style</Label>
+      <MaxLength>50</MaxLength>
+      <Name>Style</Name>
+      <ParamType>DropDown</ParamType>
+      <Required>false</Required>
+      <SelectedValue>compact</SelectedValue>
+      <Values>compact</Values>
+      <Values>large</Values>
+    </Parameters>
+    <Parameters>
+      <KeyField>false</KeyField>
+      <Label>Alignment</Label>
+      <MaxLength>30</MaxLength>
+      <Name>Alignment</Name>
+      <ParamType>DropDown</ParamType>
+      <Required>false</Required>
+      <SelectedValue>TopRight</SelectedValue>
+      <Values>BottomLeft</Values>
+      <Values>BottomRight</Values>
+      <Values>TopLeft</Values>
+      <Values>TopRight</Values>
+    </Parameters>
+    <Parameters>
+      <KeyField>false</KeyField>
+      <Label>Order Number</Label>
+      <MaxLength>5</MaxLength>
+      <Name>OrderNumber</Name>
+      <ParamType>Integer</ParamType>
+      <Required>false</Required>
+      <SelectedValue />
+      <Values>98</Values>
+    </Parameters>
+    <Parameters>
+      <KeyField>false</KeyField>
+      <Label>Enabled</Label>
+      <MaxLength>30</MaxLength>
+      <Name>Enabled</Name>
+      <ParamType>Boolean</ParamType>
+      <Required>false</Required>
+      <SelectedValue />
+      <Values>True</Values>
+    </Parameters>
+    <Parameters>
+      <KeyField>false</KeyField>
+      <Label>Hide in post list</Label>
+      <MaxLength>30</MaxLength>
+      <Name>HidePostList</Name>
+      <ParamType>Boolean</ParamType>
+      <Required>false</Required>
+      <SelectedValue />
+      <Values>False</Values>
+    </Parameters>
+    <ShowAdd>true</ShowAdd>
+    <ShowDelete>true</ShowDelete>
+    <ShowEdit>true</ShowEdit>
+  </Settings>
+  <Settings>
+    <Delimiter>44</Delimiter>
+    <Help>&lt;span  style="font-weight: bold;"&gt;Digg&lt;/span&gt; (http://www.digg.com) is a famous social bookmarking service. The button can be displayed in a small and a large version, a static version with counter isn't supported by digg.&lt;br/&gt;&lt;br/&gt;If you want to add the button only in some posts, simply add the HTML comment &amp;lt;!--[Digg]--&amp;gt; to the your post in the HTML view.</Help>
+    <Hidden>false</Hidden>
+    <Index>4</Index>
+    <IsScalar>true</IsScalar>
+    <KeyField>Style</KeyField>
+    <Name>Digg</Name>
+    <Parameters>
+      <KeyField>false</KeyField>
+      <Label>Style</Label>
+      <MaxLength>50</MaxLength>
+      <Name>Style</Name>
+      <ParamType>DropDown</ParamType>
+      <Required>false</Required>
+      <SelectedValue>compact</SelectedValue>
+      <Values>compact</Values>
+      <Values>large</Values>
+    </Parameters>
+    <Parameters>
+      <KeyField>false</KeyField>
+      <Label>Alignment</Label>
+      <MaxLength>30</MaxLength>
+      <Name>Alignment</Name>
+      <ParamType>DropDown</ParamType>
+      <Required>false</Required>
+      <SelectedValue>TopRight</SelectedValue>
+      <Values>BottomLeft</Values>
+      <Values>BottomRight</Values>
+      <Values>TopLeft</Values>
+      <Values>TopRight</Values>
+    </Parameters>
+    <Parameters>
+      <KeyField>false</KeyField>
+      <Label>Order Number</Label>
+      <MaxLength>5</MaxLength>
+      <Name>OrderNumber</Name>
+      <ParamType>Integer</ParamType>
+      <Required>false</Required>
+      <SelectedValue />
+      <Values>99</Values>
+    </Parameters>
+    <Parameters>
+      <KeyField>false</KeyField>
+      <Label>Enabled</Label>
+      <MaxLength>30</MaxLength>
+      <Name>Enabled</Name>
+      <ParamType>Boolean</ParamType>
+      <Required>false</Required>
+      <SelectedValue />
+      <Values>False</Values>
+    </Parameters>
+    <Parameters>
+      <KeyField>false</KeyField>
+      <Label>Hide in post list</Label>
+      <MaxLength>30</MaxLength>
+      <Name>HidePostList</Name>
+      <ParamType>Boolean</ParamType>
+      <Required>false</Required>
+      <SelectedValue />
+      <Values>False</Values>
+    </Parameters>
+    <ShowAdd>true</ShowAdd>
+    <ShowDelete>true</ShowDelete>
+    <ShowEdit>true</ShowEdit>
+  </Settings>
+  <Settings>
+    <Delimiter>44</Delimiter>
+    <Help>&lt;span  style="font-weight: bold;"&gt;Facebook Share&lt;/span&gt; (http://www.facebook.com/) is a counter and publishing service. The button can be displayed in a small and a large version, a static version with counter isn't supported by facebook.&lt;br/&gt;&lt;br/&gt;If you want to add the button only in some posts, simply add the HTML comment &amp;lt;!--[FacebookShare]--&amp;gt; to the your post in the HTML view.</Help>
+    <Hidden>false</Hidden>
+    <Index>5</Index>
+    <IsScalar>true</IsScalar>
+    <KeyField>Style</KeyField>
+    <Name>FacebookShare</Name>
+    <Parameters>
+      <KeyField>false</KeyField>
+      <Label>Style</Label>
+      <MaxLength>50</MaxLength>
+      <Name>Style</Name>
+      <ParamType>DropDown</ParamType>
+      <Required>false</Required>
+      <SelectedValue>compact</SelectedValue>
+      <Values>compact</Values>
+      <Values>large</Values>
+    </Parameters>
+    <Parameters>
+      <KeyField>false</KeyField>
+      <Label>Alignment</Label>
+      <MaxLength>30</MaxLength>
+      <Name>Alignment</Name>
+      <ParamType>DropDown</ParamType>
+      <Required>false</Required>
+      <SelectedValue>TopRight</SelectedValue>
+      <Values>BottomLeft</Values>
+      <Values>BottomRight</Values>
+      <Values>TopLeft</Values>
+      <Values>TopRight</Values>
+    </Parameters>
+    <Parameters>
+      <KeyField>false</KeyField>
+      <Label>Order Number</Label>
+      <MaxLength>5</MaxLength>
+      <Name>OrderNumber</Name>
+      <ParamType>Integer</ParamType>
+      <Required>false</Required>
+      <SelectedValue />
+      <Values>99</Values>
+    </Parameters>
+    <Parameters>
+      <KeyField>false</KeyField>
+      <Label>Enabled</Label>
+      <MaxLength>30</MaxLength>
+      <Name>Enabled</Name>
+      <ParamType>Boolean</ParamType>
+      <Required>false</Required>
+      <SelectedValue />
+      <Values>True</Values>
+    </Parameters>
+    <Parameters>
+      <KeyField>false</KeyField>
+      <Label>Hide in post list</Label>
+      <MaxLength>30</MaxLength>
+      <Name>HidePostList</Name>
+      <ParamType>Boolean</ParamType>
+      <Required>false</Required>
+      <SelectedValue />
+      <Values>False</Values>
+    </Parameters>
+    <ShowAdd>true</ShowAdd>
+    <ShowDelete>true</ShowDelete>
+    <ShowEdit>true</ShowEdit>
+  </Settings>
+  <Settings>
+    <Delimiter>44</Delimiter>
+    <Help>&lt;span  style="font-weight: bold;"&gt;Google +1&lt;/span&gt; is a counter and publishing service provided by Google (http://www.google.com/+1/button). It can be displayed in a medium and a large version, a static version with counter isn't supported by Google.&lt;br/&gt;&lt;br/&gt;If you want to add the button only in some posts, simply add the HTML comment &amp;lt;!--[PlusOne]--&amp;gt; to the your post in the HTML view.</Help>
+    <Hidden>false</Hidden>
+    <Index>6</Index>
+    <IsScalar>true</IsScalar>
+    <KeyField>Style</KeyField>
+    <Name>PlusOne</Name>
+    <Parameters>
+      <KeyField>false</KeyField>
+      <Label>Style</Label>
+      <MaxLength>50</MaxLength>
+      <Name>Style</Name>
+      <ParamType>DropDown</ParamType>
+      <Required>false</Required>
+      <SelectedValue>medium</SelectedValue>
+      <Values>medium</Values>
+      <Values>large</Values>
+    </Parameters>
+    <Parameters>
+      <KeyField>false</KeyField>
+      <Label>Alignment</Label>
+      <MaxLength>30</MaxLength>
+      <Name>Alignment</Name>
+      <ParamType>DropDown</ParamType>
+      <Required>false</Required>
+      <SelectedValue>TopRight</SelectedValue>
+      <Values>BottomLeft</Values>
+      <Values>BottomRight</Values>
+      <Values>TopLeft</Values>
+      <Values>TopRight</Values>
+    </Parameters>
+    <Parameters>
+      <KeyField>false</KeyField>
+      <Label>Order Number</Label>
+      <MaxLength>5</MaxLength>
+      <Name>OrderNumber</Name>
+      <ParamType>Integer</ParamType>
+      <Required>false</Required>
+      <SelectedValue />
+      <Values>99</Values>
+    </Parameters>
+    <Parameters>
+      <KeyField>false</KeyField>
+      <Label>Enabled</Label>
+      <MaxLength>30</MaxLength>
+      <Name>Enabled</Name>
+      <ParamType>Boolean</ParamType>
+      <Required>false</Required>
+      <SelectedValue />
+      <Values>True</Values>
+    </Parameters>
+    <Parameters>
+      <KeyField>false</KeyField>
+      <Label>Hide in post list</Label>
+      <MaxLength>30</MaxLength>
+      <Name>HidePostList</Name>
+      <ParamType>Boolean</ParamType>
+      <Required>false</Required>
+      <SelectedValue />
+      <Values>False</Values>
+    </Parameters>
+    <ShowAdd>true</ShowAdd>
+    <ShowDelete>true</ShowDelete>
+    <ShowEdit>true</ShowEdit>
+  </Settings>
+  <Settings>
+    <Delimiter>44</Delimiter>
+    <Help>&lt;span  style="font-weight: bold;"&gt;Facebook Like&lt;/span&gt; (http://www.facebook.com/) is a counter service (no bookmarking service) and shows how many readers like your article. The button can be displayed in a small and a large version, a static version with counter isn't supported by facebook.&lt;br/&gt;&lt;br/&gt;If you want to add the button only in some posts, simply add the HTML comment &amp;lt;!--[FacebookLike]--&amp;gt; to the your post in the HTML view.</Help>
+    <Hidden>false</Hidden>
+    <Index>7</Index>
+    <IsScalar>true</IsScalar>
+    <KeyField>Style</KeyField>
+    <Name>FacebookLike</Name>
+    <Parameters>
+      <KeyField>false</KeyField>
+      <Label>Style</Label>
+      <MaxLength>50</MaxLength>
+      <Name>Style</Name>
+      <ParamType>DropDown</ParamType>
+      <Required>false</Required>
+      <SelectedValue>compact</SelectedValue>
+      <Values>compact</Values>
+      <Values>large</Values>
+    </Parameters>
+    <Parameters>
+      <KeyField>false</KeyField>
+      <Label>Alignment</Label>
+      <MaxLength>30</MaxLength>
+      <Name>Alignment</Name>
+      <ParamType>DropDown</ParamType>
+      <Required>false</Required>
+      <SelectedValue>TopRight</SelectedValue>
+      <Values>BottomLeft</Values>
+      <Values>BottomRight</Values>
+      <Values>TopLeft</Values>
+      <Values>TopRight</Values>
+    </Parameters>
+    <Parameters>
+      <KeyField>false</KeyField>
+      <Label>Order Number</Label>
+      <MaxLength>5</MaxLength>
+      <Name>OrderNumber</Name>
+      <ParamType>Integer</ParamType>
+      <Required>false</Required>
+      <SelectedValue />
+      <Values>99</Values>
+    </Parameters>
+    <Parameters>
+      <KeyField>false</KeyField>
+      <Label>Enabled</Label>
+      <MaxLength>30</MaxLength>
+      <Name>Enabled</Name>
+      <ParamType>Boolean</ParamType>
+      <Required>false</Required>
+      <SelectedValue />
+      <Values>True</Values>
+    </Parameters>
+    <Parameters>
+      <KeyField>false</KeyField>
+      <Label>Hide in post list</Label>
+      <MaxLength>30</MaxLength>
+      <Name>HidePostList</Name>
+      <ParamType>Boolean</ParamType>
+      <Required>false</Required>
+      <SelectedValue />
+      <Values>False</Values>
+    </Parameters>
+    <ShowAdd>true</ShowAdd>
+    <ShowDelete>true</ShowDelete>
+    <ShowEdit>true</ShowEdit>
+  </Settings>
+  <Settings>
+    <Delimiter>44</Delimiter>
+    <Help>&lt;span  style="font-weight: bold;"&gt;StumbleUpon&lt;/span&gt; (http://www.stumbleupon.com) is a rapidly growing social bookmarking and counter service. The button can be displayed in a small and a large version, a static version with counter isn't supported by StumbleUpon.&lt;br/&gt;&lt;br/&gt;If you want to add the button only in some posts, simply add the HTML comment &amp;lt;!--[StumbeUpon]--&amp;gt; to the your post in the HTML view.</Help>
+    <Hidden>false</Hidden>
+    <Index>8</Index>
+    <IsScalar>true</IsScalar>
+    <KeyField>Style</KeyField>
+    <Name>StumbeUpon</Name>
+    <Parameters>
+      <KeyField>false</KeyField>
+      <Label>Style</Label>
+      <MaxLength>50</MaxLength>
+      <Name>Style</Name>
+      <ParamType>DropDown</ParamType>
+      <Required>false</Required>
+      <SelectedValue>compact</SelectedValue>
+      <Values>compact</Values>
+      <Values>large</Values>
+    </Parameters>
+    <Parameters>
+      <KeyField>false</KeyField>
+      <Label>Alignment</Label>
+      <MaxLength>30</MaxLength>
+      <Name>Alignment</Name>
+      <ParamType>DropDown</ParamType>
+      <Required>false</Required>
+      <SelectedValue>TopRight</SelectedValue>
+      <Values>BottomLeft</Values>
+      <Values>BottomRight</Values>
+      <Values>TopLeft</Values>
+      <Values>TopRight</Values>
+    </Parameters>
+    <Parameters>
+      <KeyField>false</KeyField>
+      <Label>Order Number</Label>
+      <MaxLength>5</MaxLength>
+      <Name>OrderNumber</Name>
+      <ParamType>Integer</ParamType>
+      <Required>false</Required>
+      <SelectedValue />
+      <Values>99</Values>
+    </Parameters>
+    <Parameters>
+      <KeyField>false</KeyField>
+      <Label>Enabled</Label>
+      <MaxLength>30</MaxLength>
+      <Name>Enabled</Name>
+      <ParamType>Boolean</ParamType>
+      <Required>false</Required>
+      <SelectedValue />
+      <Values>False</Values>
+    </Parameters>
+    <Parameters>
+      <KeyField>false</KeyField>
+      <Label>Hide in post list</Label>
+      <MaxLength>30</MaxLength>
+      <Name>HidePostList</Name>
+      <ParamType>Boolean</ParamType>
+      <Required>false</Required>
+      <SelectedValue />
+      <Values>False</Values>
+    </Parameters>
+    <ShowAdd>true</ShowAdd>
+    <ShowDelete>true</ShowDelete>
+    <ShowEdit>true</ShowEdit>
+  </Settings>
+  <Settings>
+    <Delimiter>44</Delimiter>
+    <Help>&lt;span  style="font-weight: bold;"&gt;Buzz&lt;/span&gt; is a counter and publishing service provided by Google (http://www.google.com/buzz). It can be displayed in a small and a large version, a static version with counter isn't supported by Google.&lt;br/&gt;&lt;br/&gt;If you want to add the button only in some posts, simply add the HTML comment &amp;lt;!--[Buzz]--&amp;gt; to the your post in the HTML view.</Help>
+    <Hidden>false</Hidden>
+    <Index>9</Index>
+    <IsScalar>true</IsScalar>
+    <KeyField>Style</KeyField>
+    <Name>Buzz</Name>
+    <Parameters>
+      <KeyField>false</KeyField>
+      <Label>Style</Label>
+      <MaxLength>50</MaxLength>
+      <Name>Style</Name>
+      <ParamType>DropDown</ParamType>
+      <Required>false</Required>
+      <SelectedValue>compact</SelectedValue>
+      <Values>compact</Values>
+      <Values>large</Values>
+    </Parameters>
+    <Parameters>
+      <KeyField>false</KeyField>
+      <Label>Alignment</Label>
+      <MaxLength>30</MaxLength>
+      <Name>Alignment</Name>
+      <ParamType>DropDown</ParamType>
+      <Required>false</Required>
+      <SelectedValue>TopRight</SelectedValue>
+      <Values>BottomLeft</Values>
+      <Values>BottomRight</Values>
+      <Values>TopLeft</Values>
+      <Values>TopRight</Values>
+    </Parameters>
+    <Parameters>
+      <KeyField>false</KeyField>
+      <Label>Order Number</Label>
+      <MaxLength>5</MaxLength>
+      <Name>OrderNumber</Name>
+      <ParamType>Integer</ParamType>
+      <Required>false</Required>
+      <SelectedValue />
+      <Values>99</Values>
+    </Parameters>
+    <Parameters>
+      <KeyField>false</KeyField>
+      <Label>Enabled</Label>
+      <MaxLength>30</MaxLength>
+      <Name>Enabled</Name>
+      <ParamType>Boolean</ParamType>
+      <Required>false</Required>
+      <SelectedValue />
+      <Values>False</Values>
+    </Parameters>
+    <Parameters>
+      <KeyField>false</KeyField>
+      <Label>Hide in post list</Label>
+      <MaxLength>30</MaxLength>
+      <Name>HidePostList</Name>
+      <ParamType>Boolean</ParamType>
+      <Required>false</Required>
+      <SelectedValue />
+      <Values>False</Values>
+    </Parameters>
+    <ShowAdd>true</ShowAdd>
+    <ShowDelete>true</ShowDelete>
+    <ShowEdit>true</ShowEdit>
+  </Settings>
+  <ShowSettings>true</ShowSettings>
+  <Version>5</Version>
+</ManagedExtension>

@@ -39,9 +39,10 @@
             <!-- BEGIN TOP SOCIAL LINKS -->
 			<div id="topSocial">
 				<ul>
-					<li><a href="http://www.linkedin.com/in/mattwrock" title="Join me on LinkedIn!"><img width="1" height="1" class="linkedin" runat="server" src="~/themes/Boldy/images/trans.gif" alt="LinkedIn" /></a></li>
-					<li><a href="http://twitter.com/mwrockx" title="Follow me on Twitter!"><img width="1" height="1" runat="server" class="twitter" src="~/themes/Boldy/images/trans.gif" alt="Follow Us on Twitter!" /></a></li>
-					<li><a href="http://feeds.feedburner.com/Wrockblog" title="RSS" ><img width="1" height="1" runat="server" class="rss" src="~/themes/Boldy/images/trans.gif" alt="Subcribe to Our RSS Feed" /></a></li>
+					<li><a rel="me" href="http://www.linkedin.com/in/mattwrock" title="Join me on LinkedIn!"><img width="1" height="1" class="linkedin" runat="server" src="~/themes/Boldy/images/trans.gif" alt="LinkedIn" /></a></li>
+					<li><a rel="me" href="http://twitter.com/mwrockx" title="Follow me on Twitter!"><img width="1" height="1" runat="server" class="twitter" src="~/themes/Boldy/images/trans.gif" alt="Follow Us on Twitter!" /></a></li>
+					<li><a rel="me" href="http://feeds.feedburner.com/Wrockblog" title="RSS" ><img width="1" height="1" runat="server" class="rss" src="~/themes/Boldy/images/trans.gif" alt="Subcribe to Our RSS Feed" /></a></li>
+                    <li><a rel="author" href="https://profiles.google.com/109056412257727509222"><img src="http://www.google.com/images/icons/ui/gprofile_button-32.png" width="32" height="32"></a></li>
 				</ul>
 			</div>	
 			<!-- END TOP SOCIAL LINKS -->
@@ -71,7 +72,7 @@
                 <!-- END FOOTER WIDGETS -->
 				<!-- BEGIN COPYRIGHT -->
 				<div id="copyright">
-					© 2009-<%=DateTime.Now.Year.ToString() %> www.mattwrock.com &nbsp;&nbsp; Powered by <a href="http://www.dotnetblogengine.net">BlogEngine.NET</a> <%=BlogSettings.Instance.Version() %> 
+					© 2009-<%=DateTime.Now.Year.ToString() %> <a title="Matt Wrock" rel="me" href="https://profiles.google.com/109056412257727509222?rel=me">Matt Wrock</a> &nbsp;&nbsp; Powered by <a href="http://www.dotnetblogengine.net">BlogEngine.NET</a> <%=BlogSettings.Instance.Version() %> 
                 </div>
 				<!-- END COPYRIGHT -->						
 			</div>	
@@ -81,5 +82,21 @@
     </form>
 </div>
 <!-- END MAINWRAPPER -->
+<script type="text/javascript">
+    (function () {
+        var po = document.createElement('script'); po.type = 'text/javascript'; po.async = true;
+        po.src = 'https://apis.google.com/js/plusone.js';
+        var s = document.getElementsByTagName('script')[0]; 
+        s.parentNode.insertBefore(po, s);
+    })();
+    (function () {
+        var twitterWidgets = document.createElement('script');
+        twitterWidgets.type = 'text/javascript';
+        twitterWidgets.async = true;
+        twitterWidgets.src = '//platform.twitter.com/widgets.js';
+        var s = document.getElementsByTagName('script')[0]; 
+        s.parentNode.insertBefore(twitterWidgets, s);
+    })();
+    </script>
 </body>
 </html>

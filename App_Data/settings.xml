@@ -65,7 +65,7 @@
   <allowservertodownloadremotefiles>False</allowservertodownloadremotefiles>
   <culture>Auto</culture>
   <disquswebsitename />
-  <handlewwwsubdomain>add</handlewwwsubdomain>
+  <handlewwwsubdomain />
   <theme>Boldy</theme>
   <sendmailoncomment>True</sendmailoncomment>
   <description>Matt Wrock's blog on software engineering</description>
