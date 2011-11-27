@@ -21,7 +21,7 @@
       <ParamType>Boolean</ParamType>
       <Required>false</Required>
       <SelectedValue />
-      <Values>False</Values>
+      <Values>True</Values>
     </Parameters>
     <ShowAdd>true</ShowAdd>
     <ShowDelete>true</ShowDelete>
@@ -53,7 +53,7 @@
       <ParamType>String</ParamType>
       <Required>false</Required>
       <SelectedValue />
-      <Values>preferred_1, preferred_2, preferred_3, preferred_4, preferred_5</Values>
+      <Values>facebook_like, tweet, google_plusone</Values>
     </Parameters>
     <Parameters>
       <KeyField>false</KeyField>
@@ -62,7 +62,7 @@
       <Name>Style</Name>
       <ParamType>DropDown</ParamType>
       <Required>false</Required>
-      <SelectedValue>plus</SelectedValue>
+      <SelectedValue>counter</SelectedValue>
       <Values>plus</Values>
       <Values>counter</Values>
       <Values>share</Values>
@@ -76,7 +76,7 @@
       <Name>StaticStyle</Name>
       <ParamType>DropDown</ParamType>
       <Required>false</Required>
-      <SelectedValue>share</SelectedValue>
+      <SelectedValue>plus</SelectedValue>
       <Values>plus</Values>
       <Values>share</Values>
       <Values>bookmark</Values>
@@ -89,7 +89,7 @@
       <Name>Alignment</Name>
       <ParamType>DropDown</ParamType>
       <Required>false</Required>
-      <SelectedValue>BottomLeft</SelectedValue>
+      <SelectedValue>TopRight</SelectedValue>
       <Values>BottomLeft</Values>
       <Values>BottomRight</Values>
       <Values>TopLeft</Values>
@@ -154,7 +154,7 @@
       <Name>Alignment</Name>
       <ParamType>DropDown</ParamType>
       <Required>false</Required>
-      <SelectedValue>BottomLeft</SelectedValue>
+      <SelectedValue>TopRight</SelectedValue>
       <Values>BottomLeft</Values>
       <Values>BottomRight</Values>
       <Values>TopLeft</Values>
@@ -470,7 +470,7 @@
       <ParamType>Boolean</ParamType>
       <Required>false</Required>
       <SelectedValue />
-      <Values>True</Values>
+      <Values>False</Values>
     </Parameters>
     <Parameters>
       <KeyField>false</KeyField>
@@ -602,7 +602,7 @@
       <ParamType>Boolean</ParamType>
       <Required>false</Required>
       <SelectedValue />
-      <Values>True</Values>
+      <Values>False</Values>
     </Parameters>
     <Parameters>
       <KeyField>false</KeyField>
@@ -668,7 +668,7 @@
       <ParamType>Boolean</ParamType>
       <Required>false</Required>
       <SelectedValue />
-      <Values>True</Values>
+      <Values>False</Values>
     </Parameters>
     <Parameters>
       <KeyField>false</KeyField>
@@ -734,7 +734,7 @@
       <ParamType>Boolean</ParamType>
       <Required>false</Required>
       <SelectedValue />
-      <Values>True</Values>
+      <Values>False</Values>
     </Parameters>
     <Parameters>
       <KeyField>false</KeyField>

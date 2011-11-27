@@ -84,6 +84,7 @@ body#home #mainWrapper {
 #header {
 	height:190px;
 	position:relative;
+    width: 960px;
 	background:url(images/bk_header.png) 0 0 no-repeat;
 }
 
@@ -217,6 +218,12 @@ body#home #content, body#portfolio #content {
 
 .rss {
     background:url(images/ico_rss.png) 0 0 no-repeat;
+    width: 32px;
+    height: 32px;
+}
+
+.googlePlus {
+    background:url(images/gprofile_button-32.png) 0 0 no-repeat;
     width: 32px;
     height: 32px;
 }
@@ -1531,3 +1538,9 @@ ul.recentPosts li span{
 }
 
 #newsletterform input[type="submit"] { float: left !important; }
+
+.addthis_default_style a{
+    padding: 0 2px;
+    float: left;
+    cursor: pointer;
+}

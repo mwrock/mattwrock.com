@@ -9,6 +9,7 @@
  </head>
 
  <body onload="setupMenu()">
+<div id="fb-root"></div>
 <!-- BEGINN MAINWRAPPER -->
 <div id="mainWrapper">
     <form id="Form1" runat="Server">
@@ -40,9 +41,9 @@
 			<div id="topSocial">
 				<ul>
 					<li><a rel="me" href="http://www.linkedin.com/in/mattwrock" title="Join me on LinkedIn!"><img width="1" height="1" class="linkedin" runat="server" src="~/themes/Boldy/images/trans.gif" alt="LinkedIn" /></a></li>
-					<li><a rel="me" href="http://twitter.com/mwrockx" title="Follow me on Twitter!"><img width="1" height="1" runat="server" class="twitter" src="~/themes/Boldy/images/trans.gif" alt="Follow Us on Twitter!" /></a></li>
-					<li><a rel="me" href="http://feeds.feedburner.com/Wrockblog" title="RSS" ><img width="1" height="1" runat="server" class="rss" src="~/themes/Boldy/images/trans.gif" alt="Subcribe to Our RSS Feed" /></a></li>
-                    <li><a rel="author" href="https://profiles.google.com/109056412257727509222"><img src="http://www.google.com/images/icons/ui/gprofile_button-32.png" width="32" height="32"></a></li>
+					<li><a rel="me" href="http://twitter.com/mwrockx" title="Follow me on Twitter!"><img width="1" height="1" runat="server" class="twitter" src="~/themes/Boldy/images/trans.gif" alt="Follow me on Twitter!" /></a></li>
+					<li><a rel="me" href="http://feeds.feedburner.com/Wrockblog" title="RSS" ><img width="1" height="1" runat="server" class="rss" src="~/themes/Boldy/images/trans.gif" alt="Subcribe to my RSS Feed" /></a></li>
+                    <li><a rel="author" href="https://profiles.google.com/109056412257727509222"><img src="/themes/Boldy/images/trans.gif" width="1" height="1" alt="Google+" class="googlePlus" /></a></li>
 				</ul>
 			</div>	
 			<!-- END TOP SOCIAL LINKS -->
@@ -83,20 +84,18 @@
 </div>
 <!-- END MAINWRAPPER -->
 <script type="text/javascript">
+    var addthis_config = {
+        ui_use_css: false
+    };
+    
     (function () {
-        var po = document.createElement('script'); po.type = 'text/javascript'; po.async = true;
-        po.src = 'https://apis.google.com/js/plusone.js';
-        var s = document.getElementsByTagName('script')[0]; 
-        s.parentNode.insertBefore(po, s);
+        var addThis = document.createElement('script'); 
+        addThis.type = 'text/javascript';
+        addThis.async = true;
+        addThis.src = 'http://s7.addthis.com/js/250/addthis_widget.js#pubid=ra-4ecfd81b0dada7b7';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(addThis, s);
     })();
-    (function () {
-        var twitterWidgets = document.createElement('script');
-        twitterWidgets.type = 'text/javascript';
-        twitterWidgets.async = true;
-        twitterWidgets.src = '//platform.twitter.com/widgets.js';
-        var s = document.getElementsByTagName('script')[0]; 
-        s.parentNode.insertBefore(twitterWidgets, s);
-    })();
-    </script>
+
+</script>
 </body>
 </html>

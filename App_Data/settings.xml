@@ -9,7 +9,8 @@
   <htmlheader />
   <contactthankmessage>&lt;h1&gt;Thank you&lt;/h1&gt;&lt;p&gt;The message was sent.&lt;/p&gt;</contactthankmessage>
   <emailsubjectprefix>Weblog</emailsubjectprefix>
-  <trackingscript>&lt;script type="text/javascript"&gt;
+  <trackingscript>&lt;script type="text/javascript" defer="defer" src="/blog/js.axd?path=/themes/Boldy/js/ddsmoothmenu.js"&gt;&lt;/script&gt;
+&lt;script type="text/javascript"&gt;
 
   var _gaq = _gaq || [];
   _gaq.push(['_setAccount', 'UA-10685042-1']);
@@ -22,8 +23,8 @@
   })();
 
 &lt;/script&gt;
-&lt;script type="text/javascript" defer="defer" src="/blog/js.axd?path=/themes/Boldy/js/ddsmoothmenu.js"&gt;&lt;/script&gt;</trackingscript>
-  <showdescriptioninpostlist>False</showdescriptioninpostlist>
+</trackingscript>
+  <showdescriptioninpostlist>True</showdescriptioninpostlist>
   <commentsperpage>10</commentsperpage>
   <enablepingbacksend>True</enablepingbacksend>
   <showdescriptioninpostlistforpostsbytagorcategory>False</showdescriptioninpostlistforpostsbytagorcategory>

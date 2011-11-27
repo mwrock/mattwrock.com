@@ -29,39 +29,13 @@ public class FacebookLikeButton : AdnButton
 
     public override HtmlControl RenderDynamic(AdnBookmarkingItem item)
     {
-        string src = "http://www.facebook.com/plugins/like.php?href="+HttpUtility.HtmlEncode(item.Link);
-        src += "&show_faces=false";
-    //    src += "&width=80";
-        src += "&action=like";
-        src += "&colorscheme=light";
-        src += "&height=21";
-
-        string style = "border:none;";
-        style += "overflow:hidden;"; 
-
-        if (AdnHelper.To<string>("Style", Configuration.ExtensionSettings).Equals("compact"))
-        {
-            src += "&layout=button_count";
-                src += "&width=80";
-                style += "width:80px;";
-                style += "height:21px"; 
-        }
-        else
-        {
-            src += "&layout=box_count";
-            src += "&width=57";
-            style += "width:57px;";
-            style += "height:62px"; 
-
-        }
-
-        HtmlGenericControl iframe = new HtmlGenericControl("iframe");
-        iframe.Attributes.Add("src", src);
-        iframe.Attributes.Add("scrolling", "no");
-        iframe.Attributes.Add("frameborder", "0");
-        iframe.Attributes.Add("allowTransparency", "true");
-        iframe.Attributes.Add("style", style); //"border:none; overflow:hidden; width:80px;");
-
-        return iframe;
+        HtmlGenericControl tag = new HtmlGenericControl("div");
+        tag.Attributes.Add("data-send", "true");
+        tag.Attributes.Add("data-layout", "button_count");
+        tag.Attributes.Add("data-width", "80");
+        tag.Attributes.Add("data-show-faces", "false");
+        tag.Attributes.Add("class", "fb-like");
+        tag.Attributes.Add("data-href", HttpUtility.HtmlEncode(item.Link));
+        return tag;
     }
 }

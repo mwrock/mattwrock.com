@@ -57,10 +57,6 @@ public class AddThisButton : AdnButton
         string id = AdnHelper.To<string>(AddThisId, settings).Equals("<anonymous>") ? "xa-4cb7e4d77c1aa8bd" : AdnHelper.To<string>(AddThisId, settings);
         string style = AdnHelper.To<string>("Style", settings);
 
-        HtmlGenericControl script = new HtmlGenericControl("script");
-        script.Attributes.Add("type", "text/javascript");
-        script.Attributes.Add("src", string.Format("http://s7.addthis.com/js/250/addthis_widget.js#username={0}", id));
-
         HtmlGenericControl panel = new HtmlGenericControl("div");
 
 
@@ -98,7 +94,6 @@ public class AddThisButton : AdnButton
 
             left.Attributes.Add("style", "float:left");
             left.Controls.Add(addthisButton);
-            left.Controls.Add(script);
 
             panel.Controls.Add(left);
         }
@@ -135,7 +130,6 @@ public class AddThisButton : AdnButton
         HtmlGenericControl right = new HtmlGenericControl("div");
         right.Attributes.Add("style", "float:left");
         right.Controls.Add(container);
-        right.Controls.Add(script);
 
         
         panel.Controls.Add(right); 
