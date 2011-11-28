@@ -141,7 +141,7 @@ public class AddThisButton : AdnButton
     {
         ExtensionSettings settings = Configuration.ExtensionSettings;
         string id = AdnHelper.To<string>(AddThisId, settings).Equals("<anonymous>") ? "4a00fc5d6a261f84" : AdnHelper.To<string>(AddThisId, settings);
-        string style = AdnHelper.To<string>("Static Style", settings);
+        string style = AdnHelper.To<string>("StaticStyle", settings);
 
 
         HtmlImage image = new HtmlImage();

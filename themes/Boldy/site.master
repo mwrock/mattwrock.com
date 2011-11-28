@@ -43,7 +43,7 @@
 					<li><a rel="me" href="http://www.linkedin.com/in/mattwrock" title="Join me on LinkedIn!"><img width="1" height="1" class="linkedin" runat="server" src="~/themes/Boldy/images/trans.gif" alt="LinkedIn" /></a></li>
 					<li><a rel="me" href="http://twitter.com/mwrockx" title="Follow me on Twitter!"><img width="1" height="1" runat="server" class="twitter" src="~/themes/Boldy/images/trans.gif" alt="Follow me on Twitter!" /></a></li>
 					<li><a rel="me" href="http://feeds.feedburner.com/Wrockblog" title="RSS" ><img width="1" height="1" runat="server" class="rss" src="~/themes/Boldy/images/trans.gif" alt="Subcribe to my RSS Feed" /></a></li>
-                    <li><a rel="author" href="https://profiles.google.com/109056412257727509222"><img src="/themes/Boldy/images/trans.gif" width="1" height="1" alt="Google+" class="googlePlus" /></a></li>
+                    <li><a rel="author" title="google+" href="https://profiles.google.com/109056412257727509222?rel=author"><img title="google+" src="/themes/Boldy/images/trans.gif" width="1" height="1" alt="Google+" class="googlePlus" /></a></li>
 				</ul>
 			</div>	
 			<!-- END TOP SOCIAL LINKS -->
@@ -73,7 +73,7 @@
                 <!-- END FOOTER WIDGETS -->
 				<!-- BEGIN COPYRIGHT -->
 				<div id="copyright">
-					© 2009-<%=DateTime.Now.Year.ToString() %> <a title="Matt Wrock" rel="me" href="https://profiles.google.com/109056412257727509222?rel=me">Matt Wrock</a> &nbsp;&nbsp; Powered by <a href="http://www.dotnetblogengine.net">BlogEngine.NET</a> <%=BlogSettings.Instance.Version() %> 
+					© 2009-<%=DateTime.Now.Year.ToString() %> <a title="Matt Wrock" href="http://profiles.google.com/109056412257727509222?rel=me">Matt Wrock</a> &nbsp;&nbsp; Powered by <a href="http://www.dotnetblogengine.net">BlogEngine.NET</a> <%=BlogSettings.Instance.Version() %> 
                 </div>
 				<!-- END COPYRIGHT -->						
 			</div>	

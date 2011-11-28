@@ -62,7 +62,7 @@
       <Name>Style</Name>
       <ParamType>DropDown</ParamType>
       <Required>false</Required>
-      <SelectedValue>counter</SelectedValue>
+      <SelectedValue>plus</SelectedValue>
       <Values>plus</Values>
       <Values>counter</Values>
       <Values>share</Values>
@@ -76,7 +76,7 @@
       <Name>StaticStyle</Name>
       <ParamType>DropDown</ParamType>
       <Required>false</Required>
-      <SelectedValue>plus</SelectedValue>
+      <SelectedValue>share</SelectedValue>
       <Values>plus</Values>
       <Values>share</Values>
       <Values>bookmark</Values>
@@ -284,7 +284,7 @@
       <Name>Alignment</Name>
       <ParamType>DropDown</ParamType>
       <Required>false</Required>
-      <SelectedValue>BottomLeft</SelectedValue>
+      <SelectedValue>TopRight</SelectedValue>
       <Values>BottomLeft</Values>
       <Values>BottomRight</Values>
       <Values>TopLeft</Values>
@@ -308,7 +308,7 @@
       <ParamType>Boolean</ParamType>
       <Required>false</Required>
       <SelectedValue />
-      <Values>False</Values>
+      <Values>True</Values>
     </Parameters>
     <Parameters>
       <KeyField>false</KeyField>
@@ -328,7 +328,7 @@
       <ParamType>Boolean</ParamType>
       <Required>false</Required>
       <SelectedValue />
-      <Values>False</Values>
+      <Values>True</Values>
     </Parameters>
     <ShowAdd>true</ShowAdd>
     <ShowDelete>true</ShowDelete>
