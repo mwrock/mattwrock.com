@@ -13,6 +13,7 @@ namespace App_Code.Controls
     using System.Web;
     using System.Web.UI;
     using System.Web.UI.WebControls;
+    using System.Text.RegularExpressions;
 
     using BlogEngine.Core;
 
@@ -83,6 +84,11 @@ namespace App_Code.Controls
         {
             var pages = new List<int>();
             var midStack = new List<int>();
+
+			if (total <= 0 || current > total)
+			{
+				return pages;
+			}
             
             // should be more then 4
             const int MaxPages = 12; 
@@ -156,7 +162,10 @@ namespace App_Code.Controls
         /// <returns>The page URL.</returns>
         private static string PageUrl()
         {
-            var path = HttpContext.Current.Request.RawUrl.Replace("Default.aspx", string.Empty);
+            var path = HttpContext.Current.Request.RawUrl;
+            if(string.IsNullOrEmpty(BlogConfig.FileExtension))
+                path = path.Replace("default.aspx", string.Empty);
+
             if (path.Contains("?"))
             {
                 if (path.Contains("page="))
@@ -166,7 +175,8 @@ namespace App_Code.Controls
                 }
                 else
                 {
-                    path += "&";
+                    if (!path.EndsWith("?"))
+                        path += "&";
                 }
             }
             else
@@ -174,7 +184,7 @@ namespace App_Code.Controls
                 path += "?";
             }
 
-            return path + "page={0}";
+            return HttpUtility.HtmlEncode(path + "page={0}");
         }
 
         /// <summary>
@@ -185,13 +195,18 @@ namespace App_Code.Controls
         {
             if (this.Posts == null) return "";
 
+			var postsPerPage = BlogSettings.Instance.PostsPerPage;
+			if (postsPerPage <= 0)
+			{
+				return "";
+			}
+
             var retValue = string.Empty;
             var link = string.Format("<li class=\"PagerLink\"><a href=\"{0}\">{{1}}</a></li>", PageUrl());
             const string LinkCurrent = "<li class=\"PagerLinkCurrent\">{0}</li>";
             var linkFirst = string.Format("<li class=\"PagerFirstLink\"><a href=\"{0}\">{{0}}</a></li>", PageUrl());
             const string LinkDisabled = "<li class=\"PagerLinkDisabled\">{0}</li>";
 
-            var postsPerPage = BlogSettings.Instance.PostsPerPage;
             var currentPage = PageIndex();
 
             var visiblePosts = this.Posts.FindAll(p => p.IsVisible);

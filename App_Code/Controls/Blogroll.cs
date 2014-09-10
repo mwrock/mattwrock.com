@@ -183,9 +183,12 @@ namespace App_Code.Controls
                 {
                     if (Items.Count == 0)
                     {
-                        foreach (var roll in BlogRollItem.BlogRolls)
+                        if (BlogRollItem.BlogRolls != null)
                         {
-                            AddBlog(roll);
+                            foreach (var roll in BlogRollItem.BlogRolls)
+                            {
+                                AddBlog(roll);
+                            }
                         }
                     }
                 }
@@ -217,6 +220,8 @@ namespace App_Code.Controls
                             Src = string.Format("{0}pics/rssButton.png", Utils.ApplicationRelativeWebRoot), Alt = string.Format("RSS feed for {0}", item.RollItem.Title)
                         })
                     {
+                        image.Width = 12;
+                        image.Height = 12;
                         feedAnchor.Controls.Add(image);
                     }
                 }
@@ -302,9 +307,9 @@ namespace App_Code.Controls
         /// </returns>
         private static string EnsureLength(string textToShorten)
         {
-            return textToShorten.Length > BlogSettings.Instance.BlogrollMaxLength
+			return HttpUtility.HtmlEncode(textToShorten.Length > BlogSettings.Instance.BlogrollMaxLength
                        ? string.Format("{0}...", textToShorten.Substring(0, BlogSettings.Instance.BlogrollMaxLength).Trim())
-                       : HttpUtility.HtmlEncode(textToShorten);
+                       : textToShorten);
         }
 
         /// <summary>
@@ -342,15 +347,15 @@ namespace App_Code.Controls
         /// <param name="async">
         /// The async result.
         /// </param>
-        private static void ProcessResponse(IAsyncResult async)
+        private static void ProcessResponse(IAsyncResult asyncResult)
         {
-            GetRequestData data = (GetRequestData)async.AsyncState;
+            GetRequestData data = (GetRequestData)asyncResult.AsyncState;
             Blog.InstanceIdOverride = data.BlogInstanceId;
             var blogReq = data.BlogRequest;
 
             try
             {
-                using (var response = (HttpWebResponse)blogReq.Request.EndGetResponse(async))
+                using (var response = (HttpWebResponse)blogReq.Request.EndGetResponse(asyncResult))
                 {
                     var doc = new XmlDocument();
                     var responseStream = response.GetResponseStream();

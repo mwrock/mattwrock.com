@@ -4,7 +4,7 @@
     using System.Net.Mail;
     using System.Text;
     using System.Web.Security;
-
+    using Resources;
     using BlogEngine.Core;
 
     using Page = System.Web.UI.Page;
@@ -40,7 +40,7 @@
 
             if (string.IsNullOrEmpty(email))
             {
-                this.Master.SetStatus("warning", "Email is required");
+                this.Master.SetStatus("warning", Resources.labels.emailIsRequired);
                 return;
             }
 
@@ -48,7 +48,7 @@
 
             if (string.IsNullOrEmpty(userName))
             {
-                this.Master.SetStatus("warning", "Email does not exist in our system");
+                this.Master.SetStatus("warning", Resources.labels.emailNotExist);
                 return;
             }
 
@@ -95,7 +95,7 @@
 
             Utils.SendMailMessageAsync(mail);
 
-            this.Master.SetStatus("success", "The password has been sent");
+            this.Master.SetStatus("success", Resources.labels.passwordSent);
         }
 
         #endregion

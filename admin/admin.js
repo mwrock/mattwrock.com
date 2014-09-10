@@ -1,7 +1,7 @@
 ﻿
 $(document).ready(function () {
-   $('.editButton').live("click", function () { return EditRow(this); });
-   $('.deleteButton').live("click", function () { return DeleteRow(this); });
+   $(document).on("click", ".editButton", function () { return EditRow(this); });
+   $(document).on("click", ".deleteButton", function () { return DeleteRow(this); });
    $('.loader').hide();
 });
 
@@ -78,17 +78,17 @@ function SaveChanges(obj, str) {
    return false;
 }
 
-
 function CancelChanges(obj, str) {
    $(obj).closest("tr").html(str);
    return false;
 }
 
 function DeleteRow(obj) {
-   var row = $(obj).closest("tr")
+   var row = $(obj).closest("tr");
    var id = row.data("recordId");
    var srv = $(obj).closest("table").attr("id");
    var dto = { "id": id };
+   var toolsId = row.find(".rowToolsMenu").attr('id');
 
    $.ajax({
        url: SiteVars.ApplicationRelativeWebRoot + "api/" + srv + ".asmx/Delete",
@@ -100,12 +100,17 @@ function DeleteRow(obj) {
        success: function (result) {
            var rt = result.d;
            if (rt.Success) {
-               row.fadeOut(500, function () {
-                   var tbody = row.closest('tbody');
-                   row.remove();
-                   $('tr:odd', tbody).addClass('alt');
-                   $('tr:even', tbody).removeClass('alt');
-               });
+               if (toolsId === 'users') {
+                   LoadUsers($.cookie('GenericCurrentPage'));
+               }
+               else {
+                   row.fadeOut(500, function () {
+                       var tbody = row.closest('tbody');
+                       row.remove();
+                       $('tr:odd', tbody).addClass('alt');
+                       $('tr:even', tbody).removeClass('alt');
+                   });
+               }
                ShowStatus("success", rt.Message);
            }
            else {
@@ -192,20 +197,38 @@ function LoadRoles() {
     });
 }
 
-function LoadUsers() {
+function LoadUsers(page) {
+   var dto = { "page": page };
    $.ajax({
-      url: SiteVars.ApplicationRelativeWebRoot + "admin/Users/Users.aspx/GetUsers",
-      data: "{ }",
-      type: "POST",
-      contentType: "application/json; charset=utf-8",
-      dataType: "json",
-      beforeSend: onAjaxBeforeSend,
-      success: function (msg) {
-         $('#Container').setTemplateURL(SiteVars.ApplicationRelativeWebRoot + 'Templates/users.htm', null, { filter_data: false });
-         $('#Container').processTemplate(msg);
-         SaveOriginalIdValues('#Container tr', '.username');
-      }
+       url: SiteVars.ApplicationRelativeWebRoot + "admin/Users/Users.aspx/GetUsers",
+       data: JSON.stringify(dto),
+       type: "POST",
+       contentType: "application/json; charset=utf-8",
+       dataType: "json",
+       beforeSend: onAjaxBeforeSend,
+       success: function (msg) {
+           $('#Container').setTemplateURL(SiteVars.ApplicationRelativeWebRoot + 'Templates/users.htm', null, { filter_data: false });
+           $('#Container').processTemplate(msg);
+           SaveOriginalIdValues('#Container tr', '.username');
+           LoadGenericPager(page, 'admin/Users/Users.aspx');
+           $.cookie('GenericCurrentPage', page, { expires: 7 });
+       }
    });
+}
+
+function LoadGenericPager(page, url) {
+    $.ajax({
+        url: SiteVars.ApplicationRelativeWebRoot + url + "/LoadPager",
+        data: "{'page':'" + page + "'}",
+        type: "POST",
+        contentType: "application/json; charset=utf-8",
+        dataType: "json",
+        beforeSend: onAjaxBeforeSend,
+        success: function (msg) {
+            $('.Pager').html(msg.d);
+        }
+    });
+    return false;
 }
 
 function LoadProfile() {
@@ -244,8 +267,8 @@ function LoadCustomFilters() {
 
 //--------------    TRASH
 
-function LoadTrash(obj) {
-    $('.loader').hide();
+function LoadTrash(obj, page) {
+    $('.loader').show();
     var type = "All";
 
     if (obj != null) {
@@ -255,7 +278,7 @@ function LoadTrash(obj) {
     }
     $.ajax({
         url: SiteVars.ApplicationRelativeWebRoot + "admin/Trash.aspx/LoadTrash",
-        data: "{'trashType':'" + type + "'}",
+        data: "{'trashType':'" + type + "', 'page':" + page + "}",
         type: "POST",
         contentType: "application/json; charset=utf-8",
         dataType: "json",
@@ -263,16 +286,56 @@ function LoadTrash(obj) {
         success: function (msg) {
             $('#Container').setTemplateURL(SiteVars.ApplicationRelativeWebRoot + 'Templates/trash.htm', null, { filter_data: false });
             $('#Container').processTemplate(msg);
+            LoadTrashPager(page);
         }
     });
     return false;
 }
 
+function LoadTrashPager(page) {
+    $.ajax({
+        url: SiteVars.ApplicationRelativeWebRoot + "admin/Trash.aspx/LoadPager",
+        data: "{'page':'" + page + "'}",
+        type: "POST",
+        contentType: "application/json; charset=utf-8",
+        dataType: "json",
+        beforeSend: onAjaxBeforeSend,
+        success: function (msg) {
+            $('.Pager').html(msg.d);
+        }
+    });
+    return false;
+}
+
+function PurgeLogfile() {
+    $('#AjaxLoader').addClass('loader');
+    $.ajax({
+        url: SiteVars.ApplicationRelativeWebRoot + "admin/Trash.aspx/PurgeLogfile",
+        type: "post",
+        contentType: "application/json; charset=utf-8",
+        dataType: "json",
+        beforeSend: onAjaxBeforeSend,
+        success: function (result) {
+            var rt = result.d;
+            if (rt.Success) {
+                ShowStatus("success", rt.Message);
+            }
+            else {
+                ShowStatus("warning", rt.Message);
+            }
+        }
+    });
+    //$('#AjaxLoader').removeClass('loader');
+    return false;
+}
+
 function ProcessTrash(action, scope) {
     $('#AjaxLoader').addClass('loader');
+
+    var page = $('#current-page').html();
     var vals = [];   
     if (scope == 'Selected') {
-        var checked = $('#TrashTable input[@type=checkbox]:checked');
+        var checked = $('#TrashTable input[type="checkbox"]:checked');
         if (checked.length > 0) {
             checked.each(function () {
                 var jThis = $(this);
@@ -302,7 +365,7 @@ function ProcessTrash(action, scope) {
         success: function (result) {
             var rt = result.d;
             if (rt.Success) {
-                LoadTrash(null);
+                LoadTrash(null, page);
                 ShowStatus("success", rt.Message);
             }
             else {
@@ -310,13 +373,13 @@ function ProcessTrash(action, scope) {
             }
         }
     });
-    $('#AjaxLoader').removeClass('loader');
+    //$('#AjaxLoader').removeClass('loader');
     return false;
 }
 
 //--------------    COMMENTS
 
-var rowLoading = '<td colspan="8" style="text-align:center"><img src="../../pics/ajax-loader.gif" alt="Loading" /></td>';
+var rowLoading = '<td colspan="8" style="text-align:center"><img src="../../pics/ajax-loader.gif" width="24" height="24" alt="Loading" /></td>';
 
 function ProcessSelected(action, page) {
    var vals = [];
@@ -328,7 +391,7 @@ function ProcessSelected(action, page) {
 
    // Gets all checkboxes inside the #Comments table to prevent selecting
    // checkboxes that aren't part of the comments list.
-   var checkedComments = $('#Comments input[@type=checkbox]:checked');
+   var checkedComments = $('#Comments input[type="checkbox"]:checked');
 
    if(checkedComments.length > 0) {
 
@@ -408,6 +471,9 @@ function ProcessSelected(action, page) {
                                   break;
 
                               case "Delete":
+                                  $("#recyclebin a").removeClass("empty");
+                                  $("#recyclebin a").addClass("full");
+
                                   switch (page) {
                                       case "Approved": (com_cnt -= 1); break;
                                       case "Spam": (spm_cnt -= 1); break;
@@ -527,7 +593,7 @@ function CommentAction(act, id) {
    var oRow = $("[id$='" + id + "']");
    var hRow = oRow.html();
 
-   var rowLoader = '<td colspan="8" style="text-align:center"><img src="../../pics/ajax-loader.gif" alt="Loading" /></td>';
+   var rowLoader = '<td colspan="8" style="text-align:center"><img src="../../pics/ajax-loader.gif" width="24" height="24" alt="Loading" /></td>';
    oRow.html(rowLoader);
 
    var vals = [];
@@ -999,12 +1065,11 @@ function SetCurrentTheme(theme, mobile) {
     return false;
 }
 
-function GalleryGetPackages(pg) {
+function GalleryGetPackages(pg, pkgType) {
     $('.page-loader').show();
     var srt = $("#gallery-sort-order").val();
     var srch = $("#searchGallery").val();
-    //var pg = Querystring('p').length > 0 ? Querystring('p') : 1;
-    var dto = { "pkgType": "Theme", "page": pg, "sortOrder": srt, "searchVal": srch };
+    var dto = { "pkgType": pkgType, "page": pg, "sortOrder": srt, "searchVal": srch };
     $.ajax({
         url: SiteVars.ApplicationRelativeWebRoot + "admin/AjaxHelper.aspx/LoadGalleryPage",
         data: JSON.stringify(dto),
@@ -1023,7 +1088,7 @@ function GalleryGetPackages(pg) {
 }
 
 function GalleryGetPager() {
-    var dto = { };
+    var dto = {};
     $.ajax({
         url: SiteVars.ApplicationRelativeWebRoot + "admin/AjaxHelper.aspx/LoadGalleryPager",
         data: JSON.stringify(dto),
@@ -1041,7 +1106,11 @@ function GalleryGetPager() {
 
 function InstallPackage(pkgId) {
     var dto = { "pkgId": pkgId };
-    $("[id$='" + pkgId + "']").show();
+    var spinner = '<img class="loader2" src="../../pics/ajax-loader.gif" width="24" height="24" alt="loading..." />';
+    var p = $("[id$='p_" + pkgId + "']");
+    var backup = p.html();
+
+    p.html(spinner);
     $.ajax({
         url: SiteVars.ApplicationRelativeWebRoot + "admin/AjaxHelper.aspx/InstallPackage",
         data: JSON.stringify(dto),
@@ -1052,20 +1121,69 @@ function InstallPackage(pkgId) {
         success: function (result) {
             var rt = result.d;
             if (rt.Success) {
+                p.removeClass("package-update");
+                p.addClass("package-installed");
+                p.closest("li").addClass("pkg-installed");
+                p.html('Installed');
                 ShowStatus("success", rt.Message);
             }
             else {
+                p.html(backup);
                 ShowStatus("warning", rt.Message);
             }
-            $("[id$='" + pkgId + "']").hide();
+        }
+    });
+    return false;
+}
+
+function UpdatePackage(pkgId, location) {
+    var spinner = '<img class="loader2" style="margin-left: 0" src="../../pics/ajax-loader.gif" width="24" height="24" alt="loader" />';
+    var p = $("[id$='upd-" + pkgId + "']");
+    var backup = p.html();
+    p.css('background','none');
+    p.html(spinner);
+
+    var dto = { "pkgId": pkgId };
+    $.ajax({
+        url: SiteVars.ApplicationRelativeWebRoot + "admin/AjaxHelper.aspx/InstallPackage",
+        data: JSON.stringify(dto),
+        type: "POST",
+        contentType: "application/json; charset=utf-8",
+        dataType: "json",
+        beforeSend: onAjaxBeforeSend,
+        success: function (result) {
+            var rt = result.d;
+            if (rt.Success) {
+                if (location == 'G') {
+                    p.css('background', 'url("../images/action-enable.png") no-repeat scroll left center transparent');
+                    p.html('Installed');
+                    p.removeClass("package-update");
+                    p.addClass("package-installed");
+                }
+                else {
+                    $(p).fadeOut(500, function () {
+                        $(p).remove();
+                    });
+                }
+                ShowStatus("success", rt.Message);
+            }
+            else {
+                p.css('background', 'url("../images/action-enable.png") no-repeat scroll left center transparent');
+                p.html(packup);
+                ShowStatus("warning", rt.Message);
+            }
         }
     });
     return false;
 }
 
 function UninstallPackage(pkgId) {
-    $('.loader2').show();
-    var li = $("[id$='" + pkgId + "']");
+    var spinner = '<img class="loader2" style="margin-left: 0" src="../../pics/ajax-loader.gif" width="24" height="24" alt="loader" />';
+    var p = $("[id$='del-" + pkgId + "']");
+    var li = p.closest("li");
+    var backup = p.html();
+    p.html(spinner);
+
     var dto = { "pkgId": pkgId };
     $.ajax({
         url: SiteVars.ApplicationRelativeWebRoot + "admin/AjaxHelper.aspx/UninstallPackage",
@@ -1083,13 +1201,46 @@ function UninstallPackage(pkgId) {
                 ShowStatus("success", rt.Message);
             }
             else {
+                p.html(backup);
                 ShowStatus("warning", rt.Message);
             }
         }
     });
-    $('.loader2').hide();
     return false;
 }
+
+// extensions are special case
+function UninstallExtension(pkgId) {
+    var spinner = '<img class="loader2" style="margin-left: 70px" src="../../pics/ajax-loader.gif" width="24" height="24" alt="loader" />';
+    var row = $("[id$='ext_" + pkgId + "']");
+    var backup = row.html();
+    row.html(spinner);
+    
+    var dto = { "pkgId": pkgId };
+    $.ajax({
+        url: SiteVars.ApplicationRelativeWebRoot + "admin/AjaxHelper.aspx/UninstallPackage",
+        data: JSON.stringify(dto),
+        type: "POST",
+        contentType: "application/json; charset=utf-8",
+        dataType: "json",
+        beforeSend: onAjaxBeforeSend,
+        success: function (result) {
+            var rt = result.d;
+            if (rt.Success) {
+                $(row).fadeOut(500, function () {
+                    $(row).remove();
+                });
+                ShowStatus("success", rt.Message);
+            }
+            else {
+                row.html(backup);
+                ShowStatus("warning", rt.Message);
+            }
+        }
+    });
+    return false;
+}
+
 
 //--------------HELPERS AND MISC
 
@@ -1125,11 +1276,11 @@ function colorboxDialogSubmitClicked(validationGroup, panelId) {
 }
 
 function toggleAllChecks(o) {
-   if($(o).attr('checked')) {
+   if($(o).is(':checked')) {
       $('.chk').not(':disabled').attr('checked', 'checked');
    }
    else {
-      $('.chk').attr('checked', '');
+      $('.chk').removeAttr('checked');
    }
    return false;
 }

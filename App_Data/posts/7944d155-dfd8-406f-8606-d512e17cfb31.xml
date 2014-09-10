@@ -1,0 +1,38 @@
+﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<post>
+  <author>mwrock</author>
+  <title>Copy Files From Local Computer to an Azure VM</title>
+  <description />
+  <content>&lt;p&gt;&lt;a href="http://www.mattwrock.com/image.axd?picture=vm.png"&gt;&lt;img title="vm" style="border-top: 0px; border-right: 0px; background-image: none; border-bottom: 0px; padding-top: 0px; padding-left: 0px; margin: 0px 10px 0px 0px; border-left: 0px; display: inline; padding-right: 0px" border="0" alt="vm" src="http://www.mattwrock.com/image.axd?picture=vm_thumb.png" width="244" height="223" /&gt;&lt;/a&gt;I’m currently ironing out my strategy of how my &lt;a href="http://boxstarter.org/"&gt;Boxstarter&lt;/a&gt; Virtualization module will provision VM’s in Azure. I recently started a blog series of how I will provision local Hyper-V VMs &lt;a href="http://www.mattwrock.com/post/2013/09/06/Windows-VM-Provisioning-Part-1-Inject-a-startup-on-boot-script-into-a-VHD.aspx"&gt;here&lt;/a&gt;. My strategy for Azure VMs will be similar in that I will do most of the heavy lifting via Powershell remoting and fortunately lighting up a Azure VM with powershell remoting all set to go is a lot simpler that with a normal Hyper-V VM. The trick is getting the initial boxstarter modules copied to the VM. Based on some cursory googling, there are a lot of people trying to copy files to their azure VM and the most common approach is to copy/paste them via remote desktop. That does not work for me. It has to be 100% hands off.&lt;/p&gt;  &lt;p&gt;So here is the script to accomplish this:&lt;/p&gt;  &lt;div id="codeSnippetWrapper"&gt;   &lt;pre id="codeSnippet" style="border-top-style: none; overflow: visible; font-size: 8pt; font-family: &amp;#39;Courier New&amp;#39;, courier, monospace; width: 100%; border-bottom-style: none; color: black; padding-bottom: 0px; direction: ltr; text-align: left; padding-top: 0px; border-right-style: none; padding-left: 0px; margin: 0em; border-left-style: none; line-height: 12pt; padding-right: 0px; background-color: #f4f4f4"&gt;&lt;span style="color: #008000"&gt;#Create and mount a new local VHD&lt;/span&gt;&lt;br /&gt;$volume = new-vhd -Path test.vhd -SizeBytes 50MB | `&lt;br /&gt;  Mount-VHD -PassThru | `&lt;br /&gt;  Initialize-Disk -PartitionStyle mbr -Confirm:$false -PassThru | `&lt;br /&gt;  New-Partition -UseMaximumSize -AssignDriveLetter -MbrType IFS | `&lt;br /&gt;  Format-Volume -NewFileSystemLabel &lt;span style="color: #006080"&gt;&amp;quot;VHD&amp;quot;&lt;/span&gt; -Confirm:$false&lt;br /&gt;&lt;br /&gt;&lt;span style="color: #008000"&gt;#Copy my files  &lt;/span&gt;&lt;br /&gt;Copy-Item C:\dev\boxstarter &lt;span style="color: #006080"&gt;&amp;quot;$($volume.DriveLetter):\&amp;quot; -Recurse&lt;br /&gt;Dismount-VHD test.vhd&lt;br /&gt;&lt;br /&gt;#upload the Vhd to azure&lt;br /&gt;Add-AzureVhd -Destination http://mystorageacct.blob.core.windows.net/vhdstore/test.vhd `&lt;br /&gt;  -LocalFilePath test.vhd&lt;br /&gt;&lt;br /&gt;#mount the VHD to my VM&lt;br /&gt;Get-AzureVM MyCloudService MyVMName | `&lt;br /&gt;  Add-AzureDataDisk -ImportFrom `&lt;br /&gt;  -MediaLocation &amp;quot;&lt;/span&gt;http://mystorageacct.blob.core.windows.net/vhdstore/test.vhd&lt;span style="color: #006080"&gt;&amp;quot; `&lt;br /&gt;  -DiskLabel &amp;quot;&lt;/span&gt;boxstarter&amp;quot; -LUN 0 | `&lt;br /&gt;  Update-AzureVM&lt;br /&gt;&lt;/pre&gt;
+
+  &lt;br /&gt;&lt;/div&gt;
+
+
+
+&lt;p&gt;This uses the Powershell v3 Hyper-V module to create the VHD locally. Then it uses the &lt;a href="http://msdn.microsoft.com/en-us/library/windowsazure/jj554332.aspx"&gt;Azure Powershell module&lt;/a&gt; (available for download &lt;a href="http://go.microsoft.com/?linkid=9811175&amp;amp;clcid=0x409"&gt;here&lt;/a&gt;) to upload that vhd and mount it to my VM.&lt;/p&gt;
+
+&lt;p&gt;Here is a screenshot of my remote Powershell session connected to my azure VM.&lt;/p&gt;
+
+&lt;p&gt;&lt;a href="http://www.mattwrock.com/image.axd?picture=azurecopy.png"&gt;&lt;img title="azurecopy" style="border-top: 0px; border-right: 0px; background-image: none; border-bottom: 0px; padding-top: 0px; padding-left: 0px; margin: 0px 10px 0px 0px; border-left: 0px; display: inline; padding-right: 0px" border="0" alt="azurecopy" src="http://www.mattwrock.com/image.axd?picture=azurecopy_thumb.png" width="692" height="479" /&gt;&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;Maybe there is a better way. I’d love to hear it if you know of one, but this works well without having to expose a public SMB endpoint.&lt;/p&gt;
+
+&lt;p&gt;With this in place I can invoke Boxstarter on the VM and initiate a provisioning session that installs and configures all of my things. My virtualization module will allow individuals to provision a VM with a command like this:&lt;/p&gt;
+
+&lt;div id="codeSnippetWrapper"&gt;
+  &lt;pre id="codeSnippet" style="border-top-style: none; overflow: visible; font-size: 8pt; font-family: &amp;#39;Courier New&amp;#39;, courier, monospace; width: 100%; border-bottom-style: none; color: black; padding-bottom: 0px; direction: ltr; text-align: left; padding-top: 0px; border-right-style: none; padding-left: 0px; margin: 0em; border-left-style: none; line-height: 12pt; padding-right: 0px; background-color: #f4f4f4"&gt;New-BoxstarterAzureVM VMName -BoxstarterPackage mypackage `&lt;br /&gt;  -InstanceSize &lt;span style="color: #006080"&gt;&amp;quot;ExtraSmall&amp;quot;&lt;/span&gt; -OS &lt;span style="color: #006080"&gt;&amp;quot;Windows-Server-2012-Datacenter&amp;quot;&lt;/span&gt; `&lt;br /&gt;  -credential Admin -location  &lt;span style="color: #006080"&gt;&amp;quot;West US&amp;quot;&lt;/span&gt;&lt;/pre&gt;
+
+  &lt;br /&gt;&lt;/div&gt;</content>
+  <ispublished>True</ispublished>
+  <isdeleted>False</isdeleted>
+  <iscommentsenabled>True</iscommentsenabled>
+  <pubDate>2013-09-12 02:55:00</pubDate>
+  <lastModified>2013-09-12 02:56:07</lastModified>
+  <raters>0</raters>
+  <rating>0</rating>
+  <slug>Copy-Files-From-Local-Computer-to-an-Azure-VM</slug>
+  <tags />
+  <comments />
+  <categories />
+  <notifications />
+</post>

@@ -46,7 +46,7 @@
                     success: function (result) {
                         var rt = result.d;
                         if (rt.Success) {
-                            LoadUsers();
+                            LoadUsers(1);
                             ShowStatus("success", rt.Message);
                         }
                         else {
@@ -60,14 +60,14 @@
         }
 
         function OnAdminDataSaved() {
-            LoadUsers();
+            LoadUsers(1);
         }
     </script>
 
     <script type="text/javascript" src="../jquery.colorbox.js"></script>
     <script type="text/javascript">
         $(document).ready(function () {
-            $(".addNew").colorbox({ width: "550px", inline: true, href: "#frmAddNew" });
+            $(".new").colorbox({ width: "550px", inline: true, href: "#frmAddNew" });
         });
 
         function closeOverlay() {
@@ -87,12 +87,14 @@
 	<div class="content-box-outer">
 		<div class="content-box-right">
             <ul>
+                <li><a href="#" id="btnNew" class="new"><%=Resources.labels.addNewUser %></a></li>
 			    <li class="content-box-selected"><a href="Users.aspx"><%=Resources.labels.users %></a></li>
 			    <li><a href="Roles.aspx" class="selected"><%=Resources.labels.roles %></a></li>
+                <li><a href="Profile.aspx?id=<%=BlogEngine.Core.Security.CurrentMembershipUser.UserName %>"><%=Resources.labels.profile %></a></li>
             </ul>
 		</div>
 		<div class="content-box-left">
-            <h1><%=Resources.labels.users %><a href="#" class="addNew"><%=Resources.labels.addNewUser %></a></h1>
+            <h1><%=Resources.labels.users %><span class="Pager"></span></h1>
             <div style="display:none;">
             <div id="frmAddNew" class="overlaypanel" >
                 <h2><%=Resources.labels.addNewUser %></h2>
@@ -132,9 +134,10 @@
 			</div>
             </div>
             <div id="Container"></div>
+            <div id="pager" class="Pager"></div>
 		</div>
 	</div>
     <script type="text/javascript">
-        LoadUsers();
+        LoadUsers(1);
     </script>
 </asp:Content>

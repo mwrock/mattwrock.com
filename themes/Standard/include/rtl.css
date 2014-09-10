@@ -1,0 +1,38 @@
+﻿/*
+    rtl.css
+    This file for supported RTL direction.
+    RTL direction for languages Right To Left (Arabic,Persian and etc.)
+    If your site is RTL, it required to be this file. otherwise you can delete it.
+    More info: http://seyfollahi.net/en/page/BlogEngine/
+*/
+
+.rtl {direction: rtl !important ;font: 12px tahoma, arial, sans-serif !important ;}
+.rtl .ltr {direction:ltr !important;}
+.rtl h1 {font-family: 'B yekan', tahoma,Arial;}
+.rtl h2, .rtl h3 {font-family: 'B Koodak','B yekan', tahoma,Arial;}
+.rtl h3 {margin-bottom: 10px; font-weight:normal;}
+.rtl h4, .rtl h5, .rtl h6 {font-family: Tahoma, Arial;}
+.rtl blockquote {border-right: 3px solid #2999e4;border-left:none !important;margin: 0px 15px 7px 0px !important;}
+.rtl #PageWrapper .Sidebar {font-size: 13px;}
+.rtl .NavBar li A {display: block;height: inherit;padding: 0 15px;font: 18px/47px 'b koodak','B Yekan', Tahoma;color: #555 !important;}
+.rtl .NavBar li ul {right: -1px;-webkit-border-radius: 5px;-webkit-border-top-right-radius: 0;-moz-border-radius: 5px;-moz-border-radius-topright: 0;border-radius: 5px;border-top-right-radius: 0;}
+.rtl .NavBar ul li A {line-height: 30px;}
+.rtl .BlogTitle h1.Title A {font-family: 'B Mitra', 'B Nazanin', 'B roya', 'B Yekan', Arial;}
+.rtl .BlogTitle .Desc {font: 12px tahoma, arial;}
+.rtl .post .ratingcontainer .rating p {right: 55px;}
+.rtl #PostPager li   { height: 25px; line-height:23px; display: inline-block; min-width: 23px; background: #FFF; }
+.rtl #PostPager li A { height: 100%; line-height:23px; }
+.rtl #commentlist .comment .comment-replies {padding: 5px 2em 0 0;}
+.rtl .comment .gravatar {margin-left: 10px;margin-right: 0;}
+.rtl #comment-form .success {background: #cdeb8e url(../img/success.png) no-repeat left center;}
+.rtl #comment-form .comment .comment-contents {border-right: 1px solid #CCC !important;border-left: none !important;}
+.rtl #comment-form .txt-country {height:30px;padding:4px;width:186px;}
+.rtl #commentMenu {float: left;}
+.rtl #commentPreview .comment {border: 1px solid #CCC;border-right: none;}
+.rtl #commenttoggle {float: left !important;}
+.rtl .Widget .delete, .rtl .Widget .move, .rtl .Widget .edit {float: left;position: relative;top: 4px;}
+.rtl .recentposts ul li A {font-size: 13px;}
+.rtl #archive h2 {font-size: 18px;}
+.rtl #archive table td, .rtl #archive table th {text-align: right;}
+.rtl .syntaxhighlighter .code { font-size: 14px !important; font-family: sans-serif !important; }
+.rtl .Footer .License  {font: 16px Calibri, tahoma, arial, sans-serif;}

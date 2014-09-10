@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <widgets>
   <widget id="4447978a-ea42-461d-bc32-6853134afe91" title="About Me" showTitle="True">TextBox</widget>
+  <widget id="954ca2b8-16fd-46ee-b2c5-d051e37fb0f6" title="OSS Projects" showTitle="True">LinkList</widget>
   <widget id="42fcbe7c-2c9c-440a-bad9-65a94472fccc" title="Administration" showTitle="True">Administration</widget>
   <widget id="ab2b8c27-02c4-46ab-a78f-28939c2a1a09" title="Month List" showTitle="True">Month List</widget>
   <widget id="b24cf3fc-38be-48d8-b039-76356a78e46c" title="RecentPosts" showTitle="True">RecentPosts</widget>

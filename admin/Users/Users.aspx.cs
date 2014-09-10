@@ -6,12 +6,16 @@
     using System.Linq;
     using System.Web.Security;
     using System.Web.Services;
+    using BlogEngine.Core.Web.Navigation;
 
     /// <summary>
     /// The Users.
     /// </summary>
     public partial class Users : System.Web.UI.Page
     {
+        static int listCount = 0;
+        static int pageSize = BlogConfig.GenericPageSize;
+
         #region Public Methods
 
         protected void Page_Load(object sender, EventArgs e)
@@ -35,17 +39,37 @@
         /// </summary>
         /// <returns>The users.</returns>
         [WebMethod]
-        public static List<MembershipUser> GetUsers()
+        public static List<MembershipUser> GetUsers(int page)
         {
             CheckSecurity();
 
             int count;
             var userCollection = Membership.Provider.GetAllUsers(0, 999, out count);
             var users = userCollection.Cast<MembershipUser>().ToList();
-
             users.Sort((u1, u2) => string.Compare(u1.UserName, u2.UserName));
 
-            return users;
+            listCount = users.Count;
+
+            if (users.Count < pageSize)
+                return users;
+
+            var skip = page == 1 ? 0 : page * pageSize - pageSize;
+            var usersPage = users.Skip(skip).Take(pageSize).ToList();
+
+            return usersPage;
+        }
+
+        [WebMethod]
+        public static string LoadPager(int page)
+        {
+            CheckSecurity();
+
+            if (listCount == 0)
+                return string.Empty;
+
+            IPager pager = new Pager(page, pageSize, listCount);
+
+            return pager.Render(page, "LoadUsers({1})");
         }
 
         #endregion

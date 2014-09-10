@@ -33,6 +33,32 @@
             grid.RowDeleting += grid_RowDeleting;
             btnAdd.Click += btnAdd_Click;
             btnAdd.Text = Resources.labels.add + " ping service";
+            btnBatchAdd.Click += BtnBatchAdd_Click;
+            btnBatchAdd.Text = Resources.labels.add + " ping services";
+        }
+
+        /// <summary>
+        /// Handles the Click event of the btnBatchAdd control.
+        /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.</param>
+        private void BtnBatchAdd_Click(object sender, EventArgs eventArgs)
+        {
+            StringCollection col = BlogService.LoadPingServices();
+
+            foreach (string service in txtBatchPingService.Text.Split(new char[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries))
+            {
+                if (!col.Contains(service.ToLower()))
+                {
+                    col.Add(service);
+                }
+                else
+                {
+                    liBatchOutput.Text += service + " " + Resources.labels.pingServiceNotUnique + ".<br/>";
+                }
+            }
+            BlogService.SavePingServices(col);
+			BindGrid();
         }
 
         /// <summary>

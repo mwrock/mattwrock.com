@@ -31,6 +31,8 @@ namespace admin.Widgets
 
             btnSave.Click += BtnSaveClick;
             btnSave.Text = string.Format("{0} {1}", labels.save, labels.settings);
+            btnSave2.Click += BtnSaveClick;
+            btnSave2.Text = string.Format("{0} {1}", labels.save, labels.settings);
             Page.Title = labels.controls;
 
             base.OnInit(e);

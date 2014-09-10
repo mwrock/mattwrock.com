@@ -17,6 +17,9 @@
         {
             var extensions = ExtensionManager.Extensions.Where(x => x.Key != "MetaExtension").ToList();
 
+            if(!Blog.CurrentInstance.IsPrimary)
+                extensions = extensions.Where(x => x.Value.SubBlogEnabled == true).ToList();
+
             extensions.Sort(
                 (e1, e2) => e1.Value.Priority == e2.Value.Priority ? string.CompareOrdinal(e1.Key, e2.Key) : e1.Value.Priority.CompareTo(e2.Value.Priority));
 
@@ -54,15 +57,15 @@
                 EnabledLink = string.Format(EnabledLink, extname);
             }
 
-            foreach (var setting in from x in ExtensionManager.Extensions
-                                    where x.Key == extname
-                                    from setting in x.Value.Settings
-                                    where !string.IsNullOrEmpty(setting.Name) && !setting.Hidden
-                                    select setting)
+            var extension = ExtensionList().Where(x => x.Name == extname).FirstOrDefault();
+            foreach (var s in extension.BlogSettings)
             {
-                var uc = (UserControlSettings)Page.LoadControl("Settings.ascx");
-                uc.ID = setting.Name;
-                ucPlaceHolder.Controls.Add(uc);
+                if (!string.IsNullOrEmpty(s.Name) && !s.Hidden)
+                {
+                    var uc = (UserControlSettings)Page.LoadControl("Settings.ascx");
+                    uc.ID = s.Name;
+                    ucPlaceHolder.Controls.Add(uc);
+                }
             }
 
             base.OnInit(e);

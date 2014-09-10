@@ -2,8 +2,12 @@
 ValidateRequest="false" CodeFile="EditPage.aspx.cs" Inherits="Admin.Pages.EditPage" %>
 
 <%@ Register Src="~/admin/htmlEditor.ascx" TagPrefix="Blog" TagName="TextEditor" %>
+<%@ Register Src="~/admin/FileManager/FileManager.ascx" TagName="FileManager" TagPrefix="con" %>
+
 <asp:Content ID="Content1" ContentPlaceHolderID="cphAdmin" runat="Server">
     <script type="text/javascript">
+        var postId = Querystring('id');
+
         function GetSlug() {
             var title = document.getElementById('<%=txtTitle.ClientID %>').value;
             WebForm_DoCallback('__Page', title, ApplySlug, 'slug', null, false)
@@ -33,7 +37,7 @@ ValidateRequest="false" CodeFile="EditPage.aspx.cs" Inherits="Admin.Pages.EditPa
             var parent = $("[id$='ddlParent'] option:selected").val();
 
             var dto = {
-                "id": Querystring('id'),
+                "id": postId,
                 "content": content,
                 "title": title,
                 "description": description,
@@ -57,11 +61,8 @@ ValidateRequest="false" CodeFile="EditPage.aspx.cs" Inherits="Admin.Pages.EditPa
                 success: function (result) {
                     var rt = result.d;
                     if (rt.Success) {
-                        if (rt.Data) {
-                            window.location.href = rt.Data;
-                        } else {
-                            ShowStatus("success", rt.Message);
-                        }
+                        ShowStatus("success", rt.Message);
+                        postId = rt.Data;
                     }
                     else
                         ShowStatus("warning", rt.Message);
@@ -138,11 +139,23 @@ ValidateRequest="false" CodeFile="EditPage.aspx.cs" Inherits="Admin.Pages.EditPa
     </div>
 
     <div class="content-box-outer">
+        <con:FileManager runat="server" ID="FileManager1" />
         <div class="content-box-full">
+            <div class="rightligned-top action_buttons">
+                <input type="button" id="btnSave" value="<%=Resources.labels.savePage %>" class="btn primary" onclick="return SavePage()" /> <%=Resources.labels.or %> 
+                <% if (!string.IsNullOrEmpty(Request.QueryString["id"]))
+                   { %>
+                <a href="<%=PageUrl %>" title="Go to page"><%=Resources.labels.goToPage %></a>
+                <%}
+                   else
+                   {%>
+                <a href="Pages.aspx" title="Cancel"><%=Resources.labels.cancel %></a>
+                <%} %>
+            </div>
             <h1><%=Resources.labels.editPage %></h1>
             <table class="tblForm largeForm" style="width:100%; margin:0;">
                 <tr>
-                    <td style="vertical-align:top; padding:0 40px 0 0;">
+                    <td style="vertical-align:top;" class="mainForm">
                         <ul class="fl">
                             <li>
                                 <label class="lbl" for="<%=txtTitle.ClientID %>">
@@ -156,6 +169,7 @@ ValidateRequest="false" CodeFile="EditPage.aspx.cs" Inherits="Admin.Pages.EditPa
                                     <a href="#" id="uploadImage" class="image"><%=Resources.labels.insertImage %></a>
                                     <a href="#" id="uploadVideo" class="video"><%=Resources.labels.insertVideo %></a>
                                     <a href="#" id="uploadFile" class="file"><%=Resources.labels.attachFile %></a>
+                                     <a href="javascript:;" id="fileManager" class="file">File Manager</a>
                                 </div>
                                 <Blog:TextEditor runat="server" id="txtContent" TabIndex="4" />
                             </li>
@@ -197,8 +211,8 @@ ValidateRequest="false" CodeFile="EditPage.aspx.cs" Inherits="Admin.Pages.EditPa
                 </tr>
             </table>
 
-            <div class="action_buttons">
-                <input type="button" id="btnSave" value="<%=Resources.labels.savePage %>" class="btn primary" onclick="return SavePage()" /> <%=Resources.labels.or %> 
+            <div class="rightligned-bottom action_buttons">
+                <input type="button" id="btnSave2" value="<%=Resources.labels.savePage %>" class="btn primary" onclick="return SavePage()" /> <%=Resources.labels.or %> 
                 <% if (!string.IsNullOrEmpty(Request.QueryString["id"]))
                    { %>
                 <a href="<%=PageUrl %>" title="Go to page"><%=Resources.labels.goToPage %></a>

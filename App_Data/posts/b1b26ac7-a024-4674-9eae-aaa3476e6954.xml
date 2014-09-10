@@ -1,0 +1,93 @@
+﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<post>
+  <author>mwrock</author>
+  <title>Released: RequestReduce 1.2 with Javascript merge and minify</title>
+  <description />
+  <content>&lt;p&gt;With this week&amp;rsquo;s release of &lt;a href="http://www.requestreduce.com"&gt;RequestReduce&lt;/a&gt; 1.2, &lt;a href="http://www.requestreduce.com"&gt;RequestReduce&lt;/a&gt; is even more effective in reducing the HTTP requests made by a browser when visiting your website. Most significantly, this release adds the minification and merging of external javascript resources. A big thanks goes to &lt;a href="http://matthewmanela.com"&gt;Matt Manela&lt;/a&gt; for providing the initial Javascript Reduction code! Other mentionable features in this release include:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Automatic expansion of CSS @Import. All imports will be downloaded and injected into the calling CSS and then minified and merged with the rest of the page&amp;rsquo;s head CSS.&lt;/li&gt;
+&lt;li&gt;Wider support for PNG lossless compression. RequestReduce now issues the &amp;ndash;fix parameter to optipng which will attempt to fix PNGs with extraneous data.&lt;/li&gt;
+&lt;li&gt;Ignore 404 and 500 failures of individual resources. In other words, if one script or stylesheet fails to crunch, the rest should still succeed.&lt;/li&gt;
+&lt;li&gt;Several bug fixes to the overall response filtering.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;a href="http://www.requestreduce.com"&gt;RequestReduce&lt;/a&gt; 1.2 is available via &lt;a href="http://nuget.org/List/Packages/RequestReduce"&gt;Nuget&lt;/a&gt; installations and from downloading it at &lt;a href="http://www.RequestReduce.com"&gt;http://www.RequestReduce.com&lt;/a&gt;. I will discuss the new features in some detail but first&amp;hellip;&lt;/p&gt;
+&lt;h2&gt;What makes RequestReduce the best static resource cruncher available?&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;No need for code changes. &lt;a href="http://www.requestreduce.com"&gt;RequestReduce&lt;/a&gt; does not have to be told what to crunch nor does it require you to move resources that you want crunched to a special set of directories.&lt;/li&gt;
+&lt;li&gt;&lt;a href="http://www.requestreduce.com"&gt;RequestReduce&lt;/a&gt; loads resources via HTTP on the fly and will therefore work with css and scripts that you may not host or that periodically changes&amp;nbsp; out of band of your own releases.&lt;/li&gt;
+&lt;li&gt;&lt;a href="http://www.requestreduce.com"&gt;RequestReduce&lt;/a&gt; not only crunches the bytes, it then serves them with optimized caching headers.&lt;/li&gt;
+&lt;li&gt;&lt;a href="http://www.requestreduce.com"&gt;RequestReduce&lt;/a&gt; sprites css background images and optimizes their PNG color palliate and compression. (Please see &lt;a href="https://github.com/mwrock/RequestReduce/wiki/Can-I-make-changes-to-my-CSS-classes-to-optimize-RequestReduce-spriting%3F"&gt;https://github.com/mwrock/RequestReduce/wiki/Can-I-make-changes-to-my-CSS-classes-to-optimize-RequestReduce-spriting%3F&lt;/a&gt; for tips to help RequestReduce sprite more effectively)&lt;/li&gt;
+&lt;li&gt;&lt;a href="http://www.requestreduce.com"&gt;RequestReduce&lt;/a&gt; is enterprise ready and provides support for web farm and CDN environments.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;OK. Glad I got that off my chest. Now for the details of this release&amp;rsquo;s features:&lt;/p&gt;
+&lt;h2&gt;Javascript Crunching: What exactly is crunched&lt;/h2&gt;
+&lt;p&gt;&lt;a href="http://www.requestreduce.com"&gt;RequestReduce&lt;/a&gt; will minify all external javascripts that have a valid javascript mime type, do not have a Cache-Control header set to No-Cache or No-Store and does not have an Expires or max-age of less than a week. Furthermore you can explicitly tell &lt;a href="http://www.requestreduce.com"&gt;RequestReduce&lt;/a&gt; what scripts you would like it to skip by supplying a comma separated list of url substrings. For example, on the Microsoft properties I work on, I have this set to /tiny_mce since the way that /tiny_mce loads its plugins does not play nice when the scripts are not in the same directory where tiny_mce expects them to be.&lt;/p&gt;
+&lt;p&gt;By default, if no urls are provided in this list, &lt;a href="http://www.requestreduce.com"&gt;RequestReduce&lt;/a&gt; will ignore the Google and Microsoft JQuery CDNs. It does this since it is likely that browsers will not have to download this content because most will have already cached those resources while visiting a Google or Microsoft property in the past.&lt;/p&gt;
+&lt;p&gt;You can also use more complicated or customized rules via code. &lt;a href="http://www.requestreduce.com"&gt;RequestReduce&lt;/a&gt; exposes a Func for approving the processing of urls. You can hook into this by registering a lambda or delegate to this Func in your Global.asax startup. Here is an example:&lt;/p&gt;
+&lt;div id="codeSnippetWrapper"&gt;
+&lt;pre id="codeSnippet" style="text-align: left; line-height: 12pt; background-color: #f4f4f4; margin: 0em; width: 100%; font-family: 'Courier New', courier, monospace; direction: ltr; color: black; font-size: 8pt; overflow: visible; border-style: none; padding: 0px;"&gt;var javascriptResource = RRContainer.Current.GetInstance&amp;lt;JavaScriptResource&amp;gt;();&lt;br /&gt;javascript.TagValidator = ((tag, url) =&amp;gt; &lt;br /&gt;            {&lt;br /&gt;                &lt;span style="color: #0000ff;"&gt;if&lt;/span&gt;(url.EdsWith(&lt;span style="color: #006080;"&gt;".myjss"&lt;/span&gt;) || tag.Contains(&lt;span style="color: #006080;"&gt;"data-caching=dont"&lt;/span&gt;))&lt;br /&gt;                    &lt;span style="color: #0000ff;"&gt;return&lt;/span&gt; &lt;span style="color: #0000ff;"&gt;false&lt;/span&gt;;&lt;br /&gt;            });&lt;/pre&gt;
+&lt;/div&gt;
+&lt;p&gt;The first input param is the full script tag element and the url is the javascript SRC.&lt;/p&gt;
+&lt;h2&gt;Important considerations in the placement of your javascripts&lt;/h2&gt;
+&lt;p&gt;In a perfect world, I would crunch all your scripts together and dynamically inject them into the DOM to load asynchronously. In fact, because the world is perfect, I could even defer the loading of the scripts until after document complete. But alas, the world is not perfect. &lt;a href="http://www.requestreduce.com"&gt;RequestReduce&lt;/a&gt; knows absolutely nothing about your code and takes the safest approach to ensure that your page does not break.Therefore, &lt;a href="http://www.requestreduce.com"&gt;RequestReduce&lt;/a&gt; will make sure that any dependencies that your markup has on your scripts or that your scripts have on other scripts are not broken.&lt;/p&gt;
+&lt;p&gt;&lt;a href="http://www.requestreduce.com"&gt;RequestReduce&lt;/a&gt; will only merge blocks of scripts that can be reduced contiguously. For example assume you have the following scripts on a page:&lt;/p&gt;
+&lt;div id="codeSnippetWrapper"&gt;
+&lt;pre id="codeSnippet" style="text-align: left; line-height: 12pt; background-color: #f4f4f4; margin: 0em; width: 100%; font-family: 'Courier New', courier, monospace; direction: ltr; color: black; font-size: 8pt; overflow: visible; border-style: none; padding: 0px;"&gt;&amp;lt;html&amp;gt;&lt;br /&gt;    &amp;lt;head&amp;gt;&lt;br /&gt;        &amp;lt;link href=&lt;span style="color: #006080;"&gt;"http://localhost:8877/Styles/style1.css"&lt;/span&gt; rel=&lt;span style="color: #006080;"&gt;"Stylesheet"&lt;/span&gt; type=&lt;span style="color: #006080;"&gt;"text/css"&lt;/span&gt; /&amp;gt;&lt;br /&gt;        &amp;lt;link href=&lt;span style="color: #006080;"&gt;"/Styles/style2.css"&lt;/span&gt; rel=&lt;span style="color: #006080;"&gt;"Stylesheet"&lt;/span&gt; type=&lt;span style="color: #006080;"&gt;"text/css"&lt;/span&gt; /&amp;gt;&lt;br /&gt;        &amp;lt;script src=&lt;span style="color: #006080;"&gt;"http://localhost:8877/Scripts/script1.js"&lt;/span&gt; type=&lt;span style="color: #006080;"&gt;"text/javascript"&lt;/span&gt;&amp;gt;&amp;lt;/script&amp;gt;&lt;br /&gt;        &amp;lt;script src=&lt;span style="color: #006080;"&gt;"/Scripts/script2.js"&lt;/span&gt; type=&lt;span style="color: #006080;"&gt;"text/javascript"&lt;/span&gt;&amp;gt;&amp;lt;/script&amp;gt;&lt;br /&gt;    &amp;lt;/head&amp;gt;&lt;br /&gt;    &amp;lt;body&amp;gt;&lt;br /&gt;        &amp;lt;div &lt;span style="color: #0000ff;"&gt;class&lt;/span&gt;=&lt;span style="color: #006080;"&gt;"RatingStar"&lt;/span&gt;&amp;gt;&amp;amp;nbsp;&amp;lt;/div&amp;gt;&lt;br /&gt;        &amp;lt;div &lt;span style="color: #0000ff;"&gt;class&lt;/span&gt;=&lt;span style="color: #006080;"&gt;"Up"&lt;/span&gt;&amp;gt;&amp;amp;nbsp;&amp;lt;/div&amp;gt;&lt;br /&gt;        &amp;lt;div &lt;span style="color: #0000ff;"&gt;class&lt;/span&gt;=&lt;span style="color: #006080;"&gt;"Rss"&lt;/span&gt;&amp;gt;&amp;amp;nbsp;&amp;lt;/div&amp;gt;&lt;br /&gt;        &amp;lt;div &lt;span style="color: #0000ff;"&gt;class&lt;/span&gt;=&lt;span style="color: #006080;"&gt;"Search"&lt;/span&gt;&amp;gt;&amp;amp;nbsp;&amp;lt;/div&amp;gt;&lt;br /&gt;        &amp;lt;script src=&lt;span style="color: #006080;"&gt;"http://localhost:8877/Scripts/script3.js"&lt;/span&gt; type=&lt;span style="color: #006080;"&gt;"text/javascript"&lt;/span&gt;&amp;gt;&amp;lt;/script&amp;gt;&lt;br /&gt;        &amp;lt;script src=&lt;span style="color: #006080;"&gt;"http://www.google-analytics.com/ga.js"&lt;/span&gt; type=&lt;span style="color: #006080;"&gt;"text/javascript"&lt;/span&gt;&amp;gt;&amp;lt;/script&amp;gt;&lt;br /&gt;        &amp;lt;script src=&lt;span style="color: #006080;"&gt;"/Scripts/script4.js"&lt;/span&gt; type=&lt;span style="color: #006080;"&gt;"text/javascript"&lt;/span&gt;&amp;gt;&amp;lt;/script&amp;gt;&lt;br /&gt;    &amp;lt;/body&amp;gt;&lt;br /&gt;&amp;lt;/html&amp;gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;p&gt;You will end up with five scripts:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;The scripts in the &amp;lt;head/&amp;gt; will be merged together and remain in the head.&lt;/li&gt;
+&lt;li&gt;Script 3 will be minified but will not be merged since it lies just below common markup and above a near-future expiring script (google analytics).&lt;/li&gt;
+&lt;li&gt;The google analytics script remains entirely untouched since it is a near future expiring script.&lt;/li&gt;
+&lt;li&gt;Script 4 will be minified but not merged since it is not adjacent to any other non near futures script.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;Although script three and four do not benefit from merging, they are at least minified and served with far future expiration and a valid ETag.&lt;/p&gt;
+&lt;p&gt;With all this in mind, you want to make sure that you group scripts together that are not near future expiring and can remain together without causing issues with load order dependencies. Also make sure that you do not have any setting that causes all of your javascript to be served with a near futures expiration unless you have a particularly good reason to do so.&lt;/p&gt;
+&lt;p&gt;I intend to roll out more functionality here to allow site owners to provide hints via data attributes in the script tags where scripts can be loaded asynchronously or deferred. I also intend to use some different approaches in the ways I discover changing content on the origin server and may be able to merge and minify near future expiring content. The fact is that most near future expiring content does not change often but wants to enforce that client&amp;rsquo;s check with the server frequently just in case there is a change.&lt;/p&gt;
+&lt;h2&gt;Plugging in alternative minifiers and settings&lt;/h2&gt;
+&lt;p&gt;&lt;a href="http://www.requestreduce.com"&gt;RequestReduce&lt;/a&gt; attempts to follow a decoupled architecture which allows developers to swap out certain parts with their own behavior. To override &lt;a href="http://www.requestreduce.com"&gt;RequestReduce's&lt;/a&gt; use of the Microsoft Ajax minifier library, you simply create a class that derives from IMinifier. There is not much to IMinifier:&lt;/p&gt;
+&lt;div id="codeSnippetWrapper"&gt;
+&lt;pre id="codeSnippet" style="text-align: left; line-height: 12pt; background-color: #f4f4f4; margin: 0em; width: 100%; font-family: 'Courier New', courier, monospace; direction: ltr; color: black; font-size: 8pt; overflow: visible; border-style: none; padding: 0px;"&gt;&lt;span style="color: #0000ff;"&gt;public&lt;/span&gt; &lt;span style="color: #0000ff;"&gt;interface&lt;/span&gt; IMinifier&lt;br /&gt;{&lt;br /&gt;    &lt;span style="color: #0000ff;"&gt;string&lt;/span&gt; Minify&amp;lt;T&amp;gt;(&lt;span style="color: #0000ff;"&gt;string&lt;/span&gt; unMinifiedContent) &lt;span style="color: #0000ff;"&gt;where&lt;/span&gt; T : IResourceType;&lt;br /&gt;}&lt;/pre&gt;
+&lt;br /&gt;Here Is &lt;a href="http://www.requestreduce.com"&gt;RequestReduce's&lt;/a&gt; implementation:&lt;/div&gt;
+&lt;div id="codeSnippetWrapper"&gt;
+&lt;pre id="codeSnippet" style="text-align: left; line-height: 12pt; background-color: #f4f4f4; margin: 0em; width: 100%; font-family: 'Courier New', courier, monospace; direction: ltr; color: black; font-size: 8pt; overflow: visible; border-style: none; padding: 0px;"&gt;&lt;span style="color: #0000ff;"&gt;public&lt;/span&gt; &lt;span style="color: #0000ff;"&gt;class&lt;/span&gt; Minifier : IMinifier&lt;br /&gt;{&lt;br /&gt;    &lt;span style="color: #0000ff;"&gt;private&lt;/span&gt; &lt;span style="color: #0000ff;"&gt;readonly&lt;/span&gt; Microsoft.Ajax.Utilities.Minifier minifier = &lt;span style="color: #0000ff;"&gt;new&lt;/span&gt; Microsoft.Ajax.Utilities.Minifier();&lt;br /&gt;    &lt;span style="color: #0000ff;"&gt;private&lt;/span&gt; &lt;span style="color: #0000ff;"&gt;readonly&lt;/span&gt; CodeSettings settings = &lt;span style="color: #0000ff;"&gt;new&lt;/span&gt; CodeSettings {EvalTreatment = EvalTreatment.MakeAllSafe};&lt;br /&gt;&lt;br /&gt;    &lt;span style="color: #0000ff;"&gt;public&lt;/span&gt; &lt;span style="color: #0000ff;"&gt;string&lt;/span&gt; Minify&amp;lt;T&amp;gt;(&lt;span style="color: #0000ff;"&gt;string&lt;/span&gt; unMinifiedContent) &lt;span style="color: #0000ff;"&gt;where&lt;/span&gt; T : IResourceType&lt;br /&gt;    {&lt;br /&gt;        &lt;span style="color: #0000ff;"&gt;if&lt;/span&gt; (&lt;span style="color: #0000ff;"&gt;typeof&lt;/span&gt;(T) == &lt;span style="color: #0000ff;"&gt;typeof&lt;/span&gt;(CssResource))&lt;br /&gt;            &lt;span style="color: #0000ff;"&gt;return&lt;/span&gt; minifier.MinifyStyleSheet(unMinifiedContent);&lt;br /&gt;        &lt;span style="color: #0000ff;"&gt;if&lt;/span&gt; (&lt;span style="color: #0000ff;"&gt;typeof&lt;/span&gt;(T) == &lt;span style="color: #0000ff;"&gt;typeof&lt;/span&gt;(JavaScriptResource))&lt;br /&gt;            &lt;span style="color: #0000ff;"&gt;return&lt;/span&gt; minifier.MinifyJavaScript(unMinifiedContent, settings);&lt;br /&gt;&lt;br /&gt;        &lt;span style="color: #0000ff;"&gt;throw&lt;/span&gt; &lt;span style="color: #0000ff;"&gt;new&lt;/span&gt; ArgumentException(&lt;span style="color: #006080;"&gt;"Cannot Minify Resources of unknown type"&lt;/span&gt;, &lt;span style="color: #006080;"&gt;"unMinifiedContent"&lt;/span&gt;);&lt;br /&gt;    }&lt;br /&gt;}&lt;/pre&gt;
+&lt;br /&gt;It's not difficult to imagine how you would change this implementation to use something like the YUI Compressor for.Net. Lets say you had a YuiMinifier class that you want &lt;a href="http://www.requestreduce.com"&gt;RequestReduce&lt;/a&gt; to use instead of its own minifier. You would just need to add the following code to your startup code:&lt;/div&gt;
+&lt;div&gt;&amp;nbsp;&lt;/div&gt;
+&lt;div id="codeSnippetWrapper"&gt;
+&lt;pre id="codeSnippet" style="text-align: left; line-height: 12pt; background-color: #f4f4f4; margin: 0em; width: 100%; font-family: 'Courier New', courier, monospace; direction: ltr; color: black; font-size: 8pt; overflow: visible; border-style: none; padding: 0px;"&gt;RRContainer.Current.Configure(x =&amp;gt; x.For&amp;lt;IMinifier&amp;gt;().Use&amp;lt;YuiMinifier&amp;gt;());&lt;/pre&gt;
+&lt;/div&gt;
+&lt;p&gt;That's it. Now your minification code will be used.&lt;/p&gt;
+&lt;h2&gt;Suddenly CSS @import is not quite so evil&lt;/h2&gt;
+&lt;p&gt;Just about anyone worth their salt in web development will tell you never to use CSS @Import. Except maybe the internet latency monster. He loves CSS @import but will quickly bite off your toes when he see you using it. Suffice it to say that the internet latency monster is a meanie.&lt;/p&gt;
+&lt;p&gt;&lt;a href="http://www.requestreduce.com"&gt;RequestReduce&lt;/a&gt; can now identify @import usages and auto expand them so that no extra latency is incurred. I still do not think it is a good idea to use @import but now it lacks its sting.&lt;/p&gt;
+&lt;p&gt;So if you have not started using &lt;a href="http://www.requestreduce.com"&gt;RequestReduce&lt;/a&gt; already, I strongly encourage you to do so. I would also greatly appreciate any feedback you have of what features you would like to see added or bugs you are running into. I&amp;rsquo;d also like to hear your success stories. You can submit all feature requests and bug reports to the github page at &lt;a href="https://github.com/mwrock/RequestReduce/issues?sort=comments&amp;amp;direction=desc&amp;amp;state=open"&gt;https://github.com/mwrock/RequestReduce/issues?sort=comments&amp;amp;direction=desc&amp;amp;state=open&lt;/a&gt;.&lt;/p&gt;</content>
+  <ispublished>True</ispublished>
+  <isdeleted>False</isdeleted>
+  <iscommentsenabled>True</iscommentsenabled>
+  <pubDate>2011-10-16 01:15:00</pubDate>
+  <lastModified>2011-12-12 23:13:50</lastModified>
+  <raters>0</raters>
+  <rating>0</rating>
+  <slug>Released-RequestReduce-12-with-Javascript-merge-and-minify</slug>
+  <tags />
+  <comments>
+    <comment id="ff103bd7-e2ef-4019-ae13-b346c7e4da67" parentid="00000000-0000-0000-0000-000000000000" approved="True" spam="False" deleted="False">
+      <date>2011-10-16 02:15:06</date>
+      <author>DotNetKicks.com</author>
+      <email>trackback</email>
+      <country />
+      <ip>74.86.105.210</ip>
+      <website>http://www.dotnetkicks.com/aspnet/Released_RequestReduce_1_2_with_Javascript_merge_and_minify</website>
+      <content>Released: RequestReduce 1.2 with Javascript merge and minify
+
+You've been kicked (a good thing) - Trackback from DotNetKicks.com</content>
+    </comment>
+  </comments>
+  <categories>
+    <category>2f8206f0-95a4-449e-bf74-3b2cb761de04</category>
+  </categories>
+  <notifications>
+    <email>There might be a typing error in the address. </email>
+    <email> HTTP 404 </email>
+  </notifications>
+</post>

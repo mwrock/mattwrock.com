@@ -25,6 +25,11 @@
         #endregion
 
         /// <summary>
+        /// Extension name
+        /// </summary>
+        public string ExtensionName { get; set; }
+
+        /// <summary>
         ///     Gets or sets SettingName.
         /// </summary>
         public string SettingName { get; set; }
@@ -44,9 +49,10 @@
         /// </summary>
         public UserControlSettings()
         {
-            this.GenerateDeleteButton = true;
-            this.GenerateEditButton = true;
-            this.SettingName = string.Empty;
+            GenerateDeleteButton = true;
+            GenerateEditButton = true;
+            SettingName = string.Empty;
+            ExtensionName = string.Empty;
         }
 
         /// <summary>
@@ -63,15 +69,19 @@
         {
             Security.DemandUserHasRight(BlogEngine.Core.Rights.AccessAdminPages, true);
 
-            this.SettingName = this.ID;
-            this.Settings = ExtensionManager.GetSettings(this.SettingName);
+            ExtensionName = System.Web.HttpUtility.UrlEncode(Request.QueryString["ext"]);
+            SettingName = this.ID;
+            if (string.IsNullOrEmpty(ExtensionName))
+                ExtensionName = SettingName;
 
-            this.GenerateDeleteButton = this.Settings.ShowDelete;
-            this.GenerateEditButton = this.Settings.ShowEdit;
+            Settings = ExtensionManager.GetSettings(ExtensionName, SettingName);
 
-            if (this.Settings.ShowAdd)
+            GenerateDeleteButton = Settings.ShowDelete;
+            GenerateEditButton = Settings.ShowEdit;
+
+            if (Settings.ShowAdd)
             {
-                this.CreateFormFields();
+                CreateFormFields();
             }
 
             if (!this.Page.IsPostBack)
@@ -176,7 +186,7 @@
                 }
             }
 
-            ExtensionManager.SaveSettings(this.SettingName, this.Settings);
+            ExtensionManager.SaveSettings(this.ExtensionName, this.Settings);
             if (this.Settings.IsScalar)
             {
                 this.InfoMsg.InnerHtml = labels.theValuesSaved;
@@ -206,7 +216,7 @@
                 par.DeleteValue(paramIndex);
             }
 
-            ExtensionManager.SaveSettings(this.SettingName, this.Settings);
+            ExtensionManager.SaveSettings(this.ExtensionName, this.Settings);
             this.Response.Redirect(this.Request.RawUrl);
         }
 
@@ -264,7 +274,7 @@
                 }
             }
 
-            ExtensionManager.SaveSettings(this.SettingName, this.Settings);
+            ExtensionManager.SaveSettings(this.ExtensionName, this.Settings);
             this.Response.Redirect(this.Request.RawUrl);
         }
 

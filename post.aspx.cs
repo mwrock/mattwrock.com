@@ -35,7 +35,7 @@ public partial class post : BlogEngine.Core.Web.Controls.BlogBasePage
         if ((!Utils.StringIsNullOrWhitespace(requestId)) && requestId.TryParse(out id))
         {
 
-            Post post = Post.GetPost(id);
+            Post post = Post.ApplicablePosts.Find(p => p.Id == id);
 
             if (post != null)
             {
@@ -174,7 +174,7 @@ public partial class post : BlogEngine.Core.Web.Controls.BlogBasePage
 			if (next != null && !next.Deleted)
 			{
 				hlNext.NavigateUrl = next.RelativeLink;
-				hlNext.Text = Server.HtmlEncode(next.Title + " >>");
+				hlNext.Text = Server.HtmlEncode("<< " + next.Title);
 				hlNext.ToolTip = Resources.labels.nextPost;
 				base.AddGenericLink("next", next.Title, next.RelativeLink);
 				phPostNavigation.Visible = true;
@@ -183,7 +183,7 @@ public partial class post : BlogEngine.Core.Web.Controls.BlogBasePage
 			if (prev != null && !prev.Deleted)
 			{
 				hlPrev.NavigateUrl = prev.RelativeLink;
-				hlPrev.Text = Server.HtmlEncode("<< " + prev.Title);
+				hlPrev.Text = Server.HtmlEncode(prev.Title + " >>");
 				hlPrev.ToolTip = Resources.labels.previousPost;
 				base.AddGenericLink("prev", prev.Title, prev.RelativeLink);
 				phPostNavigation.Visible = true;

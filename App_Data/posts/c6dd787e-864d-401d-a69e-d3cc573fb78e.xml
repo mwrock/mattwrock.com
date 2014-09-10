@@ -1,0 +1,54 @@
+﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<post>
+  <author>mwrock</author>
+  <title>What to do when you cant access Sql Server as Admin</title>
+  <description />
+  <content>&lt;p&gt;This happens to me on a particular VM setup framework we use at work about every couple months and I always have to spend several minutes looking it up. Well no longer I say. I shall henceforth document these steps so I will never have to wander the internets again for this answer.&lt;/p&gt;&lt;pre class="csharpcode"&gt;Stop-Service mssqlserver -Force
+&amp;amp; &lt;span class="str"&gt;'C:\Program Files\Microsoft SQL Server\MSSQL10.MSSQLSERVER\MSSQL\Binn\sqlservr.exe'&lt;/span&gt; -m
+
+sqlcmd -S &lt;span class="str"&gt;"(local)"&lt;/span&gt;
+CREATE LOGIN [REDMOND\mwrock] FROM WINDOWS WITH DEFAULT_DATABASE=[master]&lt;/pre&gt;&lt;pre class="csharpcode"&gt;GO
+sp_addsrvrolemember &lt;span class="str"&gt;'REDMOND\mwrock'&lt;/span&gt;, &lt;span class="str"&gt;'sysadmin'&lt;/span&gt;&lt;/pre&gt;&lt;pre class="csharpcode"&gt;&lt;span class="str"&gt;GO&lt;/span&gt;&lt;/pre&gt;&lt;pre class="csharpcode"&gt;&lt;span class="str"&gt;EXIT&lt;/span&gt;
+
+Start-Service mssqlserve&lt;/pre&gt;&lt;pre class="csharpcode"&gt;&amp;nbsp;&lt;/pre&gt;
+&lt;p&gt;This Stops sql server, then starts it in single user mode. You will then need to open a second shell to run the login creation script. When the user is created in the correct role, go back to the shell running the sql instance and exit via ctrl-C. Finally start sql server normally and you are good to go.&lt;/p&gt;
+&lt;style type="text/css"&gt;.csharpcode, .csharpcode pre
+{
+	font-size: small;
+	color: black;
+	font-family: consolas, "Courier New", courier, monospace;
+	background-color: #ffffff;
+	/*white-space: pre;*/
+}
+.csharpcode pre { margin: 0em; }
+.csharpcode .rem { color: #008000; }
+.csharpcode .kwrd { color: #0000ff; }
+.csharpcode .str { color: #006080; }
+.csharpcode .op { color: #0000c0; }
+.csharpcode .preproc { color: #cc6633; }
+.csharpcode .asp { background-color: #ffff00; }
+.csharpcode .html { color: #800000; }
+.csharpcode .attr { color: #ff0000; }
+.csharpcode .alt 
+{
+	background-color: #f4f4f4;
+	width: 100%;
+	margin: 0em;
+}
+.csharpcode .lnum { color: #606060; }
+&lt;/style&gt;</content>
+  <ispublished>True</ispublished>
+  <isdeleted>False</isdeleted>
+  <iscommentsenabled>True</iscommentsenabled>
+  <pubDate>2012-11-26 18:05:52</pubDate>
+  <lastModified>2013-05-31 07:06:05</lastModified>
+  <raters>0</raters>
+  <rating>0</rating>
+  <slug>What-to-do-when-you-cant-access-Sql-Server-as-Admin</slug>
+  <tags />
+  <comments />
+  <categories />
+  <notifications>
+    <email>sabaattitute@gmail.com</email>
+  </notifications>
+</post>

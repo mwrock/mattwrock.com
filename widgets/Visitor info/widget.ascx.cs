@@ -61,8 +61,8 @@ namespace Widgets.VisitorInfo
         /// </summary>
         public override void LoadWidget()
         {
-            this.Visible = false;
-            var cookie = this.Request.Cookies["comment"];
+            Visible = false;
+            var cookie = Request.Cookies["comment"];
 
             if (cookie == null)
             {
@@ -79,17 +79,17 @@ namespace Widgets.VisitorInfo
             }
 
             name = name.Replace("+", " ");
-            this.WriteHtml(name, email, website);
+            WriteHtml(name, email, website);
 
             Uri url;
-            if (this.Request.QueryString["apml"] == null && Uri.TryCreate(website, UriKind.Absolute, out url))
+            if (Request.QueryString["apml"] == null && Uri.TryCreate(website, UriKind.Absolute, out url))
             {
-                this.phScript.Visible = true;
+                phScript.Visible = true;
 
                 // ltWebsite.Text = url.ToString();
             }
 
-            this.Visible = true;
+            Visible = true;
         }
 
         #endregion
@@ -117,7 +117,7 @@ namespace Widgets.VisitorInfo
                     continue;
                 }
                 
-                this.numberOfComments += comments.Count;
+                numberOfComments += comments.Count;
                 var index = post.Comments.IndexOf(comments[comments.Count - 1]);
                 if (index < post.Comments.Count - 1 &&
                     post.Comments[post.Comments.Count - 1].DateCreated > DateTime.Now.AddDays(-7))
@@ -144,21 +144,21 @@ namespace Widgets.VisitorInfo
 
             var avatar = Avatar.GetAvatar(16, email, null, null, name);
             var avatarLink = avatar == null || avatar.Url == null ? string.Empty : avatar.Url.ToString();
-            this.Title = string.Format(
-                "<img src=\"{0}\" alt=\"{1}\" align=\"top\" /> Hi {1}", avatarLink, this.Server.HtmlEncode(name));
-            this.pName.InnerHtml = "<strong>Welcome back!</strong>";
-            var list = this.GetCommentedPosts(email, website);
+            Title = string.Format(
+                String.Concat("<img src=\"{0}\" alt=\"{1}\" align=\"top\" /> ", Resources.labels.visitorHi, " {1}"), avatarLink, Server.HtmlEncode(name));
+            pName.InnerHtml = "<strong>" + Resources.labels.welcomeBack + "</strong>";
+            var list = GetCommentedPosts(email, website);
 
             if (list.Count > 0)
             {
                 var link = string.Format(
-                    "<a href=\"{0}\">{1}</a>", list[0].RelativeLink, this.Server.HtmlEncode(list[0].Title));
-                this.pComment.InnerHtml = string.Format("New comments have been added to {0} since your last comment. ", link);
+                    "<a href=\"{0}\">{1}</a>", list[0].RelativeLink, Server.HtmlEncode(list[0].Title));
+                pComment.InnerHtml = string.Format(Resources.labels.commentsAddedSince, link);
             }
 
-            if (this.numberOfComments > 0)
+            if (numberOfComments > 0)
             {
-                this.pComment.InnerHtml += string.Format("You have written {0} comments in total.", this.numberOfComments);
+                pComment.InnerHtml += string.Format(Resources.labels.writtenCommentsTotal, numberOfComments);
             }
         }
 

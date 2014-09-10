@@ -35,9 +35,18 @@ public partial class archive : BlogEngine.Core.Web.Controls.BlogBasePage
 	/// </summary>
 	private void CreateMenu()
 	{
-		foreach (Category cat in Category.Categories)
+        var categories = new List<string>();
+
+		foreach (Category cat in Category.ApplicableCategories)
 		{
-			AddCategoryToMenu(cat.Title);
+            if (cat.Posts.Count > 0)
+            {
+                if (!categories.Contains(cat.Title))
+                {
+                    AddCategoryToMenu(cat.Title);
+                    categories.Add(cat.Title);
+                }
+            }
 		}
 	}
 
@@ -45,7 +54,7 @@ public partial class archive : BlogEngine.Core.Web.Controls.BlogBasePage
 	{
 		HtmlAnchor a = new HtmlAnchor();
 		a.InnerHtml = Server.HtmlEncode(title);
-		a.HRef = "#" + Utils.RemoveIllegalCharacters(title);
+		a.HRef = string.Format("{0}archive{1}#cat-{2}", Blog.CurrentInstance.RelativeWebRoot, BlogConfig.FileExtension, Utils.RemoveIllegalCharacters(title));
 		a.Attributes.Add("rel", "directory");
 
 		HtmlGenericControl li = new HtmlGenericControl("li");
@@ -76,24 +85,33 @@ public partial class archive : BlogEngine.Core.Web.Controls.BlogBasePage
 
 	private void CreateArchive()
 	{
-		foreach (Category cat in Category.Categories)
+        var categories = new List<string>();
+
+		foreach (Category cat in Category.ApplicableCategories)
 		{
-			string name = cat.Title;
-			List<Post> list = cat.Posts.FindAll(delegate(Post p) { return p.IsVisible; });
+            if (cat.Posts.Count > 0)
+            {
+                if (!categories.Contains(cat.Title))
+                {
+                    string name = cat.Title;
+                    List<Post> list = cat.Posts.FindAll(delegate(Post p) { return p.IsVisible; });
 
-			HtmlGenericControl h2 = CreateRowHeader(cat, name, list.Count);
-			phArchive.Controls.Add(h2);
+                    HtmlGenericControl h2 = CreateRowHeader(cat, name, list.Count);
+                    phArchive.Controls.Add(h2);
 
-			HtmlTable table = CreateTable(name);
-			foreach (Post post in list)
-			{
-				CreateTableRow(table, post);
-			}
+                    HtmlTable table = CreateTable(name);
+                    foreach (Post post in list)
+                    {
+                        CreateTableRow(table, post);
+                    }
 
-			phArchive.Controls.Add(table);
+                    phArchive.Controls.Add(table);
+                    categories.Add(cat.Title);
+                }
+            }
 		}
 
-		List<Post> noCatList = Post.Posts.FindAll(delegate(Post p) { return p.Categories.Count == 0 && p.IsVisible; });
+		List<Post> noCatList = Post.ApplicablePosts.FindAll(delegate(Post p) { return p.Categories.Count == 0 && p.IsVisible; });
 		if (noCatList.Count > 0)
 		{
 			string name = Resources.labels.uncategorized;
@@ -212,7 +230,7 @@ public partial class archive : BlogEngine.Core.Web.Controls.BlogBasePage
 	{
 		int comments = 0;
 		int raters = 0;
-		List<Post> posts = Post.Posts.FindAll(delegate(Post p) { return p.IsVisible; });
+		List<Post> posts = Post.ApplicablePosts.FindAll(delegate(Post p) { return p.IsVisible; });
 		foreach (Post post in posts)
 		{
 			comments += post.ApprovedComments.Count;

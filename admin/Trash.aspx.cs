@@ -5,6 +5,7 @@
     using System.Web.Services;
     using BlogEngine.Core;
     using BlogEngine.Core.Json;
+    using App_Code;
 
     public partial class Trash : System.Web.UI.Page
     {
@@ -21,7 +22,7 @@
         protected static int TrashCounter { get; set; }
 
         [WebMethod]
-        public static IEnumerable LoadTrash(string trashType)
+        public static IEnumerable LoadTrash(string trashType, int page)
         {
             Security.DemandUserHasRight(BlogEngine.Core.Rights.AccessAdminPages, true);
 
@@ -40,9 +41,17 @@
                 default:
                     break;
             }
-            var trashList = JsonTrashList.GetTrash(tType);
+            var trashList = JsonTrashList.GetTrash(tType, page);
             TrashCounter = trashList.Count;
             return trashList;
+        }
+
+        [WebMethod]
+        public static string LoadPager(int page)
+        {
+            WebUtils.CheckRightsForAdminSettingsPage(false);
+
+            return JsonTrashList.GetPager(page);
         }
 
         [WebMethod]
@@ -51,6 +60,14 @@
             Security.DemandUserHasRight(BlogEngine.Core.Rights.AccessAdminPages, true);
 
             return JsonTrashList.Process(action, vals);
+        }
+
+        [WebMethod]
+        public static JsonResponse PurgeLogfile()
+        {
+            Security.DemandUserHasRight(BlogEngine.Core.Rights.AccessAdminPages, true);
+
+            return JsonTrashList.PurgeLogfile();
         }
     }
 }

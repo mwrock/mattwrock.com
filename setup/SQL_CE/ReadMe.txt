@@ -2,7 +2,7 @@ Running BlogEngine.NET using SQL CE 4.0
 
 If you wish to use SQL CE to store all your blog data, this folder has all the information you'll 
 likely need.  The BlogEngine.sdf is already setup with the DB tables and initial data needed
-to get started with BlogEngine.NET.  Although not needed, SQL_CE_Setup_2.5.sql is provided
+to get started with BlogEngine.NET.  Although not needed, SQL_CE_Setup_2.7.sql is provided
 for reference.  This was the setup script used to create the BlogEngine.sdf file.
 
 Instructions for New Setup
@@ -16,7 +16,7 @@ CE 4.0.  The installation folder is located at:
 
 If you do not have SQL CE 4.0 installed on your computer, or you need the DLL files, the latest 
 CTP version of SQL CE 4.0 can be downloaded at:
-http://www.microsoft.com/downloads/en/details.aspx?FamilyID=0d2357ea-324f-46fd-88fc-7364c80e4fdb
+http://www.microsoft.com/download/en/details.aspx?id=17876
 
 However, please check for the latest version of SQL CE 4.0 before downloading the one at the 
 above link.
@@ -55,23 +55,28 @@ make sure you have a backup.)
 5. Surf out to your Blog and see the welcome post.
 6. Login with the username admin and password admin.  Change the password.
 
-Upgrading from 2.0
+Upgrading from 2.6
 -----------------------------------------------------------
 
-There is an upgrade script to update your SDF file so it is compliant with BlogEngine.NET 2.5.
-The upgrade script name is SQL_CE_UpgradeFrom2.0to2.5.sql.  This script will need to be
-run against your BlogEngine.NET 2.0 SDF file.  A recommended tool is to use the
+ - There are no changes between 2.6 and 2.7.  If you are upgrading from 2.5, see upgrade notes below.
+
+Upgrading from 2.5
+-----------------------------------------------------------
+
+There is an upgrade script to update your SDF file so it is compliant with BlogEngine.NET 2.7.
+The upgrade script name is SQL_CE_UpgradeFrom2.5to2.6.sql.  This script will need to be
+run against your BlogEngine.NET 2.5 SDF file.  A recommended tool is to use the
 SQL Server Compact Toolbox utility found at:
 
 http://sqlcetoolbox.codeplex.com/
 
-An add-in for Visual Studio 2010 can be downloaded, or a standalone version of the toolbox
+An add-in for Visual Studio 2010/2012 can be downloaded, or a standalone version of the toolbox
 can be downloaded.  This utility will allow you to run a SQL CE script against a SDF
-file.  You would want to run the script contained in SQL_CE_UpgradeFrom2.0to2.5.sql
-against your BlogEngine.NET 2.0 SDF file.  Once the script has been run, your BlogEngine.SDF
+file.  You would want to run the script contained in SQL_CE_UpgradeFrom2.5to2.6.sql
+against your BlogEngine.NET 2.5 SDF file.  Once the script has been run, your BlogEngine.SDF
 file will be ready to use in a BlogEngine.NET 2.5 website.
 
-Additionally, the web.config file has changed from 2.0 to 2.5.  It will likely be easiest to start
+Additionally, the web.config file has changed from 2.5 to 2.7.  It will likely be easiest to start
 with the sample web.config file as described above, but if you have other changes in it, 
 you'll need to merge them.  Don't forget to move your connectionString over.
 

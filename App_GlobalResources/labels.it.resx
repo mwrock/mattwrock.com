@@ -127,7 +127,7 @@
     <value>Aggiungi Commento</value>
   </data>
   <data name="addCustomCodeToHeader" xml:space="preserve">
-    <value>Aggiungi Codice persolnalizzato all&apos;intestazione (head) HTML</value>
+    <value>Aggiungi Codice personalizzato all'elemento head HTML</value>
   </data>
   <data name="administrationPanel" xml:space="preserve">
     <value>Pannello di Controllo</value>
@@ -148,7 +148,7 @@
     <value>Approva tutti i Commenti al Post</value>
   </data>
   <data name="archive" xml:space="preserve">
-    <value>Archivia</value>
+    <value>Archivio</value>
   </data>
   <data name="areYouSure" xml:space="preserve">
     <value>Sei sicuro di volere {0} {1}?</value>
@@ -163,13 +163,13 @@
     <value>Avatar</value>
   </data>
   <data name="basic" xml:space="preserve">
-    <value>Base</value>
+    <value>Basilari</value>
   </data>
   <data name="beTheFirstToRate" xml:space="preserve">
     <value>Vota questo Post</value>
   </data>
   <data name="blogMLDescription" xml:space="preserve">
-    <value>BlogEngine.NET usa BlogML come formato di esportazione. L&apos;importazione supporta sia BlogML che RSS.</value>
+    <value>BlogEngine.NET usa BlogML come formato di esportazione. L'importazione supporta sia BlogML che RSS.</value>
   </data>
   <data name="blogroll" xml:space="preserve">
     <value>Blogroll</value>
@@ -192,9 +192,6 @@
   <data name="closeCommetsAfter" xml:space="preserve">
     <value>Chiudi i Commenti dopo</value>
   </data>
-  <data name="combine" xml:space="preserve">
-    <value>Combina</value>
-  </data>
   <data name="comment" xml:space="preserve">
     <value>Commento</value>
   </data>
@@ -208,7 +205,7 @@
     <value>Commenti chiusi</value>
   </data>
   <data name="commentWasSaved" xml:space="preserve">
-    <value>Il Commento è stato salvato. Grazie per il feedback.</value>
+    <value>Il Commento è stato salvato. Grazie per il tuo intervento</value>
   </data>
   <data name="contact" xml:space="preserve">
     <value>Contatto</value>
@@ -301,13 +298,13 @@
     <value>Abilita la votazione dei Post</value>
   </data>
   <data name="enableReferrerTracking" xml:space="preserve">
-    <value>Abilita l&apos;individuazione del Referente (referrer)</value>
+    <value>Abilita l'individuazione del Referente (referrer)</value>
   </data>
   <data name="enableSearchHighlight" xml:space="preserve">
     <value>Abilita evidenziazione nelle Ricerche</value>
   </data>
   <data name="enableSearchHighlightDescription" xml:space="preserve">
-    <value>Colora le Parole ricercate all&apos;interno della pagina</value>
+    <value>Colora le Parole ricercate all'interno della pagina</value>
   </data>
   <data name="enableSsl" xml:space="preserve">
     <value>Abilita SSL</value>
@@ -353,7 +350,7 @@
     <value>Importa</value>
   </data>
   <data name="isFrontPage" xml:space="preserve">
-    <value>E&apos; la pagina iniziale</value>
+    <value>E' la pagina iniziale</value>
   </data>
   <data name="keywords" xml:space="preserve">
     <value>Keywords</value>
@@ -381,9 +378,6 @@
   </data>
   <data name="mobileTheme" xml:space="preserve">
     <value>Tema Mobile</value>
-  </data>
-  <data name="monster" xml:space="preserve">
-    <value>Mostro</value>
   </data>
   <data name="more" xml:space="preserve">
     <value>Prosegue</value>
@@ -436,7 +430,7 @@
   <data name="possibleSpam" xml:space="preserve">
     <value>Possibile Spam</value>
   </data>
-  <data name="Post" xml:space="preserve">
+  <data name="post" xml:space="preserve">
     <value>Post</value>
   </data>
   <data name="postPerPage" xml:space="preserve">
@@ -575,7 +569,7 @@
     <value>il Post</value>
   </data>
   <data name="thereAreXDrafts" xml:space="preserve">
-    <value>Ci sono {0} Post pubblicato/i</value>
+    <value>Ci sono {0} Post bozze</value>
   </data>
   <data name="timeStampPostLinks" xml:space="preserve">
     <value>Aggiungi la data al collegamento del Post</value>
@@ -590,7 +584,7 @@
     <value>Compatta Fogli di Stile</value>
   </data>
   <data name="trimStylesheetDescription" xml:space="preserve">
-    <value>Rende i Fogli di Stile più leggeri eliminando tutti gli spazi bianchi durante l&apos;esecuzione</value>
+    <value>Rende i Fogli di Stile di ogni Tema più leggeri eliminando tutti gli spazi bianchi durante l'esecuzione</value>
   </data>
   <data name="unapprovedcomments" xml:space="preserve">
     <value>Commenti non approvati</value>
@@ -698,13 +692,13 @@
     <value>Calendario</value>
   </data>
   <data name="commentWaitingModeration" xml:space="preserve">
-    <value>Grazie per il tuo Commento. Il Commento è in attesa di approvazione</value>
+    <value>Grazie per il tuo intervento. Il Commento è in attesa di approvazione</value>
   </data>
   <data name="requireSslForMetaWeblogApi" xml:space="preserve">
     <value>Richiedi SSL per le API MetaWeblog</value>
   </data>
   <data name="requireSslForMetaWeblogApiDescription" xml:space="preserve">
-    <value>Forza l&apos;uso di SSL durante la communicazione con le API MetaWeblog</value>
+    <value>Forza l'uso di SSL durante la communicazione con le API MetaWeblog</value>
   </data>
   <data name="compressWebResource" xml:space="preserve">
     <value>Comprimi WebResource.axd</value>
@@ -722,7 +716,7 @@
     <value>Nessun Categoria</value>
   </data>
   <data name="cancel" xml:space="preserve">
-    <value>Cancella</value>
+    <value>Annulla</value>
   </data>
   <data name="filter" xml:space="preserve">
     <value>Filtra</value>
@@ -737,10 +731,10 @@
     <value>Accedi</value>
   </data>
   <data name="logoff" xml:space="preserve">
-    <value>Log off</value>
+    <value>Esci</value>
   </data>
   <data name="useRawHtmlEditor" xml:space="preserve">
-    <value>Utilizza l&apos;editor HTML</value>
+    <value>Utilizza l'editor HTML</value>
   </data>
   <data name="cancelReply" xml:space="preserve">
     <value>Annulla la risposta al Commento</value>
@@ -749,7 +743,7 @@
     <value>Elimina questo Commento, ma conserva le risposte</value>
   </data>
   <data name="deletePlusReplies" xml:space="preserve">
-    <value>Elimina il Commento e tute le risposte</value>
+    <value>Elimina il Commento e tutte le risposte</value>
   </data>
   <data name="replyTo" xml:space="preserve">
     <value>In risposta a</value>
@@ -764,7 +758,7 @@
     <value>Abilita Commenti nidificati</value>
   </data>
   <data name="enableCommentNestingDescription" xml:space="preserve">
-    <value>L&apos;opzione funziona esclusivamente se il tema è stato opportunamente modificato</value>
+    <value>L'opzione funziona esclusivamente se il tema è stato opportunamente modificato</value>
   </data>
   <data name="extensions" xml:space="preserve">
     <value>Estensioni</value>
@@ -791,7 +785,7 @@
     <value>Permetti</value>
   </data>
   <data name="alwaysTrust" xml:space="preserve">
-    <value>Se l&apos;Utente è autenticato, dai sempre fiducia</value>
+    <value>Se l'Utente è autenticato, dai sempre fiducia</value>
   </data>
   <data name="approved" xml:space="preserve">
     <value>Approvato</value>
@@ -800,7 +794,7 @@
     <value>Commenti di questo Autore sono stati approvati</value>
   </data>
   <data name="authorBlocked" xml:space="preserve">
-    <value>Se il Commento viene cancellato, blocca sempre l&apos;Autore</value>
+    <value>Se il Commento viene cancellato, blocca sempre l'Autore</value>
   </data>
   <data name="authorRejected" xml:space="preserve">
     <value>Commenti di questo Autore sono stati rifiutati</value>
@@ -827,7 +821,7 @@
     <value>Hai Cancellato la Sottoscrizione alle notifiche via e-mail per i futuri Commenti a questo Post.</value>
   </data>
   <data name="commentsApprovedByAdmin" xml:space="preserve">
-    <value>Manuale - Solo dopo l&apos;approvazione dell&apos;Amministratore il Commento sarà visibile sul Blog</value>
+    <value>Manuale - Solo dopo l'approvazione dell'Amministratore il Commento sarà visibile sul Blog</value>
   </data>
   <data name="commentsAuto" xml:space="preserve">
     <value>Automatico - Regole e filtri decideranno se il Commento è Spam.</value>
@@ -866,13 +860,13 @@
     <value>Editor</value>
   </data>
   <data name="enabled" xml:space="preserve">
-    <value>Abilita</value>
+    <value>Abilitato</value>
   </data>
   <data name="enableErrorLogging" xml:space="preserve">
     <value>Abilita Log degli Errori</value>
   </data>
   <data name="enableErrorLoggingDescription" xml:space="preserve">
-    <value>Errore non gestito verrà registrato ad ogni estensione / componente iscritto al registro di notifiche.</value>
+    <value>L'errore non gestito verrà registrato ad ogni estensione / componente iscritto al registro di notifiche.</value>
   </data>
   <data name="eqls" xml:space="preserve">
     <value>Eguale</value>
@@ -941,7 +935,7 @@
     <value>Regole</value>
   </data>
   <data name="select" xml:space="preserve">
-    <value>Select</value>
+    <value>Seleziona</value>
   </data>
   <data name="selectedComments" xml:space="preserve">
     <value>Commenti selezionati</value>
@@ -1010,10 +1004,10 @@
     <value>Vuota Cestino</value>
   </data>
   <data name="enterDate" xml:space="preserve">
-    <value>Inserire una data corretta</value>
+    <value>Inserire una data corretta (aaaa-mm-gg hh:mm)</value>
   </data>
   <data name="excerpt" xml:space="preserve">
-    <value>Sinossi</value>
+    <value>Sinossi (facolvativo)</value>
   </data>
   <data name="extractFromTitle" xml:space="preserve">
     <value>Estrai dal Titolo</value>
@@ -1028,7 +1022,7 @@
     <value>Allega Video</value>
   </data>
   <data name="manually" xml:space="preserve">
-    <value>Manuale</value>
+    <value>Manualmente</value>
   </data>
   <data name="options" xml:space="preserve">
     <value>Opzioni</value>
@@ -1055,7 +1049,7 @@
     <value>Mostra</value>
   </data>
   <data name="slug" xml:space="preserve">
-    <value>Nome del File</value>
+    <value>Nome del File (facoltativo)</value>
   </data>
   <data name="stats" xml:space="preserve">
     <value>Statistiche</value>
@@ -1085,7 +1079,7 @@
     <value>E-mail non valida</value>
   </data>
   <data name="emailIsRequired" xml:space="preserve">
-    <value>Devi inserire l&apos;E-mail</value>
+    <value>Devi inserire l'E-mail</value>
   </data>
   <data name="minPassLengthInChars" xml:space="preserve">
     <value>Lunghezza Minima dei Caratteri</value>
@@ -1121,7 +1115,7 @@
     <value>Aggiungi Nuovo Utente</value>
   </data>
   <data name="addToPages" xml:space="preserve">
-    <value>Aggiungi alle Pagine (in aggiunta agli Post)</value>
+    <value>Aggiungi alle Pagine (in aggiunta ai Post)</value>
   </data>
   <data name="admin" xml:space="preserve">
     <value>Amministratore</value>
@@ -1172,7 +1166,7 @@
     <value>Controlli Comuni</value>
   </data>
   <data name="Configuration_BtnTestSmtpClick_Test_successfull" xml:space="preserve">
-    <value>Test Positivo</value>
+    <value>Test Riuscito</value>
     <comment>Smtp status text</comment>
   </data>
   <data name="Configuration_OnInit_Please_specify_a_number" xml:space="preserve">
@@ -1194,7 +1188,7 @@
     <value>Impossibile creare il Ruolo: {0}</value>
   </data>
   <data name="couldNotCreateUser" xml:space="preserve">
-    <value>Impossibile creare l&apos;Utente: {0} : {1}</value>
+    <value>Impossibile creare l'Utente: {0} : {1}</value>
   </data>
   <data name="couldNotDeleteComment" xml:space="preserve">
     <value>Impossibile cancellare il Commento: {0}</value>
@@ -1215,7 +1209,7 @@
     <value>Impossibile cancellare il Tag: {0}</value>
   </data>
   <data name="couldNotDeleteUser" xml:space="preserve">
-    <value>Impossibile cancellare l&apos;Utente : {0}</value>
+    <value>Impossibile cancellare l'Utente : {0}</value>
   </data>
   <data name="couldNotUpdateProfile" xml:space="preserve">
     <value>Impossibile aggiornare il Profilo: {0}</value>
@@ -1227,7 +1221,7 @@
     <value>Impossibile aggiornare il Tag: {0}</value>
   </data>
   <data name="couldNotUpdateUser" xml:space="preserve">
-    <value>Impossibile aggiornare l&apos;Utente: {0}</value>
+    <value>Impossibile aggiornare l'Utente: {0}</value>
   </data>
   <data name="createAccount" xml:space="preserve">
     <value>Crea Account</value>
@@ -1291,7 +1285,7 @@
     <value>Imposta i diritti per il Ruolo</value>
   </data>
   <data name="emailArgumentInvalid" xml:space="preserve">
-    <value>Argomentazioni nell&apos;e-mail non valide.</value>
+    <value>Argomenti e-mail non validi.</value>
   </data>
   <data name="enable" xml:space="preserve">
     <value>Abilita</value>
@@ -1447,7 +1441,7 @@
     <value>Recupero Password</value>
   </data>
   <data name="passwordRetrievalInstructionMessage" xml:space="preserve">
-    <value>Digita l&apos;e-mail nel campo e la Password ti sarà inviata in tempi bervi</value>
+    <value>Digita l'e-mail nel campo e la Password ti sarà inviata in tempi bervi</value>
   </data>
   <data name="pingbacksAndTrackbacks" xml:space="preserve">
     <value>Pingbacks &amp; Trackbacks</value>
@@ -1468,7 +1462,7 @@
     <value>Profilo {0} aggiornato</value>
   </data>
   <data name="recaptchaConfigureReminder" xml:space="preserve">
-    <value>Assicurati che l&apos;estensione Recaptcha sia abilitata e configurata.</value>
+    <value>Assicurati che l'estensione Recaptcha sia abilitata e configurata.</value>
   </data>
   <data name="recentDatesAtTop" xml:space="preserve">
     <value>Date recenti in cima</value>
@@ -1525,7 +1519,7 @@
     <value>Ruolo aggiornato da "{0}" a "{1}"</value>
   </data>
   <data name="runClickOnceApplicationToImport" xml:space="preserve">
-    <value>Avvia l&apos;applicazione ad importare il contenuto, salvato come BlogML o RSS 2.0, con un solo click. &lt;i&gt;Solo per Internet Explorer.&lt;/i&gt;</value>
+    <value>Avvia l'applicazione ad importare il contenuto, salvato come BlogML o RSS 2.0, con un solo click. &lt;i&gt;Solo per Internet Explorer.&lt;/i&gt;</value>
   </data>
   <data name="securitySettings" xml:space="preserve">
     <value>Impostazioni di Sicurezza</value>
@@ -1543,7 +1537,7 @@
     <value>Seleziona il file BlogML salvato e importalo nel tuo blog. Tutti i browser, solo BlogML.</value>
   </data>
   <data name="selfRegistrationInitialRole" xml:space="preserve">
-    <value>Ruolo Iniziale per l&apos;auto Registrazione</value>
+    <value>Ruolo Iniziale per l'auto Registrazione</value>
   </data>
   <data name="showSelector" xml:space="preserve">
     <value>Mostra selettori</value>
@@ -1579,10 +1573,10 @@
     <value>Tags</value>
   </data>
   <data name="testEmailSettings" xml:space="preserve">
-    <value>Testa le impostazioni e-mail</value>
+    <value>Prova le impostazioni e-mail</value>
   </data>
   <data name="themeCookieName" xml:space="preserve">
-    <value>Nome del Coockie per il Tema</value>
+    <value>Nome del cookie per il tema</value>
   </data>
   <data name="theValuesSaved" xml:space="preserve">
     <value>I valori sono stati salvati</value>
@@ -1616,7 +1610,7 @@
     <value>Utente "{0}" già esiste.</value>
   </data>
   <data name="userArgumentInvalid" xml:space="preserve">
-    <value>Valori non validi per l&apos;Utente</value>
+    <value>Valori non validi per l'Utente</value>
   </data>
   <data name="userHasBeenCreated" xml:space="preserve">
     <value>Utente "{0}" è stato creato</value>
@@ -1659,5 +1653,371 @@
   </data>
   <data name="showEnableWebSiteInCommentsDescrition" xml:space="preserve">
     <value>Scegli se permettere la pubblicazione del Sito Web nei Commenti</value>
+  </data>
+  <data name="acceptAnyTextBeforeHostname" xml:space="preserve">
+    <value>Accetta Qualsiasi Testo prima del Nome dell'Host</value>
+  </data>
+  <data name="active" xml:space="preserve">
+    <value>Attivo</value>
+  </data>
+  <data name="activeThemes" xml:space="preserve">
+    <value>Tema Attivo</value>
+  </data>
+  <data name="allowMobileTheme" xml:space="preserve">
+    <value>Sito Mobile</value>
+  </data>
+  <data name="AllPostsBy" xml:space="preserve">
+    <value>Tutti i post di</value>
+  </data>
+  <data name="AllPostsTagged" xml:space="preserve">
+    <value>Tutti i post etichettati</value>
+  </data>
+  <data name="alphaNumeric" xml:space="preserve">
+    <value>Alfanumerico</value>
+  </data>
+  <data name="anotherEmail" xml:space="preserve">
+    <value>Per favore seleziona un altro indirizzo e-mail</value>
+  </data>
+  <data name="anotherUserName" xml:space="preserve">
+    <value>Per favore seleziona un altro nome utente (username)</value>
+  </data>
+  <data name="apmlDescription" xml:space="preserve">
+    <value>Inserisci l'indirizzo del tuo sito web o del tuo APML</value>
+  </data>
+  <data name="areYouSureDeleteComment" xml:space="preserve">
+    <value>Sei sicuro di voler cancellare questo commento?</value>
+  </data>
+  <data name="areYouSureDeleteEmail" xml:space="preserve">
+    <value>Sei sicuro di voler cancellare questo indirizzo e-mail?</value>
+  </data>
+  <data name="areYouSureDeletePage" xml:space="preserve">
+    <value>Sei sicuro di voler cancellare la pagina?</value>
+  </data>
+  <data name="authorDispalyCount" xml:space="preserve">
+    <value>Ammontare massimo di autori nella lista</value>
+  </data>
+  <data name="authorDisplayPattern" xml:space="preserve">
+    <value>Mostra modello (autore, conteggio post)</value>
+  </data>
+  <data name="authorDisplayPatternAggregated" xml:space="preserve">
+    <value>Mostra il modello nei blog aggregati (autore, blog, conteggio dei post) </value>
+  </data>
+  <data name="available" xml:space="preserve">
+    <value>Disponibile</value>
+  </data>
+  <data name="blogAdded" xml:space="preserve">
+    <value>Hai aggiungo il Blog "{0}"</value>
+  </data>
+  <data name="blogDeleted" xml:space="preserve">
+    <value>Hai rimosso il Blog "{0}"</value>
+  </data>
+  <data name="blogs" xml:space="preserve">
+    <value>Blogs</value>
+  </data>
+  <data name="cannotDeleteLastAdmin" xml:space="preserve">
+    <value>Non puoi cancellare l'ultimo utente che ha i privilegi di creare o modificare altri utenti. Concedi questi diritti ad un altro utente prima di cancellare questo utente.</value>
+  </data>
+  <data name="commentRSS" xml:space="preserve">
+    <value>Commenti RSS</value>
+  </data>
+  <data name="commentsAddedSince" xml:space="preserve">
+    <value>Nuovi Commenti sono stati inseriti a {0} dal tuo ultimo intervento. </value>
+  </data>
+  <data name="contactAuthorInformation" xml:space="preserve">
+    <value>Informazioni dell'Autore</value>
+  </data>
+  <data name="contactDetails" xml:space="preserve">
+    <value>Dettagli di Contatto e Indirizzo</value>
+  </data>
+  <data name="contactIPAddress" xml:space="preserve">
+    <value>Indirizzo IP</value>
+  </data>
+  <data name="contactUserAgent" xml:space="preserve">
+    <value>User-agent</value>
+  </data>
+  <data name="couldNotDeleteBlog" xml:space="preserve">
+    <value>Impossibile cancellare il blog: {0}</value>
+  </data>
+  <data name="count" xml:space="preserve">
+    <value>Conteggio</value>
+  </data>
+  <data name="countryCode" xml:space="preserve">
+    <value>Codice Postale</value>
+  </data>
+  <data name="createBlogOnSelfRegistration" xml:space="preserve">
+    <value>Crea un nuovo blog per gli utenti autoregistrati</value>
+  </data>
+  <data name="createdOn" xml:space="preserve">
+    <value>Creato il</value>
+  </data>
+  <data name="currentTheme" xml:space="preserve">
+    <value>Tema attuale</value>
+  </data>
+  <data name="deleteAll" xml:space="preserve">
+    <value>Cancella tutto</value>
+  </data>
+  <data name="deleteSelected" xml:space="preserve">
+    <value>Cancella i selezionati</value>
+  </data>
+  <data name="downloadOPML" xml:space="preserve">
+    <value>Download OPML file</value>
+  </data>
+  <data name="downloads" xml:space="preserve">
+    <value>Downloads</value>
+  </data>
+  <data name="editExistingBlog" xml:space="preserve">
+    <value>Modifica blog</value>
+  </data>
+  <data name="emailNotExist" xml:space="preserve">
+    <value>E-mail non esistente nel nostro sistema</value>
+  </data>
+  <data name="emptyLog" xml:space="preserve">
+    <value>Svuota il file di log</value>
+  </data>
+  <data name="enableOptimization" xml:space="preserve">
+    <value>Abilita ottimizzazione</value>
+  </data>
+  <data name="enableOptimizationDesc" xml:space="preserve">
+    <value>Combina e riduce gli script ed i fogli di stile (raccomandato)</value>
+  </data>
+  <data name="enableQuickNotes" xml:space="preserve">
+    <value>Abilita le Note Rapide</value>
+  </data>
+  <data name="enterEmail" xml:space="preserve">
+    <value>Inserisci la tua e-mail</value>
+  </data>
+  <data name="enterEmailAddress" xml:space="preserve">
+    <value>Per favore inserisci l'indirizzo e-mail</value>
+  </data>
+  <data name="existingBlogToCreateNewBlogFrom" xml:space="preserve">
+    <value>Blog esistente per Creare un Nuovo Blog da</value>
+  </data>
+  <data name="fileManager" xml:space="preserve">
+    <value>Gestione dei File</value>
+  </data>
+  <data name="filestorage" xml:space="preserve">
+    <value>Gestore Archiviazione dei File</value>
+  </data>
+  <data name="followTwitter" xml:space="preserve">
+    <value>Seguimi su Twitter</value>
+  </data>
+  <data name="forceMainTheme" xml:space="preserve">
+    <value>Sito Regolare</value>
+  </data>
+  <data name="gallery" xml:space="preserve">
+    <value>Galleria</value>
+  </data>
+  <data name="galleryFeedUrl" xml:space="preserve">
+    <value>URL Feed della Galleria</value>
+  </data>
+  <data name="galleryFeedUrlDescription" xml:space="preserve">
+    <value>URL ad un feed valido per scaricare pacchetti dalla Galleria</value>
+  </data>
+  <data name="hasRated" xml:space="preserve">
+    <value>Hai già votato questo post.</value>
+  </data>
+  <data name="hostName" xml:space="preserve">
+    <value>Host Name (facoltativo)</value>
+  </data>
+  <data name="incorrectSimpleCaptcha" xml:space="preserve">
+    <value>Il valore del Captcha inserito non è corretto.</value>
+  </data>
+  <data name="install" xml:space="preserve">
+    <value>Installa</value>
+  </data>
+  <data name="installed" xml:space="preserve">
+    <value>Installato</value>
+  </data>
+  <data name="invalidBlogId" xml:space="preserve">
+    <value>ID del blog non valido</value>
+  </data>
+  <data name="isForSiteAggregation" xml:space="preserve">
+    <value>E' per un Sito di Aggregazione</value>
+  </data>
+  <data name="itemsPerPage" xml:space="preserve">
+    <value>Oggetti/Pagina</value>
+  </data>
+  <data name="LangDirection" xml:space="preserve">
+    <value>ltr</value>
+  </data>
+  <data name="latestFromTheGallery" xml:space="preserve">
+    <value>Ultime dalla Galleria</value>
+  </data>
+  <data name="ListIsEmpty" xml:space="preserve">
+    <value>Questa lista  è vuota. Puoi aggiungere nuovi elementi dal menu di sopra.</value>
+  </data>
+  <data name="loginFailed" xml:space="preserve">
+    <value>Accesso respinto</value>
+  </data>
+  <data name="newest" xml:space="preserve">
+    <value>Più recenti</value>
+  </data>
+  <data name="noApprovedComments" xml:space="preserve">
+    <value>Non ci sono commenti approvati.</value>
+  </data>
+  <data name="noBlogsWereFound" xml:space="preserve">
+    <value>Non sono stati trovati blogs.</value>
+  </data>
+  <data name="noFilesFound" xml:space="preserve">
+    <value>Non sono stati trovati files.</value>
+  </data>
+  <data name="noPackagesToDisplay" xml:space="preserve">
+    <value>Non ci sono pacchetti da mostrare.</value>
+  </data>
+  <data name="noPendingComments" xml:space="preserve">
+    <value>Non ci sono commenti in attesa.</value>
+  </data>
+  <data name="noPingbacksTrackbacks" xml:space="preserve">
+    <value>Non ci sono pingbacks o trackback. Assicurati di aver abilitato l'invio e la ricezione dei trackbacks/pingbacks nelle impostazioni avanzate.</value>
+  </data>
+  <data name="noSpamHere" xml:space="preserve">
+    <value>Evvai, non c'è spam!</value>
+  </data>
+  <data name="notifyMe" xml:space="preserve">
+    <value>Avvisami</value>
+  </data>
+  <data name="nowUnsubscribed" xml:space="preserve">
+    <value>Adesso non sei più iscritto</value>
+  </data>
+  <data name="orderBy" xml:space="preserve">
+    <value>Ordina per</value>
+  </data>
+  <data name="PageNotFound" xml:space="preserve">
+    <value>Pagina non trovata</value>
+  </data>
+  <data name="passwordNotChanged" xml:space="preserve">
+    <value>La Password non è stata modificata</value>
+  </data>
+  <data name="passwordSent" xml:space="preserve">
+    <value>La Password è stata inviata</value>
+  </data>
+  <data name="personalDetails" xml:space="preserve">
+    <value>Dettagli personali</value>
+  </data>
+  <data name="pingServiceNotUnique" xml:space="preserve">
+    <value>URL del servizio Ping già esistente</value>
+  </data>
+  <data name="pingServiceUrlBatch" xml:space="preserve">
+    <value>URL del servizio Ping (uno per linea)</value>
+  </data>
+  <data name="primary" xml:space="preserve">
+    <value>Principale</value>
+  </data>
+  <data name="purge" xml:space="preserve">
+    <value>Ripulisci</value>
+  </data>
+  <data name="purgeAll" xml:space="preserve">
+    <value>Ripulisci tutto</value>
+  </data>
+  <data name="purgeSelected" xml:space="preserve">
+    <value>Ripulisci il selezionato</value>
+  </data>
+  <data name="redirectToRemoveFileExtension" xml:space="preserve">
+    <value>Esegui il Redirect per rimuovere l'estensione .aspx dagli URLs</value>
+  </data>
+  <data name="redirectToRemoveFileExtensionDesc" xml:space="preserve">
+    <value>Trasferisce le richieste in arrivo che contentono l'estensione dei file  .aspx ad un URL con l'estensione rimossa. La rimozione dell'estensione dagli URLs deve esse abilitata.</value>
+  </data>
+  <data name="rejectSelected" xml:space="preserve">
+    <value>Rifiuta i selezionati</value>
+  </data>
+  <data name="removeExtensionsFromUrls" xml:space="preserve">
+    <value>Rimuovi l'estensione dagli URLs</value>
+  </data>
+  <data name="removeExtensionsFromUrlsDesc" xml:space="preserve">
+    <value>Rimuovi l'estensione .aspx dai nome del post o della pagina.</value>
+  </data>
+  <data name="reset" xml:space="preserve">
+    <value>Resetta</value>
+  </data>
+  <data name="restoreSelected" xml:space="preserve">
+    <value>Ripristina il selezionato</value>
+  </data>
+  <data name="rights" xml:space="preserve">
+    <value>Diritti</value>
+  </data>
+  <data name="savedByAtTime" xml:space="preserve">
+    <value>Salvato da {0} alle {1}</value>
+  </data>
+  <data name="setAsCurrentTheme" xml:space="preserve">
+    <value>Imposta come tema attuale</value>
+  </data>
+  <data name="setAsMobileTheme" xml:space="preserve">
+    <value>Imposta come tema mobile</value>
+  </data>
+  <data name="shortBiography" xml:space="preserve">
+    <value>Breve Biografia</value>
+  </data>
+  <data name="size" xml:space="preserve">
+    <value>Dimensioni</value>
+  </data>
+  <data name="spamProtection" xml:space="preserve">
+    <value>Protezione Spam</value>
+  </data>
+  <data name="storageContainerName" xml:space="preserve">
+    <value>Nome di Archiviazione</value>
+  </data>
+  <data name="textBeforeHostName" xml:space="preserve">
+    <value>Testo accetato prima del nome del Host</value>
+  </data>
+  <data name="thankYou" xml:space="preserve">
+    <value>Grazie</value>
+  </data>
+  <data name="themes" xml:space="preserve">
+    <value>Temi</value>
+  </data>
+  <data name="thumbnailServiceProvider" xml:space="preserve">
+    <value>Service Provider per le Anteprime</value>
+  </data>
+  <data name="thumbnailServiceProviderHelp" xml:space="preserve">
+    <value>API utilizzato per avere le anteprime, es. http://www.robothumb.com/src/?url={0}</value>
+  </data>
+  <data name="tools" xml:space="preserve">
+    <value>Strumenti</value>
+  </data>
+  <data name="trashIsEmpty" xml:space="preserve">
+    <value>Il Cestino è vuoto.</value>
+  </data>
+  <data name="type" xml:space="preserve">
+    <value>Tipo</value>
+  </data>
+  <data name="unapprove" xml:space="preserve">
+    <value>Non approvare</value>
+  </data>
+  <data name="upload" xml:space="preserve">
+    <value>Carica</value>
+  </data>
+  <data name="viewLargeCalendar" xml:space="preserve">
+    <value>Vedi i post nel calendario più grande</value>
+  </data>
+  <data name="virtualPath" xml:space="preserve">
+    <value>Percorso Virtuale</value>
+  </data>
+  <data name="visitorHi" xml:space="preserve">
+    <value>Ciao</value>
+  </data>
+  <data name="welcomeBack" xml:space="preserve">
+    <value>Bentornato!</value>
+  </data>
+  <data name="widgets" xml:space="preserve">
+    <value>Widgets</value>
+  </data>
+  <data name="writtenCommentsTotal" xml:space="preserve">
+    <value>Hai scritto {0} commenti in tutto..</value>
+  </data>
+  <data name="youHaveNotAddedAnyUserSoFar" xml:space="preserve">
+    <value>Non hai ancora aggiunto un utente. Per aggiungere un nuovo utente usa il collegamento nell'angolo in alto a destra della pagina.</value>
+  </data>
+  <data name="youHaveNoTaggedPosts" xml:space="preserve">
+    <value>Non hai post Taggati.</value>
+  </data>
+  <data name="youHaveNotDefinedAnyRolesSoFar" xml:space="preserve">
+    <value>Non hai definito ancora ruoli. Per aggiungere un nuovo ruolo usa il collegamento nell'angolo in alto a destra della pagina.</value>
+  </data>
+  <data name="youHaveNotWrittenAnyPosts" xml:space="preserve">
+    <value>Non hai scrito ancora un post. Per scrivere un nuovo post usa il collegamento sulla destra del menu.</value>
+  </data>
+  <data name="youHaveNoWrittenAnyPages" xml:space="preserve">
+    <value>Non hai ancora scritto una pagina. Per scrivere una nuova pagina usa il collegamento sulla destra del menu.</value>
   </data>
 </root>

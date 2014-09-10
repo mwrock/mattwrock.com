@@ -3,12 +3,12 @@
 <div id="newsletterform">
   <p><%=Resources.labels.notifiedPublished %></p>
 
-  <label for="<%=txtEmail.ClientID %>" style="font-weight:bold">Enter your e-mail</label><br />
+  <label for="<%=txtEmail.ClientID %>" style="font-weight:bold"><%=Resources.labels.enterEmail %></label><br />
   <asp:TextBox runat="server" ID="txtEmail" Width="98%" />
   <asp:RequiredFieldValidator 
     runat="server" 
     ControlToValidate="txtEmail" 
-    ErrorMessage="Please enter an e-mail address" 
+    ErrorMessage="<%$Resources:labels, enterEmailAddress %>" 
     Display="dynamic" 
     ValidationGroup="newsletter" />
     
@@ -21,13 +21,13 @@
     ValidationGroup="newsletter" />
     
   <div style="text-align:center">
-    <asp:Button runat="server" ID="btnSave" ValidationGroup="newsletter" Text="Notify me" OnClientClick="return beginAddEmail()" />
+    <asp:Button runat="server" ID="btnSave" ValidationGroup="newsletter" Text="<%$Resources:labels, notifyMe %>" OnClientClick="return beginAddEmail()" />
   </div>
 </div>
 
 <div id="newsletterthanks" style="display:none;text-align:center">
   <br /><br />
-  <h2 id="newsletteraction">Thank you</h2>
+  <h2 id="newsletteraction"><%=Resources.labels.thankYou %></h2>
   <br /><br />
 </div>
 
@@ -50,7 +50,7 @@
     BlogEngine.$('newsletterthanks').style.display = 'block';
     if (arg == "false")
     {
-      BlogEngine.$('newsletteraction').innerHTML = "You are now unsubscribed";
+      BlogEngine.$('newsletteraction').innerHTML = "<%=Resources.labels.nowUnsubscribed %>";
     }
   }
 </script>

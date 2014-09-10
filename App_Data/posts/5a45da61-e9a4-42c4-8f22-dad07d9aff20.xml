@@ -1,0 +1,201 @@
+﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<post>
+  <author>mwrock</author>
+  <title>Released RequestReduce 1.8: Making website optimization accessible to even more platforms</title>
+  <description />
+  <content>&lt;p&gt;This week RequestReduce 1.8 was released expanding its range of platform compatibility along with some minor bug fixes.&lt;/p&gt;
+&lt;h2&gt;Key Features Released&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;Syncing generated sprites and bundles across multiple web servers using sql server is now .net 3.5 compatible. Thanks to &lt;a href="http://madsstorm.dk/"&gt;Mads Storm&lt;/a&gt; (&lt;a href="https://twitter.com/#!/madsstorm"&gt;@madsstorm&lt;/a&gt;) for migrating the EntityFramework 4 implementation over to &lt;a href="http://www.toptensoftware.com/petapoco/"&gt;PetaPoco&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;Added support for Azure CDN end points. See below for API details needed to enable this.&lt;/li&gt;
+&lt;li&gt;Fixed dashboard and cache flushing to function on IIS6&lt;/li&gt;
+&lt;li&gt;Ability to manually attach the RequestReduce Response Filter earlier in the request processing pipeline via a new API call.&lt;/li&gt;
+&lt;li&gt;Fixed .Less implementation to pass querystring parameters. Thanks
+&lt;p&gt;&lt;a href="http://omegaluz.wordpress.com/"&gt;Andrew Cohen&lt;/a&gt; (&lt;a href="https://twitter.com/#!/omegaluz"&gt;@omegaluz&lt;/a&gt;) for this bug fix.&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;There were a couple bugs caught by some users the day of release but those were fixed in the first 24 hours and all is stable now. You can now get this version from &lt;a href="http://nuget.org/packages?q=RequestReduce"&gt;Nuget&lt;/a&gt; or &lt;a href="RequestReduce.com"&gt;RequestReduce.com&lt;/a&gt;. Its been very satisfying hearing from users who use RequestReduce on platforms such as classic ASP and even PHP on IIS and I&amp;rsquo;m glad to be able to expand this usage even further.&lt;/p&gt;
+&lt;h2&gt;Why RequestReduce is no longer using Entity Framework&lt;/h2&gt;
+&lt;p&gt;The short answer here is compatibility with .Net 3.5. It may seem odd as we stand on the precipice of the release of .Net 4.5 that this would be a significant concern, but I have received several requests to support Sql Server synchronization on .net 3.5. A lot of shops are still on 3.5 and the Sql Server option is a compelling enterprise feature. Its what we use at Microsoft&amp;rsquo;s EPX organization to sync the generated bundles and sprites across approximately 50 web servers. Since Entity Framework Code First is only compatible with .Net 4.0, we had to drop this in favor of a solution that would work with .Net 3.5.&lt;/p&gt;
+&lt;p&gt;The reason I chose to originally implement this feature using Entity Framework was mainly to become more familiar with how it worked and compared to the ORM that I have historically used, &lt;a href="http://nhforge.org/Default.aspx"&gt;nHibernate&lt;/a&gt;. The data access needs of RequestReduce.SqlServer are actually quite trivial so I felt like it would be a good project to test out this ORM with little risk. In the end, I achieved what I wanted which was to understand how it worked at a nuts and bolts level beyond the white papers and podcasts I had been exposed to. I have to say that it had come a long way since my initial exposure to it a few years back. The code first functionality felt very much like my nHibernate/Fluent nHibernate work flow. It still has some maturing to do. especially in regards to caching.&lt;/p&gt;
+&lt;p&gt;Mads Storm was kind enough to submit a pull request overhauling the EF implementation using a Micro ORM called PetaPoco. While I certainly could have ported RequestReduce to straight ADO given its simple data needs, the PetaPoco migration was simple given that it follows a similar pattern to Entity Framework. I would definitely recommend PetaPoco to anyone interested in a Micro ORM that needs .Net 3.5 compatibility. I had previously held interested in using a framework like &lt;a href="https://github.com/robconery/massive"&gt;Massive&lt;/a&gt;,&amp;nbsp; &lt;a href="https://github.com/markrendle/Simple.Data"&gt;Simple.Data&lt;/a&gt; or &lt;a href="http://code.google.com/p/dapper-dot-net/"&gt;Dapper&lt;/a&gt;. However all of these make use of the .Net 4 &lt;a href="http://msdn.microsoft.com/en-us/magazine/gg598922.aspx"&gt;Dynamic&lt;/a&gt; type. PetaPoco is the only micro ORM that I am aware of that is compatible with .Net 3.5.&lt;/p&gt;
+&lt;h2&gt;How to integrate RequestReduce with Azure CDN Endpoints&lt;/h2&gt;
+&lt;p&gt;Azure&amp;rsquo;s CDN (content delivery network) implementation is a little different from most standard CDNs like Akamai. My experiences working with a couple of the major CDN vendors has been that you point your URLs to the same Url that you would use locally with the exception that the host name is one dedicated to static content and whose DNS points to your CDN provider. The CDN provider serves your content from its own cache which is geographically located close to the requesting browser. If the CDN does not have the content cached, it makes a normal HTTP call to the &amp;ldquo;origin&amp;rdquo; server (your local server) using the same url it was given but using the host name of your local site. Azure follows this same model with the exception that it expects your CDN content to reside in a directory (physical or virtual) explicitly named &amp;ldquo;CDN&amp;rdquo;.&lt;/p&gt;
+&lt;h4&gt;Standard Implementation:&lt;/h4&gt;
+&lt;p&gt;&lt;span style="font-size: xx-small;"&gt;Browser &amp;ndash;&amp;gt; http://cdn.yoursite.com/images/logo.png &amp;ndash;&amp;gt; CDN Povider (cold cache) &amp;ndash;&amp;gt; http://www.yoursite.com/images/logo.png&lt;/span&gt;&lt;/p&gt;
+&lt;h4&gt;Azure Implementation:&lt;/h4&gt;
+&lt;p&gt;&lt;span style="font-size: xx-small;"&gt;Browser &amp;ndash;&amp;gt; http://azurecdn.com/images/logo.png &amp;ndash;&amp;gt; CDN Povider (cold cache) &amp;ndash;&amp;gt; http://www.yoursite.com/cdn/images/logo.png&lt;/span&gt;&lt;/p&gt;
+&lt;p&gt;RequestReduce allows applications to serve its generated content via a CDN or cookie less domain by specifying a ContentHost configuration setting. When this setting is provided, RequestReduce serves all of its generated javascript and css and any local embedded resources in the CSS using the host provided in the ContentHost setting. However, because not only the host but also the path differs when using Azure CDN endpoints, this solution fails because http://longazurecdnhostname.com/images/logo.png fails to get content from http://friendlylocalhostname.com/images/logo.png since the content is actually located at http://friendlylocalhostname.com/cdn/images/logo.png. RequestReduce&amp;rsquo;s ContentHost setting will now work with Azure as long as you include this API call somewhere in your application&amp;rsquo;s startup code:&lt;/p&gt;
+&lt;div id="codeSnippetWrapper"&gt;
+&lt;pre id="codeSnippet" style="text-align: left; line-height: 12pt; background-color: #f4f4f4; margin: 0em; width: 100%; font-family: 'Courier New', courier, monospace; direction: ltr; color: black; font-size: 8pt; overflow: visible; border-style: none; padding: 0px;"&gt;RequestReduce.Api.Registry.UrlTransformer = (x, y, z) =&amp;gt; z.Replace(&lt;span style="color: #006080;"&gt;"/cdn/"&lt;/span&gt;, &lt;span style="color: #006080;"&gt;"/"&lt;/span&gt;);&lt;/pre&gt;
+&lt;/div&gt;
+&lt;p&gt;This tells requestReduce that when it generates a URL, remove the CDN directory from the path.&lt;/p&gt;
+&lt;h2&gt;Attaching the RequestReduce response filter early in the request&lt;/h2&gt;
+&lt;p&gt;RequestReduce uses a Response Filter to dynamically analyze your web site&amp;rsquo;s markup and manipulate it by replacing multiple css and javascript references with bundled javascript and css files transforming the background images in the CSS with sprites where it can. RequestReduce waits until the last possible moment of the request processing pipeline to attach itself to the response so that it has all of the information about the response needed to make an informed decision as to whether or not it should attach itself. This works well in almost all cases.&lt;/p&gt;
+&lt;p&gt;There are rare cases where an application may have another response filter that either simply does not play nice with other response filters by not chaining its neighboring filter correctly or it manipulates the content of the response in such a way that makes it necessary that RequestReduce filters the content after this filter has performed its manipulations.&lt;/p&gt;
+&lt;p&gt;I ran into this last week working with the MSDN and Technet Dev Centers in their adoption of RequestReduce. They have a ResponseFilter that gets attached in an MVC controller action filter which is before RequestReduce attaches itself. The nature of chained response filters is that the first filter to attach itself is the last filter to receive the response. Since the dev center Response Filter explicitly removes some excess css and javascript, it is important that RequestReduce receives the content last and is therefore attached first. To accommodate this scenario, I added the following API method that they were able to call in their action filter just before attaching their own method:&lt;/p&gt;
+&lt;div id="codeSnippetWrapper"&gt;
+&lt;pre id="codeSnippet" style="text-align: left; line-height: 12pt; background-color: #f4f4f4; margin: 0em; width: 100%; font-family: 'Courier New', courier, monospace; direction: ltr; color: black; font-size: 8pt; overflow: visible; border-style: none; padding: 0px;"&gt;RequestReduce.Api.Registry.InstallResponseFilter();&lt;/pre&gt;
+&lt;/div&gt;
+&lt;p&gt;This tells RequestReduce to attach itself Now.&lt;/p&gt;
+&lt;p&gt;Now excuse me as I slip into my 100% polyester leisure suit&amp;hellip;&lt;/p&gt;
+&lt;p&gt;So what are you waiting for? Head over to Nuget and download RequestReduce today! It will make your site faster or my name isn&amp;rsquo;t Matt Wrock. Oh&amp;hellip;and its Freeeeeeeeeeeeeee!!!!&lt;/p&gt;</content>
+  <ispublished>True</ispublished>
+  <isdeleted>False</isdeleted>
+  <iscommentsenabled>True</iscommentsenabled>
+  <pubDate>2012-03-15 07:38:00</pubDate>
+  <lastModified>2013-05-31 22:42:21</lastModified>
+  <raters>0</raters>
+  <rating>0</rating>
+  <slug>Released-RequestReduce-18-Making-website-optimization-accessible-to-even-more-platforms</slug>
+  <tags />
+  <comments>
+    <comment id="dc7db334-90f4-4232-bcf6-26ca23760eda" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="False">
+      <date>2013-07-15 20:51:19</date>
+      <author>http://www.fablabenschede.nl/</author>
+      <email>porter_rader@fast-email.com</email>
+      <country />
+      <ip>195.190.13.198</ip>
+      <moderatedby>Rule:black list</moderatedby>
+      <avatar />
+      <content>Hi there! Someone in my Myspace group shared this site with us so I came to take a look. I&amp;#39;m definitely loving the information. I&amp;#39;m book-marking and will be tweeting this to my followers! Wonderful blog and amazing design.
+
+Also visit my blog weightloss -  http://www.fablabenschede.nl/ - http://www.fablabenschede.nl/vraag-aanbod/rudimentary-elements-weightloss-options  -</content>
+    </comment>
+    <comment id="c4495dc0-be90-44bd-a947-b6fbda5818cd" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="False">
+      <date>2013-07-15 20:54:40</date>
+      <author>levit98.soup.io</author>
+      <email>winifredhinojosa@gmail.com</email>
+      <country />
+      <ip>195.190.13.198</ip>
+      <moderatedby>Rule:black list</moderatedby>
+      <avatar />
+      <content>You could definitely see your skills in the work you write. The sector hopes for more passionate writers like you who are not afraid to mention how they believe. Always follow your heart.
+
+Also visit my web-site ... weightloss -  levit98.soup.io - http://levit98.soup.io/  -</content>
+    </comment>
+    <comment id="e56d8d23-4975-4c85-a378-14bea01943d0" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="False">
+      <date>2013-07-15 20:54:53</date>
+      <author>http://levit98.soup.io/</author>
+      <email>jennisolis@web.de</email>
+      <country />
+      <ip>195.190.13.198</ip>
+      <moderatedby>Rule:black list</moderatedby>
+      <avatar />
+      <content>I enjoy what you guys are up too. This type of clever work and reporting! Keep up the good works guys I&amp;#39;ve incorporated you guys to my personal blogroll.
+
+Check out my web blog - weightloss * http://levit98.soup.io/ - http://levit98.soup.io/ *</content>
+    </comment>
+    <comment id="eb74f55c-c039-443d-aa0a-55a632d88638" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="False">
+      <date>2013-07-15 20:58:08</date>
+      <author>http://www.fablabenschede.nl/vraag-aanbod/rudimentary-elements-weightloss-options</author>
+      <email>iveyaskew@gmail.com</email>
+      <country />
+      <ip>195.190.13.198</ip>
+      <moderatedby>Rule:black list</moderatedby>
+      <avatar />
+      <content>My brother suggested I might like this blog. He was totally right. This submit truly made my day. You can not consider just how much time I had spent for this info! Thank you!
+
+Look at my website - weightloss -  http://www.fablabenschede.nl/vraag-aanbod/rudimentary-elements-weightloss-options - http://www.fablabenschede.nl/vraag-aanbod/rudimentary-elements-weightloss-options  -</content>
+    </comment>
+    <comment id="150c9bff-5de9-48da-8aec-081f931712db" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="False">
+      <date>2013-07-15 21:28:32</date>
+      <author>http://levit98.soup.io/</author>
+      <email>margaretvick@aol.com</email>
+      <country />
+      <ip>195.190.13.198</ip>
+      <moderatedby>Rule:black list</moderatedby>
+      <avatar />
+      <content>Hey would you mind stating which blog platform you&amp;#39;re using? I&amp;#39;m going to start my own blog soon but I&amp;#39;m having a difficult time making a decision between BlogEngine/Wordpress/B2evolution and Drupal. The reason I ask is because your layout seems different then most blogs and I&amp;#39;m looking for something completely unique.                  P.S Apologies for being off-topic but I had to ask!
+
+My blog post :: weightloss * http://levit98.soup.io/ - http://levit98.soup.io/ *</content>
+    </comment>
+    <comment id="ea52d988-9a65-4d3c-a1bb-745b9235acb9" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="False">
+      <date>2013-07-15 21:28:40</date>
+      <author>fablabenschede.nl</author>
+      <email>andersontrammell@gmail.com</email>
+      <country />
+      <ip>195.190.13.198</ip>
+      <moderatedby>Rule:black list</moderatedby>
+      <avatar />
+      <content>Wonderful blog! I found it while surfing around on Yahoo News. Do you have any suggestions on how to get listed in Yahoo News? I&amp;#39;ve been trying for a while but I never seem to get there! Appreciate it
+
+My blog: weightloss ( fablabenschede.nl - http://www.fablabenschede.nl/vraag-aanbod/rudimentary-elements-weightloss-options )</content>
+    </comment>
+    <comment id="a133a116-d157-463f-8d83-c10eae70b213" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="False">
+      <date>2013-07-15 21:31:59</date>
+      <author>levit98.soup.io</author>
+      <email>lindsay_harry@yahoo.de</email>
+      <country />
+      <ip>195.190.13.198</ip>
+      <moderatedby>Rule:black list</moderatedby>
+      <avatar />
+      <content>That is really fascinating, You&amp;#39;re an overly skilled blogger. I have joined your rss feed and look ahead to searching for extra of your excellent post. Additionally, I have shared your site in my social networks
+
+Feel free to visit my page: weightloss ( levit98.soup.io - http://levit98.soup.io/ )</content>
+    </comment>
+    <comment id="d12df940-4532-4106-b662-cd5cddc81bbe" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="False">
+      <date>2013-07-15 21:32:04</date>
+      <author>www.fablabenschede.nl</author>
+      <email>kristiejefferies@gmail.com</email>
+      <country />
+      <ip>195.190.13.198</ip>
+      <moderatedby>Rule:black list</moderatedby>
+      <avatar />
+      <content>You actually make it seem so easy with your presentation but I find this matter to be really something that I think I would never understand. It seems too complex and very broad for me. I&amp;#39;m looking forward for your next post, I will try to get the hang of it!
+
+Check out my web-site - weightloss ( www.fablabenschede.nl - http://www.fablabenschede.nl/vraag-aanbod/rudimentary-elements-weightloss-options )</content>
+    </comment>
+    <comment id="4b0d3ce4-a032-49a7-ba45-73eef84a48ae" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="False">
+      <date>2013-07-15 21:41:40</date>
+      <author>ecoles.ac-rouen.fr</author>
+      <email>kari_styles@live.com</email>
+      <country />
+      <ip>5.39.5.97</ip>
+      <moderatedby>App_Code.Extensions.StopForumSpam</moderatedby>
+      <avatar />
+      <content>Whether you diy or hire an attorney, hardwood floor refinishing is an excellent option to revitalize the flooring within your home. Hardwood flooring in Denver will add a lot of style to your property. Before using any specific cleaning product, test the color fastness in the carpet by applying the cleaner to your hidden part of the carpet. If not given careful thought, improper sanding will lead to damage of your hardwood and may even cause the price of your respective home to depreciate. Because canister vacuums are so easy to use, they will often offer you a new way of looking at cleaning normally.
+
+my blog :: good vacuum for hardwood and carpet ( ecoles.ac-rouen.fr - http://ecoles.ac-rouen.fr/encyclo/index.php?title=Exploring_Sensible_hardwood_floor_vacuum_Methods )</content>
+    </comment>
+    <comment id="e064f886-c880-4786-acc6-dcc943a90c45" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="False">
+      <date>2013-07-15 21:44:18</date>
+      <author>0800allergy.com</author>
+      <email>darnell_muir@gmail.com</email>
+      <country />
+      <ip>195.190.13.198</ip>
+      <moderatedby>Rule:black list</moderatedby>
+      <avatar />
+      <content>Tremendous things here. I am very satisfied to look your post. Thanks a lot and I&amp;#39;m looking ahead to contact you. Will you kindly drop me a mail?
+
+my blog: phen375 ( 0800allergy.com - http://0800allergy.com/2012/11/28/trouble-free-products-for-is-phen375-safe-around-the-uk/ )</content>
+    </comment>
+    <comment id="06d3fc57-aa40-41e5-88ff-1fa79548ef50" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="False">
+      <date>2013-07-15 21:55:41</date>
+      <author>http://0800allergy.com</author>
+      <email>laraewhittle@aol.com</email>
+      <country />
+      <ip>195.190.13.198</ip>
+      <moderatedby>Rule:black list</moderatedby>
+      <avatar />
+      <content>Hi there all, here every person is sharing these know-how, therefore it&amp;#39;s pleasant to read this webpage, and I used to go to see this web site all the time.
+
+Stop by my page ... phen375 -  http://0800allergy.com - http://0800allergy.com/2012/11/28/trouble-free-products-for-is-phen375-safe-around-the-uk/  -</content>
+    </comment>
+    <comment id="d65690e3-a53e-40c7-b063-c096c38b2494" parentid="00000000-0000-0000-0000-000000000000" approved="True" spam="False" deleted="False">
+      <date>2013-09-09 21:01:05</date>
+      <author>com-lab.biz</author>
+      <email>pingback</email>
+      <country />
+      <ip>119.18.58.84</ip>
+      <website>http://com-lab.biz/user20/2013/09/10/requestreduce-cache-flushing/</website>
+      <content>Pingback from com-lab.biz
+
+RequestReduce cache flushing | User20</content>
+    </comment>
+  </comments>
+  <categories>
+    <category>2f8206f0-95a4-449e-bf74-3b2cb761de04</category>
+  </categories>
+  <notifications />
+</post>

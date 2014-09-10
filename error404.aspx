@@ -21,7 +21,7 @@
       
       <p>I suggest you try one of the links below:</p>
       <ul>
-        <li><a href="archive.aspx"><%=Resources.labels.archive %></a></li>
+        <li><a href="archive<%= BlogEngine.Core.BlogConfig.FileExtension %>"><%=Resources.labels.archive %></a></li>
         <li><a href="<%=BlogEngine.Core.Utils.RelativeWebRoot %>">Home page</a></li>
       </ul>
       
@@ -46,7 +46,7 @@
       <p>You might find one of the following links useful:</p>
       <ul>
         <asp:placeholder runat="server" id="phSearchResult" />
-        <li><a href="archive.aspx"><%=Resources.labels.archive %></a></li>
+        <li><a href="archive<%= BlogEngine.Core.BlogConfig.FileExtension %>"><%=Resources.labels.archive %></a></li>
         <li><a href="<%=BlogEngine.Core.Utils.RelativeWebRoot %>">Home page</a></li>
       </ul>
       

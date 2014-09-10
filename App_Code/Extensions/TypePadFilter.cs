@@ -12,7 +12,7 @@
     /// The type pad filter.
     /// </summary>
     [Extension("TypePad anti-spam comment filter (based on AkismetFilter)", "1.0", 
-        "<a href=\"http://lucsiferre.net\">By Chris Nicola</a>")]
+        "<a href=\"http://lucsiferre.net\">By Chris Nicola</a>", 0, false)]
     public class TypePadFilter : ICustomFilter
     {
         #region Constants and Fields

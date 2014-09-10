@@ -1,4 +1,5 @@
 ﻿<%@ Page Title="" Language="C#" MasterPageFile="~/admin/admin.master" AutoEventWireup="true" CodeFile="Profile.aspx.cs" Inherits="Admin.Users.ProfilePage" %>
+<%@ MasterType VirtualPath="~/admin/admin.master" %>
 <%@ Register Src="~/admin/htmlEditor.ascx" TagPrefix="Blog" TagName="TextEditor" %>
 <asp:Content ID="Content1" ContentPlaceHolderID="cphAdmin" Runat="Server">
     <script type="text/javascript">
@@ -20,7 +21,7 @@
             var birthday = $('#txtBirthday').val();
             var photoURL = $('#txtPhotoURL').val();
             var isPrivate = false;
-            if ($('#chkPrivate').attr('checked')) {
+            if ($('#chkPrivate').is(':checked')) {
                 isPrivate = true;
             }
             var mobile = $('#txtMobile').val();
@@ -86,13 +87,18 @@
         <asp:PlaceHolder ID="phRightContentBox" runat="server">
 		    <div class="content-box-right">
                 <ul>
-			        <li class="content-box-selected"><a href="Users.aspx"><%=Resources.labels.users %></a></li>
-			        <li><a href="Roles.aspx" class="selected"><%=Resources.labels.roles %></a></li>
+                    <% if (BlogEngine.Core.Security.IsAuthorizedTo(BlogEngine.Core.Rights.EditOtherUsersRoles)) { %>
+			        <%--<li><a href="#" class="new"><%=Resources.labels.addNewRole %></a></li>--%>
+                    <li><a href="Users.aspx"><%=Resources.labels.users%></a></li>
+			        <li><a href="Roles.aspx" class="selected"><%=Resources.labels.roles%></a></li>
+                    <% } %>
+                    <li class="content-box-selected"><a href="Profile.aspx?id=<%=BlogEngine.Core.Security.CurrentMembershipUser.UserName %>"><%=Resources.labels.profile %></a></li>
                 </ul>
 		    </div>
         </asp:PlaceHolder>
 		<div class="content-box-left">
-            <h1 style="border:none;"><%=Resources.labels.profile %> : <%=Request.QueryString["id"] %></h1>
+            <h1 style="border:none;"><%= AvatarImage %> <%=Resources.labels.profile %> : <%=Request.QueryString["id"] %></h1>
+            
             <div id="Container"></div>
 
             <asp:PlaceHolder ID="phRoles" runat="server">
@@ -102,8 +108,8 @@
 
             <div id="Container2"></div>
             <div class="action_buttons">
-                <input type="submit" class="btn primary rounded" value="<%=Resources.labels.saveProfile %>" onclick="return SaveProfile()" />
-		        or <a href="Users.aspx"><%=Resources.labels.cancel %></a>
+                <input type="submit" id="btnSave" class="btn primary rounded" value="<%=Resources.labels.saveProfile %>" onclick="return SaveProfile()" />
+		        <%=Resources.labels.or %> <a href="Users.aspx"><%=Resources.labels.cancel %></a>
             </div>
 		</div>
 	</div>

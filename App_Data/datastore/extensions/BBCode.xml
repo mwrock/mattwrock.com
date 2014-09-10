@@ -5,6 +5,7 @@
   <Description>Converts BBCode to XHTML in the comments</Description>
   <Enabled>true</Enabled>
   <Priority>999</Priority>
+  <SubBlogEnabled>true</SubBlogEnabled>
   <Settings>
     <Delimiter>44</Delimiter>
     <Help>Converts BBCode to XHTML in the comments. Close tag is optional.</Help>
@@ -55,6 +56,267 @@
     <ShowAdd>true</ShowAdd>
     <ShowDelete>true</ShowDelete>
     <ShowEdit>true</ShowEdit>
+    <BlogId xsi:nil="true" />
+  </Settings>
+  <Settings>
+    <Delimiter>44</Delimiter>
+    <Help>Converts BBCode to XHTML in the comments. Close tag is optional.</Help>
+    <Hidden>false</Hidden>
+    <Index>0</Index>
+    <IsScalar>false</IsScalar>
+    <KeyField>Code</KeyField>
+    <Name>BBCode</Name>
+    <Parameters>
+      <KeyField>false</KeyField>
+      <Label>Code</Label>
+      <MaxLength>20</MaxLength>
+      <Name>Code</Name>
+      <ParamType>String</ParamType>
+      <Required>true</Required>
+      <SelectedValue />
+      <Values>b</Values>
+      <Values>i</Values>
+      <Values>u</Values>
+      <Values>quote</Values>
+    </Parameters>
+    <Parameters>
+      <KeyField>false</KeyField>
+      <Label>Open Tag</Label>
+      <MaxLength>150</MaxLength>
+      <Name>OpenTag</Name>
+      <ParamType>String</ParamType>
+      <Required>true</Required>
+      <SelectedValue />
+      <Values>strong</Values>
+      <Values>em</Values>
+      <Values>span style="text-decoration:underline"</Values>
+      <Values>cite title="Quote"</Values>
+    </Parameters>
+    <Parameters>
+      <KeyField>false</KeyField>
+      <Label>Close Tag</Label>
+      <MaxLength>100</MaxLength>
+      <Name>CloseTag</Name>
+      <ParamType>String</ParamType>
+      <Required>false</Required>
+      <SelectedValue />
+      <Values />
+      <Values />
+      <Values>span</Values>
+      <Values>cite</Values>
+    </Parameters>
+    <ShowAdd>true</ShowAdd>
+    <ShowDelete>true</ShowDelete>
+    <ShowEdit>true</ShowEdit>
+    <BlogId>03012b68-cf2a-4fa7-9bef-368352b32900</BlogId>
+  </Settings>
+  <Settings>
+    <Delimiter>44</Delimiter>
+    <Help>Converts BBCode to XHTML in the comments. Close tag is optional.</Help>
+    <Hidden>false</Hidden>
+    <Index>0</Index>
+    <IsScalar>false</IsScalar>
+    <KeyField>Code</KeyField>
+    <Name>BBCode</Name>
+    <Parameters>
+      <KeyField>false</KeyField>
+      <Label>Code</Label>
+      <MaxLength>20</MaxLength>
+      <Name>Code</Name>
+      <ParamType>String</ParamType>
+      <Required>true</Required>
+      <SelectedValue />
+      <Values>b</Values>
+      <Values>i</Values>
+      <Values>u</Values>
+      <Values>quote</Values>
+    </Parameters>
+    <Parameters>
+      <KeyField>false</KeyField>
+      <Label>Open Tag</Label>
+      <MaxLength>150</MaxLength>
+      <Name>OpenTag</Name>
+      <ParamType>String</ParamType>
+      <Required>true</Required>
+      <SelectedValue />
+      <Values>strong</Values>
+      <Values>em</Values>
+      <Values>span style="text-decoration:underline"</Values>
+      <Values>cite title="Quote"</Values>
+    </Parameters>
+    <Parameters>
+      <KeyField>false</KeyField>
+      <Label>Close Tag</Label>
+      <MaxLength>100</MaxLength>
+      <Name>CloseTag</Name>
+      <ParamType>String</ParamType>
+      <Required>false</Required>
+      <SelectedValue />
+      <Values />
+      <Values />
+      <Values>span</Values>
+      <Values>cite</Values>
+    </Parameters>
+    <ShowAdd>true</ShowAdd>
+    <ShowDelete>true</ShowDelete>
+    <ShowEdit>true</ShowEdit>
+    <BlogId>6c97124b-78ed-4787-b3d2-4d63eebfe7d2</BlogId>
+  </Settings>
+  <Settings>
+    <Delimiter>44</Delimiter>
+    <Help>Converts BBCode to XHTML in the comments. Close tag is optional.</Help>
+    <Hidden>false</Hidden>
+    <Index>0</Index>
+    <IsScalar>false</IsScalar>
+    <KeyField>Code</KeyField>
+    <Name>BBCode</Name>
+    <Parameters>
+      <KeyField>false</KeyField>
+      <Label>Code</Label>
+      <MaxLength>20</MaxLength>
+      <Name>Code</Name>
+      <ParamType>String</ParamType>
+      <Required>true</Required>
+      <SelectedValue />
+      <Values>b</Values>
+      <Values>i</Values>
+      <Values>u</Values>
+      <Values>quote</Values>
+    </Parameters>
+    <Parameters>
+      <KeyField>false</KeyField>
+      <Label>Open Tag</Label>
+      <MaxLength>150</MaxLength>
+      <Name>OpenTag</Name>
+      <ParamType>String</ParamType>
+      <Required>true</Required>
+      <SelectedValue />
+      <Values>strong</Values>
+      <Values>em</Values>
+      <Values>span style="text-decoration:underline"</Values>
+      <Values>cite title="Quote"</Values>
+    </Parameters>
+    <Parameters>
+      <KeyField>false</KeyField>
+      <Label>Close Tag</Label>
+      <MaxLength>100</MaxLength>
+      <Name>CloseTag</Name>
+      <ParamType>String</ParamType>
+      <Required>false</Required>
+      <SelectedValue />
+      <Values />
+      <Values />
+      <Values>span</Values>
+      <Values>cite</Values>
+    </Parameters>
+    <ShowAdd>true</ShowAdd>
+    <ShowDelete>true</ShowDelete>
+    <ShowEdit>true</ShowEdit>
+    <BlogId>38e5d162-2a63-45c9-b130-e60dd0edb2a2</BlogId>
+  </Settings>
+  <Settings>
+    <Delimiter>44</Delimiter>
+    <Help>Converts BBCode to XHTML in the comments. Close tag is optional.</Help>
+    <Hidden>false</Hidden>
+    <Index>0</Index>
+    <IsScalar>false</IsScalar>
+    <KeyField>Code</KeyField>
+    <Name>BBCode</Name>
+    <Parameters>
+      <KeyField>false</KeyField>
+      <Label>Code</Label>
+      <MaxLength>20</MaxLength>
+      <Name>Code</Name>
+      <ParamType>String</ParamType>
+      <Required>true</Required>
+      <SelectedValue />
+      <Values>b</Values>
+      <Values>i</Values>
+      <Values>u</Values>
+      <Values>quote</Values>
+    </Parameters>
+    <Parameters>
+      <KeyField>false</KeyField>
+      <Label>Open Tag</Label>
+      <MaxLength>150</MaxLength>
+      <Name>OpenTag</Name>
+      <ParamType>String</ParamType>
+      <Required>true</Required>
+      <SelectedValue />
+      <Values>strong</Values>
+      <Values>em</Values>
+      <Values>span style="text-decoration:underline"</Values>
+      <Values>cite title="Quote"</Values>
+    </Parameters>
+    <Parameters>
+      <KeyField>false</KeyField>
+      <Label>Close Tag</Label>
+      <MaxLength>100</MaxLength>
+      <Name>CloseTag</Name>
+      <ParamType>String</ParamType>
+      <Required>false</Required>
+      <SelectedValue />
+      <Values />
+      <Values />
+      <Values>span</Values>
+      <Values>cite</Values>
+    </Parameters>
+    <ShowAdd>true</ShowAdd>
+    <ShowDelete>true</ShowDelete>
+    <ShowEdit>true</ShowEdit>
+    <BlogId>7bef2dd3-4458-49e5-be5d-7a0a69039bf9</BlogId>
+  </Settings>
+  <Settings>
+    <Delimiter>44</Delimiter>
+    <Help>Converts BBCode to XHTML in the comments. Close tag is optional.</Help>
+    <Hidden>false</Hidden>
+    <Index>0</Index>
+    <IsScalar>false</IsScalar>
+    <KeyField>Code</KeyField>
+    <Name>BBCode</Name>
+    <Parameters>
+      <KeyField>false</KeyField>
+      <Label>Code</Label>
+      <MaxLength>20</MaxLength>
+      <Name>Code</Name>
+      <ParamType>String</ParamType>
+      <Required>true</Required>
+      <SelectedValue />
+      <Values>b</Values>
+      <Values>i</Values>
+      <Values>u</Values>
+      <Values>quote</Values>
+    </Parameters>
+    <Parameters>
+      <KeyField>false</KeyField>
+      <Label>Open Tag</Label>
+      <MaxLength>150</MaxLength>
+      <Name>OpenTag</Name>
+      <ParamType>String</ParamType>
+      <Required>true</Required>
+      <SelectedValue />
+      <Values>strong</Values>
+      <Values>em</Values>
+      <Values>span style="text-decoration:underline"</Values>
+      <Values>cite title="Quote"</Values>
+    </Parameters>
+    <Parameters>
+      <KeyField>false</KeyField>
+      <Label>Close Tag</Label>
+      <MaxLength>100</MaxLength>
+      <Name>CloseTag</Name>
+      <ParamType>String</ParamType>
+      <Required>false</Required>
+      <SelectedValue />
+      <Values />
+      <Values />
+      <Values>span</Values>
+      <Values>cite</Values>
+    </Parameters>
+    <ShowAdd>true</ShowAdd>
+    <ShowDelete>true</ShowDelete>
+    <ShowEdit>true</ShowEdit>
+    <BlogId>6c3f3078-12b7-49ac-a627-5db4d5811fbf</BlogId>
   </Settings>
   <ShowSettings>true</ShowSettings>
   <Version>1.0</Version>

@@ -1,0 +1,46 @@
+﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<post>
+  <author>mwrock</author>
+  <title>RequestReduce now fully compatible with AppHarbor and Medium Trust hosting environments.</title>
+  <description />
+  <content>&lt;h2&gt;Now even more sites can take advantage of automatic CSS merging and minification as well as image spriting and color optimization with no code changes or directory structure conventions.&lt;/h2&gt;
+&lt;p&gt;This week I rolled out two key features which add compatibility to &lt;a href="http://requestreduce.com/"&gt;RequestReduce&lt;/a&gt;&amp;rsquo;s core functionality and some popular hosting environments. In a nutshell, here is what has been added:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Support for web server environments behind proxies. No extra configuration is needed. It just works.&lt;/li&gt;
+&lt;li&gt;Full support for AppHarbor applications. If you have not heard of &lt;a href="https://appharbor.com/"&gt;AppHarbor&lt;/a&gt;, I strongly encourage you to check it out. It ties into your GIT repository and automatically builds and deploys your Visual Studio solution upon git push.&lt;/li&gt;
+&lt;li&gt;RequestReduce now runs in Medium Trust environments such as GoDaddy. There are &lt;a href="https://github.com/mwrock/RequestReduce/wiki/Will-requestreduce-work-in-a-medium-trust-hosted-environment%3F"&gt;some features that will not work here&lt;/a&gt; such as image color and compression optimizations and other multi server synchronization scenarios, but the core out of the box functionality of CSS merging, minification and on the fly background image spriting will work in these environments.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;And as from the beginning, RequestReduce will run on ANY IIS hosted environment including ASP.NET Web Forms, all versions and view engines of MVC, Webmatrix &amp;ldquo;Web Pages&amp;rdquo; and even static html files.&lt;/p&gt;
+&lt;p&gt;So download the latest bits from &lt;a href="http://www.RequestReduce.com"&gt;www.RequestReduce.com&lt;/a&gt; or simply enter:&lt;/p&gt;
+&lt;div id="codeSnippetWrapper"&gt;
+&lt;pre id="codeSnippet" style="text-align: left; line-height: 12pt; background-color: #f4f4f4; margin: 0em; width: 100%; font-family: 'Courier New', courier, monospace; direction: ltr; color: black; font-size: 8pt; overflow: visible; border-style: none; padding: 0px;"&gt;Install-Package RequestReduce&lt;/pre&gt;
+&lt;br /&gt;from the nuget power shell to get these features added to your site with no change to your code, almost no configuration and no rearranging of files and stylesheets into arbitrary folder conventions. As long as your background images are marked no-repeat and have explicit widths in their class properties, RequestReduce does all of the tedious work for you on the fly and makes sure that these resources have far future Expires headers and multi server friendly ETags allowing browsers to propperly cache your content.&lt;/div&gt;
+&lt;div&gt;&amp;nbsp;&lt;/div&gt;
+&lt;div&gt;Do you need multi server synchronization and CDN support? RequestReduce has got you covered.&lt;/div&gt;</content>
+  <ispublished>True</ispublished>
+  <isdeleted>False</isdeleted>
+  <iscommentsenabled>True</iscommentsenabled>
+  <pubDate>2011-09-21 03:57:00</pubDate>
+  <lastModified>2011-12-12 23:14:44</lastModified>
+  <raters>0</raters>
+  <rating>0</rating>
+  <slug>RequestReduce-now-fully-compatible-with-AppHarbor-and-Medium-Trust-hosting-environments</slug>
+  <tags />
+  <comments>
+    <comment id="2dd8d1ef-035b-4081-9578-2cdfcf8d35fb" parentid="00000000-0000-0000-0000-000000000000" approved="True" spam="False" deleted="False">
+      <date>2011-09-21 04:23:12</date>
+      <author>DotNetKicks.com</author>
+      <email>trackback</email>
+      <country />
+      <ip>74.86.105.210</ip>
+      <website>http://www.dotnetkicks.com/aspnet/RequestReduce_now_fully_compatible_with_AppHarbor_and_Medium_Trust</website>
+      <content>RequestReduce now fully compatible with AppHarbor and Medium Trust
+
+You've been kicked (a good thing) - Trackback from DotNetKicks.com</content>
+    </comment>
+  </comments>
+  <categories>
+    <category>2f8206f0-95a4-449e-bf74-3b2cb761de04</category>
+  </categories>
+  <notifications />
+</post>

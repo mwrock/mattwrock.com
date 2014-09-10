@@ -8,7 +8,7 @@
     <siteMapNode url="~/admin/Pages/Pages.aspx" title="pages" description="" rightsAuthorizationCheck="HasAny" rights="CreateNewPages, EditOwnPages, EditOtherUsersPages, PublishOwnPages, PublishOtherUsersPages" />
     <siteMapNode url="~/admin/Tracking/Pingbacks.aspx" title="tracking" description="" rights="AccessAdminPages" />
     <siteMapNode url="~/admin/Widgets/Blogroll.aspx" title="controls" description="" rights="AccessAdminPages" />
-    <siteMapNode url="~/admin/Extensions/default.cshtml" title="Extensions" description="" rights="AccessAdminPages" />
+    <siteMapNode url="~/admin/Extensions/default.cshtml" title="appearance" description="" rights="AccessAdminPages" />
     <siteMapNode url="~/admin/Users/Users.aspx" title="users" description="" rights="EditOtherUsers" />
     <siteMapNode url="~/admin/Settings/Main.aspx" title="settings" rights="AccessAdminSettingsPages" description="" />
   </siteMapNode>

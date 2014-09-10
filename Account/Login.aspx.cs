@@ -37,13 +37,13 @@
             if (this.Request.QueryString.ToString() == "logoff")
             {
                 Security.SignOut();
-                if (this.Request.UrlReferrer != null && this.Request.UrlReferrer != this.Request.Url)
+                if (this.Request.UrlReferrer != null && this.Request.UrlReferrer != this.Request.Url && this.Request.UrlReferrer.LocalPath.IndexOf("/admin/", StringComparison.OrdinalIgnoreCase) == -1)
                 {
                     this.Response.Redirect(this.Request.UrlReferrer.ToString(), true);
                 }
                 else
                 {
-                    this.Response.Redirect("login.aspx");
+                    this.Response.Redirect(BlogEngine.Core.Utils.RelativeWebRoot);
                 }
 
                 return;
@@ -54,7 +54,7 @@
                 return;
             }
 
-            this.Master.SetStatus("warning", "Login failed");
+            this.Master.SetStatus("warning", Resources.labels.loginFailed);
         }
 
         protected void LoginUser_OnAuthenticate(object sender, AuthenticateEventArgs e)

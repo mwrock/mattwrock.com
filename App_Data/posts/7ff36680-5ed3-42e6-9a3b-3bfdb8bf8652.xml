@@ -1,0 +1,504 @@
+﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<post>
+  <author>mwrock</author>
+  <title>Easily test Chocolatey package development with Boxstarter 2.2 Hyper-V integration</title>
+  <description />
+  <content>&lt;p&gt;&lt;a href="http://www.mattwrock.com/image.axd?picture=Hyper-V.png"&gt;&lt;img title="Hyper-V" style="border-top: 0px; border-right: 0px; background-image: none; border-bottom: 0px; padding-top: 0px; padding-left: 0px; margin: 0px 10px 0px 0px; border-left: 0px; display: inline; padding-right: 0px" border="0" alt="Hyper-V" src="http://www.mattwrock.com/image.axd?picture=Hyper-V_thumb.png" width="240" height="60"&gt;&lt;/a&gt;A couple weeks ago I released &lt;a href="http://boxstarter.org/"&gt;Boxstarter&lt;/a&gt; v2.2. The primary feature added is the ability to target Hyper-V VMs. Boxstarter can automatically configure them without any manual setup and can both save and restore checkpoints. You can learn about the details &lt;a href="http://boxstarter.org/VMIntegration"&gt;here&lt;/a&gt;. I’d like to give a big thanks to &lt;a href="http://www.gep13.co.uk/blog/"&gt;Gary Park&lt;/a&gt; (&lt;a href="https://twitter.com/gep13"&gt;@gep13&lt;/a&gt;) for providing early feedback and helping me catch some holes I needed to fill in to make this release a better user experience. I’m sure I have not identified the last of them so please, create an issue or discussion on the &lt;a href="https://boxstarter.codeplex.com/"&gt;Codeplex&lt;/a&gt; site if you run into issues.&lt;/p&gt; &lt;p&gt;This post will discuss how you can use this new feature to greatly reduce the friction involved in &lt;a href="http://chocolatey.org/"&gt;Chocolatey&lt;/a&gt; package development or in the creation of Boxstarter-style chocolatey packages to develop Windows environments leveraging Hyper-V VMs. No additional Windows licenses will be required. More on that later. &lt;/p&gt; &lt;p&gt;NOTE: Both the Boxstarter.HyperV PowerShell module and Microsoft’s Hyper-V module require PowerShell version 3 or higher on the VM host. This is automatically available on Windows 8 and server 2012. On Windows 2008 R2, it can be installed via the &lt;a href="http://chocolatey.org/packages/PowerShell"&gt;Windows Management Framework&lt;/a&gt;.&lt;/p&gt; &lt;h2&gt;Integration testing for Chocolatey packages&lt;/h2&gt; &lt;p&gt;When you are authoring a Chocolatey package, you are likely creating something that changes the state of the machine upon which the package is installed. It may simply install a single piece of software or it may install several pieces of software along with various dependencies and possibly configure services, firewall port rules, IIS sites, databases, etc. As the package author you want to make sure that the package can run and perform the installation reliably and repeatably and perhaps on a variety of OS versions. This is almost impossible to test directly on your dev environment. &lt;/p&gt; &lt;p&gt;You want one or more virtual environments that can be started in a clean state that mimics what you imagine most others will have when they download and install your package. Furthermore, as you work out the kinks of your package, you want to be able to start over again and again and again. Virtual machines make this workflow possible.&lt;/p&gt; &lt;h2&gt;Hyper-V VM technology, there is a good chance you already have it&lt;/h2&gt; &lt;p&gt;There are lots of great VM solutions out there. Besides the cloud solutions provided by Amazon, Microsoft Azure, Rackspace and others, VMWare, Hyper-V and Virtual Box are some very popular non cloud options. Hyper-V is Microsoft’s solution. If you have Windows 8 Pro or greater or Windows 2012 or 2008 R2, this technology is available to you for free. I run Windows 8.1 Pro on a Lenovo X1 laptop with 8GB and can usually have 3 VMs running simultaneously. It works very well.&lt;/p&gt; &lt;p&gt;Simply enable the Hyper-V features on your machine either using the “Turn Windows features on or off” GUI &lt;/p&gt; &lt;p&gt;&lt;a href="http://www.mattwrock.com/image.axd?picture=image_21.png"&gt;&lt;img title="image" style="border-left-width: 0px; border-right-width: 0px; background-image: none; border-bottom-width: 0px; float: none; padding-top: 0px; padding-left: 0px; margin: 0px auto; display: block; padding-right: 0px; border-top-width: 0px" border="0" alt="image" src="http://www.mattwrock.com/image.axd?picture=image_thumb_21.png" width="446" height="391"&gt;&lt;/a&gt;&lt;/p&gt; &lt;p&gt;or from a command line running:&lt;/p&gt;&lt;pre class="csharpcode"&gt;dism.exe /Online /Enable-Feature:Microsoft-Hyper-V /All&lt;/pre&gt;&lt;pre class="csharpcode"&gt;dism.exe /Online /Enable-Feature:Microsoft-Hyper-V-Management-PowerShell&lt;/pre&gt;
+&lt;h2&gt;Creating the VM&lt;/h2&gt;
+&lt;p&gt;The first thing you need to do is create one or more VMs to reproduce the environment you are targeting. Developing Boxstarter, I have 5 VMs:&lt;/p&gt;
+&lt;p&gt;&lt;a href="http://www.mattwrock.com/image.axd?picture=image_22.png"&gt;&lt;img title="image" style="border-left-width: 0px; border-right-width: 0px; background-image: none; border-bottom-width: 0px; float: none; padding-top: 0px; padding-left: 0px; margin: 0px auto; display: block; padding-right: 0px; border-top-width: 0px" border="0" alt="image" src="http://www.mattwrock.com/image.axd?picture=image_thumb_22.png" width="650" height="462"&gt;&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;I have one for every Windows version I care to test on. I save the VM with a base os install with no configuration tweaks other than maybe changing the computer name and adding a admin user. I want to have Windows with the default settings. The first thing you need to get started creating a VM, is a VHD. That is the file type that Hyper-V uses to store the machine. That’s really all a VM is. It’s a file. It can get much more complicated with different VHD formats, differencing disks, Fixed disks, Dynamically growing disks, etc. I’m not going to get into that here and it is not necessary to understand for what I’m going to show you. However if you find yourself working with VMs a lot and want to learn how to maintain them efficiently, you will want to look into those details.&lt;/p&gt;
+&lt;p&gt;There are two main ways that I typically create a clean Windows VHD:&lt;/p&gt;
+&lt;h3&gt;Create a new VHD and mount a Windows Install ISO as a DVD drive&lt;/h3&gt;
+&lt;p&gt;If you have a Windows installation ISO file, you can mount this to the VM as a virtual DVD drive. Remember those? You need to create an empty VHD file which represents a system with no OS installed. The VM will boot from the virtual DVD and walk you through the Windows Install wizard. This can all be done through the Hyper-V GUI or from PowerShell:&lt;/p&gt;&lt;pre class="csharpcode"&gt;New-VM -Name &lt;span class="str"&gt;"myVM"&lt;/span&gt; -MemoryStartupBytes 1GB -NewVHDPath &lt;span class="str"&gt;"D:\VHDs\w81.vhdx"&lt;/span&gt; -NewVHDSizeBytes 60GB
+Set-VMDvdDrive -VMName myVM -Path &lt;span class="str"&gt;"C:\ISOs\EVAL_EN-US-IRM_CENA_X64FREE_EN-US_DV5.iso"&lt;/span&gt;
+Start-VM &lt;span class="str"&gt;"myVM"&lt;/span&gt;&lt;/pre&gt;
+&lt;style type="text/css"&gt;
+
+
+
+
+
+
+
+.csharpcode, .csharpcode pre
+{
+	font-size: small;
+	color: black;
+	font-family: consolas, "Courier New", courier, monospace;
+	background-color: #ffffff;
+	/*white-space: pre;*/
+}
+.csharpcode pre { margin: 0em; }
+.csharpcode .rem { color: #008000; }
+.csharpcode .kwrd { color: #0000ff; }
+.csharpcode .str { color: #006080; }
+.csharpcode .op { color: #0000c0; }
+.csharpcode .preproc { color: #cc6633; }
+.csharpcode .asp { background-color: #ffff00; }
+.csharpcode .html { color: #800000; }
+.csharpcode .attr { color: #ff0000; }
+.csharpcode .alt 
+{
+	background-color: #f4f4f4;
+	width: 100%;
+	margin: 0em;
+}
+.csharpcode .lnum { color: #606060; }&lt;/style&gt;
+
+&lt;p&gt;Once I complete the Windows installation and rename the computer, I create a checkpoint so that I can always snap to the point in time when windows had absolutely no additional configuration beyond installation and computer rename.&lt;/p&gt;&lt;pre class="csharpcode"&gt;Checkpoint-VM -Name &lt;span class="str"&gt;"myVM"&lt;/span&gt; -SnapshotName &lt;span class="str"&gt;"BareOS"&lt;/span&gt;&lt;/pre&gt;
+&lt;style type="text/css"&gt;
+.csharpcode, .csharpcode pre
+{
+	font-size: small;
+	color: black;
+	font-family: consolas, "Courier New", courier, monospace;
+	background-color: #ffffff;
+	/*white-space: pre;*/
+}
+.csharpcode pre { margin: 0em; }
+.csharpcode .rem { color: #008000; }
+.csharpcode .kwrd { color: #0000ff; }
+.csharpcode .str { color: #006080; }
+.csharpcode .op { color: #0000c0; }
+.csharpcode .preproc { color: #cc6633; }
+.csharpcode .asp { background-color: #ffff00; }
+.csharpcode .html { color: #800000; }
+.csharpcode .attr { color: #ff0000; }
+.csharpcode .alt 
+{
+	background-color: #f4f4f4;
+	width: 100%;
+	margin: 0em;
+}
+.csharpcode .lnum { color: #606060; }&lt;/style&gt;
+
+&lt;h3&gt;Create a new VM from an existing base OS VHD&lt;/h3&gt;
+&lt;p&gt;After performing the above procedure from an ISO, I like to “freeze” the VHD of the newly installed OS. To do this, I create a differencing disk of that VHD and mark the original VHD as read only. Now I can create new VMs based on the differencing disk that contains only the difference of the fresh install and all subsequent work. Here, I’ll create a differencing VHD based on the VHD we created for our new VM above and then we will attach it to the new VM:&lt;/p&gt;&lt;pre class="csharpcode"&gt;Stop-VM myVM
+New-VHD -Path &lt;span class="str"&gt;"D:\VHDs\w81diff.vhdx"&lt;/span&gt; -ParentPath &lt;span class="str"&gt;"D:\VHDs\w81.vhdx" &lt;/span&gt;-Differencing
+Set-VMHardDiskDrive -VMName myvm -Path &lt;span class="str"&gt;"D:\VHDs\w81diff.vhdx"&lt;/span&gt;
+Start-VM myVM&lt;/pre&gt;
+&lt;style type="text/css"&gt;
+.csharpcode, .csharpcode pre
+{
+	font-size: small;
+	color: black;
+	font-family: consolas, "Courier New", courier, monospace;
+	background-color: #ffffff;
+	/*white-space: pre;*/
+}
+.csharpcode pre { margin: 0em; }
+.csharpcode .rem { color: #008000; }
+.csharpcode .kwrd { color: #0000ff; }
+.csharpcode .str { color: #006080; }
+.csharpcode .op { color: #0000c0; }
+.csharpcode .preproc { color: #cc6633; }
+.csharpcode .asp { background-color: #ffff00; }
+.csharpcode .html { color: #800000; }
+.csharpcode .attr { color: #ff0000; }
+.csharpcode .alt 
+{
+	background-color: #f4f4f4;
+	width: 100%;
+	margin: 0em;
+}
+.csharpcode .lnum { color: #606060; }&lt;/style&gt;
+
+&lt;h3&gt;&amp;nbsp;&lt;/h3&gt;
+&lt;h3&gt;Downloading evaluation versions of Windows installers&lt;/h3&gt;
+&lt;p&gt;You don't need a purchased copy of Windows or a fancy shmancy MSDN subscription to get a Windows OS for testing purposes. As of this posting, anyone can download evaluation copies of Windows 8.1, Server 2008 R2 and 2012 R2. The evaluation period is between 90 and 180 days depending on the version you download. In addition to the ISO, the server OS versions also provide an option to download VHD’s. These allow you to skip the OS installer. They come with a builtin Administrator account with a password set to &lt;a href="mailto:Pass@word1"&gt;Pass@word1&lt;/a&gt;. Convenient since that is the same password I use for all of my personal online accounts. When the evaluation expires, it is perfectly legal to simply start over from the original installer or VHD. Here are the current URLs you can use to download these evaluations:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href="http://technet.microsoft.com/en-US/evalcenter/hh699156.aspx?ocid=wc-tn-wctc"&gt;Windows 8.1&lt;/a&gt; 
+&lt;li&gt;&lt;a href="http://www.microsoft.com/en-us/download/details.aspx?id=16572"&gt;Server 2008 R2&lt;/a&gt; 
+&lt;li&gt;&lt;a href="http://technet.microsoft.com/en-us/evalcenter/dn205286.aspx"&gt;Server 2012 R2&lt;/a&gt; &lt;/li&gt;&lt;/ul&gt;
+&lt;h3&gt;Connecting the VM to the internet&lt;/h3&gt;
+&lt;p&gt;While it is certainly possible and sometimes desirable to write Chocolatey packages that work fine offline, chances are that you want your VM to be able to access the world wide web. There are several ways to do this. For most “normal” dev environments, the following approach should work.&lt;/p&gt;
+&lt;p&gt;Get a listing of your Network Adapters:&lt;/p&gt;&lt;pre class="csharpcode"&gt;C:\&amp;gt; Get-NetAdapter
+
+Name                      InterfaceDescrip                        ifIndex Status                                                                          s
+----                      --------------------                    ------- -----
+Bluetooth Network Conn... Bluetooth Device (Personal Area Netw...       5 Di...
+Wi-Fi                     Intel(R) Centrino(R) Advanced-N 6205          3 Up&lt;/pre&gt;
+&lt;p&gt;&amp;nbsp;&lt;/p&gt;
+&lt;p&gt;Next add a “Virtual Switch” that binds to your actual network adapter. This only has to be done once on the VM host. The switch can be reused on all guests created on the host. After adding the switch, it can be applied to the VM:&lt;/p&gt;&lt;pre class="csharpcode"&gt;New-VMSwitch -NetAdapterInterfaceName &lt;span class="str"&gt;"Wi-Fi"&lt;/span&gt; -Name MySwitch
+Set-VMSwitch -Name &lt;span class="str"&gt;"myVM"&lt;/span&gt; -VMSwitch &lt;span class="str"&gt;"MySwitch"&lt;/span&gt;&lt;/pre&gt;
+&lt;p&gt;In my case, since I am using a wireless adapter, Hyper-V creates a network bridge and a new Hyper-V adapter that binds to the bridge and that any VM using this switch will use.&lt;/p&gt;
+&lt;h2&gt;&lt;span class="str"&gt;Getting Boxstarter&lt;/span&gt;&lt;/h2&gt;
+&lt;p&gt;&lt;span class="str"&gt;There are lots of ways to get the Boxstarter modules installed. If you have Chocolatey, just CINST Boxstarter. Otherwise, you can download the installer from either the &lt;a href="http://boxstarter.codeplex.com/releases/view/116117"&gt;codeplex&lt;/a&gt; site or &lt;a href="http://boxstarter.org/"&gt;Boxstarter.org&lt;/a&gt; and run the setup.bat in the zip file and then open a new PowerShell window. Since the Boxstarter.HyperV module requires at least PowerShell 3 which can auto load all modules in your PSModulePath and the Boxstarter installer adds the Boxstarter modules to that path, all Boxstarter commands should be available without needing to import any modules explicitly.&lt;/span&gt;&lt;/p&gt;
+&lt;h2&gt;Tell Boxstarter where your packages are and build them&lt;/h2&gt;
+&lt;p&gt;Perhaps the packages you want to test have not yet been pushed to a nuget feed and you want to test the local development version. Boxstarter provides several commands to make creating packages simple. See the &lt;a href="http://boxstarter.org/CreatingPackages"&gt;boxstarter&lt;/a&gt; docs for details. We’ll assume that we have pulled our package repository from source control to a local Packages directory. It has two packages:&lt;/p&gt;
+&lt;p&gt;&lt;a href="http://www.mattwrock.com/image.axd?picture=image_23.png"&gt;&lt;img title="image" style="border-left-width: 0px; border-right-width: 0px; background-image: none; border-bottom-width: 0px; float: none; padding-top: 0px; padding-left: 0px; margin-left: auto; display: block; padding-right: 0px; border-top-width: 0px; margin-right: auto" border="0" alt="image" src="http://www.mattwrock.com/image.axd?picture=image_thumb_23.png" width="240" height="207"&gt;&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;Now we will tell Boxstarter where our local packages are stored by changing Boxstarter’s localRepo setting from the default BuildPackages folder in Boxstarter’s module directory to our package directory.&lt;/p&gt;&lt;pre class="csharpcode"&gt;C:\dev\Packages&amp;gt; Set-BoxstarterConfig –LocalRepo .
+C:\dev\Packages&amp;gt; $Boxstarter
+
+Name                           Value
+----                           -----
+IsRebooting                    False
+NugetSources                   http:&lt;span class="rem"&gt;//chocolatey.org/api/v2;http://www.myget...&lt;/span&gt;
+BaseDir                        C:\Users\Matt\AppData\Roaming\Boxstarter
+LocalRepo                      C:\dev\packages
+RebootOk                       True
+Log                            C:\Users\Matt\AppData\Local\Boxstarter\boxsta...
+SuppressLogging                False&lt;/pre&gt;
+&lt;style type="text/css"&gt;
+
+
+
+
+
+
+
+.csharpcode, .csharpcode pre
+{
+	font-size: small;
+	color: black;
+	font-family: consolas, "Courier New", courier, monospace;
+	background-color: #ffffff;
+	/*white-space: pre;*/
+}
+.csharpcode pre { margin: 0em; }
+.csharpcode .rem { color: #008000; }
+.csharpcode .kwrd { color: #0000ff; }
+.csharpcode .str { color: #006080; }
+.csharpcode .op { color: #0000c0; }
+.csharpcode .preproc { color: #cc6633; }
+.csharpcode .asp { background-color: #ffff00; }
+.csharpcode .html { color: #800000; }
+.csharpcode .attr { color: #ff0000; }
+.csharpcode .alt 
+{
+	background-color: #f4f4f4;
+	width: 100%;
+	margin: 0em;
+}
+.csharpcode .lnum { color: #606060; }&lt;/style&gt;
+
+&lt;p&gt;&amp;nbsp;&lt;/p&gt;
+&lt;p&gt;Checking the $Boxstarter variable that holds our boxstarter settings confirms that Boxstarter is tracking our local repository where we are currently working.&lt;/p&gt;
+&lt;p&gt;Now Boxstarter can build our packages by using the Invoke-BoxstarterBuild command:&lt;/p&gt;
+&lt;pre class="csharpcode"&gt;C:\dev\Packages&amp;gt; Invoke-BoxStarterBuild -all
+Boxstarter: Scanning C:\dev\packages &lt;span class="kwrd"&gt;for&lt;/span&gt; package folders
+Boxstarter: Found directory Git-TF. Looking &lt;span class="kwrd"&gt;for&lt;/span&gt; Git-TF.nuspec
+Calling &lt;span class="str"&gt;'C:\Chocolatey\chocolateyinstall\nuget.exe pack .\Git-TF\Git-TF.nuspec &lt;/span&gt;&lt;span class="str"&gt;-NoPackageAnalysis'&lt;/span&gt;.
+Attempting to build package from &lt;span class="str"&gt;'Git-TF.nuspec'&lt;/span&gt;.
+Successfully created package &lt;span class="str"&gt;'C:\dev\packages\Git-TF.2.0.2.20130214.nupkg'&lt;/span&gt;.
+
+Your package has been built. Using Boxstarter.bat Git-TF or Install-BoxstarterPackage Git-TF will run &lt;span class="kwrd"&gt;this&lt;/span&gt; package.
+Boxstarter: Found directory NugetPackageExplorer. Looking &lt;span class="kwrd"&gt;for&lt;/span&gt; NugetPackageExplorer.nuspec
+Calling &lt;span class="str"&gt;'C:\Chocolatey\chocolateyinstall\nuget.exe pack .\NugetPackageExplorer\NugetPackageExplorer.nuspec &lt;/span&gt;&lt;span class="str"&gt;-NoPackageAnalysis'&lt;/span&gt;.
+Attempting to build package from &lt;span class="str"&gt;'NugetPackageExplorer.nuspec'&lt;/span&gt;.
+Successfully created package &lt;span class="str"&gt;'C:\dev\packages\NugetPackageExplorer.3.7.0.20131203.nupkg'&lt;/span&gt;.
+
+Your package has been built. Using Boxstarter.bat NugetPackageExplorer or Install-BoxstarterPackage NugetPackageExplorer will run &lt;span class="kwrd"&gt;this&lt;/span&gt; package.&lt;/pre&gt;
+&lt;p&gt;
+&lt;style type="text/css"&gt;
+
+
+
+
+
+
+
+.csharpcode, .csharpcode pre
+{
+	font-size: small;
+	color: black;
+	font-family: consolas, "Courier New", courier, monospace;
+	background-color: #ffffff;
+	/*white-space: pre;*/
+}
+.csharpcode pre { margin: 0em; }
+.csharpcode .rem { color: #008000; }
+.csharpcode .kwrd { color: #0000ff; }
+.csharpcode .str { color: #006080; }
+.csharpcode .op { color: #0000c0; }
+.csharpcode .preproc { color: #cc6633; }
+.csharpcode .asp { background-color: #ffff00; }
+.csharpcode .html { color: #800000; }
+.csharpcode .attr { color: #ff0000; }
+.csharpcode .alt 
+{
+	background-color: #f4f4f4;
+	width: 100%;
+	margin: 0em;
+}
+.csharpcode .lnum { color: #606060; }&lt;/style&gt;
+&lt;/p&gt;
+&lt;p&gt;This iterates all folders in our local repo and creates the .nupkg files for all our package nuspec files. Note that if we do not want to build every package we could specify a single package to build:&lt;/p&gt;&lt;pre class="csharpcode"&gt;C:\dev\Packages&amp;gt; Invoke-BoxStarterBuild -Name Git-TF&lt;/pre&gt;
+&lt;style type="text/css"&gt;.csharpcode, .csharpcode pre
+{
+	font-size: small;
+	color: black;
+	font-family: consolas, "Courier New", courier, monospace;
+	background-color: #ffffff;
+	/*white-space: pre;*/
+}
+.csharpcode pre { margin: 0em; }
+.csharpcode .rem { color: #008000; }
+.csharpcode .kwrd { color: #0000ff; }
+.csharpcode .str { color: #006080; }
+.csharpcode .op { color: #0000c0; }
+.csharpcode .preproc { color: #cc6633; }
+.csharpcode .asp { background-color: #ffff00; }
+.csharpcode .html { color: #800000; }
+.csharpcode .attr { color: #ff0000; }
+.csharpcode .alt 
+{
+	background-color: #f4f4f4;
+	width: 100%;
+	margin: 0em;
+}
+.csharpcode .lnum { color: #606060; }
+&lt;/style&gt;
+
+&lt;style type="text/css"&gt;
+
+
+
+
+
+
+
+.csharpcode, .csharpcode pre
+{
+	font-size: small;
+	color: black;
+	font-family: consolas, "Courier New", courier, monospace;
+	background-color: #ffffff;
+	/*white-space: pre;*/
+}
+.csharpcode pre { margin: 0em; }
+.csharpcode .rem { color: #008000; }
+.csharpcode .kwrd { color: #0000ff; }
+.csharpcode .str { color: #006080; }
+.csharpcode .op { color: #0000c0; }
+.csharpcode .preproc { color: #cc6633; }
+.csharpcode .asp { background-color: #ffff00; }
+.csharpcode .html { color: #800000; }
+.csharpcode .attr { color: #ff0000; }
+.csharpcode .alt 
+{
+	background-color: #f4f4f4;
+	width: 100%;
+	margin: 0em;
+}
+.csharpcode .lnum { color: #606060; }&lt;/style&gt;
+
+&lt;h2&gt;Testing the packages in your VMs&lt;/h2&gt;
+&lt;p&gt;Now we are ready to test our packages. Unless the package is incredibly trivial, I like to test on at least a PowerShell 2 and a Powershell 3 (or 4) environment since there are some unobvious incompatibilities between v2 and post v2 versions. We will test against Server 2012 and Server 2008 R2. We can pipe our VM names to Boxstarter’s Enable-BoxstarterVM command which will inspect the VM and ensure that Boxstarter can connect to the VM using PowerShell remoting. If it can not, Boxstarter will manipulate the VM machine’s registry settings in its VHD to enable WMI Firewall rules which will allow Boxstarter to connect and enable PowerShell remoting. We will also ask Boxstarter to restore a checkpoint (named “fresh”) that we previously set which brings the VM to a clean state.&lt;/p&gt;
+&lt;p&gt;After ensuring that it can establish connections to the VMs, Boxstarter copies the Boxstarter modules and the local repository nupkg files to the VM. Then Boxstarter initiates the installation of the package on the VM.&lt;/p&gt;
+&lt;p&gt;So lets have Boxstarter test a package out on our VMs and analyze the console output.&lt;/p&gt;&lt;pre class="csharpcode"&gt;C:\dev\Packages&amp;gt; &lt;span class="str"&gt;"win2012"&lt;/span&gt;,&lt;span class="str"&gt;"win2k8r2"&lt;/span&gt; | Enable-BoxstarterVM
+-Credential $c -CheckpointName fresh | Install-BoxstarterPackage -PackageName NugetPackageExplorer -Force
+Boxstarter: fresh restored on win2012 waiting to complete...
+Boxstarter: Configuring local Powershell Remoting settings...
+Boxstarter: Testing remoting access on win2012...
+Boxstarter: Testing WSMAN...
+Boxstarter: fresh restored on win2k8r2 waiting to complete...
+Boxstarter: Configuring local Powershell Remoting settings...
+Boxstarter: Testing remoting access on WIN-HNB91NNAB2G...
+Boxstarter: Testing WSMAN...
+Boxstarter: Testing WMI...&lt;/pre&gt;
+&lt;p&gt;Here I pipe the names of my VMs to Boxstarter’s Enable-BoxstarterVM command. I have a checkpoint named “fresh” which is my “clean” state so Boxstarter will restore that checkpoint before proceeding. The result of Enable-BoxstarterVM, which is the computer name and credentials of my VMs, is piped to Install-BoxstarterPackage which will perform the package installation.&lt;/p&gt;
+&lt;p&gt;We can see that Boxstarter checks WSMan, the protocol used by PowerShell remoting, and if that is not enabled it also checks WMI. Windows 2012 has PowerShell remoting enabled by default so there is no need to check WMI, but Server 2008 R2, does not have PowerShell remoting enabled and thus checks for WMI. I am using the built-in administrator account and WMI is accessible. Therefore Boxstarter does not need to make any adjustments to the VM’s registry. If WMI was not accesible or if I was using a local user, Boxstarter would need to edit the registry and enable the WMI ports and also enable LocalAccountTokenFilterPolicy for the local user.&lt;/p&gt;
+&lt;p&gt;Also note that the 2008 R2 VM has a different computer name than the VM Name, WIN-HNB91NNAB2G. Boxstarter will find the DNS name of the VM and pass that on to the Install-BoxstarterPackage command which needs that to establish the remote connection.&lt;/p&gt;&lt;pre class="csharpcode"&gt;Boxstarter Version 2.2.56
+(c) 2013 Matt Wrock. http:&lt;span class="rem"&gt;//boxstarter.org&lt;/span&gt;
+
+Boxstarter: Configuring local Powershell Remoting settings...
+Boxstarter: Configuring CredSSP settings...
+Boxstarter: Testing remoting access on win2012...
+Boxstarter: Remoting &lt;span class="kwrd"&gt;is&lt;/span&gt; accesible on win2012
+Boxstarter: Copying Boxstarter Modules and local repo packages at C:\dev\Packages to C:\Users\Matt\AppData\Local\Temp on win2012...
+Boxstarter: Creating a scheduled task to enable CredSSP Authentication on win2012...&lt;/pre&gt;
+&lt;p&gt;Here Boxstarter begins the install on win2012. It determines that remoting to the VM is accessible, copies the Boxstarter modules and the local packages and enables CredSSP (using CredSSP allows Boxstarter packages to access other remote resources that may need the user’s credentials like network shares).&lt;/p&gt;&lt;pre class="csharpcode"&gt;[WIN2012]Boxstarter: Installing package &lt;span class="str"&gt;'NugetPackageExplorer'&lt;/span&gt;
+[WIN2012]Boxstarter: Disabling Automatic Updates from Windows Update
+[WIN2012]Boxstarter: Chocolatey not instaled. Downloading and installing...
+[WIN2012]+ Boxstarter starting Calling Chocolatey to install NugetPackageExplorer. This may take several minutes to complete...
+Chocolatey (v0.9.8.23) &lt;span class="kwrd"&gt;is&lt;/span&gt; installing &lt;span class="str"&gt;'NugetPackageExplorer'&lt;/span&gt; and dependencies. By installing you accept the license &lt;span class="kwrd"&gt;for&lt;/span&gt; &lt;span class="str"&gt;'NugetPackageExplorer'&lt;/span&gt; and each dependency you are installing.
+______ DotNet4.5 v4.5.20120822 ______
+Microsoft .Net 4.5 Framework &lt;span class="kwrd"&gt;is&lt;/span&gt; already installed on your machine.
+______ NugetPackageExplorer v3.7.0.20131203 ______
+Downloading NugetPackageExplorer 64 bit (https:&lt;span class="rem"&gt;//github.com/mwrock/Chocolatey-Packages/raw/master/NugetPackageExplorer/NpeLocalExecutable.zip) to C:\Users\ADMINI~1\AppData\Local\Temp\chocolatey\NugetPackageExplorer\NugetPackageExplorerInstall.zip&lt;/span&gt;
+Extracting C:\Users\ADMINI~1\AppData\Local\Temp\chocolatey\NugetPackageExplorer\NugetPackageExplorerInstall.zip to C:\Chocolatey\lib\NugetPackageExplorer.3.7.0.20131203...
+NugetPackageExplorer has finished successfully! The chocolatey gods have answered your request!
+&lt;span class="str"&gt;'C:\Chocolatey\lib\NugetPackageExplorer.3.7.0.20131203\NugetPackageExplorer.exe'&lt;/span&gt; has been linked &lt;span class="kwrd"&gt;as&lt;/span&gt; a shortcut on your desktop
+File association not found &lt;span class="kwrd"&gt;for&lt;/span&gt; extension .nupkg
+    + CategoryInfo          : NotSpecified: (File associatio...xtension .nupkg
+   :String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+    + PSComputerName        : win2012
+
+Elevating Permissions and running C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe -NoProfile -ExecutionPolicy unrestricted -Command &lt;span class="str"&gt;"&amp;amp; import-module -name  'C:\Chocolatey\chocolateyinstall\helpers\chocolateyInstaller.psm1'; try{cmd /c assoc .nupkg=Nuget.Package; start-sleep 6;}catch{write-error 'That was not
+sucessful';start-sleep 8;throw;}"&lt;/span&gt;. This may take awhile, depending on the statements.
+Elevating Permissions and running C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe -NoProfile -ExecutionPolicy unrestricted -Command &lt;span class="str"&gt;"&amp;amp; import-module -name  'C:\Chocolatey\chocolateyinstall\helpers\chocolateyInstaller.psm1'; try{cmd /c ftype Nuget.Package="&lt;/span&gt;C:\Chocolatey\lib\NugetPackageExplorer.3.7.0.20131203\NugetPackageExplorer.exe&lt;span class="str"&gt;" %1; start-sleep 6;}catch{write-error 'That was not sucessful';start-sleep 8;throw;}"&lt;/span&gt;. This may take awhile, depending on the statements.
+NuGet Package Explorer has finished successfully! The chocolatey gods have answered your request!
+Adding C:\Chocolatey\bin\NuGetPackageExplorer.bat and pointing to &lt;span class="str"&gt;'%DIR%..\lib\nugetpackageexplorer.3.7.0.20131203\nugetpackageexplorer.exe'&lt;/span&gt;.
+Adding C:\Chocolatey\bin\NuGetPackageExplorer and pointing to &lt;span class="str"&gt;'%DIR%..\lib\nugetpackageexplorer.3.7.0.20131203\nugetpackageexplorer.exe'&lt;/span&gt;.
+Setting up NuGetPackageExplorer &lt;span class="kwrd"&gt;as&lt;/span&gt; a non-command line application.
+Finished installing &lt;span class="str"&gt;'NugetPackageExplorer'&lt;/span&gt; and dependencies - &lt;span class="kwrd"&gt;if&lt;/span&gt; errors not shown &lt;span class="kwrd"&gt;in&lt;/span&gt; console, none detected. Check log &lt;span class="kwrd"&gt;for&lt;/span&gt; errors &lt;span class="kwrd"&gt;if&lt;/span&gt; unsure.
+[WIN2012]+ Boxstarter finished Calling Chocolatey to install NugetPackageExplorer. This may take several minutes to complete... 00:00:31.8857706
+[WIN2012]Boxstarter: Enabling Automatic Updates from Windows Update
+
+
+Errors       : {File association not found &lt;span class="kwrd"&gt;for&lt;/span&gt; extension .nupkg}
+ComputerName : win2012
+Completed    : True
+FinishTime   : 12/28/2013 1:05:13 AM
+StartTime    : 12/28/2013 1:04:00 AM&lt;/pre&gt;
+&lt;p&gt;Now we see mostly what we would expect to see if we were doing a vanilla CINST via Chocolatey. What is noteworthy here is that Boxstarter outputs an object to the pipeline for each VM. This object holds basic metadata regarding the installation including any errors encountered. In our case, the installation did produce one non-terminating error. Overall the install is successful.&lt;/p&gt;
+&lt;p&gt;Now Boxstarter moves on to the Server 2008 R2 VM.&lt;/p&gt;&lt;pre class="csharpcode"&gt;Boxstarter: Testing remoting access on WIN-HNB91NNAB2G...
+Boxstarter: Enabling Powershell Remoting on WIN-HNB91NNAB2G
+Boxstarter: PowerShell Remoting enabled successfully
+Boxstarter: Copying Boxstarter Modules and local repo packages at C:\dev\Packages to C:\Users\Matt\AppData\Local\Temp on WIN-HNB91NNAB2G...
+Boxstarter: Creating a scheduled task to enable CredSSP Authentication on WIN-HNB91NNAB2G...&lt;/pre&gt;
+&lt;p&gt;This is slightly different from the Server 2012 install. PowerShell remoting was not initially enabled on Windows 2008 R2; so Boxstarter needed to enable it before it could copy over the Boxstarter modules and local packages. 
+&lt;style type="text/css"&gt;.csharpcode, .csharpcode pre
+{
+	font-size: small;
+	color: black;
+	font-family: consolas, "Courier New", courier, monospace;
+	background-color: #ffffff;
+	/*white-space: pre;*/
+}
+.csharpcode pre { margin: 0em; }
+.csharpcode .rem { color: #008000; }
+.csharpcode .kwrd { color: #0000ff; }
+.csharpcode .str { color: #006080; }
+.csharpcode .op { color: #0000c0; }
+.csharpcode .preproc { color: #cc6633; }
+.csharpcode .asp { background-color: #ffff00; }
+.csharpcode .html { color: #800000; }
+.csharpcode .attr { color: #ff0000; }
+.csharpcode .alt 
+{
+	background-color: #f4f4f4;
+	width: 100%;
+	margin: 0em;
+}
+.csharpcode .lnum { color: #606060; }
+&lt;/style&gt;
+
+&lt;style type="text/css"&gt;.csharpcode, .csharpcode pre
+{
+	font-size: small;
+	color: black;
+	font-family: consolas, "Courier New", courier, monospace;
+	background-color: #ffffff;
+	/*white-space: pre;*/
+}
+.csharpcode pre { margin: 0em; }
+.csharpcode .rem { color: #008000; }
+.csharpcode .kwrd { color: #0000ff; }
+.csharpcode .str { color: #006080; }
+.csharpcode .op { color: #0000c0; }
+.csharpcode .preproc { color: #cc6633; }
+.csharpcode .asp { background-color: #ffff00; }
+.csharpcode .html { color: #800000; }
+.csharpcode .attr { color: #ff0000; }
+.csharpcode .alt 
+{
+	background-color: #f4f4f4;
+	width: 100%;
+	margin: 0em;
+}
+.csharpcode .lnum { color: #606060; }
+&lt;/style&gt;
+&lt;/p&gt;&lt;pre class="csharpcode"&gt;[WIN-HNB91NNAB2G]Boxstarter: Installing package &lt;span class="str"&gt;'NugetPackageExplorer'&lt;/span&gt;
+[WIN-HNB91NNAB2G]Boxstarter: Disabling Automatic Updates from Windows Update
+[WIN-HNB91NNAB2G]Boxstarter: Downloading .net 4.5...
+[WIN-HNB91NNAB2G]Boxstarter: Installing .net 4.5...
+[WIN-HNB91NNAB2G]Boxstarter: Chocolatey not instaled. Downloading and installing...
+
+[WIN-HNB91NNAB2G]Boxstarter: Enabling Automatic Updates from Windows Update
+[WIN-HNB91NNAB2G]Boxstarter: Restart Required. Restarting now...
+Boxstarter: Waiting &lt;span class="kwrd"&gt;for&lt;/span&gt; WIN-HNB91NNAB2G to sever remote session...
+Boxstarter: Waiting &lt;span class="kwrd"&gt;for&lt;/span&gt; WIN-HNB91NNAB2G to respond to remoting...&lt;/pre&gt;
+&lt;p&gt;Next is more activity that we did not see on Server 2012. Server 2008 R2 comes with .Net 2.0 installed. Chocolatey needs at least 4.0 and Boxstarter will install v4.5 if v4.0 is not installed since v4.5 is an “in place upgrade” from 4.0 and thus includes 4.0. After installing .Net4.5 and Chocolatey, there is a pending reboot. Boxstarter needs to reboot the VM before proceeding with the install in order to reduce the risk of a failed install.&lt;/p&gt;
+&lt;p&gt;The remainder of the Server 2008 R2 install is identical to the Server 2012 install and so we will not examine the rest of the output.&lt;/p&gt;
+&lt;style type="text/css"&gt;.csharpcode, .csharpcode pre
+{
+	font-size: small;
+	color: black;
+	font-family: consolas, "Courier New", courier, monospace;
+	background-color: #ffffff;
+	/*white-space: pre;*/
+}
+.csharpcode pre { margin: 0em; }
+.csharpcode .rem { color: #008000; }
+.csharpcode .kwrd { color: #0000ff; }
+.csharpcode .str { color: #006080; }
+.csharpcode .op { color: #0000c0; }
+.csharpcode .preproc { color: #cc6633; }
+.csharpcode .asp { background-color: #ffff00; }
+.csharpcode .html { color: #800000; }
+.csharpcode .attr { color: #ff0000; }
+.csharpcode .alt 
+{
+	background-color: #f4f4f4;
+	width: 100%;
+	margin: 0em;
+}
+.csharpcode .lnum { color: #606060; }
+&lt;/style&gt;
+
+
+
+
+
+&lt;p&gt;Now your VMs should have the NugetPacketExplorer installed and all *.Nupkg files should be associated with that application.&lt;/p&gt;
+&lt;p&gt;&lt;a href="http://www.mattwrock.com/image.axd?picture=image_24.png"&gt;&lt;img title="image" style="border-top: 0px; border-right: 0px; background-image: none; border-bottom: 0px; padding-top: 0px; padding-left: 0px; margin: 0px 10px 0px 0px; border-left: 0px; display: inline; padding-right: 0px" border="0" alt="image" src="http://www.mattwrock.com/image.axd?picture=image_thumb_24.png" width="631" height="536"&gt;&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&amp;nbsp;&lt;/p&gt;
+&lt;p&gt;&amp;nbsp;&lt;/p&gt;
+&lt;p&gt;&amp;nbsp;&lt;/p&gt;
+&lt;h2&gt;Creating Checkpoints&lt;/h2&gt;
+&lt;p&gt;In the Enable-BoxstarterVM call we saw above, we restored to a known clean state that we had previously saved. However, we can also have Boxstarter create the clean state. In the example we used above, we hade a checkpoint named “fresh” that Boxstarter restored. If that checkpoint did not exist, Boxstarter would have created one just after exiting Enable-BoxstarterVM.&lt;/p&gt;
+&lt;h2&gt;Rolling package testing into Continuous Integration&lt;/h2&gt;
+&lt;p&gt;This post shows you how you can use Boxstarter and Hyper-V to create an environment where you can easily test package development. However, wouldn’t it be great to take this to the next level and have your package checkins automatically kickoff a package install on a Azure or AWS VM? My next post will explore just that which will be possible when I release the Windows Azure integration.&lt;/p&gt;</content>
+  <ispublished>True</ispublished>
+  <isdeleted>False</isdeleted>
+  <iscommentsenabled>True</iscommentsenabled>
+  <pubDate>2013-12-29 01:42:00</pubDate>
+  <lastModified>2013-12-29 02:07:43</lastModified>
+  <raters>0</raters>
+  <rating>0</rating>
+  <slug>Easily-test-Chocolatey-package-development-with-Boxstarter-22-Hyper-V-integration</slug>
+  <tags />
+  <comments>
+    <comment id="29bf3645-77f5-4c6e-9844-22c01149925f" parentid="00000000-0000-0000-0000-000000000000" approved="True" spam="False" deleted="False">
+      <date>2013-12-29 19:17:54</date>
+      <author>scoop.it</author>
+      <email>pingback</email>
+      <country />
+      <ip>89.30.105.121</ip>
+      <website>http://www.scoop.it/t/dsl/p/4013384811/2013/12/29/matt-wrock-s-blog-easily-test-chocolatey-package-development-with-boxstarter-2-2-hyper-v-integration</website>
+      <content>Pingback from scoop.it
+
+Matt Wrock's Blog | Easily test Chocolatey pack...</content>
+    </comment>
+    <comment id="ce4c0f0f-a433-4a5f-befd-d532127f558f" parentid="00000000-0000-0000-0000-000000000000" approved="True" spam="False" deleted="False">
+      <date>2014-01-26 02:57:27</date>
+      <author>Matt Wrock's Blog</author>
+      <email>trackback</email>
+      <country />
+      <ip>131.107.159.115</ip>
+      <website>http://feedproxy.google.com/~r/Wrockblog/~3/4tq1Z-CnLFY/post.aspx</website>
+      <content>Automate the Install and setup of a Team Foundation 2013 Server with Build services on a Azure VM with Boxstarter
+
+Last week I released version 2.3 of Boxstarter which includes some Azure VM integration features to Boxstarter</content>
+    </comment>
+    <comment id="131ae3c2-03c6-405f-ae33-02cb96410099" parentid="00000000-0000-0000-0000-000000000000" approved="True" spam="False" deleted="False">
+      <date>2014-08-19 01:21:36</date>
+      <author>mattwp.azurewebsites.net</author>
+      <email>pingback</email>
+      <country />
+      <ip>168.62.22.219</ip>
+      <website>http://mattwp.azurewebsites.net/?p=1481</website>
+      <content>Pingback from mattwp.azurewebsites.net
+
+Automate the Install and setup of a Team Foundation 2013 Server with Build services on a Azure VM with Boxstarter | mattwrock</content>
+    </comment>
+  </comments>
+  <categories>
+    <category>219109f8-7b0b-459b-8f25-9ce747eb0851</category>
+  </categories>
+  <notifications />
+</post>

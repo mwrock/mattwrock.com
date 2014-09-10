@@ -5,8 +5,14 @@
     using Resources;
     using BlogEngine.Core;
     using BlogEngine.Core.Json;
+    using System.Web.Security;
+    using System.Linq;
     using App_Code;
     using Page = System.Web.UI.Page;
+    using BlogEngine.Core.Providers;
+    using System.Configuration;
+    using System.Web.Configuration;
+    using System.IO;
 
     public partial class Advanced : Page
     {
@@ -18,11 +24,19 @@
         {
             WebUtils.CheckRightsForAdminSettingsPage(false);
 
+            BindRoles();
             BindSettings();
 
             Page.MaintainScrollPositionOnPostBack = true;
             Page.Title = labels.settings;
             base.OnInit(e);
+        }
+
+        private void BindRoles()
+        {
+            ddlSelfRegistrationInitialRole.AppendDataBoundItems = true;
+            ddlSelfRegistrationInitialRole.DataSource = Roles.GetAllRoles().Where(r => !r.Equals(BlogConfig.AnonymousRole, StringComparison.OrdinalIgnoreCase));
+            ddlSelfRegistrationInitialRole.DataBind();
         }
 
         /// <summary>
@@ -37,19 +51,66 @@
             var settings = BlogSettings.Instance;
 
             cbEnableCompression.Checked = settings.EnableHttpCompression;
-            cbRemoveWhitespaceInStyleSheets.Checked = settings.RemoveWhitespaceInStyleSheets;
+            if (!Blog.CurrentInstance.IsPrimary) { cbEnableCompression.Enabled = false; }
+            cbEnableOptimization.Checked = settings.EnableOptimization;
+            if (!Blog.CurrentInstance.IsPrimary) { cbEnableOptimization.Enabled = false; }
             cbCompressWebResource.Checked = settings.CompressWebResource;
+            if (!Blog.CurrentInstance.IsPrimary) { cbCompressWebResource.Enabled = false; }
             cbEnableOpenSearch.Checked = settings.EnableOpenSearch;
             cbRequireSslForMetaWeblogApi.Checked = settings.RequireSslMetaWeblogApi;
             rblWwwSubdomain.SelectedValue = settings.HandleWwwSubdomain;
-            cbEnablePingBackSend.Checked = settings.EnablePingBackSend;
-            cbEnablePingBackReceive.Checked = settings.EnablePingBackReceive;
-            cbEnableTrackBackSend.Checked = settings.EnableTrackBackSend;
-            cbEnableTrackBackReceive.Checked = settings.EnableTrackBackReceive;
             cbEnableErrorLogging.Checked = settings.EnableErrorLogging;
+            if (!Blog.CurrentInstance.IsPrimary) { cbEnableErrorLogging.Enabled = false; }
+            txtGalleryFeed.Text = settings.GalleryFeedUrl;
+            if (!Blog.CurrentInstance.IsPrimary) { txtGalleryFeed.Enabled = false; }
             cbAllowRemoteFileDownloads.Checked = settings.AllowServerToDownloadRemoteFiles;
             txtRemoteTimeout.Text = settings.RemoteFileDownloadTimeout.ToString();
             txtRemoteMaxFileSize.Text = settings.RemoteMaxFileSize.ToString();
+            cbEnablePasswordReset.Checked = BlogSettings.Instance.EnablePasswordReset;
+            cbEnableSelfRegistration.Checked = BlogSettings.Instance.EnableSelfRegistration;
+            if (!Blog.CurrentInstance.IsPrimary) { cbCreateBlogOnSelfRegistration.Enabled = false; }
+            cbCreateBlogOnSelfRegistration.Checked = BlogSettings.Instance.CreateBlogOnSelfRegistration;
+            Utils.SelectListItemByValue(ddlSelfRegistrationInitialRole, BlogSettings.Instance.SelfRegistrationInitialRole);
+            if (!Page.IsPostBack)
+            {
+                ddlProvider.DataSource = BlogService.FileSystemProviders;
+                ddlProvider.DataTextField = "Description";
+                ddlProvider.DataValueField = "Name";
+                ddlProvider.DataBind();
+                ddlProvider.SelectedValue = BlogService.FileSystemProvider.Name;
+                hdnProvider.Value = BlogService.FileSystemProvider.Name;
+            }
+        }
+
+        protected void btnChangeProvider_Click(object sender, EventArgs e)
+        {
+            providerError.Visible = false;
+            var zipArchive = Server.MapPath(string.Format("{0}FileSystemBackup-{1}.zip", Blog.CurrentInstance.StorageLocation, DateTime.Now.ToString("yyyy-MM-dd-HH-mm-ss")));
+            var msg = new BlogEngine.Core.FileSystem.FileSystemUtilities().DumpProvider(ddlProvider.SelectedValue.ToString(), zipArchive);
+            if (!string.IsNullOrWhiteSpace(msg))
+            {
+                providerError.Visible = true;
+                providerError.Text = msg;
+            }
+            else
+                hdnProvider.Value = ddlProvider.SelectedValue.ToString();
+        }
+
+        protected void btnDownloadArchive_Click(object sender, EventArgs e)
+        {
+            var zipArchive = Server.MapPath(string.Format("{0}FileSystemBackup-{1}.zip", Blog.CurrentInstance.StorageLocation, DateTime.Now.ToString("yyyy-MM-dd-HH-mm-ss")));
+            new BlogEngine.Core.FileSystem.FileSystemUtilities().CompressDirectory(zipArchive, Blog.CurrentInstance.RootFileStore);
+            var file = new FileInfo(zipArchive);
+            byte[] Buffer = null;
+            System.IO.FileStream FileStream = new System.IO.FileStream(file.FullName, System.IO.FileMode.Open, System.IO.FileAccess.Read);
+            System.IO.BinaryReader BinaryReader = new System.IO.BinaryReader(FileStream);
+            long TotalBytes = file.Length;
+            Buffer = BinaryReader.ReadBytes((int)TotalBytes);
+            FileStream.Close();
+            FileStream.Dispose();
+            BinaryReader.Close();
+            Response.AppendHeader("Content-Disposition", string.Format("attachment; filename=\"{0}\"", file.Name));
+            Response.BinaryWrite(Buffer);
         }
 
         /// <summary>
@@ -69,22 +130,24 @@
         /// <param name="allowRemoteFileDownloads"></param>
         /// <param name="remoteTimeout"></param>
         /// <param name="remoteMaxFileSize"></param>
+        /// <param name="galleryFeedUrl">Online gallery feed URL</param>
         /// <returns></returns>
         [WebMethod]
         public static JsonResponse Save(bool enableCompression, 
-			bool removeWhitespaceInStyleSheets,
+			bool enableOptimization,
             bool compressWebResource,
             bool enableOpenSearch,
             bool requireSslForMetaWeblogApi,
 			string wwwSubdomain,
-            bool enableTrackBackSend,
-            bool enableTrackBackReceive,
-            bool enablePingBackSend,
-            bool enablePingBackReceive,
             bool enableErrorLogging,
             bool allowRemoteFileDownloads,
             int remoteTimeout,
-            int remoteMaxFileSize)
+            int remoteMaxFileSize,
+            string galleryFeedUrl,
+            string enablePasswordReset,
+            string enableSelfRegistration,
+            string createBlogOnSelfRegistration,
+            string selfRegistrationInitialRole)
         {
             var response = new JsonResponse { Success = false };
             var settings = BlogSettings.Instance;
@@ -109,25 +172,24 @@
                 else if (remoteMaxFileSize < 0)
                 {
                     throw new ArgumentOutOfRangeException("RemoteMaxFileSize must be greater than or equal to 0 bytes.");
-                }
-
-         
+                }  
 
                 settings.EnableHttpCompression = enableCompression;
-                settings.RemoveWhitespaceInStyleSheets = removeWhitespaceInStyleSheets;
+                settings.EnableOptimization = enableOptimization;
                 settings.CompressWebResource = compressWebResource;
                 settings.EnableOpenSearch = enableOpenSearch;
                 settings.RequireSslMetaWeblogApi = requireSslForMetaWeblogApi;
                 settings.HandleWwwSubdomain = wwwSubdomain;
-                settings.EnableTrackBackSend = enableTrackBackSend;
-                settings.EnableTrackBackReceive = enableTrackBackReceive;
-                settings.EnablePingBackSend = enablePingBackSend;
-                settings.EnablePingBackReceive = enablePingBackReceive;
                 settings.EnableErrorLogging = enableErrorLogging;
+                settings.GalleryFeedUrl = galleryFeedUrl;
 
                 settings.AllowServerToDownloadRemoteFiles = allowRemoteFileDownloads;
                 settings.RemoteFileDownloadTimeout = remoteTimeout;
                 settings.RemoteMaxFileSize = remoteMaxFileSize;
+                settings.EnablePasswordReset = bool.Parse(enablePasswordReset);
+                settings.EnableSelfRegistration = bool.Parse(enableSelfRegistration);
+                settings.CreateBlogOnSelfRegistration = bool.Parse(createBlogOnSelfRegistration);
+                settings.SelfRegistrationInitialRole = selfRegistrationInitialRole;
 
                 settings.Save();
             }

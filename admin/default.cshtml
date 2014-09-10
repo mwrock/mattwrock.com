@@ -24,6 +24,15 @@
                     <a class="deleteAction" href="#" onclick="return ProcessTrash('Purge', 'All');">@Resources.labels.emptyTrash</a>
                 </div>
             </div>
+            <div class="dashboardWidget rounded">
+                <div class="rounded">
+                    <h2>Logfile</h2>
+                    <a class="deleteAction" href="#" onclick="return PurgeLogfile();">@Resources.labels.emptyLog</a>
+                    <div style="overflow: auto; font-size:smaller; height: 200px;">
+                        @Helpers.DashboardHelper.GetLog();
+                    </div>
+                </div>
+            </div>      
         </div>
         <div id="widgets" style="width:38%;">
             <div class="dashboardWidget">

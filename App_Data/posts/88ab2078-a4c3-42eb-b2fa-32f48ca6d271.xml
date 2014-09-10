@@ -1,0 +1,75 @@
+﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<post>
+  <author>mwrock</author>
+  <title>Released: RequestReduce 1.3 Now Runs on .net 3.5 and a Preview of Support for Third Party Javascripts in your Minification and Merge Process</title>
+  <description />
+  <content>&lt;h2&gt;Welcome .net 3.5 Users!&lt;/h2&gt;
+&lt;p&gt;Earlier (MUCH earlier) this morning I released version 1.3 of &lt;a href="http://www.RequestReduce.com"&gt;RequestReduce&lt;/a&gt;. While not as exciting as the previous javascript crunching and merging release, I am very happy that a broader base of users will now have access to this resource. It can now be installed on any server running .net 3.5. Huge thanks to my co worker &lt;a href="http://www.eworldui.net/blog/"&gt;Matt Hawley&lt;/a&gt; (@matthawley) for this pull request.&lt;/p&gt;
+&lt;p&gt;As part of this effort, Matt ripped out the Sql synchronization code and moved it into a new assembly RequestReduce.SqlServer which is now available as a separate nuget package. This code uses EntityFramework Code First which is limited to .net4.0. So if you need this functionality (most do not), you must be running .net4 (I&amp;rsquo;m also open to pull requests using a different data access strategy &amp;ndash; not at all married to EF). If you are interested in learning more about synchronizing RequestReduce across multiple servers using SqlServer, see this &lt;a href="https://github.com/mwrock/RequestReduce/wiki/Will-RequestReduce-sync-css%2C-javascript-and-sprite-image-files-accross-all-of-the-web-servers-in-my-web-farm%3F"&gt;wiki&lt;/a&gt;.&lt;/p&gt;
+&lt;h2&gt;What else is in this release?&lt;/h2&gt;
+&lt;ol&gt;
+&lt;li&gt;Fixed javascript inside IE conditional comments. RequestReduce will ignore these just as it does with CSS links inside conditional comments&lt;/li&gt;
+&lt;li&gt;Added a configuration setting to turn off image spriting: imageSpritingDisabled&lt;/li&gt;
+&lt;li&gt;Added some optimizations to the Response filter&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h2&gt;Troubleshooting Guide&lt;/h2&gt;
+&lt;p&gt;In addition to these features, I have added a &lt;a href="https://github.com/mwrock/RequestReduce/wiki/RequestReduce-is-not-working.-I-don%27t-see-any-spriting-or-minification.-How-can-I-troubleshoot-this%3F"&gt;troubleshooting wiki&lt;/a&gt; to the github site. I have gotten a couple issues reported from people who were unable to get RequestReduce running at first due to issues in their environment. This guide should allow most users to at least begin troubleshooting their situation. However, if for any reason you find yourself spending a lot of time investigating this, please do not hesitate to &lt;a href="https://github.com/mwrock/RequestReduce/issues"&gt;file an issue&lt;/a&gt; and I will get on it usually within 24 hours. If most cannot successfully use RequestReduce from a typical nuget install, I have failed.&lt;/p&gt;
+&lt;h2&gt;What&amp;rsquo;s Next?&lt;/h2&gt;
+&lt;p&gt;The two key features up next for RequestReduce are:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;Support for the CSS Media attribute. RequestReduce has no awareness of this attribute and ignores it. While most do not use this, it can have breaking consequences right now with RequestReduce.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Automatic Content refreshing&lt;/strong&gt;. This is a feature I&amp;rsquo;m particularly excited about because it will not only make changing content refresh more quickly, &lt;strong&gt;it will allow users to have many third party scripts included in the crunch and merge process&lt;/strong&gt;. Right now RequestReduce ignores many third party scripts that have expiring headers. With this feature, RequestReduce will occasionally send a head request to the original script in the background to see if content has changed, if it has, RequestReduce will refetch and reduce the content.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;This Release (1.3) is now available at &lt;a href="http://www.RequestReduce.com"&gt;http://www.RequestReduce.com&lt;/a&gt; and on Nuget. Don&amp;rsquo;t forget: if there are features in RequestReduce you would like to see added, please suggest them on the &lt;a href="https://github.com/mwrock/RequestReduce/issues"&gt;github issues page&lt;/a&gt;. I received two requests last week and both were added to this release.&lt;/p&gt;</content>
+  <ispublished>True</ispublished>
+  <isdeleted>False</isdeleted>
+  <iscommentsenabled>True</iscommentsenabled>
+  <pubDate>2011-10-24 13:44:00</pubDate>
+  <lastModified>2013-06-01 01:32:09</lastModified>
+  <raters>0</raters>
+  <rating>0</rating>
+  <slug>Released-RequestReduce-13-Now-runs-on-net-35</slug>
+  <tags />
+  <comments>
+    <comment id="7a8ddbc4-a24c-46ff-bb45-b05bca8539c1" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="False">
+      <date>2013-07-15 21:06:35</date>
+      <author>voyance en ligne</author>
+      <email>isabelleechevarria@yahoo.com</email>
+      <country />
+      <ip>217.195.202.11</ip>
+      <moderatedby>App_Code.Extensions.StopForumSpam</moderatedby>
+      <avatar />
+      <content>Horoscope poissons demain cameltoe  horoscope de la semaine amour
+
+Review my website ::  voyance en ligne - http://www.mavoyancegratuite.biz </content>
+    </comment>
+    <comment id="a66f92c9-710d-4765-bd99-20e8ecd75aaf" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="False">
+      <date>2013-07-15 21:20:13</date>
+      <author>zappos michael kors shoes</author>
+      <email>casimira.burks@bigstring.com</email>
+      <country />
+      <ip>108.163.197.62</ip>
+      <moderatedby>App_Code.Extensions.StopForumSpam</moderatedby>
+      <avatar />
+      <content>Is certainly Saeng first solitary enterprise and she showed any eaterie immediately chanel handbags for cheap can plunge to the other side, backward and forward. And actress Hilary Swank got a taste of it when she popped back stage at the michael kors outlet online Rodeo Drive boutique. The company had said at the time of the year, the company owned 177 retail stores. Step two is educating families about how to obtain michael kors outlet online purses on sale.
+
+my web-site -  zappos michael kors shoes - http://www.avlogbook.com/michael-kors-handbags.html </content>
+    </comment>
+    <comment id="54a7a21e-0328-469a-bc6e-724e085da8f6" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="False">
+      <date>2013-07-15 21:29:07</date>
+      <author>toms outlet</author>
+      <email>kristianparr@googlemail.com</email>
+      <country />
+      <ip>199.188.109.60</ip>
+      <moderatedby>App_Code.Extensions.StopForumSpam</moderatedby>
+      <avatar />
+      <content>I&amp;#39;m not sure why but this web site is loading extremely slow for me. Is anyone else having this problem or is it a problem on my end? I&amp;#39;ll check back later on and see if the problem still exists.
+
+Here is my homepage  toms outlet - http://www.wattographs.com/js/toms_shoes.aspx </content>
+    </comment>
+  </comments>
+  <categories>
+    <category>2f8206f0-95a4-449e-bf74-3b2cb761de04</category>
+  </categories>
+  <notifications />
+</post>

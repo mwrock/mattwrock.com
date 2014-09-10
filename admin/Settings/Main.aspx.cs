@@ -25,20 +25,12 @@
             WebUtils.CheckRightsForAdminSettingsPage(false);
 
             BindCultures();
-            BindRoles();
             BindSettings();
 
             Page.MaintainScrollPositionOnPostBack = true;
             Page.Title = labels.settings;
 
             base.OnInit(e);
-        }
-
-        private void BindRoles()
-        {
-            ddlSelfRegistrationInitialRole.AppendDataBoundItems = true;
-            ddlSelfRegistrationInitialRole.DataSource = Roles.GetAllRoles().Where(r => !r.Equals(BlogConfig.AnonymousRole, StringComparison.OrdinalIgnoreCase));
-            ddlSelfRegistrationInitialRole.DataBind();
         }
 
         /// <summary>
@@ -66,9 +58,8 @@
             ddlCulture.SelectedValue = BlogSettings.Instance.Culture;
             txtTimeZone.Text = BlogSettings.Instance.Timezone.ToString();
             cbShowPostNavigation.Checked = BlogSettings.Instance.ShowPostNavigation;
-            cbEnablePasswordReset.Checked = BlogSettings.Instance.EnablePasswordReset;
-            cbEnableSelfRegistration.Checked = BlogSettings.Instance.EnableSelfRegistration;
-            Utils.SelectListItemByValue(ddlSelfRegistrationInitialRole, BlogSettings.Instance.SelfRegistrationInitialRole);
+            cbRemoveFileExtension.Checked = BlogSettings.Instance.RemoveExtensionsFromUrls;
+            cbRedirectToRemoveFileExtension.Checked = BlogSettings.Instance.RedirectToRemoveFileExtension;
         }
 
         /// <summary>
@@ -138,26 +129,26 @@
         /// <param name="selfRegistrationInitialRole">Self registration initial role</param>
         /// <returns></returns>
         [WebMethod]
-        public static JsonResponse Save(string name, 
-			string desc,
-			string postsPerPage,
-			string themeCookieName,
-			string useBlogNameInPageTitles,
-			string enableRelatedPosts,
-			string enableRating,
-			string showDescriptionInPostList,
-			string descriptionCharacters,
-			string showDescriptionInPostListForPostsByTagOrCategory,
-			string descriptionCharactersForPostsByTagOrCategory,
-			string timeStampPostLinks,
-			string showPostNavigation,
-			string culture,
-			string timezone,
-            string enablePasswordReset,
-			string enableSelfRegistration,
-            string selfRegistrationInitialRole)
+        public static JsonResponse Save(string name,
+            string desc,
+            string postsPerPage,
+            string themeCookieName,
+            string useBlogNameInPageTitles,
+            string enableRelatedPosts,
+            string enableRating,
+            string showDescriptionInPostList,
+            string descriptionCharacters,
+            string showDescriptionInPostListForPostsByTagOrCategory,
+            string descriptionCharactersForPostsByTagOrCategory,
+            string timeStampPostLinks,
+            string showPostNavigation,
+            string culture,
+            string timezone,
+            string removeFileExtension,
+            string redirectToRemoveFileExtension)
         {
-            var response = new JsonResponse {Success = false};
+            var response = new JsonResponse { Success = false };
+            var recycle = false;
 
             if (!WebUtils.CheckRightsForAdminSettingsPage(true))
             {
@@ -169,26 +160,31 @@
             {
                 BlogSettings.Instance.Name = name;
                 BlogSettings.Instance.Description = desc;
-				BlogSettings.Instance.PostsPerPage = int.Parse(postsPerPage);
-				BlogSettings.Instance.ThemeCookieName = themeCookieName;
-				BlogSettings.Instance.UseBlogNameInPageTitles = bool.Parse(useBlogNameInPageTitles);
-				BlogSettings.Instance.EnableRelatedPosts = bool.Parse(enableRelatedPosts);
-				BlogSettings.Instance.EnableRating = bool.Parse(enableRating);
-				BlogSettings.Instance.ShowDescriptionInPostList = bool.Parse(showDescriptionInPostList);
-				BlogSettings.Instance.DescriptionCharacters = int.Parse(descriptionCharacters);
-				BlogSettings.Instance.ShowDescriptionInPostListForPostsByTagOrCategory =
-					bool.Parse(showDescriptionInPostListForPostsByTagOrCategory);
-				BlogSettings.Instance.DescriptionCharactersForPostsByTagOrCategory =
-					int.Parse(descriptionCharactersForPostsByTagOrCategory);
-				BlogSettings.Instance.TimeStampPostLinks = bool.Parse(timeStampPostLinks);
-				BlogSettings.Instance.ShowPostNavigation = bool.Parse(showPostNavigation);
-				BlogSettings.Instance.Culture = culture;
-				BlogSettings.Instance.Timezone = double.Parse(timezone);
-                BlogSettings.Instance.EnablePasswordReset = bool.Parse(enablePasswordReset);
-				BlogSettings.Instance.EnableSelfRegistration = bool.Parse(enableSelfRegistration);
-                BlogSettings.Instance.SelfRegistrationInitialRole = selfRegistrationInitialRole;
+                BlogSettings.Instance.PostsPerPage = int.Parse(postsPerPage);
+                BlogSettings.Instance.ThemeCookieName = themeCookieName;
+                BlogSettings.Instance.UseBlogNameInPageTitles = bool.Parse(useBlogNameInPageTitles);
+                BlogSettings.Instance.EnableRelatedPosts = bool.Parse(enableRelatedPosts);
+                BlogSettings.Instance.EnableRating = bool.Parse(enableRating);
+                BlogSettings.Instance.ShowDescriptionInPostList = bool.Parse(showDescriptionInPostList);
+                BlogSettings.Instance.DescriptionCharacters = int.Parse(descriptionCharacters);
+                BlogSettings.Instance.ShowDescriptionInPostListForPostsByTagOrCategory =
+                    bool.Parse(showDescriptionInPostListForPostsByTagOrCategory);
+                BlogSettings.Instance.DescriptionCharactersForPostsByTagOrCategory =
+                    int.Parse(descriptionCharactersForPostsByTagOrCategory);
+                BlogSettings.Instance.TimeStampPostLinks = bool.Parse(timeStampPostLinks);
+                BlogSettings.Instance.ShowPostNavigation = bool.Parse(showPostNavigation);
+                BlogSettings.Instance.Culture = culture;
+                BlogSettings.Instance.Timezone = double.Parse(timezone);
 
+                if (BlogSettings.Instance.RemoveExtensionsFromUrls != bool.Parse(removeFileExtension))
+                    recycle = true;
+
+                BlogSettings.Instance.RemoveExtensionsFromUrls = bool.Parse(removeFileExtension);
+                BlogSettings.Instance.RedirectToRemoveFileExtension = bool.Parse(redirectToRemoveFileExtension);
                 BlogSettings.Instance.Save();
+
+                // recycle to reload some static variables
+                if (recycle) Utils.RecycleIIS();
             }
             catch (Exception ex)
             {

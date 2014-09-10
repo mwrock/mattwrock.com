@@ -5,6 +5,7 @@
   <Description>Settings for the SimpleCaptcha control</Description>
   <Enabled>false</Enabled>
   <Priority>2</Priority>
+  <SubBlogEnabled>true</SubBlogEnabled>
   <Settings>
     <Delimiter>44</Delimiter>
     <Help>To get started with SimpleCaptcha, just provide some captcha instructions for your users in the &lt;b&gt;CaptchaLabel&lt;/b&gt;
@@ -47,6 +48,227 @@
     <ShowAdd>true</ShowAdd>
     <ShowDelete>true</ShowDelete>
     <ShowEdit>true</ShowEdit>
+    <BlogId xsi:nil="true" />
+  </Settings>
+  <Settings>
+    <Delimiter>44</Delimiter>
+    <Help>To get started with SimpleCaptcha, just provide some captcha instructions for your users in the &lt;b&gt;CaptchaLabel&lt;/b&gt;
+                                field and the value you require from your users in order to post a comment in the &lt;b&gt;CaptchaAnswer&lt;/b&gt; field.</Help>
+    <Hidden>false</Hidden>
+    <Index>0</Index>
+    <IsScalar>true</IsScalar>
+    <KeyField>CaptchaLabel</KeyField>
+    <Name>SimpleCaptcha</Name>
+    <Parameters>
+      <KeyField>true</KeyField>
+      <Label>Your captcha's label</Label>
+      <MaxLength>30</MaxLength>
+      <Name>CaptchaLabel</Name>
+      <ParamType>String</ParamType>
+      <Required>true</Required>
+      <SelectedValue />
+      <Values>5+5 = </Values>
+    </Parameters>
+    <Parameters>
+      <KeyField>true</KeyField>
+      <Label>Your captcha's expected value</Label>
+      <MaxLength>30</MaxLength>
+      <Name>CaptchaAnswer</Name>
+      <ParamType>String</ParamType>
+      <Required>true</Required>
+      <SelectedValue />
+      <Values>10</Values>
+    </Parameters>
+    <Parameters>
+      <KeyField>false</KeyField>
+      <Label>Show Captcha For Authenticated Users</Label>
+      <MaxLength>1</MaxLength>
+      <Name>ShowForAuthenticatedUsers</Name>
+      <ParamType>Boolean</ParamType>
+      <Required>true</Required>
+      <SelectedValue />
+      <Values>False</Values>
+    </Parameters>
+    <ShowAdd>true</ShowAdd>
+    <ShowDelete>true</ShowDelete>
+    <ShowEdit>true</ShowEdit>
+    <BlogId>38e5d162-2a63-45c9-b130-e60dd0edb2a2</BlogId>
+  </Settings>
+  <Settings>
+    <Delimiter>44</Delimiter>
+    <Help>To get started with SimpleCaptcha, just provide some captcha instructions for your users in the &lt;b&gt;CaptchaLabel&lt;/b&gt;
+                                field and the value you require from your users in order to post a comment in the &lt;b&gt;CaptchaAnswer&lt;/b&gt; field.</Help>
+    <Hidden>false</Hidden>
+    <Index>0</Index>
+    <IsScalar>true</IsScalar>
+    <KeyField>CaptchaLabel</KeyField>
+    <Name>SimpleCaptcha</Name>
+    <Parameters>
+      <KeyField>true</KeyField>
+      <Label>Your captcha's label</Label>
+      <MaxLength>30</MaxLength>
+      <Name>CaptchaLabel</Name>
+      <ParamType>String</ParamType>
+      <Required>true</Required>
+      <SelectedValue />
+      <Values>5+5 = </Values>
+    </Parameters>
+    <Parameters>
+      <KeyField>true</KeyField>
+      <Label>Your captcha's expected value</Label>
+      <MaxLength>30</MaxLength>
+      <Name>CaptchaAnswer</Name>
+      <ParamType>String</ParamType>
+      <Required>true</Required>
+      <SelectedValue />
+      <Values>10</Values>
+    </Parameters>
+    <Parameters>
+      <KeyField>false</KeyField>
+      <Label>Show Captcha For Authenticated Users</Label>
+      <MaxLength>1</MaxLength>
+      <Name>ShowForAuthenticatedUsers</Name>
+      <ParamType>Boolean</ParamType>
+      <Required>true</Required>
+      <SelectedValue />
+      <Values>False</Values>
+    </Parameters>
+    <ShowAdd>true</ShowAdd>
+    <ShowDelete>true</ShowDelete>
+    <ShowEdit>true</ShowEdit>
+    <BlogId>03012b68-cf2a-4fa7-9bef-368352b32900</BlogId>
+  </Settings>
+  <Settings>
+    <Delimiter>44</Delimiter>
+    <Help>To get started with SimpleCaptcha, just provide some captcha instructions for your users in the &lt;b&gt;CaptchaLabel&lt;/b&gt;
+                                field and the value you require from your users in order to post a comment in the &lt;b&gt;CaptchaAnswer&lt;/b&gt; field.</Help>
+    <Hidden>false</Hidden>
+    <Index>0</Index>
+    <IsScalar>true</IsScalar>
+    <KeyField>CaptchaLabel</KeyField>
+    <Name>SimpleCaptcha</Name>
+    <Parameters>
+      <KeyField>true</KeyField>
+      <Label>Your captcha's label</Label>
+      <MaxLength>30</MaxLength>
+      <Name>CaptchaLabel</Name>
+      <ParamType>String</ParamType>
+      <Required>true</Required>
+      <SelectedValue />
+      <Values>5+5 = </Values>
+    </Parameters>
+    <Parameters>
+      <KeyField>true</KeyField>
+      <Label>Your captcha's expected value</Label>
+      <MaxLength>30</MaxLength>
+      <Name>CaptchaAnswer</Name>
+      <ParamType>String</ParamType>
+      <Required>true</Required>
+      <SelectedValue />
+      <Values>10</Values>
+    </Parameters>
+    <Parameters>
+      <KeyField>false</KeyField>
+      <Label>Show Captcha For Authenticated Users</Label>
+      <MaxLength>1</MaxLength>
+      <Name>ShowForAuthenticatedUsers</Name>
+      <ParamType>Boolean</ParamType>
+      <Required>true</Required>
+      <SelectedValue />
+      <Values>False</Values>
+    </Parameters>
+    <ShowAdd>true</ShowAdd>
+    <ShowDelete>true</ShowDelete>
+    <ShowEdit>true</ShowEdit>
+    <BlogId>6c97124b-78ed-4787-b3d2-4d63eebfe7d2</BlogId>
+  </Settings>
+  <Settings>
+    <Delimiter>44</Delimiter>
+    <Help>To get started with SimpleCaptcha, just provide some captcha instructions for your users in the &lt;b&gt;CaptchaLabel&lt;/b&gt;
+                                field and the value you require from your users in order to post a comment in the &lt;b&gt;CaptchaAnswer&lt;/b&gt; field.</Help>
+    <Hidden>false</Hidden>
+    <Index>0</Index>
+    <IsScalar>true</IsScalar>
+    <KeyField>CaptchaLabel</KeyField>
+    <Name>SimpleCaptcha</Name>
+    <Parameters>
+      <KeyField>true</KeyField>
+      <Label>Your captcha's label</Label>
+      <MaxLength>30</MaxLength>
+      <Name>CaptchaLabel</Name>
+      <ParamType>String</ParamType>
+      <Required>true</Required>
+      <SelectedValue />
+      <Values>5+5 = </Values>
+    </Parameters>
+    <Parameters>
+      <KeyField>true</KeyField>
+      <Label>Your captcha's expected value</Label>
+      <MaxLength>30</MaxLength>
+      <Name>CaptchaAnswer</Name>
+      <ParamType>String</ParamType>
+      <Required>true</Required>
+      <SelectedValue />
+      <Values>10</Values>
+    </Parameters>
+    <Parameters>
+      <KeyField>false</KeyField>
+      <Label>Show Captcha For Authenticated Users</Label>
+      <MaxLength>1</MaxLength>
+      <Name>ShowForAuthenticatedUsers</Name>
+      <ParamType>Boolean</ParamType>
+      <Required>true</Required>
+      <SelectedValue />
+      <Values>False</Values>
+    </Parameters>
+    <ShowAdd>true</ShowAdd>
+    <ShowDelete>true</ShowDelete>
+    <ShowEdit>true</ShowEdit>
+    <BlogId>6c3f3078-12b7-49ac-a627-5db4d5811fbf</BlogId>
+  </Settings>
+  <Settings>
+    <Delimiter>44</Delimiter>
+    <Help>To get started with SimpleCaptcha, just provide some captcha instructions for your users in the &lt;b&gt;CaptchaLabel&lt;/b&gt;
+                                field and the value you require from your users in order to post a comment in the &lt;b&gt;CaptchaAnswer&lt;/b&gt; field.</Help>
+    <Hidden>false</Hidden>
+    <Index>0</Index>
+    <IsScalar>true</IsScalar>
+    <KeyField>CaptchaLabel</KeyField>
+    <Name>SimpleCaptcha</Name>
+    <Parameters>
+      <KeyField>true</KeyField>
+      <Label>Your captcha's label</Label>
+      <MaxLength>30</MaxLength>
+      <Name>CaptchaLabel</Name>
+      <ParamType>String</ParamType>
+      <Required>true</Required>
+      <SelectedValue />
+      <Values>5+5 = </Values>
+    </Parameters>
+    <Parameters>
+      <KeyField>true</KeyField>
+      <Label>Your captcha's expected value</Label>
+      <MaxLength>30</MaxLength>
+      <Name>CaptchaAnswer</Name>
+      <ParamType>String</ParamType>
+      <Required>true</Required>
+      <SelectedValue />
+      <Values>10</Values>
+    </Parameters>
+    <Parameters>
+      <KeyField>false</KeyField>
+      <Label>Show Captcha For Authenticated Users</Label>
+      <MaxLength>1</MaxLength>
+      <Name>ShowForAuthenticatedUsers</Name>
+      <ParamType>Boolean</ParamType>
+      <Required>true</Required>
+      <SelectedValue />
+      <Values>False</Values>
+    </Parameters>
+    <ShowAdd>true</ShowAdd>
+    <ShowDelete>true</ShowDelete>
+    <ShowEdit>true</ShowEdit>
+    <BlogId>7bef2dd3-4458-49e5-be5d-7a0a69039bf9</BlogId>
   </Settings>
   <ShowSettings>true</ShowSettings>
   <Version>1.0</Version>

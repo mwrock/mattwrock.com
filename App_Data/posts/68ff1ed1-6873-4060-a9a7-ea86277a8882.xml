@@ -1,0 +1,200 @@
+﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<post>
+  <author>mwrock</author>
+  <title>Unit Testing Powershell and Hello Pester</title>
+  <description />
+  <content>&lt;p&gt;&lt;img style="margin: 0px 10px 0px 0px" src="https://secure.gravatar.com/avatar/7e4ed1c78c82719b99f361a1d65d8f30?s=420&amp;amp;d=https://a248.e.akamai.net/assets.github.com%2Fimages%2Fgravatars%2Fgravatar-org-420.png" width="270" height="264" /&gt;It has been a long time since I have blogged. Too long. I have changed roles at Microsoft moving to Cloud Developer Services and have taken on two new Open Source projects: &lt;a href="http://chocolatey.org/"&gt;Chocolatey&lt;/a&gt; and &lt;a href="https://github.com/pester/Pester"&gt;Pester&lt;/a&gt;, joining as a project committer to both. &lt;a href="http://requestreduce.org/"&gt;RequestReduce&lt;/a&gt; is still alive but has gone far under nourished. Fortunately it is pretty stable except for a few edge cases and I hope to get back to enhancements and fixes soon. All these commitments in addition to my &lt;a href="http://boxstarter.codeplex.com/"&gt;Boxstarter&lt;/a&gt; project keep me pretty much working nearly 24/7. Its been a lot of fun but its not a sustainable life style I can recommend.&lt;/p&gt;  &lt;h2&gt;A year of Powershell&lt;/h2&gt;  &lt;p&gt;This has been my year of Powershell. I was introduced about three years ago and was immediately impressed with its power and also a bit daunted by the learning curve. Unless you work with it often, some things are hard to get used to and not obvious to the curmudgeon C# developer like myself. About a year ago, I decided that I was tired of complaining about my organization’s deployment practices and began to revamp the process from a 50 page document of manual steps to a few thousand lines of powershell. I learned a lot.&lt;/p&gt;  &lt;p&gt;You can pretty much do anything in Powershell. There really is no excuse for manual deployments. If you must have manual steps, then there is something wrong with your process or tool set.&lt;/p&gt;  &lt;h2&gt;The Pain of a large Powershell Code Base&lt;/h2&gt;  &lt;p&gt;One interesting thing about powershell is that it lends itself extremely well to small but powerful functions and modules. Once you reach a certain level of competence, its almost addictive to automate everything and add lots of scripts to your profile. Over time, these small scripts can grow and I have now worked on about a half dozen powershell projects that have become full blown applications.&lt;/p&gt;  &lt;p&gt;As a Powershell application becomes larger and more complex, the pain of no compiler (one might call this the first unit test) and lacking unit testing ecosystem begins to rear its ugly head. As a C# developer practicing TDD in my day job, I have grown to appreciate TDD (test driven development where you write tests before implementation code) as a design tool and as a productivity tool. Without it, it is easy for a growing code base to get sloppy and to get mired down in regression bugs as you add features. I like to think that V1 (or at least the first prototype) always ships faster without tests but with each release, the lack of strong Unit Test coverage slows feature work exponentially. After several years, where Unit tests are done later if at all, its easy to end up with a maintenance nightmare where teams are simply chasing bugs.&lt;/p&gt;  &lt;p&gt;Powershell is not immune and needs and deserves a strong Unit Testing toolset.&lt;/p&gt;  &lt;h2&gt;Unit testing Powershell? Seems a bit overkill doesn’t it?&lt;/h2&gt;  &lt;p&gt;Maybe. I do think there is a place for the ability to rattle off ad hoc scripts without the compelling need for unit testing. What also makes Powershell unique is that it tends to work in the domain of “external dependencies” that are typically mocked out in traditional unit testing. Look at most powershell scripts and you will find that databases, file systems, the registry, large enterprise systems are central areas of concern. How do you unit test something that simply acts to glue these things together?&lt;/p&gt;  &lt;p&gt;So maybe you don’t. I’m not going to advise that every line of powershell needs to be Unit Tested. However, once you start writing scripts with lots of conditionals and alternate paths and flows, Unit Testing is a must I think and its all too often that more time goes by without tests to make catching up painful. So if you think your powershell app is going to hold some weight, its best to start&amp;#160; unit testing right away. Of course in languages like C#, Java, and Ruby this is a no brainer. There is a rich set of tools and vibrant communities committed to polishing unit testing patterns. There are a countless number of unit testing frameworks, mocking frameworks, test runners and now “continuous testing” tools to choose from. Powershell?…Not so much. The tool is new, the domain is often difficult to test and a large part of the community lack a unit testing background.&lt;/p&gt;  &lt;h2&gt;How do you do it?&lt;/h2&gt;  &lt;p&gt;Its at this point where we should all bow our heads and offer up a minute of silence as we submit warm rays of gratitude toward &lt;a href="http://scottmuc.com/"&gt;Scott Muc&lt;/a&gt; (&lt;a href="https://twitter.com/ScottMuc"&gt;@scottmuc&lt;/a&gt;). Scott created a great tool called Pester that is a BDD style Unit Testing framework for powershell. I do know a bit about &lt;a href="http://en.wikipedia.org/wiki/Behavior-driven_development"&gt;BDD&lt;/a&gt; (behavior driven development) but not enough to pontificate about it on the internets. I think that’s ok. Regardless, I’m going to demonstrate how you use Pester to test powershell scripts.&lt;/p&gt;  &lt;h2&gt;Chocolatey: A Pester Case Study&lt;/h2&gt;  &lt;p&gt;For the past few months, I have been an active contributor to Chocolatey – an awesome Windows application package management command line app originated by &lt;a href="http://ferventcoder.com/"&gt;Rob Reynolds&lt;/a&gt; (&lt;a href="https://twitter.com/ferventcoder"&gt;@ferventcoder&lt;/a&gt;) who is one of the very early team members of what we now call &lt;a href="http://nuget.org/"&gt;Nuget&lt;/a&gt; back when it was called Nu and on Ruby Gems. In fact, chocolatey is largely developed on top of Nuget.&lt;/p&gt;  &lt;p&gt;Chocolatey is written in 100% powershell. As many applications go,it is a relatively small app, but it is a fairly large Powershell application. Chocolatey deals a lot with communicating with Nuget.exe and also managing downloads from various package and download feeds. So there is a lot of “heavy machinery glue” tying together black boxes but there is also a lot of raw logic involved in deciding which black box to attach to what and which entry points to use to enter the black boxes. Do we call Nuget or WebPI or Ruby Gems? How do we deal with the package versioning APIs, are we raising appropriate exceptions when things go wrong? This is where unit testing helps us and where Pester helps us with unit testing. We only have about 125 tests right now. We got started a little late but we are catching up.&lt;/p&gt;  &lt;h2&gt;Lets Write a Test!&lt;/h2&gt;  &lt;pre class="csharpcode"&gt;Describe &lt;span class="str"&gt;&amp;quot;When calling Get-PackageFoldersForPackage against multiple versions and other packages&amp;quot;&lt;/span&gt; {
+  $packageName = &lt;span class="str"&gt;'sake'&lt;/span&gt;
+  $packageVersion1 = &lt;span class="str"&gt;'0.1.3'&lt;/span&gt;
+  $packageVersion2 = &lt;span class="str"&gt;'0.1.3.1'&lt;/span&gt;
+  $packageVersion3 = &lt;span class="str"&gt;'0.1.4'&lt;/span&gt;
+  Setup -File &lt;span class="str"&gt;&amp;quot;chocolatey\lib\$packageName.$packageVersion1\sake.nuspec&amp;quot;&lt;/span&gt; &lt;span class="str"&gt;''&lt;/span&gt;
+  Setup -File &lt;span class="str"&gt;&amp;quot;chocolatey\lib\$packageName.$packageVersion2\sake.nuspec&amp;quot;&lt;/span&gt; &lt;span class="str"&gt;''&lt;/span&gt;
+  Setup -File &lt;span class="str"&gt;&amp;quot;chocolatey\lib\sumo.$packageVersion3\sake.nuspec&amp;quot;&lt;/span&gt; &lt;span class="str"&gt;''&lt;/span&gt;
+  $returnValue = Get-PackageFoldersForPackage $packageName
+  $expectedValue = &lt;span class="str"&gt;&amp;quot;$packageName.$packageVersion1 $packageName.$packageVersion2&amp;quot;&lt;/span&gt;
+  
+  It &lt;span class="str"&gt;&amp;quot;should return multiple package folders back&amp;quot;&lt;/span&gt; {
+    $returnValue.should.be($expectedValue)
+  }    
+  
+  It &lt;span class="str"&gt;&amp;quot;should not return the package that is not the same name&amp;quot;&lt;/span&gt; {
+    &lt;span class="kwrd"&gt;foreach&lt;/span&gt; ($item &lt;span class="kwrd"&gt;in&lt;/span&gt; $returnValue) {
+      $item.Name.Contains(&lt;span class="str"&gt;&amp;quot;sumo.$packageVersion3&amp;quot;&lt;/span&gt;).should.be($&lt;span class="kwrd"&gt;false&lt;/span&gt;)
+    }
+  }  
+}&lt;/pre&gt;
+
+&lt;p&gt;&lt;style type="text/css"&gt;
+
+.csharpcode, .csharpcode pre
+{
+	font-size: small;
+	color: black;
+	font-family: consolas, "Courier New", courier, monospace;
+	background-color: #ffffff;
+	/*white-space: pre;*/
+}
+.csharpcode pre { margin: 0em; }
+.csharpcode .rem { color: #008000; }
+.csharpcode .kwrd { color: #0000ff; }
+.csharpcode .str { color: #006080; }
+.csharpcode .op { color: #0000c0; }
+.csharpcode .preproc { color: #cc6633; }
+.csharpcode .asp { background-color: #ffff00; }
+.csharpcode .html { color: #800000; }
+.csharpcode .attr { color: #ff0000; }
+.csharpcode .alt 
+{
+	background-color: #f4f4f4;
+	width: 100%;
+	margin: 0em;
+}
+.csharpcode .lnum { color: #606060; }&lt;/style&gt;&lt;/p&gt;
+
+&lt;p&gt;Here we are asking Chocolatey to tell us what versions it has for a given package. If Chocolatey has three packages, two being separate versions of the one we are asking about and the third for an entirely different package, we would expect to get back the two version packages for the package we are querying. There are several more tests around this feature alone but we will focus on this one.&lt;/p&gt;
+
+&lt;p&gt;The first thing to call out is the &lt;strong&gt;Describe&lt;/strong&gt; block. This often contains the “Given” and the “When” clauses of BDD’s Given-When-Then idiom. The Chocolatey team are not BDD purists.Otherwise the test might read: &lt;/p&gt;
+
+&lt;blockquote&gt;
+  &lt;p&gt;Given a caller for package folders&lt;/p&gt;
+
+  &lt;p&gt;When there are multiple versions of that package&lt;/p&gt;
+
+  &lt;p&gt;Then it should return multiple packages&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;This might also be considered the “Arrange-Act” of the Arrange-Act-Assert” pattern. Here we are setting up the conditions of our test to match the scenario we want to replicate. Finally the “&lt;strong&gt;It&lt;/strong&gt;” block performs our validation. It’s the “Then” of Given-When-Then or the “Assert” of Arrange-Act-Assert. If the validation does not resolve, then our test should fail.&lt;/p&gt;
+
+&lt;h2&gt;Make it simple, use lots of functions&lt;/h2&gt;
+
+&lt;p&gt;As I mentioned above, I see Unit testing first and foremost as a design tool. This is largely because it is down right painful to test code that follows poor design principles. One way to make your powershell scripts a bear to test is to have long running procedural scripts. As it so happens, it also makes the code a bear to maintain and add features to. So just like in other languages, use the power of encapsulation and the Single Responsibility Principle. The pattern that the Chocolatey code follows is to break the code up into a file per function and another file for all the tests of that function. The actual functions are dot-sourced into the test file.&lt;/p&gt;
+
+&lt;p&gt;At the top of most test functions, you will find:&lt;/p&gt;
+
+&lt;pre class="csharpcode"&gt;$here = Split-Path -Parent $MyInvocation.MyCommand.Definition
+$common = Join-Path (Split-Path -Parent $here)  &lt;span class="str"&gt;'_Common.ps1'&lt;/span&gt;
+. $common&lt;/pre&gt;
+
+&lt;p&gt;This dot sources _common.ps1 which is responsible for dot sourcing all of the chocolatey functions and includes some other test setup logic.&lt;/p&gt;
+
+&lt;h2&gt;Mocking&lt;/h2&gt;
+
+&lt;p&gt;I personally got involved with the Pester project when I wanted a true Mocking framework. We were stubbing out all of the Chocolatey functions and used flags to signal whether the real function or a stub should be invoked. This got very tedious to setup and maintain. The Chocolatey code base had well over a 1000 lines of this stubbing code. Given the dynamic nature of Powershell, it seemed to me that it would be straight forward to create a true Mocking framework. It also looked like a lot of fun (the main reason why I do anything) and a way to fill in some knowledge gaps I had with powershell. This all proved to be true (this does not often happen for me). &lt;/p&gt;
+
+&lt;p&gt;Essentially you can tell the mocking functions to endow any Powershell command (or custom function) with new behavior. You can also have it track or record what is being called and with what parameters. Here is a test that uses mocking:&lt;/p&gt;
+
+&lt;pre class="csharpcode"&gt;Describe &lt;span class="str"&gt;&amp;quot;Install-ChocolateyVsixPackage&amp;quot;&lt;/span&gt; {
+  Context &lt;span class="str"&gt;&amp;quot;When not Specifying a version and version 10 and 11 is installed&amp;quot;&lt;/span&gt; {
+    Mock Get-ChildItem {@(@{Name=&lt;span class="str"&gt;&amp;quot;path\10.0&amp;quot;&lt;/span&gt;;Property=@(&lt;span class="str"&gt;&amp;quot;InstallDir&amp;quot;&lt;/span&gt;);PSPath=&lt;span class="str"&gt;&amp;quot;10&amp;quot;&lt;/span&gt;},@{Name=&lt;span class="str"&gt;&amp;quot;path\11.0&amp;quot;&lt;/span&gt;;Property=@(&lt;span class="str"&gt;&amp;quot;InstallDir&amp;quot;&lt;/span&gt;);PSPath=&lt;span class="str"&gt;&amp;quot;11&amp;quot;&lt;/span&gt;})}
+    Mock get-itemproperty {@{InstallDir=$Path}}
+    Mock Get-ChocolateyWebFile
+    Mock Write-Debug
+    Mock Write-ChocolateySuccess
+    Mock Install-Vsix
+
+    Install-ChocolateyVsixPackage &lt;span class="str"&gt;&amp;quot;package&amp;quot;&lt;/span&gt; &lt;span class="str"&gt;&amp;quot;url&amp;quot;&lt;/span&gt;
+    It &lt;span class="str"&gt;&amp;quot;should install for version 11&amp;quot;&lt;/span&gt; {
+        Assert-MockCalled Write-Debug -ParameterFilter {$message -like &lt;span class="str"&gt;&amp;quot;*11\VsixInstaller.exe&amp;quot;&lt;/span&gt; }
+    }
+  }
+
+  Context &lt;span class="str"&gt;&amp;quot;When not Specifying a version and only 10 is installed&amp;quot;&lt;/span&gt; {
+    Mock Get-ChildItem {@{Name=&lt;span class="str"&gt;&amp;quot;path\10.0&amp;quot;&lt;/span&gt;;Property=@(&lt;span class="str"&gt;&amp;quot;InstallDir&amp;quot;&lt;/span&gt;);PSPath=&lt;span class="str"&gt;&amp;quot;10&amp;quot;&lt;/span&gt;;Length=$&lt;span class="kwrd"&gt;false&lt;/span&gt;}}
+    Mock get-itemproperty {@{InstallDir=$Path}}
+    Mock Get-ChocolateyWebFile
+    Mock Write-Debug
+    Mock Write-ChocolateySuccess
+    Mock Write-ChocolateyFailure
+    Mock Install-Vsix
+
+    Install-ChocolateyVsixPackage &lt;span class="str"&gt;&amp;quot;package&amp;quot;&lt;/span&gt; &lt;span class="str"&gt;&amp;quot;url&amp;quot;&lt;/span&gt;
+    It &lt;span class="str"&gt;&amp;quot;should install for version 10&amp;quot;&lt;/span&gt; {
+        Assert-MockCalled Write-Debug -ParameterFilter {$message -like &lt;span class="str"&gt;&amp;quot;*10\VsixInstaller.exe&amp;quot;&lt;/span&gt; }
+    }
+  }
+}&lt;/pre&gt;
+
+&lt;p&gt;These are tests of the Chocolatey VSIX installer. A VSIX is a Visual Studio extension. Before focusing on the mocking, lets look at a new form of syntactic sugar here to call out the “When” as a first class expression using the &lt;strong&gt;Context&lt;/strong&gt; block. Its essentially a nested Describe but expresses the Given-When-Then pattern more naturally.&lt;/p&gt;
+
+&lt;p&gt;A user can specify a version of visual studio to have the extension installed in if that user has more than one version installed. If they do not specify a version, we want to install it in the most recent version. That is what the first context is testing. The way that one checks is to inspect the registry for the versions installed and their locations. That’s where mocking comes in. We do not want to have to install and uninstall multiple versions of Visual Studio on our dev boxes if we do not have them. We certainly do not want to do this on a CI server. We also do not want to be futzing with the Windows Registry and try to feed it fake data.&lt;/p&gt;
+
+&lt;p&gt;Instead we can Mock the Get-ChildItem Cmdlet that we use to query the registry. Using the Mock function, we state that when Get-ChildItem is called, it should return a Hashtable that “looks” just like the Registry Key collection that a real Get-ChildItem would give us when querying VS versions on a machine with multiple versions. Then you see several functions mocked but no alternate behavior is specified. Specifying no behavior is the same as specifying simply {} or do nothing. We do this because none of those functions are relevant to this test and we don’t want the real code to execute. For instance, we do not want Get-ChocolateyWebFile to make a network call for a file.&lt;/p&gt;
+
+&lt;p&gt;In our It block, you can see how we use the Assert-MockCalled to verify that our code called into a mocked function as expected. Here if things go as planned, a debug message will record the path of the VsixInstaller used. Since we previously declared Write-Debug as a mocked function, we allow the mocking framework to monitor its calls. Using Assert-MockCalled we state that Write-Debug should be called at least once. There is further functionality that allows us to specify an exact number of calls or 0. Using the ParameterFilter, we state that only calls where the message argument contains the VS 11 path should be counted.&lt;/p&gt;
+
+&lt;p&gt;If you are curious about the implementation details of the mocking in Pester, the &lt;a href="https://github.com/pester/Pester/blob/master/Functions/Mock.ps1"&gt;code&lt;/a&gt; is only a couple hundred lines.&lt;/p&gt;
+
+&lt;h2&gt;And now a few words on state vs. behavior based testing&lt;/h2&gt;
+
+&lt;p&gt;A common cause for debate in testing discussions is the use of state based vs. behavior based testing. It is generally agreed that it is best to test the state of a function and its collaborators once the function has completed. Too often we instead test the behavior of a function. We are reaching deeper into the function and assuming we know more that we should about what the function is doing. We are testing the implementation details of the function rather that the outcome of its state. The behavior based tests open the testing framework up to added fragility since changes in implementation often requires changing the tests. Mocking can lead developers to overusing behavior based tests since it makes it so easy to test the functions interactions at various points of the function’s logic.&lt;/p&gt;
+
+&lt;p&gt;I very much agree with the need to test state. This can be more difficult I think given the nature and eco system of powershell. Powershell is largely built for connecting and controlling the interactions of “black boxes.” Often the behavior being tested is blurred with state. I think we can get better at this and I admit to being new to this kind of unit testing. I hope to evolve patterns more indicative of state based tests as I learn in this space.&lt;/p&gt;
+
+&lt;h2&gt;Tying Powershell Test Results into your CI Builds&lt;/h2&gt;
+
+&lt;p&gt;One great feature of Pester is its ability to output test results according to the NUnit XML schema. While I personally have difficulty using the words “great” and “XML schema” in the same sentence, here it is sincere. This is particularly cool because most continuous integration servers understand this schema and support tooling that surfaces these results for easy visibility. Both Pester and Chocolatey use the CodeBetter TeamCity server to run builds after commits to the master repo and leverage this feature. There is a wiki on the Pester &lt;a href="https://github.com/pester/Pester/wiki/Showing-Test-Results-in-TeamCity"&gt;wiki page&lt;/a&gt; explaining how to set this up.&lt;/p&gt;
+
+&lt;p&gt;Here is a shot of how this looks:&lt;/p&gt;
+
+&lt;p&gt;&lt;a href="http://www.mattwrock.com/image.axd?picture=image_19.png"&gt;&lt;img title="image" style="border-left-width: 0px; border-right-width: 0px; background-image: none; border-bottom-width: 0px; padding-top: 0px; padding-left: 0px; margin: 0px 10px 0px 0px; display: inline; padding-right: 0px; border-top-width: 0px" border="0" alt="image" src="http://www.mattwrock.com/image.axd?picture=image_thumb_19.png" width="673" height="183" /&gt;&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;I can see what tests failed and how long the tests took.&lt;/p&gt;
+
+&lt;h2&gt;Learning more&lt;/h2&gt;
+
+&lt;p&gt;We just scratched the surface of pester and in no way toured all of its great features. The &lt;a href="https://github.com/pester/Pester/wiki"&gt;Pester github wiki&lt;/a&gt; has lots of detailed information on its API and usage. When you install the Pester Powershell module, you also have access to the command line help which is pretty thorough. I’d also encourage you to look at both &lt;a href="https://github.com/pester/Pester/tree/master/Functions"&gt;Pester&lt;/a&gt; and &lt;a href="https://github.com/chocolatey/chocolatey/tree/master/tests"&gt;Chocolatey&lt;/a&gt; for a suite of example tests that demonstrate how to use all of the functionality in Pester. Also both &lt;a href="https://groups.google.com/forum/?fromgroups#!forum/pester"&gt;Pester&lt;/a&gt; and &lt;a href="https://groups.google.com/forum/?fromgroups#!forum/chocolatey"&gt;Chocolatey&lt;/a&gt; have a google groups discussion page for raising issues and questions.&lt;/p&gt;
+
+&lt;p&gt;I hope you have found this post informative and please do let us know what you think of Pester and how you would like to see it improved.&lt;/p&gt;
+
+&lt;p&gt;Also If you are attending the &lt;a href="http://powershell.org/summit/calendar.php"&gt;Powershell Summit&lt;/a&gt; this Spring, please catch my talk on this exact subject.&lt;/p&gt;</content>
+  <ispublished>True</ispublished>
+  <isdeleted>False</isdeleted>
+  <iscommentsenabled>True</iscommentsenabled>
+  <pubDate>2012-11-15 02:53:25</pubDate>
+  <lastModified>2013-05-08 16:10:47</lastModified>
+  <raters>0</raters>
+  <rating>0</rating>
+  <slug>Unit-Testing-Powershell-and-Hello-Pester</slug>
+  <tags />
+  <comments>
+    <comment id="f4573e3b-0d96-4973-addc-046f204f4891" parentid="00000000-0000-0000-0000-000000000000" approved="True" spam="False" deleted="False">
+      <date>2012-11-21 12:26:07</date>
+      <author>Richard</author>
+      <email>richardsmailboxatgmaildotcom@aol.com</email>
+      <country />
+      <ip>24.173.214.18</ip>
+      <moderatedby>mwrock</moderatedby>
+      <avatar />
+      <content>I am glad I found this blog, as I am intermediate Powershell developer and looking forward to Unit Testing heavily in Powershell version 3. Please keep up the great work and contributions!! </content>
+    </comment>
+    <comment id="e3f305a9-7d86-4124-9887-b7ba33843190" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="False">
+      <date>2013-07-15 21:00:33</date>
+      <author>whatsapp in windows</author>
+      <email>fredericka_bonilla@imap-mail.com</email>
+      <country />
+      <ip>50.115.171.193</ip>
+      <moderatedby>App_Code.Extensions.StopForumSpam</moderatedby>
+      <avatar />
+      <content>Hi, after reading this amazing piece of writing i am also delighted to share my familiarity here with mates.
+
+Visit my blog ...  whatsapp in windows - http://whatsappforpcfreedownload.weebly.com/ </content>
+    </comment>
+    <comment id="e75c57f9-0ef5-4bb8-82cc-3428934a9832" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="False">
+      <date>2013-07-15 21:06:13</date>
+      <author>tattoogall.com</author>
+      <email>celsa-sales@yahoo.com</email>
+      <country />
+      <ip>23.29.56.22</ip>
+      <moderatedby>App_Code.Extensions.StopForumSpam</moderatedby>
+      <avatar />
+      <content>The sessions themselves do not take on lengthy but there is however a consirable period of time between sessions (3-4 months or more) which means that your skin can recover and heal in the damage. For hundreds of years, tattoos happen to be a vital (and permanent) portion of cultures throughout the world. Irvine laser tattoo removal might be simple and relatively painless if someone chooses a reputable company, for example Laser Away. It is incredibly important to gauge the various advantages and disadvantages of using tattoo removal creams in order that a knowledgeable decision may be made. It is usual for anyone to begin hoping to get gone tattoos after having them to get a lots of time on his or her body.
+
+my weblog; aries tattoos-tattoogall [ tattoogall.com - http://tattoogall.com/aries-tattoos/ ]</content>
+    </comment>
+  </comments>
+  <categories />
+  <notifications>
+    <email>richardsmailboxatgmaildotcom@aol.com</email>
+  </notifications>
+</post>

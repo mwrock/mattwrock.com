@@ -92,7 +92,8 @@
             bool isAnyTextBeforeHostnameAccepted,
             string storageContainerName,
             string virtualPath,
-            bool isActive)
+            bool isActive,
+            bool isSiteAggregation)
         {
             Security.DemandUserHasRight(Rights.AccessAdminPages, true);
             if (!Blog.CurrentInstance.IsPrimary)
@@ -114,7 +115,7 @@
             }
 
             string message;
-            if (!Blog.ValidateProperties(blog == null, blog, blogName, hostname, isAnyTextBeforeHostnameAccepted, storageContainerName, virtualPath, out message))
+            if (!Blog.ValidateProperties(blog == null, blog, blogName, hostname, isAnyTextBeforeHostnameAccepted, storageContainerName, virtualPath, isSiteAggregation, out message))
             {
                 if (string.IsNullOrWhiteSpace(message)) { message = "Validation for new blog failed."; }
                 return new JsonResponse() { Message = message };
@@ -124,7 +125,7 @@
             {
                 // new blog
 
-                blog = Blog.CreateNewBlog(copyFromExistingBlogId, blogName, hostname, isAnyTextBeforeHostnameAccepted, storageContainerName, virtualPath, isActive, out message);
+                blog = Blog.CreateNewBlog(copyFromExistingBlogId, blogName, hostname, isAnyTextBeforeHostnameAccepted, storageContainerName, virtualPath, isActive, isSiteAggregation, out message);
 
                 if (blog == null || !string.IsNullOrWhiteSpace(message))
                 {
@@ -143,6 +144,7 @@
                 blog.IsActive = isActive;
                 blog.Hostname = hostname;
                 blog.IsAnyTextBeforeHostnameAccepted = isAnyTextBeforeHostnameAccepted;
+                blog.IsSiteAggregation = isSiteAggregation;
 
                 // intentionally not updating StorageContainerName for an update.  this would
                 // involve renaming the folder on disk, or DB changes (DB changes are not

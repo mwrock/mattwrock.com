@@ -1,0 +1,686 @@
+﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<post>
+  <author>mwrock</author>
+  <title>Automate the Install and setup of a Team Foundation 2013 Server with Build services on a Azure VM with Boxstarter</title>
+  <description />
+  <content>&lt;p&gt;&lt;a href="http://www.mattwrock.com/image.axd?picture=tfsBox.png"&gt;&lt;img title="tfsBox" style="border-left-width: 0px; border-right-width: 0px; background-image: none; border-bottom-width: 0px; padding-top: 0px; padding-left: 0px; margin: 0px 10px 0px 0px; display: inline; padding-right: 0px; border-top-width: 0px" border="0" alt="tfsBox" src="http://www.mattwrock.com/image.axd?picture=tfsBox_thumb.png" width="240" height="194" /&gt;&lt;/a&gt;Last week I released version 2.3 of &lt;a href="http://boxstarter.org/"&gt;Boxstarter&lt;/a&gt; which includes some &lt;a href="http://boxstarter.org/VMIntegration#azure"&gt;Azure VM integration features&lt;/a&gt; to Boxstarter’s Chocolatey/Nuget Package management approach to Windows environment automation tools. I &lt;a href="http://www.mattwrock.com/post/2014/01/21/Released-Boxstarter-23-Windows-Azure-integration.aspx"&gt;blogged&lt;/a&gt; about how one can use it to deploy and configure a publicly accessible &lt;a href="https://minecraft.net/"&gt;Minecraft&lt;/a&gt; server. Well Minecraft might not be for everyone. Others might prefer a &lt;a href="http://msdn.microsoft.com/en-us/vstudio/ff637362.aspx"&gt;TFS 2013&lt;/a&gt; server.&lt;/p&gt;  &lt;p&gt;In this post we will install Boxstarter and the Windows Azure PowerShell tools, create a Windows Azure VM, and with a single command deploy a &lt;a href="http://chocolatey.org/"&gt;chocolatey&lt;/a&gt; package that will connect to our VM and install Sql Server 2012 Express with SP1, Team Foundation Server 2013 Express, configure the TFS server to connect to the database and create a default collection and also configure and start build services. You will then be able to launch a browser or Visual Studio and connect to your VM on port 8080 to access these services. Because the entire install and configuration is encapsulated in a Chocolatey package, you can repeat this on as many servers as you like again and again and again.&lt;/p&gt;  &lt;h2&gt;Azure is cool, but what about Hyper-V or “On Prem”&lt;/h2&gt;  &lt;p&gt;Definition: “On-Prem” is what the cool kids say when referring to On Premise installs or installations that runs on hardware which resides in your own data center.&lt;/p&gt;  &lt;p&gt;In case you are not interested in deploying TFS on an Azure VM, I will also show you how you can apply the install package to an on prem server or a Hyper-V VM toward the later end of this post.&lt;/p&gt;  &lt;h2&gt;Chocolatey? Sounds yummy. What is it?&lt;/h2&gt;  &lt;p&gt;You are correct. It is yummy, but its not the kind of chocolate you are probably thinking of. Unless of course you are thinking of the chocolate that can install Visual Studio, Office 365, ITunes and over 1500 other applications in a single command. Next…next…finish? C’mon, what are you? a Farmer? Uhh…well if you are the guy who runs the entire TFS team (AKA &lt;a href="http://blogs.msdn.com/b/bharry/about.aspx"&gt;Brian Harry&lt;/a&gt;), then &lt;a href="http://blogs.msdn.com/b/bharry/archive/2008/04/14/pictures-of-my-farm.aspx"&gt;maybe you are&lt;/a&gt;.&lt;/p&gt;  &lt;p&gt;Chocolatey leverages &lt;a href="http://www.nuget.org/"&gt;Nuget&lt;/a&gt; packaging technology and standards to automate the installation of machine applications. While typical Nuget packages componentize code libraries that can easily be consumed by Visual Studio, Chocolatey packages make the command line installation of applications a simple and repeatable operation. Furthermore you can compose these packages to build out everything a server needs. The packages are entirely Powershell based so anything that you can do in Powershell (in other words, pretty much anything) can be captured in a package.&lt;/p&gt;  &lt;h2&gt;What does Boxstarter add?&lt;/h2&gt;  &lt;p&gt;Boxstarter provides an environment for running Chocolatey packages that can handle reboots, remote installations, windows specific settings and Windows Update control and several other features. Boxstarter takes Chocolatey and targets its use specifically for scenarios involving the setup of a Windows environment from scratch. You can check out &lt;a href="http://boxstarter.org/WhyBoxstarter"&gt;this page&lt;/a&gt; on the Boxstarter.org site for details on Boxstarter specific features.&lt;/p&gt;  &lt;h2&gt;Preparing your deployment environment&lt;/h2&gt;  &lt;p&gt;Before you can begin actually deploying your Chocolatey package to build your TFS Server, we will install the Boxstarter core modules and its Boxstarter.Azure module and configure our Azure subscription account to be managed by the Windows Azure Powershell toolkit. This is a one time step that should only need to be performed once on an individual machine that uses Boxstarter.&lt;/p&gt;  &lt;p&gt;&lt;strong&gt;PREREQUISITES&lt;/strong&gt;: There are two key prerequisites to running the software and commands in this tutorial:&lt;/p&gt;  &lt;ul&gt;   &lt;li&gt;Powershell V 3 or higher. This ships with Windows 8/2012 and higher. Windows 7 and server 2008 R2 can be upgraded with the latest &lt;a href="http://www.microsoft.com/en-us/download/details.aspx?id=40855"&gt;Windows Management Framework&lt;/a&gt;. &lt;/li&gt;    &lt;li&gt;A Windows Azure subscription. Trying to add a VM without an Azure subscription will only end in disappointment. Don’t be disappointed. Get an Azure subscription instead! If you have an MSDN subscription, &lt;a href="http://www.windowsazure.com/en-us/pricing/member-offers/msdn-benefits/"&gt;you can get one for FREEEEEE&lt;/a&gt;!!! &lt;/li&gt; &lt;/ul&gt;  &lt;h4&gt;Getting Boxstarter&lt;/h4&gt;  &lt;p&gt;Getting Boxstarter is easy especially since you can get Boxstarter with Boxstarter. If you do not already have Chocolatey installed (if you do, just CINST Boxstarter.Azure), this is a no brainer. Simply direct IE, or any browser that supports click once apps, to &lt;a href="http://boxstarter.org/package/nr/Boxstarter.Azure"&gt;http://boxstarter.org/package/nr/Boxstarter.Azure&lt;/a&gt;. This invokes a Click Once app that will bootstrap Chocolatey and install all Boxstarter modules including the new Boxstarter.Azure module. As I already mentioned, this is all built on top of Nuget packaging which supports package dependencies. So along with the Boxstarter.Azure package, the Windows Azure .Net libraries and Windows Azure Powershell tools will be downloaded and installed. If you do not have the .Net 4.5 framework, you get that too.&lt;/p&gt;  &lt;p&gt;&lt;a href="http://www.mattwrock.com/image.axd?picture=launchend.png"&gt;&lt;img title="launchend" style="border-left-width: 0px; border-right-width: 0px; background-image: none; border-bottom-width: 0px; padding-top: 0px; padding-left: 0px; margin: 0px 10px 0px 0px; display: inline; padding-right: 0px; border-top-width: 0px" border="0" alt="launchend" src="http://www.mattwrock.com/image.axd?picture=launchend_thumb.png" width="646" height="309" /&gt;&lt;/a&gt;Note that the /nr/ in the URL you used to kick off the Boxstarter install tells Boxstarter not to reboot your machine. Without that, if Boxstarter detects a pending reboot at any time during the install, it will reboot, and automatically log you back in and restart the install. Any install packages already installed will be skipped. Most Boxstarter packages and prerequisites should not require a reboot to run however the .Net framework version 4.5 may be an exception. So if you do not have that, you may want to remove the /nr/ from the above URL or you can manually rerun the install if you receive an error during the install.&lt;/p&gt;  &lt;h3&gt;The Boxstarter Shell&lt;/h3&gt;  &lt;p&gt;While you can use any PowerShell console to load the Boxstarter modules and run its commands (see &lt;a href="http://boxstarter.org/UsingBoxstarter"&gt;this page&lt;/a&gt; for details on running Boxstarter commands), launching the Boxstarter Shell shortcut ensures that all modules are loaded and prints some “getting started” text when the shell first loads.&lt;/p&gt;  &lt;p&gt;&lt;a href="http://www.mattwrock.com/image.axd?picture=shell.png"&gt;&lt;img title="shell" style="border-left-width: 0px; border-right-width: 0px; background-image: none; border-bottom-width: 0px; padding-top: 0px; padding-left: 0px; margin: 0px 10px 0px 0px; display: inline; padding-right: 0px; border-top-width: 0px" border="0" alt="shell" src="http://www.mattwrock.com/image.axd?picture=shell_thumb.png" width="651" height="331" /&gt;&lt;/a&gt;&amp;#160;&lt;/p&gt;  &lt;p&gt;Due to the improved module auto loading in PowerShell version 3, this is not as much of an issue as it is in PowerShell 2 environments (which are not supported for the Azure integration features in Boxstarter). That said, if you are not familiar with PowerShell and want to use Boxstarter’s core commands in a PowerShell 2 environment, you may find using the Boxstarter Shell to provide a better experience.&lt;/p&gt;  &lt;h3&gt;Importing your Azure subscription details&lt;/h3&gt;  &lt;p&gt;Before you can create VMs or interact at all with your subscription resources via the Azure PowerShell commands, you need to import your Azure subscription and authentication certificate so that the Powershell commands can properly associate you with your account. The easiest way to establish this association is by running:&lt;/p&gt;  &lt;pre class="csharpcode"&gt;Get-AzurePublishSettingsFile&lt;/pre&gt;
+
+&lt;p&gt;&lt;style type="text/css"&gt;
+
+
+
+.csharpcode {
+	font-size: small; font-family: consolas, "Courier New", courier, monospace; color: black; background-color: #ffffff
+}
+.csharpcode pre {
+	font-size: small; font-family: consolas, "Courier New", courier, monospace; color: black; background-color: #ffffff
+}
+.csharpcode pre {
+	margin: 0em
+}
+.csharpcode .rem {
+	color: #008000
+}
+.csharpcode .kwrd {
+	color: #0000ff
+}
+.csharpcode .str {
+	color: #006080
+}
+.csharpcode .op {
+	color: #0000c0
+}
+.csharpcode .preproc {
+	color: #cc6633
+}
+.csharpcode .asp {
+	background-color: #ffff00
+}
+.csharpcode .html {
+	color: #800000
+}
+.csharpcode .attr {
+	color: #ff0000
+}
+.csharpcode .alt {
+	width: 100%; margin: 0em; background-color: #f4f4f4
+}
+.csharpcode .lnum {
+	color: #606060
+}&lt;/style&gt;This will launch your default browser and assuming that you have not recently logged into the Azure management portal, you will find yourself at a Microsoft Account login screen. Once you successfully authenticate with your account, your publisher settings file will begin downloading.&lt;/p&gt;
+
+&lt;p&gt;&lt;a href="http://www.mattwrock.com/image.axd?picture=publish.png"&gt;&lt;img title="publish" style="border-left-width: 0px; border-right-width: 0px; background-image: none; border-bottom-width: 0px; padding-top: 0px; padding-left: 0px; margin: 0px 10px 0px 0px; display: inline; padding-right: 0px; border-top-width: 0px" border="0" alt="publish" src="http://www.mattwrock.com/image.axd?picture=publish_thumb.png" width="651" height="458" /&gt;&lt;/a&gt;Choose to Save these settings. Then after the download completes, click the “Open Folder” link and note the location where the recently downloaded publish settings file was saved. Then run Import-AzurePublishSettingsFile and pass the path of the file. My import command looks like this:&lt;/p&gt;
+
+&lt;p&gt;&lt;a href="http://www.mattwrock.com/image.axd?picture=import.png"&gt;&lt;img title="import" style="border-left-width: 0px; border-right-width: 0px; background-image: none; border-bottom-width: 0px; padding-top: 0px; padding-left: 0px; margin: 0px 10px 0px 0px; display: inline; padding-right: 0px; border-top-width: 0px" border="0" alt="import" src="http://www.mattwrock.com/image.axd?picture=import_thumb.png" width="645" height="328" /&gt;&lt;/a&gt;&lt;/p&gt;
+
+&lt;pre class="csharpcode"&gt;&amp;#160;&lt;/pre&gt;
+&lt;style type="text/css"&gt;
+
+
+
+.csharpcode {
+	font-size: small; font-family: consolas, "Courier New", courier, monospace; color: black; background-color: #ffffff
+}
+.csharpcode pre {
+	font-size: small; font-family: consolas, "Courier New", courier, monospace; color: black; background-color: #ffffff
+}
+.csharpcode pre {
+	margin: 0em
+}
+.csharpcode .rem {
+	color: #008000
+}
+.csharpcode .kwrd {
+	color: #0000ff
+}
+.csharpcode .str {
+	color: #006080
+}
+.csharpcode .op {
+	color: #0000c0
+}
+.csharpcode .preproc {
+	color: #cc6633
+}
+.csharpcode .asp {
+	background-color: #ffff00
+}
+.csharpcode .html {
+	color: #800000
+}
+.csharpcode .attr {
+	color: #ff0000
+}
+.csharpcode .alt {
+	width: 100%; margin: 0em; background-color: #f4f4f4
+}
+.csharpcode .lnum {
+	color: #606060
+}&lt;/style&gt;The final step to get all of your subscription settings properly configured is to set the Storage&amp;#160; Account to be used for all operations invoked with the Azure Powershell tools which Boxstarter uses to access your VM. If you already have a Azure VM you plan to use for your TFS server, Boxstarter can set this on its own, but we are going to assume that is not the case and create a new VM. So we will need to set this value. To find all of your current Storage accounts, if any, run: 
+
+&lt;pre class="csharpcode"&gt;PS C:\&amp;gt; Get-AzureStorageAccount
+
+
+StorageAccountDescription : Implicitly created storage service
+AffinityGroup             :
+Location                  : West US
+GeoReplicationEnabled     : True
+GeoPrimaryLocation        : West US
+GeoSecondaryLocation      : East US
+Label                     : portalvhdslwf0p2qrfyt34
+StorageAccountStatus      : Created
+StatusOfPrimary           :
+StatusOfSecondary         :
+...&lt;/pre&gt;
+&lt;style type="text/css"&gt;
+
+
+
+.csharpcode {
+	font-size: small; font-family: consolas, "Courier New", courier, monospace; color: black; background-color: #ffffff
+}
+.csharpcode pre {
+	font-size: small; font-family: consolas, "Courier New", courier, monospace; color: black; background-color: #ffffff
+}
+.csharpcode pre {
+	margin: 0em
+}
+.csharpcode .rem {
+	color: #008000
+}
+.csharpcode .kwrd {
+	color: #0000ff
+}
+.csharpcode .str {
+	color: #006080
+}
+.csharpcode .op {
+	color: #0000c0
+}
+.csharpcode .preproc {
+	color: #cc6633
+}
+.csharpcode .asp {
+	background-color: #ffff00
+}
+.csharpcode .html {
+	color: #800000
+}
+.csharpcode .attr {
+	color: #ff0000
+}
+.csharpcode .alt {
+	width: 100%; margin: 0em; background-color: #f4f4f4
+}
+.csharpcode .lnum {
+	color: #606060
+}&lt;/style&gt;
+
+&lt;p&gt;This is a snippet of the first of my storage accounts which is the one I will use. So I now run:&lt;/p&gt;
+
+&lt;pre class="csharpcode"&gt;Set-AzureSubscription -SubscriptionName Subscription-1 `
+  -CurrentStorageAccountName portalvhdslwf0p2qrfyt34&lt;/pre&gt;
+
+&lt;p&gt;&lt;style type="text/css"&gt;
+
+
+
+.csharpcode {
+	font-size: small; font-family: consolas, "Courier New", courier, monospace; color: black; background-color: #ffffff
+}
+.csharpcode pre {
+	font-size: small; font-family: consolas, "Courier New", courier, monospace; color: black; background-color: #ffffff
+}
+.csharpcode pre {
+	margin: 0em
+}
+.csharpcode .rem {
+	color: #008000
+}
+.csharpcode .kwrd {
+	color: #0000ff
+}
+.csharpcode .str {
+	color: #006080
+}
+.csharpcode .op {
+	color: #0000c0
+}
+.csharpcode .preproc {
+	color: #cc6633
+}
+.csharpcode .asp {
+	background-color: #ffff00
+}
+.csharpcode .html {
+	color: #800000
+}
+.csharpcode .attr {
+	color: #ff0000
+}
+.csharpcode .alt {
+	width: 100%; margin: 0em; background-color: #f4f4f4
+}
+.csharpcode .lnum {
+	color: #606060
+}&lt;/style&gt;&lt;/p&gt;
+
+&lt;p&gt;Subscription-1 is the name of my subscription. Creative I know. If you do not have a storage account, you can create one either using the Azure Powershell commands or using the Azure management portal. Using PowerShell, one can create a new account using:&lt;/p&gt;
+
+&lt;pre class="csharpcode"&gt;New-AzureStorageAccount -StorageAccountName newaccount -Location &lt;span class="str"&gt;&amp;quot;West US&amp;quot;&lt;/span&gt;&lt;/pre&gt;
+&lt;style type="text/css"&gt;
+
+
+
+.csharpcode {
+	font-size: small; font-family: consolas, "Courier New", courier, monospace; color: black; background-color: #ffffff
+}
+.csharpcode pre {
+	font-size: small; font-family: consolas, "Courier New", courier, monospace; color: black; background-color: #ffffff
+}
+.csharpcode pre {
+	margin: 0em
+}
+.csharpcode .rem {
+	color: #008000
+}
+.csharpcode .kwrd {
+	color: #0000ff
+}
+.csharpcode .str {
+	color: #006080
+}
+.csharpcode .op {
+	color: #0000c0
+}
+.csharpcode .preproc {
+	color: #cc6633
+}
+.csharpcode .asp {
+	background-color: #ffff00
+}
+.csharpcode .html {
+	color: #800000
+}
+.csharpcode .attr {
+	color: #ff0000
+}
+.csharpcode .alt {
+	width: 100%; margin: 0em; background-color: #f4f4f4
+}
+.csharpcode .lnum {
+	color: #606060
+}&lt;/style&gt;
+
+&lt;p&gt;One detail not to be missed here is that the StorageAccountName must be only lowercase letters or numbers. The Location must be a valid Azure data center location. You can find all of them using the Get-AzureLocation command.&lt;/p&gt;
+
+&lt;p&gt;Understand that everything we have done up until now has been a one time setup process that we should not need to repeat on the same machine if you plan to use Boxstarter again.&lt;/p&gt;
+
+&lt;h2&gt;Creating the Azure VM&lt;/h2&gt;
+
+&lt;p&gt;You can create an Azure VM in a single command. We will use the New-AzureQuickVM command. Since this command expects an Admin user name and password and we will need these same credentials when provisioning the VM with Boxstarter, we will store the credentials once in a variable:&lt;/p&gt;
+
+&lt;pre class="csharpcode"&gt;$secpasswd = ConvertTo-SecureString &lt;span class="str"&gt;&amp;quot;1276Tfs!&amp;quot;&lt;/span&gt; -AsPlainText -Force
+$cred=New-Object System.Management.Automation.PSCredential (&lt;span class="str"&gt;&amp;quot;TfsAdmin&amp;quot;&lt;/span&gt;, $secpasswd) &lt;/pre&gt;
+
+&lt;p&gt;Now lets create the VM:&lt;/p&gt;
+
+&lt;pre class="csharpcode"&gt;New-AzureQuickVM -ServiceName MyTfsVMService -Windows -Name tfs1 `
+  -ImageName 3a50f22b388a4ff7ab41029918570fa6__Windows-Server-2012-Essentials-20131217-enus `
+  -Password $cred.GetNetworkCredential().Password -AdminUsername $cred.UserName `
+  -InstanceSize Medium -Location &lt;span class="str"&gt;&amp;quot;West US&amp;quot;&lt;/span&gt; –WaitForBoot&lt;/pre&gt;
+
+&lt;p&gt;&lt;style type="text/css"&gt;
+
+
+
+.csharpcode {
+	font-size: small; font-family: consolas, "Courier New", courier, monospace; color: black; background-color: #ffffff
+}
+.csharpcode pre {
+	font-size: small; font-family: consolas, "Courier New", courier, monospace; color: black; background-color: #ffffff
+}
+.csharpcode pre {
+	margin: 0em
+}
+.csharpcode .rem {
+	color: #008000
+}
+.csharpcode .kwrd {
+	color: #0000ff
+}
+.csharpcode .str {
+	color: #006080
+}
+.csharpcode .op {
+	color: #0000c0
+}
+.csharpcode .preproc {
+	color: #cc6633
+}
+.csharpcode .asp {
+	background-color: #ffff00
+}
+.csharpcode .html {
+	color: #800000
+}
+.csharpcode .attr {
+	color: #ff0000
+}
+.csharpcode .alt {
+	width: 100%; margin: 0em; background-color: #f4f4f4
+}
+.csharpcode .lnum {
+	color: #606060
+}&lt;/style&gt;&lt;/p&gt;
+
+&lt;p&gt;This will create a new VM named tfs1 and since I do not have an Azure Cloud Service named MyTfsVMService, it will also create a new Cloud Service in which the VM will run. You can run multiple VMs in a single cloud service. Note that the cloud service name must be unique not only to your account but to all azure. This is because the service name forms the DNS name by which the VMs are reached. All VMs created inside of MyTfsVMService will be accessed via MyTfsVMService.Cloudapp.net. Multiple VMs are accessed through a different port. Of course now that I have created the service, you may not reuse the name unless I delete it, which I will likely do very soon. If you have an existing cloud service that you would like to reuse, you may specify that service. If you do, make sure to omit the -Location argument since the VM will use the location assigned to the service. Finally, if you are supplying a brand new service, use the same Location as the one used by the Storage account you chose above.&lt;/p&gt;
+
+&lt;p&gt;A couple other things to point out here. For our TFS server, specify an instance size of AT LEAST Medium. While I tend to use smaller VMs for my personal use, with TFS and SQL Server together, you are likely to have a much better trial experience with the Medium size with 3.5GB of ram as opposed to 1.75 in the Small sized instances. Of course you pay more for the larger VMs. This is one reason we are using a Windows Server 2012 R2 image as opposed to an image prebuilt with Sql Server. Since the Sql Server image costs include the additional SQL licensing costs, they are considerably more expensive. We will be installing the Sql Express SKU which will be quite sufficient for out purposes (and free). Furthermore, the Server 2012 R2 images, according to the &lt;a href="http://www.windowsazure.com/en-us/pricing/details/virtual-machines/"&gt;current Azure pricing information&lt;/a&gt; as of this post is provided at the lower Linux rates.&lt;/p&gt;
+
+&lt;p&gt;Since we specified the –WaitForBoot argument, the command will not complete until our VM has completed its build cycle and is ready for connections….Oh look!…Its ready!&lt;/p&gt;
+
+&lt;p&gt;&lt;a href="http://www.mattwrock.com/image.axd?picture=image_28.png"&gt;&lt;img title="image" style="border-left-width: 0px; border-right-width: 0px; background-image: none; border-bottom-width: 0px; padding-top: 0px; padding-left: 0px; margin: 0px 10px 0px 0px; display: inline; padding-right: 0px; border-top-width: 0px" border="0" alt="image" src="http://www.mattwrock.com/image.axd?picture=image_thumb_28.png" width="663" height="22" /&gt;&lt;/a&gt;&lt;/p&gt;
+
+&lt;h2&gt;Provisioning with Boxstarter&lt;/h2&gt;
+
+&lt;p&gt;Now that we have our VM, the next logical thing to do is install our software. So what does that look like with Chocolatey packages run through Boxstarter?&lt;/p&gt;
+
+&lt;h3&gt;Package Composition&lt;/h3&gt;
+
+&lt;p&gt;There are several ways to approach package creation. There is &lt;a href="http://boxstarter.org/CreatingPackages"&gt;a page devoted to this topic&lt;/a&gt; in the Boxstarter documentation. Boxstarter provides some convenient commands to make package creation easy and sometimes altogether unnecessary.&amp;#160; We will use a &lt;a href="https://gist.github.com/mwrock/8576155"&gt;Github Gist&lt;/a&gt; to compose the package script. So the next logical question is “What is a package and what can/should we include in the script?”&lt;/p&gt;
+
+&lt;p&gt;As already stated, Chocolatey packages are based on and completely comply with the &lt;a href="http://docs.nuget.org/"&gt;Nuget packaging specification&lt;/a&gt;. In the common Chocolatey scenario, the package consists of two files:&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;A &lt;a href="http://docs.nuget.org/docs/reference/nuspec-reference"&gt;Nuspec&lt;/a&gt; file which is an XML formated manifest with metadata describing the package. This includes key things like the package name, its version, what other packages it depends on and what files are included. There is more but this covers the basics. &lt;/li&gt;
+
+  &lt;li&gt;The ChocolateyInstall file. This is a PowerShell (.ps1) file that actually performs the installation. The beauty of this file is that it can contain absolutely any valid Powershell which gives us a lot of flexibility and power. When this script is executed inside of Chocolatey, it has access to the many &lt;a href="https://github.com/chocolatey/chocolatey/wiki/HelpersReference"&gt;commands that Chocolatey exposes&lt;/a&gt; to cover lots of common install scenarios like downloading, unzipping, and silently installing MSI files. There are commands for creating shortcuts, installing windows features, and more. When running with Boxstarter, there are &lt;a href="http://boxstarter.org/WinConfig"&gt;even more commands&lt;/a&gt; covering scenarios around initial environment setup such as installing critical Windows updates. &lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;You can supply more files. For example there may be config files specific to the applications you are installing that you might want to include in the package. All files in the package are zipped up into a single .nupkg file. This is the file that the underlying Nuget infrastructure unpacks.&lt;/p&gt;
+
+&lt;p&gt;Lets take a look at what our ChocolateyInstall script looks like:&lt;/p&gt;
+
+&lt;pre class="csharpcode"&gt;cinst VisualStudioTeamFoundationServerExpress2013
+cinst MsSqlServer2012Express
+ 
+$tfsConfig=&lt;span class="str"&gt;&amp;quot;$env:ProgramFiles\Microsoft Team Foundation Server 12.0\Tools\TfsConfig.exe&amp;quot;&lt;/span&gt;
+.$tfsConfig unattend /configure /type:standard
+.$tfsConfig unattend /configure /type:build `
+  /inputs:collectionurl=http:&lt;span class="rem"&gt;//localhost:8080/tfs`;ServiceAccountName=&amp;quot;LOCAL SERVICE&amp;quot;`;ServiceAccountPassword=&amp;quot;pass&amp;quot;&lt;/span&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;style type="text/css"&gt;
+
+
+
+.csharpcode, .csharpcode pre
+{
+	font-size: small;
+	color: black;
+	font-family: consolas, "Courier New", courier, monospace;
+	background-color: #ffffff;
+	/*white-space: pre;*/
+}
+.csharpcode pre { margin: 0em; }
+.csharpcode .rem { color: #008000; }
+.csharpcode .kwrd { color: #0000ff; }
+.csharpcode .str { color: #006080; }
+.csharpcode .op { color: #0000c0; }
+.csharpcode .preproc { color: #cc6633; }
+.csharpcode .asp { background-color: #ffff00; }
+.csharpcode .html { color: #800000; }
+.csharpcode .attr { color: #ff0000; }
+.csharpcode .alt 
+{
+	background-color: #f4f4f4;
+	width: 100%;
+	margin: 0em;
+}
+.csharpcode .lnum { color: #606060; }&lt;/style&gt;&lt;/p&gt;
+
+&lt;p&gt;This uses the Chocolatey Install command CINST to first install two packages: TFS 2013 Express and SqlServer 2012 Express. Both of these packages have their own dependencies. Sql depends on the .Net framework version 3.5 and TFS depends on version 4.5. Since we are installing on to Windows Server 2012 R2, we already have .Net 4.5 but R2 does not come preinstalled with v. 3.5 so that will be installed as well.&lt;/p&gt;
+
+&lt;p&gt;Once these are installed we will configure TFS with a standard server configuration. This will use the local default named sql instance for the TFS configuration and collection databases and create both of them. That creates a server capable of hosting source control and work item tracking. Next we configure Build services so that now we can add Build controllers, agents and Build definitions to be executed.&lt;/p&gt;
+
+&lt;p&gt;Our goal is that when these commands complete, we can navigate to &lt;a href="http://MyTfsVMService.CloudApp.net:8080/tfs"&gt;http://MyTfsVMService.CloudApp.net:8080/tfs&lt;/a&gt; from our local machine and see the web portal of our TFS collection.&lt;/p&gt;
+
+&lt;h3&gt;Package Consumption&lt;/h3&gt;
+
+&lt;p&gt;So how do we package up this script so that we can execute it and configure our VM? One answer is: we don’t need to. Boxstarter can take a file path or http URL and as long as they resolve to a raw text resource, Boxstarter will convert them to a temporary package and run them. This is very convenient for one off installs where you do not want to go through the trouble of composing a manifest and packaging process. Not that it is so onerous of a process. The down side to this approach is that if you plan to consume the same package again and again, a raw gist URL is very awkward to type and nearly impossible to memorize.&lt;/p&gt;
+
+&lt;p&gt;Lets say that we intend to use this package repeatedly and therefore want to invoke the package using a reasonably short and easy to remember label. Boxstarter provides a command that can create a minimal package from our gist.&lt;/p&gt;
+
+&lt;pre class="csharpcode"&gt;New-PackageFromScript `
+  -Source https:&lt;span class="rem"&gt;//gist.github.com/mwrock/8576155/raw/3edd9c39bed40b2398e6158062a1e05f4b4c5dff/gistfile1.ps1 `&lt;/span&gt;
+  -PackageName TfsServerWithBuild&lt;/pre&gt;
+
+&lt;p&gt;&lt;style type="text/css"&gt;
+
+
+
+.csharpcode, .csharpcode pre
+{
+	font-size: small;
+	color: black;
+	font-family: consolas, "Courier New", courier, monospace;
+	background-color: #ffffff;
+	/*white-space: pre;*/
+}
+.csharpcode pre { margin: 0em; }
+.csharpcode .rem { color: #008000; }
+.csharpcode .kwrd { color: #0000ff; }
+.csharpcode .str { color: #006080; }
+.csharpcode .op { color: #0000c0; }
+.csharpcode .preproc { color: #cc6633; }
+.csharpcode .asp { background-color: #ffff00; }
+.csharpcode .html { color: #800000; }
+.csharpcode .attr { color: #ff0000; }
+.csharpcode .alt 
+{
+	background-color: #f4f4f4;
+	width: 100%;
+	margin: 0em;
+}
+.csharpcode .lnum { color: #606060; }&lt;/style&gt;&lt;/p&gt;
+
+&lt;p&gt;This just created a TfsServerWithBuild.1.0.0.nupkg file in our “local package repository”. This is a special location on disk that Boxstarter looks for packages before attempting to fetch the package from a remote nuget feed. By default this is a folder in the same directory where the Boxstarter modules live, but you can configure Boxstarter to store them elsewhere. The local repo is great for personal use but cant likely be accessed let alone discovered by others. The best way to share your package with others is to publish the package to a feed.&lt;/p&gt;
+
+&lt;h3&gt;Package Publishing&lt;/h3&gt;
+
+&lt;p&gt;There are multiple options when it comes to publishing your package. If you think that the package provides value to a broad range of users and include those outside of your organization, the &lt;a href="http://chocolatey.org/"&gt;Chocolatey.org&lt;/a&gt; feed is likely the best place. If fact this is where the &lt;a href="http://chocolatey.org/packages/VisualStudioTeamFoundationServerExpress2013"&gt;TFS&lt;/a&gt; and &lt;a href="http://chocolatey.org/packages/MsSqlServer2012Express"&gt;SqlServer&lt;/a&gt; packages reside that our package will install. If the package likely only has value for yourself or your own organization, then a feed provider like &lt;a href="https://www.myget.org/"&gt;MyGet.org&lt;/a&gt; works great. You can create one or more of your own feeds on Myget. These can even be private and require authentication which is desirable especially when there is sensitive information contained inside of your package.&lt;/p&gt;
+
+&lt;p&gt;I’m going to publish this package to a &lt;a href="https://www.myget.org/gallery/boxstarter"&gt;Boxstarter Community feed&lt;/a&gt; on Myget.org.&amp;#160; By default, Boxstarter will include this feed in the feeds it scans to find packages. Here is how we publish:&lt;/p&gt;
+
+&lt;pre class="csharpcode"&gt;PS C:\&amp;gt; .&lt;span class="str"&gt;&amp;quot;$env:ChocolateyInstall\ChocolateyInstall\nuget&amp;quot;&lt;/span&gt; push C:\Users\Matt\App
+Data\Roaming\Boxstarter\BuildPackages\TfsServerWithBuild.1.0.0.nupkg &amp;lt;My Own KEY&amp;gt; -Source https:&lt;span class="rem"&gt;//www.myget.org/F/boxstarter/api/v2/pack&lt;/span&gt;
+age
+Pushing TfsServerWithBuild 1.0.0 to &lt;span class="str"&gt;'https://www.myget.org/F/boxstarter/api/v2/p
+ackage'&lt;/span&gt;...
+Your package was pushed.
+PS C:\&amp;gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;style type="text/css"&gt;
+
+
+
+.csharpcode, .csharpcode pre
+{
+	font-size: small;
+	color: black;
+	font-family: consolas, "Courier New", courier, monospace;
+	background-color: #ffffff;
+	/*white-space: pre;*/
+}
+.csharpcode pre { margin: 0em; }
+.csharpcode .rem { color: #008000; }
+.csharpcode .kwrd { color: #0000ff; }
+.csharpcode .str { color: #006080; }
+.csharpcode .op { color: #0000c0; }
+.csharpcode .preproc { color: #cc6633; }
+.csharpcode .asp { background-color: #ffff00; }
+.csharpcode .html { color: #800000; }
+.csharpcode .attr { color: #ff0000; }
+.csharpcode .alt 
+{
+	background-color: #f4f4f4;
+	width: 100%;
+	margin: 0em;
+}
+.csharpcode .lnum { color: #606060; }&lt;/style&gt;&lt;/p&gt;
+
+&lt;p&gt;Note that as with any Nuget based package feed, you always push using an API key that identifies you as the publisher. You can sign up for a free personal account at Myget and do not have to pay for creating and publishing to feeds. Here we see our feed show up:&lt;a href="http://www.mattwrock.com/image.axd?picture=image_29.png"&gt;&lt;img title="image" style="border-left-width: 0px; border-right-width: 0px; background-image: none; border-bottom-width: 0px; padding-top: 0px; padding-left: 0px; margin: 0px 10px 0px 0px; display: inline; padding-right: 0px; border-top-width: 0px" border="0" alt="image" src="http://www.mattwrock.com/image.axd?picture=image_thumb_29.png" width="673" height="87" /&gt;&lt;/a&gt; 
+
+  &lt;br /&gt;&lt;/p&gt;
+&lt;style type="text/css"&gt;
+
+
+
+.csharpcode, .csharpcode pre
+{
+	font-size: small;
+	color: black;
+	font-family: consolas, "Courier New", courier, monospace;
+	background-color: #ffffff;
+	/*white-space: pre;*/
+}
+.csharpcode pre { margin: 0em; }
+.csharpcode .rem { color: #008000; }
+.csharpcode .kwrd { color: #0000ff; }
+.csharpcode .str { color: #006080; }
+.csharpcode .op { color: #0000c0; }
+.csharpcode .preproc { color: #cc6633; }
+.csharpcode .asp { background-color: #ffff00; }
+.csharpcode .html { color: #800000; }
+.csharpcode .attr { color: #ff0000; }
+.csharpcode .alt 
+{
+	background-color: #f4f4f4;
+	width: 100%;
+	margin: 0em;
+}
+.csharpcode .lnum { color: #606060; }&lt;/style&gt;
+
+&lt;h3&gt;Installing the Package&lt;/h3&gt;
+
+&lt;p&gt;Finally we are ready to kick off our install. Here it goes:&lt;/p&gt;
+
+&lt;pre class="csharpcode"&gt;PS C:\&amp;gt; Enable-BoxstarterVM -Provider azure -CloudServiceName MyTfsVMService -VM
+Name tfs1 -Credential $cred -CheckpointName BareOS | Install-BoxstarterPackage -
+PackageName TfsServerWithBuild
+Boxstarter: Locating Azure VM tfs1...
+Boxstarter: Installing WinRM Certificate
+Boxstarter: Configuring local Powershell Remoting settings...
+
+Powershell remoting &lt;span class="kwrd"&gt;is&lt;/span&gt; not enabled locally. Should Boxstarter enable powershell
+ remoting?
+Powershell remoting &lt;span class="kwrd"&gt;is&lt;/span&gt; not enabled locally. Should Boxstarter enable powershell
+ remoting?
+[Y] Yes  [N] No  [?] Help (&lt;span class="kwrd"&gt;default&lt;/span&gt; &lt;span class="kwrd"&gt;is&lt;/span&gt; &lt;span class="str"&gt;&amp;quot;Y&amp;quot;&lt;/span&gt;):
+Boxstarter: Enabling Powershell Remoting on local machine
+Boxstarter: Testing remoting access on mytfsvmservice.cloudapp.net...
+Boxstarter: Creating Checkpoint BareOS &lt;span class="kwrd"&gt;for&lt;/span&gt; service MyTfsVMService VM tfs1 at&lt;/pre&gt;
+
+&lt;p&gt;&amp;#160;&lt;/p&gt;
+
+&lt;p&gt;Here we see the beginning of the Boxstarter output. We are issuing two commands really – piping one to the other. The Enable-BoxstarterVM performs a VM specific implementation for finding the DNS name and WinRM port for connecting to the VM. It may also do some prep work to ensure that a connection can be made. In Azure’s case, this includes downloading the certificate from the VM and installing it into our root certificate store so that we can communicate with the VM using HTTPS, which is the protocol powershell remoting is using here.&lt;/p&gt;
+
+&lt;h3&gt;VM Checkpoints&lt;/h3&gt;
+
+&lt;p&gt;Also note that just before the install begins, a checkpoint is taken that we label “BareOS.” This is optional but convenient in the event something goes wrong with our package as a result of a mistake in our authoring. We can then Restore this checkpoint, fix the package and retry from the exact same state we had when we began without needing to wipe out and create a new VM. You will not find these Checkpoints in the Azure management portal. Boxstarter uses Azure Blob Snapshots to create an implementation of checkpoints similar to what you would find in Hyper-V or other VM technologies.&lt;/p&gt;
+
+&lt;p&gt;If the BareOS checkpoint already existed when we ran our command, instead of creating the checkpoint, Boxstarter would have restored it. So if we were to run the above command without any changes all over again, our VM would be restored to its original state first.&lt;/p&gt;
+
+&lt;p&gt;Boxstarter exposes some additional commands for listing, creating, restoring and deleting checkpoints. You can check out the &lt;a href="http://boxstarter.org/VMIntegration#azure"&gt;Boxstarter Azure documentation&lt;/a&gt; for details.&lt;/p&gt;
+
+&lt;p&gt;ProTip #1: Substitute “HyperV“ for the “Azure” provider argument and remove the CloudServiceName argument and Boxstarter would look for a Hyper-V VM named tfs1 and provision it. With Hyper-V, Boxstarter may mount the VM’s VHD file to configure it for remote connectivity. That’s often not necessary.&lt;/p&gt;
+
+&lt;p&gt;You don’t think you could run this in a Hyper-V VM because you would need another Windows Server licence? Not true. You can get evaluation VHDs for free and they can legally be “reevaluated.” See &lt;a href="http://www.mattwrock.com/post/2013/12/29/Easily-test-Chocolatey-package-development-with-Boxstarter-22-Hyper-V-integration.aspx"&gt;my blog on the Boxstarter Hyper-V functionality&lt;/a&gt; that touches on this point and where you can find them.&lt;/p&gt;
+
+&lt;h2&gt;Adding an Endpoint for port 8080&lt;/h2&gt;
+
+&lt;p&gt;By default, TFS listens on port 8080 for requests to its web services. We need to provide an endpoint to our Azure Service that will forward all 8080 traffic to the same port on our VM. By default, when you create a new VM in Azure, it will automatically create endpoints for Remote Desktop and PowerShell remoting. Adding an endpoint is fairly straight forward. Here is the command we will use:&lt;/p&gt;
+
+&lt;pre class="csharpcode"&gt;$vm = Get-AzureVM -ServiceName MyTfsVMService -Name tfs1
+Add-AzureEndpoint -Name tfs -Protocol tcp -LocalPort 8080 -PublicPort 8080 -VM $vm | 
+  Update-AzureVM&lt;/pre&gt;
+
+&lt;p&gt;&lt;style type="text/css"&gt;
+
+
+
+.csharpcode, .csharpcode pre
+{
+	font-size: small;
+	color: black;
+	font-family: consolas, "Courier New", courier, monospace;
+	background-color: #ffffff;
+	/*white-space: pre;*/
+}
+.csharpcode pre { margin: 0em; }
+.csharpcode .rem { color: #008000; }
+.csharpcode .kwrd { color: #0000ff; }
+.csharpcode .str { color: #006080; }
+.csharpcode .op { color: #0000c0; }
+.csharpcode .preproc { color: #cc6633; }
+.csharpcode .asp { background-color: #ffff00; }
+.csharpcode .html { color: #800000; }
+.csharpcode .attr { color: #ff0000; }
+.csharpcode .alt 
+{
+	background-color: #f4f4f4;
+	width: 100%;
+	margin: 0em;
+}
+.csharpcode .lnum { color: #606060; }&lt;/style&gt;&lt;/p&gt;
+
+&lt;h2&gt;Lets check out or new TFS server&lt;/h2&gt;
+
+&lt;p&gt;First lets take a look at the last bit of Boxstarter output:&lt;/p&gt;
+
+&lt;pre class="csharpcode"&gt;Errors       : {}
+ComputerName : mytfsvmservice.cloudapp.net
+Completed    : True
+FinishTime   : 1/26/2014 12:18:04 AM
+StartTime    : 1/25/2014 11:47:21 PM&lt;/pre&gt;
+
+&lt;p&gt;&lt;style type="text/css"&gt;
+
+
+
+.csharpcode, .csharpcode pre
+{
+	font-size: small;
+	color: black;
+	font-family: consolas, "Courier New", courier, monospace;
+	background-color: #ffffff;
+	/*white-space: pre;*/
+}
+.csharpcode pre { margin: 0em; }
+.csharpcode .rem { color: #008000; }
+.csharpcode .kwrd { color: #0000ff; }
+.csharpcode .str { color: #006080; }
+.csharpcode .op { color: #0000c0; }
+.csharpcode .preproc { color: #cc6633; }
+.csharpcode .asp { background-color: #ffff00; }
+.csharpcode .html { color: #800000; }
+.csharpcode .attr { color: #ff0000; }
+.csharpcode .alt 
+{
+	background-color: #f4f4f4;
+	width: 100%;
+	margin: 0em;
+}
+.csharpcode .lnum { color: #606060; }&lt;/style&gt;&lt;/p&gt;
+
+&lt;p&gt;This is exactly what we want to see. Our installation completed with no errors. This means no exceptions were thrown and the final Exit Code was 0.&lt;/p&gt;
+
+&lt;p&gt;So lets see if we can create a new project in Visual Studio.&lt;/p&gt;
+
+&lt;p&gt;First we need to connect to our server:&lt;/p&gt;
+
+&lt;p&gt;&lt;a href="http://www.mattwrock.com/image.axd?picture=image_30.png"&gt;&lt;img title="image" style="border-left-width: 0px; border-right-width: 0px; background-image: none; border-bottom-width: 0px; float: none; padding-top: 0px; padding-left: 0px; margin: 0px auto; display: block; padding-right: 0px; border-top-width: 0px" border="0" alt="image" src="http://www.mattwrock.com/image.axd?picture=image_thumb_30.png" width="510" height="334" /&gt;&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;You will be prompted for a user name and password. Provide the same credentials that you provided earlier when creating the VM admin account. Now lets create a new project:&lt;/p&gt;
+
+&lt;p&gt;&lt;a href="http://www.mattwrock.com/image.axd?picture=image_31.png"&gt;&lt;img title="image" style="border-left-width: 0px; border-right-width: 0px; background-image: none; border-bottom-width: 0px; float: none; padding-top: 0px; padding-left: 0px; margin: 0px auto; display: block; padding-right: 0px; border-top-width: 0px" border="0" alt="image" src="http://www.mattwrock.com/image.axd?picture=image_thumb_31.png" width="517" height="420" /&gt;&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;Looks good so far. Now lets go to the web portal and create a work item.&lt;/p&gt;
+
+&lt;p&gt;&lt;a href="http://www.mattwrock.com/image.axd?picture=image_32.png"&gt;&lt;img title="image" style="border-left-width: 0px; border-right-width: 0px; background-image: none; border-bottom-width: 0px; float: none; padding-top: 0px; padding-left: 0px; margin: 0px auto; display: block; padding-right: 0px; border-top-width: 0px" border="0" alt="image" src="http://www.mattwrock.com/image.axd?picture=image_thumb_32.png" width="778" height="415" /&gt;&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;Now THAT is a work item. &lt;/p&gt;
+
+&lt;h2&gt;On Premise Install (aka physical machine install)&lt;/h2&gt;
+
+&lt;p&gt;Boxstarter can install anywhere. We just saw Boxstarter work on an Azure VM and I mentioned how to accomplish the same with Hyper-V.&amp;#160; As long as Powershell Remoting or at least remote WMI is enabled on a machine, the Boxstarer user has admin rights and its available on the network, Boxstarter can be used to provision any physical or virtual machine using Install-BoxstarterPackage:&lt;/p&gt;
+
+&lt;pre class="csharpcode"&gt;Install-BoxstarterPackage -ComputerName MyMachine.MyDomain.com -Credential $creds -PackageName MyPackage&lt;/pre&gt;
+
+&lt;p&gt;&amp;#160;&lt;/p&gt;
+
+&lt;p&gt;If you are actually on the local machine, just as we did at the beginning of this post to install the Boxstarter modules, you can use the click-once launcher from IE or any Click-Once enabled browser (extensions exist for both &lt;a href="https://chrome.google.com/webstore/detail/clickonce-for-google-chro/eeifaoomkminpbeebjdmdojbhmagnncl?hl=en"&gt;Chrome&lt;/a&gt; and &lt;a href="https://addons.mozilla.org/en-us/firefox/addon/microsoft-net-framework-assist/"&gt;Firefox&lt;/a&gt;). If your default browser can run click-once apps, you can even launch the installer from a command line:&lt;/p&gt;
+
+&lt;pre class="csharpcode"&gt;START &lt;a href="http://boxstarter.org/package/MyPackage"&gt;http://boxstarter.org/package/MyPackage&lt;/a&gt;&lt;/pre&gt;
+&lt;style type="text/css"&gt;
+
+
+.csharpcode, .csharpcode pre
+{
+	font-size: small;
+	color: black;
+	font-family: consolas, "Courier New", courier, monospace;
+	background-color: #ffffff;
+	/*white-space: pre;*/
+}
+.csharpcode pre { margin: 0em; }
+.csharpcode .rem { color: #008000; }
+.csharpcode .kwrd { color: #0000ff; }
+.csharpcode .str { color: #006080; }
+.csharpcode .op { color: #0000c0; }
+.csharpcode .preproc { color: #cc6633; }
+.csharpcode .asp { background-color: #ffff00; }
+.csharpcode .html { color: #800000; }
+.csharpcode .attr { color: #ff0000; }
+.csharpcode .alt 
+{
+	background-color: #f4f4f4;
+	width: 100%;
+	margin: 0em;
+}
+.csharpcode .lnum { color: #606060; }&lt;/style&gt;</content>
+  <ispublished>True</ispublished>
+  <isdeleted>False</isdeleted>
+  <iscommentsenabled>True</iscommentsenabled>
+  <pubDate>2014-01-26 02:25:00</pubDate>
+  <lastModified>2014-01-26 02:26:19</lastModified>
+  <raters>0</raters>
+  <rating>0</rating>
+  <slug>Automate-the-Install-and-setup-of-a-Team-Foundation-2013-Server-with-Build-services-on-a-Azure-VM-with-Boxstarter</slug>
+  <tags />
+  <comments />
+  <categories>
+    <category>219109f8-7b0b-459b-8f25-9ce747eb0851</category>
+  </categories>
+  <notifications />
+</post>

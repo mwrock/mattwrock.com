@@ -1,4 +1,4 @@
-﻿<%@ Page Language="C#" MasterPageFile="account.master" AutoEventWireup="true"
+﻿<%@ Page Language="C#" MasterPageFile="account.master" AutoEventWireup="true" ClientIDMode="Static"
     CodeFile="login.aspx.cs" Inherits="Account.Login" %>
 
 <%@ MasterType VirtualPath="~/Account/account.master" %>

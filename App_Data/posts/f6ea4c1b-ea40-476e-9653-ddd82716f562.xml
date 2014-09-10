@@ -1,0 +1,151 @@
+﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<post>
+  <author>mwrock</author>
+  <title>Understanding networking options with a wireless Hyper-V host and solving Catastrophic failure (0x8000FFFF)</title>
+  <description />
+  <content>&lt;p&gt;I have been experimenting lately with different network configurations and exploring ways to automate the setup and deployment of VMs in conjunction with &lt;a href="http://boxstarter.org"&gt;Boxstarter&lt;/a&gt;. Along the way I have bumped up against some problems and discovered more than one way that many on the net recommend configuring a Windows 8 Hyper-V setup on a wireless network. In the process of this experimentation I have also managed to, more than once, screw things up. I’ll start with the screwing things up part.&lt;/p&gt;  &lt;h2&gt;Problem: cant create a Hyper-V network due to catastrophic failures&lt;/h2&gt;  &lt;p&gt;A few months ago my laptop ended up in a state where I could not create an external network on my Hyper-V virtual switch. All attempts resulted in a catastrophic failure which included the guid of the Network Interface and the hex code 0x8000FFFF.&lt;/p&gt;  &lt;blockquote&gt;   &lt;p&gt;Ethernet port '{C7DB406D-4F2A-44A9-8C10-7952707F7498}' bind failed: Catastrophic failure (0x8000FFFF).&lt;/p&gt; &lt;/blockquote&gt;  &lt;p&gt;&lt;a href="http://www.mattwrock.com/image.axd?picture=catastrophy.png"&gt;&lt;img title="catastrophy" style="border-left-width: 0px; border-right-width: 0px; background-image: none; border-bottom-width: 0px; padding-top: 0px; padding-left: 0px; margin: 0px 10px 0px 0px; display: inline; padding-right: 0px; border-top-width: 0px" border="0" alt="catastrophy" src="http://www.mattwrock.com/image.axd?picture=catastrophy_thumb.png" width="389" height="264" /&gt;&lt;/a&gt;&lt;/p&gt;  &lt;p&gt;After hours of futile random attempts to fix this and little to no clues from google, I arrived at a hypothesis that this was somehow connected to my &lt;a href="https://www.virtualbox.org/"&gt;VirtualBox&lt;/a&gt; setup that I had since uninstalled but there were some Network interfaces left over that I could not seem to remove. I ended up repaving my OS to get back to a good state.That was clearly not the solution I was hoping for.&lt;/p&gt;  &lt;p&gt;SIDEBAR: I have been working on a project called &lt;a href="http://boxstarter.org"&gt;Boxstarter&lt;/a&gt; off and on for the past year. This allows one to rebuild a machine in a scripted manner. It leverages the functionality of &lt;a href="http://chocolatey.org/"&gt;Chocolatey&lt;/a&gt; and adds an environment that is reboot resilient and also exposes some handy Cmdlets that tweak windows configuration and install updates. So this was not such a big deal since I can have my familiar dev environment back in about an hour.&lt;/p&gt;  &lt;p&gt;Last weekend I started running into the exact same scenario and error. However, I have been doing some experimenting with different network and Hyper-V configurations lately and found a clue that helped me to recover without reinstalling my OS.&lt;/p&gt;  &lt;h2&gt;The Solution&lt;/h2&gt;  &lt;p&gt;For those that do not care to read on, this was the issue: I had previously setup an “Internal Network” in Hyper-V and “Shared” my wireless adapters internet connection with my Hyper-V Internal Network. I later removed the Internal Network but did not turn off sharing on my wireless adapter first. A Shared network interface cannot be bridged, which is what is used when you create an External network on a wireless connection. Oddly even attempting to create a new Private hyper-v network was failing but with a different but equally unhelpful error. The key problem here is now that I only had one network adapter, the ability to turn on or off sharing was no longer available. The adapter was shared:&lt;/p&gt;  &lt;p&gt;&lt;a href="http://www.mattwrock.com/image.axd?picture=shared.png"&gt;&lt;img title="shared" style="border-left-width: 0px; border-right-width: 0px; background-image: none; border-bottom-width: 0px; padding-top: 0px; padding-left: 0px; margin: 0px 10px 0px 0px; display: inline; padding-right: 0px; border-top-width: 0px" border="0" alt="shared" src="http://www.mattwrock.com/image.axd?picture=shared_thumb.png" width="244" height="60" /&gt;&lt;/a&gt;&lt;/p&gt;  &lt;p&gt;but I could not go to the properties page, go to the “Sharing”&amp;#160; tab and then turn off sharing. The Sharing tab was no longer present.&lt;/p&gt;  &lt;p&gt;&lt;a href="http://www.mattwrock.com/image.axd?picture=NoTab.png"&gt;&lt;img title="NoTab" style="border-left-width: 0px; border-right-width: 0px; background-image: none; border-bottom-width: 0px; padding-top: 0px; padding-left: 0px; margin: 0px 10px 0px 0px; display: inline; padding-right: 0px; border-top-width: 0px" border="0" alt="NoTab" src="http://www.mattwrock.com/image.axd?picture=NoTab_thumb.png" width="411" height="519" /&gt;&lt;/a&gt;&lt;/p&gt;  &lt;p&gt;&amp;#160;&lt;/p&gt;  &lt;p&gt;&amp;#160;&lt;/p&gt;  &lt;p&gt;&amp;#160;&lt;/p&gt;  &lt;p&gt;&amp;#160;&lt;/p&gt;  &lt;p&gt;&amp;#160;&lt;/p&gt;  &lt;p&gt;&amp;#160;&lt;/p&gt;  &lt;p&gt;&amp;#160;&lt;/p&gt;  &lt;p&gt;&amp;#160;&lt;/p&gt;  &lt;p&gt;&amp;#160;&lt;/p&gt;  &lt;p&gt;&amp;#160;&lt;/p&gt;  &lt;p&gt;&amp;#160;&lt;/p&gt;  &lt;p&gt;This problem is further complicated by the fact that even on Powershell 3 and 4 with all of its new Networking cmdlets, there is no cmdlet that can turn on or off Internet Connection Sharing. However, there are a set of COM interfaces that expose the sharing properties of a network interface. This script disabled&amp;#160; my internet sharing and allowed me to then create a new Hyper-V network:&lt;/p&gt;  &lt;div id="codeSnippetWrapper"&gt;   &lt;div id="codeSnippetWrapper"&gt;     &lt;pre id="codeSnippet" style="border-top-style: none; overflow: visible; font-size: 8pt; font-family: &amp;#39;Courier New&amp;#39;, courier, monospace; width: 100%; border-bottom-style: none; color: black; padding-bottom: 0px; direction: ltr; text-align: left; padding-top: 0px; border-right-style: none; padding-left: 0px; margin: 0em; border-left-style: none; line-height: 12pt; padding-right: 0px; background-color: #f4f4f4"&gt;function Disable-ICS{&lt;br /&gt;    $cfg = New-Object -ComObject HNetCfg.HNetShare.1&lt;br /&gt;    $all = $cfg.EnumEveryConnection&lt;br /&gt;    &lt;span style="color: #0000ff"&gt;foreach&lt;/span&gt;($conn &lt;span style="color: #0000ff"&gt;in&lt;/span&gt; $all){&lt;br /&gt;        $shareCfg=$cfg.INetSharingConfigurationForINetConnection($conn)&lt;br /&gt;        $props=$cfg.NetConnectionProps($conn)&lt;br /&gt;        $props&lt;br /&gt;        $shareCfg.DisableSharing()&lt;br /&gt;    }&lt;br /&gt;}&lt;br /&gt;&lt;br /&gt;Disable-ICS&lt;/pre&gt;
+
+    &lt;br /&gt;&lt;/div&gt;
+
+  &lt;h2&gt;Hyper-V, Wireless Adapters, and a connected VM&lt;/h2&gt;
+
+  &lt;p&gt;One of the great things about Windows 8 is that one can run a Hyper-V server and host guest VMs. Given that I use my personal laptop to develop Boxstarter. Being able to test machine installs makes running VMs a necessity and I much prefer running the lighter weight Windows 8 over Server 2012. Also given that I am working on a laptop, I am always using a wireless connection.&lt;/p&gt;
+
+  &lt;h2&gt;The challenge of a wireless adapter&lt;/h2&gt;
+
+  &lt;p&gt;Prior to the Windows 8 implementation of Hyper-V, a Hyper-V VM could only connect to an external network through a wired network adapter. Since Hyper-V supports a Layer-2 switch, it routes traffic based on the MAC address of the virtual network adapters. A wired adapter can run in promiscuous mode and allow packets to be transmitted with the MAC address of the virtual NIC. A wireless adapter can only send traffic with its own MAC address. To mitigate this issue, the Windows 8 Hyper-V uses a bridged adapter to bridge the wireless NIC and the virtual NIC. Although the virtual MAC address is replaced by the wireless adapter’s MAC address when a packet is sent, the bridge maintains a mapping of virtual IP addresses to their MAC addresses so that traffic can be properly routed back to the correct VM.&lt;/p&gt;
+
+  &lt;h2&gt;Two ways to connect your Windows 8 VMs to the internet&lt;/h2&gt;
+
+  &lt;h3&gt;#1: Using an External Network Switch&lt;/h3&gt;
+
+  &lt;p&gt;This is essentially exactly what I have just outlined above. In the Hyper-V manager (this can also be accomplished using the Hyper-V powershell module), go to the Virtual Switch Manager and create an External network binding to your wireless network adapter:&lt;/p&gt;
+
+  &lt;p&gt;&lt;a href="http://www.mattwrock.com/image.axd?picture=External.png"&gt;&lt;img title="External" style="border-left-width: 0px; border-right-width: 0px; background-image: none; border-bottom-width: 0px; padding-top: 0px; padding-left: 0px; margin: 0px 10px 0px 0px; display: inline; padding-right: 0px; border-top-width: 0px" border="0" alt="External" src="http://www.mattwrock.com/image.axd?picture=External_thumb.png" width="553" height="521" /&gt;&lt;/a&gt;&lt;/p&gt;
+
+  &lt;p&gt;&amp;#160;&lt;/p&gt;
+
+  &lt;p&gt;&amp;#160;&lt;/p&gt;
+
+  &lt;p&gt;&amp;#160;&lt;/p&gt;
+
+  &lt;p&gt;&amp;#160;&lt;/p&gt;
+
+  &lt;p&gt;&amp;#160;&lt;/p&gt;
+
+  &lt;p&gt;&amp;#160;&lt;/p&gt;
+
+  &lt;p&gt;&amp;#160;&lt;/p&gt;
+
+  &lt;p&gt;&amp;#160;&lt;/p&gt;
+
+  &lt;p&gt;&amp;#160;&lt;/p&gt;
+
+  &lt;p&gt;&amp;#160;&lt;/p&gt;
+
+  &lt;p&gt;&amp;#160;&lt;/p&gt;
+
+  &lt;p&gt;As previously described, this will create a new network adapter (the virtual adapter) and a network bridge that connects the virtual and wireless adapters.&lt;/p&gt;
+&lt;/div&gt;
+
+&lt;p&gt;&lt;a href="http://www.mattwrock.com/image.axd?picture=Bridged.png"&gt;&lt;img title="Bridged" style="border-left-width: 0px; border-right-width: 0px; background-image: none; border-bottom-width: 0px; padding-top: 0px; padding-left: 0px; margin: 0px 10px 0px 0px; display: inline; padding-right: 0px; border-top-width: 0px" border="0" alt="Bridged" src="http://www.mattwrock.com/image.axd?picture=Bridged_thumb.png" width="667" height="115" /&gt;&lt;/a&gt;Finally go to the “Add Hardware” section of your VM while it is turned off and add a Network Adapter assigning it to the switch you just created. Now your VMs access the same external network as the host as if they are simply another device attached to your wireless router and assigned their own IP from your router’s DHCP server.&lt;/p&gt;
+
+&lt;h3&gt;#2: A Shared Internal Network&lt;/h3&gt;
+
+&lt;p&gt;There is another option to connect your VMs to the internet besides using an External Virtual switch as described above. This includes the creation of an Internal virtual switch instead of an external one. An Internal switch establishes a connection between the guest VM and the host but not to the outside world. Ok. So how in the heck will that connect a VM to my internet? Well after you create the Internal switch:&lt;/p&gt;
+
+&lt;p&gt;&lt;a href="http://www.mattwrock.com/image.axd?picture=internal.png"&gt;&lt;img title="internal" style="border-left-width: 0px; border-right-width: 0px; background-image: none; border-bottom-width: 0px; padding-top: 0px; padding-left: 0px; margin: 0px 10px 0px 0px; display: inline; padding-right: 0px; border-top-width: 0px" border="0" alt="internal" src="http://www.mattwrock.com/image.axd?picture=internal_thumb.png" width="698" height="189" /&gt;&lt;/a&gt;You will “Share” your wireless adapter with the internal switch.&lt;/p&gt;
+
+&lt;p&gt;&lt;a href="http://www.mattwrock.com/image.axd?picture=share.png"&gt;&lt;img title="share" style="border-left-width: 0px; border-right-width: 0px; background-image: none; border-bottom-width: 0px; padding-top: 0px; padding-left: 0px; margin: 0px 10px 0px 0px; display: inline; padding-right: 0px; border-top-width: 0px" border="0" alt="share" src="http://www.mattwrock.com/image.axd?picture=share_thumb.png" width="642" height="481" /&gt;&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;&amp;#160;&lt;/p&gt;
+
+&lt;p&gt;&amp;#160;&lt;/p&gt;
+
+&lt;p&gt;&amp;#160;&lt;/p&gt;
+
+&lt;p&gt;&amp;#160;&lt;/p&gt;
+
+&lt;p&gt;&amp;#160;&lt;/p&gt;
+
+&lt;p&gt;&amp;#160;&lt;/p&gt;
+
+&lt;p&gt;&amp;#160;&lt;/p&gt;
+
+&lt;p&gt;&amp;#160;&lt;/p&gt;
+
+&lt;p&gt;&amp;#160;&lt;/p&gt;
+
+&lt;p&gt;&amp;#160;&lt;/p&gt;
+
+&lt;p&gt;Note that when you have one or more internal network adapters, the “sharing” tab becomes available in your WIFI adapter’s properties. If you had more than one internal adapter, you would also see a drop down menu allowing you to choose which internal adapter to share. Once you add the internal adapter to your VM, you should be able to access your host internet connection from your guest. Maybe…&lt;/p&gt;
+
+&lt;h2&gt;Which method should I u…Maybe?…What does that mean?&lt;/h2&gt;
+
+&lt;p&gt;If you have done much if any investigation already on setting up a windows 8 VM client on a wireless network, you have likely run across accounts of others having issues getting connectivity setup just right and also seen others advising to follow one of the two above methods. Sometimes the recommendations are reported to work but other times the individual seeking help states that they still cannot establish connectivity.&lt;/p&gt;
+
+&lt;p&gt;I’ve been tinkering with this for months and have several times fallen into a state where I have followed every step but things fail to work. This technology is fairly young and still, IMHO rather fragile. Usually the fix is something like rebooting the host or guest, disabling/enabling one of the adapters, fiddling with the network bindings (YUCK!), or toggling the network sharing on or off. None of these solutions inspire much confidence, but sometimes the answer to which approach works best is whichever approach simply works for you.&lt;/p&gt;
+
+&lt;h2&gt;Fragility Aside, what are some of the nuances of each&lt;/h2&gt;
+
+&lt;h3&gt;The Bridged External Switch is the more stable&lt;/h3&gt;
+
+&lt;p&gt;My personal experience is that the bridged network is more stable and the connectivity is the most “full featured.” I did go through a bout of having to reset the bridged connection and rebinding its IPv4 and IPv6 bindings after each reboot or sleep cycle. That was quite annoying and I eventually wrote this script to automate the process:&lt;/p&gt;
+
+&lt;div id="codeSnippetWrapper"&gt;
+  &lt;pre id="codeSnippet" style="border-top-style: none; overflow: visible; font-size: 8pt; font-family: &amp;#39;Courier New&amp;#39;, courier, monospace; width: 100%; border-bottom-style: none; color: black; padding-bottom: 0px; direction: ltr; text-align: left; padding-top: 0px; border-right-style: none; padding-left: 0px; margin: 0em; border-left-style: none; line-height: 12pt; padding-right: 0px; background-color: #f4f4f4"&gt;function Reset-NetAdapters {&lt;br /&gt;    $bindings = @(&lt;br /&gt;        &lt;span style="color: #006080"&gt;&amp;quot;Client for Microsoft Networks&amp;quot;&lt;/span&gt;,&lt;br /&gt;        &lt;span style="color: #006080"&gt;&amp;quot;Internet Protocol Version 6 (TCP/IPv6)&amp;quot;&lt;/span&gt;,&lt;br /&gt;        &lt;span style="color: #006080"&gt;&amp;quot;Internet Protocol Version 4 (TCP/IPv4)&amp;quot;&lt;/span&gt;&lt;br /&gt;        )&lt;br /&gt;    $bindings | %{ Enable-NetAdapterBinding -Name &lt;span style="color: #006080"&gt;&amp;quot;Network Bridge&amp;quot;&lt;/span&gt; -DisplayName&lt;br /&gt; $_ }&lt;br /&gt;    Disable-NetAdapter &lt;span style="color: #006080"&gt;&amp;quot;vEthernet (Virtual Switch)&amp;quot;&lt;/span&gt;&lt;br /&gt;    Enable-NetAdapter &lt;span style="color: #006080"&gt;&amp;quot;vEthernet (Virtual Switch)&amp;quot;&lt;/span&gt;&lt;br /&gt;}&lt;br /&gt;&lt;/pre&gt;
+
+  &lt;br /&gt;&lt;/div&gt;
+
+
+
+&lt;p&gt;When I installed the Windows 8.1 preview that went away but I honestly think that was more the fault of an OS overhaul than windows 8.1 specifically.&lt;/p&gt;
+
+&lt;p&gt;This also seems to be the “official” or “supported” approach. It was even mentioned in &lt;a href="http://blogs.msdn.com/b/b8/archive/2011/09/07/bringing-hyper-v-to-windows-8.aspx"&gt;Stephen Sinofsky’s blog&lt;/a&gt;.&lt;/p&gt;
+
+&lt;h3&gt;The Internal switch can be unreliable but adds some privacy&lt;/h3&gt;
+
+&lt;p&gt;If you simply want to access the web or access files on the host, the connectivity provided here should be fine. However I did run into some odd bumps. For example, windows updates did not work at first until I discovered this very cryptic fix: on the guest NIC, go to the advanced configuration settings and disable the “Large Send Offload” settings for both IPv4 and IPv6. &lt;/p&gt;
+
+&lt;p&gt;&lt;a href="http://www.mattwrock.com/image.axd?picture=offload.png"&gt;&lt;img title="offload" style="border-top: 0px; border-right: 0px; background-image: none; border-bottom: 0px; padding-top: 0px; padding-left: 0px; margin: 0px 10px 0px 0px; border-left: 0px; display: inline; padding-right: 0px" border="0" alt="offload" src="http://www.mattwrock.com/image.axd?picture=offload_thumb.png" width="653" height="556" /&gt;&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;&amp;#160;&lt;/p&gt;
+
+&lt;p&gt;&amp;#160;&lt;/p&gt;
+
+&lt;p&gt;&amp;#160;&lt;/p&gt;
+
+&lt;p&gt;&amp;#160;&lt;/p&gt;
+
+&lt;p&gt;&amp;#160;&lt;/p&gt;
+
+&lt;p&gt;&amp;#160;&lt;/p&gt;
+
+&lt;p&gt;&amp;#160;&lt;/p&gt;
+
+&lt;p&gt;&amp;#160;&lt;/p&gt;
+
+&lt;p&gt;&amp;#160;&lt;/p&gt;
+
+&lt;p&gt;&amp;#160;&lt;/p&gt;
+
+&lt;p&gt;&amp;#160;&lt;/p&gt;
+
+&lt;p&gt;&amp;#160;&lt;/p&gt;
+
+&lt;p&gt;Also, while this allows your guest VM to access the outside world, the outside world cannot see it. This can be good or bad depending on how you want to use the VM. The benefit is some added security. The VM is not actually on the external network and therefore others in your network cannot ping it or access its shares. But then maybe that is exactly what you want to do. This is basically using NAT (network address translation) and assigns the guest VM its own address when transmitting communication outside of the internal network. This is the default networking method used by VirtualBox and is most convenient if you have a limited number of IP addresses and don’t want to assign a separate address to every device.&lt;/p&gt;
+
+&lt;p&gt;Hopefully you have found this usefull and especially if you are suffering from good old 0x8000FFFF, the SEO gods have provided you a solution more quickly than it took me to find.&lt;/p&gt;</content>
+  <ispublished>True</ispublished>
+  <isdeleted>False</isdeleted>
+  <iscommentsenabled>True</iscommentsenabled>
+  <pubDate>2013-08-22 02:26:00</pubDate>
+  <lastModified>2013-08-22 02:29:53</lastModified>
+  <raters>0</raters>
+  <rating>0</rating>
+  <slug>Understanding-networking-options-with-a-wireless-Hyper-V-host-and-solving-Catastrophic-failure-(0x8000FFFF)</slug>
+  <tags />
+  <comments />
+  <categories />
+  <notifications />
+</post>

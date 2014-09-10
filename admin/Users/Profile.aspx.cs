@@ -5,6 +5,9 @@
     using System.Web.Services;
     using System.Web.Security;
     using BlogEngine.Core;
+    using BlogEngine.Core.Json;
+    using System.Web;
+    using System.IO;
 
     /// <summary>
     /// The admin pages profile.
@@ -36,9 +39,56 @@
             }
         }
 
+        protected string AvatarImage
+        {
+            get
+            {
+                var pf = AuthorProfile.GetProfile(theId) ?? new AuthorProfile(theId);
+                return Avatar.GetAvatar(pf.EmailAddress, null, "", "", 48, 48).ImageTag;
+            }
+        }
+
         #endregion
 
         #region Public Methods
+
+        protected void Page_Load(object sender, EventArgs e)
+        {
+            this.Form.Enctype = "multipart/form-data";
+            if (Page.IsPostBack)
+            {
+                try
+                {
+                    HttpPostedFile file = Request.Files["file"];
+
+                    if (file != null && file.ContentLength > 0)
+                    {
+                        string id = Request.QueryString["id"];
+                        string login = string.IsNullOrEmpty(id) ? HttpContext.Current.User.Identity.Name : id;
+                        string dir = Server.MapPath(Path.Combine(BlogConfig.StorageLocation, "files/Avatars", Blog.CurrentInstance.Name, login));
+
+                        if (!Directory.Exists(dir))
+                            Directory.CreateDirectory(dir);
+
+                        string fname = Path.GetFileName(file.FileName);
+                        fname = Path.Combine(dir, fname);
+
+                        file.SaveAs(fname);
+
+                        var pf = AuthorProfile.GetProfile(login) ?? new AuthorProfile(login);
+                        pf.PhotoUrl = Blog.CurrentInstance.Name + "/" + login + "/" + file.FileName;
+
+                        pf.Save();
+
+                        Master.SetStatus("success", "File saved");
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Master.SetStatus("warning", ex.Message);
+                }
+            }
+        }
 
         /// <summary>
         /// The get profile.
@@ -50,7 +100,7 @@
         /// An AuthorProfile.
         /// </returns>
         [WebMethod]
-        public static AuthorProfile GetProfile(string id)
+        public static JsonProfile GetProfile(string id)
         {
             if (!Utils.StringIsNullOrWhitespace(id))
             { 
@@ -58,23 +108,20 @@
                 if (!CanUserEditProfile(id, out canEditRoles))
                     return null;
 
-                return AuthorProfile.GetProfile(id) ?? new AuthorProfile()
+                var pf = AuthorProfile.GetProfile(id);
+
+                if (pf == null)
                 {
-                    DisplayName = string.Empty,
-                    FirstName = string.Empty,
-                    MiddleName = string.Empty,
-                    LastName = string.Empty,
-                    Birthday = new DateTime(1001, 1, 1),
-                    PhotoUrl = string.Empty,
-                    EmailAddress = string.Empty,
-                    PhoneMobile = string.Empty,
-                    PhoneMain = string.Empty,
-                    PhoneFax = string.Empty,
-                    CityTown = string.Empty,
-                    RegionState = string.Empty,
-                    Country = string.Empty,
-                    AboutMe = string.Empty
-                };
+                    pf = new AuthorProfile(id);
+                    pf.Birthday = DateTime.Parse("01/01/1900");
+                    pf.DisplayName = id;
+                    pf.EmailAddress = Utils.GetUserEmail(id);
+                    pf.FirstName = id;
+                    pf.Private = true;
+                    pf.Save();
+                }
+
+                return AuthorProfile.ToJson(id);
             }
 
             return null;
@@ -125,8 +172,8 @@
             bool canEditRoles = false;
             if (!CanUserEditProfile(Request.QueryString["id"], out canEditRoles))
             {
-                Response.Redirect("Users.aspx");
-                return;
+                //Response.Redirect("Users.aspx");
+                //return;
             }
 
             this.theId = Request.QueryString["id"];

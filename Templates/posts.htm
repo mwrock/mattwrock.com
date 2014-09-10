@@ -1,18 +1,17 @@
 ﻿{#if $T.d.length == 0}
-<br />
 <div class="info">
-    You haven't written any posts so far. To write a new post use the link in the right side menu.
+    {BlogAdmin.i18n.youHaveNotWrittenAnyPosts}
 </div>
 {#else}
 <table id="Posts" class="beTable rounded" style="width:100%">
     <thead>
         <tr>
-            <th width="70" style="text-align:center;">Published</th>
-            <th width="auto">Title</th>
-            <th width="120">Author</th>
-            <th width="120">Categories</th>
-            <th width="120">Tags</th>
-	        <th width="100">Created on</th>
+            <th width="70" style="text-align:center;">{BlogAdmin.i18n.published}</th>
+            <th width="auto">{BlogAdmin.i18n.title}</th>
+            <th width="120">{BlogAdmin.i18n.author}</th>
+            <th width="120">{BlogAdmin.i18n.categories}</th>
+            <th width="120">{BlogAdmin.i18n.tags}</th>
+	        <th width="100">{BlogAdmin.i18n.createdOn}</th>
             <th width="70"></th>
 	        <th width="70">&nbsp;</th>
         </tr>
@@ -30,10 +29,10 @@
             <td>
                 <ul class="rowTools">
                     <li>
-                        <a class="toolsAction" href="#"><span class="">Tools</span></a>
+                        <a class="toolsAction" href="#"><span class="">{BlogAdmin.i18n.tools}</span></a>
                         <ul class="rowToolsMenu">
-                            {#if $T.p.CanUserEdit}<li><a class="editAction" href="Add_entry.aspx?id={$T.p.Id}">Edit</a></li>{#/if}
-                            {#if $T.p.CanUserDelete}<li><a class="deleteAction" href="#" onclick="return DeletePost(this);">Delete</a></li>{#/if}
+                            {#if $T.p.CanUserEdit}<li><a class="editAction" href="Add_entry.aspx?id={$T.p.Id}">{BlogAdmin.i18n.edit}</a></li>{#/if}
+                            {#if $T.p.CanUserDelete}<li><a id="a-{$T.p.Id}" class="deleteAction" href="#" onclick="return DeletePost(this);">{BlogAdmin.i18n.doDelete}</a></li>{#/if}
                        </ul>
                     </li>
                </ul>

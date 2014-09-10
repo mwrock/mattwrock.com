@@ -97,29 +97,29 @@ public partial class contact : BlogBasePage, ICallbackEventHandler
 			using (MailMessage mail = new MailMessage())
 			{
 				mail.From = new MailAddress(BlogSettings.Instance.Email, name);
-				mail.ReplyTo = new MailAddress(email, name);
+				mail.ReplyToList.Add(new MailAddress(email, name));
 
 				mail.To.Add(BlogSettings.Instance.Email);
-				mail.Subject = BlogSettings.Instance.EmailSubjectPrefix + " e-mail - " + subject;
+				mail.Subject = BlogSettings.Instance.EmailSubjectPrefix + " " + Resources.labels.email.ToLower() + " - " + subject;
 
 				mail.Body = "<div style=\"font: 11px verdana, arial\">";
 				mail.Body += Server.HtmlEncode(message).Replace("\n", "<br />") + "<br /><br />";
 				mail.Body += "<hr /><br />";
-				mail.Body += "<h3>Author information</h3>";
+                		mail.Body += "<h3>" + Resources.labels.contactAuthorInformation + "</h3>";
 				mail.Body += "<div style=\"font-size:10px;line-height:16px\">";
-				mail.Body += "<strong>Name:</strong> " + Server.HtmlEncode(name) + "<br />";
-				mail.Body += "<strong>E-mail:</strong> " + Server.HtmlEncode(email) + "<br />";
+				mail.Body += "<strong>" + Resources.labels.name + ":</strong> " + Server.HtmlEncode(name) + "<br />";
+                		mail.Body += "<strong>" + Resources.labels.email + ":</strong> " + Server.HtmlEncode(email) + "<br />";
 
 				if (ViewState["url"] != null)
-					mail.Body += string.Format("<strong>Website:</strong> <a href=\"{0}\">{0}</a><br />", ViewState["url"]);
+                    		mail.Body += string.Format("<strong>" + Resources.labels.website + ":</strong> <a href=\"{0}\">{0}</a><br />", ViewState["url"]);
 
 				if (ViewState["country"] != null)
-					mail.Body += "<strong>Country code:</strong> " + ((string)ViewState["country"]).ToUpperInvariant() + "<br />";
+                    		mail.Body += "<strong>" + Resources.labels.countryCode + ":</strong> " + ((string)ViewState["country"]).ToUpperInvariant() + "<br />";
 
 				if (HttpContext.Current != null)
 				{
-					mail.Body += "<strong>IP address:</strong> " + HttpContext.Current.Request.UserHostAddress + "<br />";
-					mail.Body += "<strong>User-agent:</strong> " + HttpContext.Current.Request.UserAgent;
+                    			mail.Body += "<strong>" + Resources.labels.contactIPAddress + ":</strong> " + Utils.GetClientIP() + "<br />";
+                    			mail.Body += "<strong>" + Resources.labels.contactUserAgent + ":</strong> " + HttpContext.Current.Request.UserAgent;
 				}
 
 				if (txtAttachment.HasFile)
@@ -128,7 +128,9 @@ public partial class contact : BlogBasePage, ICallbackEventHandler
 					mail.Attachments.Add(attachment);
 				}
 
-				Utils.SendMailMessage(mail);
+				if (Utils.SendMailMessage(mail).Length > 0) {
+					return false;
+				};
 			}
 
 			return true;

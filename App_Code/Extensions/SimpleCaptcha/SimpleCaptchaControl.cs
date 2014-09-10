@@ -57,7 +57,7 @@ namespace App_Code.Controls
         {
             get
             {
-                return this.errorMessage ?? "The captcha value you provided is incorrect.";
+                return this.errorMessage ?? Resources.labels.incorrectSimpleCaptcha;
             }
 
             set
@@ -153,19 +153,22 @@ namespace App_Code.Controls
             base.OnInit(e);
 
             var settings = ExtensionManager.GetSettings("SimpleCaptcha");
-            this.simpleCaptchaAnswer = settings.GetSingleValue("CaptchaAnswer");
-            this.simpleCaptchaLabel = settings.GetSingleValue("CaptchaLabel");
+			if (settings != null)
+			{
+				this.simpleCaptchaAnswer = settings.GetSingleValue("CaptchaAnswer");
+				this.simpleCaptchaLabel = settings.GetSingleValue("CaptchaLabel");
 
-            if (this.SimpleCaptchaEnabled && this.SimpleCaptchaNecessary)
-            {
-                this.skipSimpleCaptcha = false;
-            }
+				if (this.SimpleCaptchaEnabled && this.SimpleCaptchaNecessary)
+				{
+					this.skipSimpleCaptcha = false;
+				}
 
-            if (String.IsNullOrEmpty(this.simpleCaptchaAnswer) || String.IsNullOrEmpty(this.simpleCaptchaLabel))
-            {
-                throw new ApplicationException(
-                    "SimpleCaptcha needs to be configured with an appropriate captcha label and a captcha value.");
-            }
+				if (String.IsNullOrEmpty(this.simpleCaptchaAnswer) || String.IsNullOrEmpty(this.simpleCaptchaLabel))
+				{
+					throw new ApplicationException(
+						"SimpleCaptcha needs to be configured with an appropriate captcha label and a captcha value.");
+				}
+			}
         }
 
         /// <summary>

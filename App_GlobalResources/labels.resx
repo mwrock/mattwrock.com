@@ -198,6 +198,9 @@
   <data name="commentLabelText" xml:space="preserve">
     <value>Comment label text</value>
   </data>
+  <data name="commentRSS" xml:space="preserve">
+    <value>Comment RSS</value>
+  </data>
   <data name="comments" xml:space="preserve">
     <value>Comments</value>
   </data>
@@ -245,6 +248,9 @@
   </data>
   <data name="displayRatingsOnRecentPosts" xml:space="preserve">
     <value>Display rating</value>
+  </data>
+  <data name="downloadOPML" xml:space="preserve">
+    <value>Download OPML file</value>
   </data>
   <data name="edit" xml:space="preserve">
     <value>Edit</value>
@@ -348,6 +354,9 @@
   </data>
   <data name="import" xml:space="preserve">
     <value>Import</value>
+  </data>
+  <data name="incorrectSimpleCaptcha" xml:space="preserve">
+    <value>The captcha value you provided is incorrect.</value>
   </data>
   <data name="isFrontPage" xml:space="preserve">
     <value>Is front page</value>
@@ -598,6 +607,9 @@
   <data name="trimStylesheetDescription" xml:space="preserve">
     <value>Makes all stylesheets of any theme smaller by removing all whitespace at runtime.</value>
   </data>
+  <data name="type" xml:space="preserve">
+    <value>Type</value>
+  </data>
   <data name="unapprovedcomments" xml:space="preserve">
     <value>Unapproved Comments</value>
   </data>
@@ -671,7 +683,7 @@
     <value>Occupation</value>
   </data>
   <data name="photoURL" xml:space="preserve">
-    <value>PhotoURL</value>
+    <value>Photo URL</value>
   </data>
   <data name="regionState" xml:space="preserve">
     <value>State/Region</value>
@@ -1015,9 +1027,6 @@
   <data name="createUser" xml:space="preserve">
     <value>Create User</value>
   </data>
-  <data name="deleteConfirm" xml:space="preserve">
-    <value>Are you sure you want to delete this comment?</value>
-  </data>
   <data name="developmentMode" xml:space="preserve">
     <value>Development mode</value>
   </data>
@@ -1114,6 +1123,15 @@
   </data>
   <data name="addNewRole" xml:space="preserve">
     <value>Add new role</value>
+  </data>
+  <data name="areYouSureDeleteComment" xml:space="preserve">
+    <value>Are you sure you want to delete the comment?</value>
+  </data>
+  <data name="areYouSureDeleteEmail" xml:space="preserve">
+    <value>Are you sure you want to delete this e-mail?</value>
+  </data>
+  <data name="areYouSureDeletePage" xml:space="preserve">
+    <value>Are you sure you want to delete the page?</value>
   </data>
   <data name="areYouSureDeleteRow" xml:space="preserve">
     <value>Are you sure you want to delete this row?</value>
@@ -1598,7 +1616,7 @@
     <value>Add new user</value>
   </data>
   <data name="appearance" xml:space="preserve">
-    <value>Appearance</value>
+    <value>Customize</value>
   </data>
   <data name="commentSettings" xml:space="preserve">
     <value>Comment settings</value>
@@ -1650,6 +1668,12 @@
   </data>
   <data name="pingServiceUrl" xml:space="preserve">
     <value>Ping service URL</value>
+  </data>
+  <data name="pingServiceUrlBatch" xml:space="preserve">
+    <value>Ping service URL's (one per line)</value>
+  </data>
+  <data name="pingServiceNotUnique" xml:space="preserve">
+    <value>Ping service URL already listed</value>
   </data>
   <data name="runClickOnceApplicationToImport" xml:space="preserve">
     <value>Run click-once application to import content saved as BlogML or RSS 2.0 into your blog. &lt;i&gt;Internet Explorer only.&lt;/i&gt;</value>
@@ -1708,6 +1732,9 @@
   <data name="acceptAnyTextBeforeHostname" xml:space="preserve">
     <value>Accept Any Text before Host Name</value>
   </data>
+  <data name="isForSiteAggregation" xml:space="preserve">
+    <value>Is For Site Aggregation</value>
+  </data>
   <data name="latestFromTheGallery" xml:space="preserve">
     <value>Latest from the gallery</value>
   </data>
@@ -1749,5 +1776,254 @@
   </data>
   <data name="activeThemes" xml:space="preserve">
     <value>Active themes</value>
+  </data>
+  <data name="enterEmail" xml:space="preserve">
+    <value>Enter your e-mail</value>
+  </data>
+  <data name="enterEmailAddress" xml:space="preserve">
+    <value>Please enter an e-mail address</value>
+  </data>
+  <data name="notifyMe" xml:space="preserve">
+    <value>Notify me</value>
+  </data>
+  <data name="thankYou" xml:space="preserve">
+    <value>Thank you</value>
+  </data>
+  <data name="nowUnsubscribed" xml:space="preserve">
+    <value>You are now unsubscribed</value>
+  </data>
+  <data name="viewLargeCalendar" xml:space="preserve">
+    <value>View posts in large calendar</value>
+  </data>
+  <data name="followTwitter" xml:space="preserve">
+    <value>Follow me on Twitter</value>
+  </data>
+  <data name="visitorHi" xml:space="preserve">
+    <value>Hi</value>
+  </data>
+  <data name="welcomeBack" xml:space="preserve">
+    <value>Welcome back!</value>
+  </data>
+  <data name="commentsAddedSince" xml:space="preserve">
+    <value>New comments have been added to {0} since your last comment. </value>
+  </data>
+  <data name="writtenCommentsTotal" xml:space="preserve">
+    <value>You have written {0} comments in total.</value>
+  </data>
+  <data name="contactAuthorInformation" xml:space="preserve">
+    <value>Author information</value>
+  </data>
+  <data name="countryCode" xml:space="preserve">
+    <value>Country code</value>
+  </data>
+  <data name="contactIPAddress" xml:space="preserve">
+    <value>IP address</value>
+  </data>
+  <data name="contactUserAgent" xml:space="preserve">
+    <value>User-agent</value>
+  </data>
+  <data name="filestorage" xml:space="preserve">
+    <value>File Storage Management</value>
+  </data>
+  <data name="galleryFeedUrl" xml:space="preserve">
+    <value>Gallery Feed URL</value>
+  </data>
+  <data name="galleryFeedUrlDescription" xml:space="preserve">
+    <value>URL to the valid Gallery feed containing downloadable packages</value>
+  </data>
+  <data name="enableQuickNotes" xml:space="preserve">
+    <value>Enable Quick Notes</value>
+  </data>
+  <data name="tools" xml:space="preserve">
+    <value>Tools</value>
+  </data>
+  <data name="youHaveNotAddedAnyUserSoFar" xml:space="preserve">
+    <value>You have not added any user so far. To add a new user use the link in the top right corner of the page.</value>
+  </data>
+  <data name="rights" xml:space="preserve">
+    <value>Rights</value>
+  </data>
+  <data name="youHaveNotDefinedAnyRolesSoFar" xml:space="preserve">
+    <value>You have not defined any roles so far. To add a new role use the link in the top right corner of the page.</value>
+  </data>
+  <data name="primary" xml:space="preserve">
+    <value>Primary</value>
+  </data>
+  <data name="textBeforeHostName" xml:space="preserve">
+    <value>Text Accepted Before Host Name</value>
+  </data>
+  <data name="noBlogsWereFound" xml:space="preserve">
+    <value>No blogs were found.</value>
+  </data>
+  <data name="unapprove" xml:space="preserve">
+    <value>Unapprove</value>
+  </data>
+  <data name="createdOn" xml:space="preserve">
+    <value>Created on</value>
+  </data>
+  <data name="trashIsEmpty" xml:space="preserve">
+    <value>Trash is empty.</value>
+  </data>
+  <data name="restoreSelected" xml:space="preserve">
+    <value>Restore selected</value>
+  </data>
+  <data name="purgeSelected" xml:space="preserve">
+    <value>Purge selected</value>
+  </data>
+  <data name="purge" xml:space="preserve">
+    <value>Purge</value>
+  </data>
+  <data name="purgeAll" xml:space="preserve">
+    <value>Purge all</value>
+  </data>
+  <data name="count" xml:space="preserve">
+    <value>Count</value>
+  </data>
+  <data name="youHaveNoTaggedPosts" xml:space="preserve">
+    <value>You have no tagged posts.</value>
+  </data>
+  <data name="youHaveNotWrittenAnyPosts" xml:space="preserve">
+    <value>You have not written any posts so far. To write a new post use the link in the right side menu.</value>
+  </data>
+  <data name="youHaveNoWrittenAnyPages" xml:space="preserve">
+    <value>You have not written any pages so far. To write a new page use the link in the right side menu.</value>
+  </data>
+  <data name="size" xml:space="preserve">
+    <value>Size</value>
+  </data>
+  <data name="noFilesFound" xml:space="preserve">
+    <value>No files found.</value>
+  </data>
+  <data name="reset" xml:space="preserve">
+    <value>Reset</value>
+  </data>
+  <data name="noPackagesToDisplay" xml:space="preserve">
+    <value>There are no packages to display.</value>
+  </data>
+  <data name="install" xml:space="preserve">
+    <value>Install</value>
+  </data>
+  <data name="personalDetails" xml:space="preserve">
+    <value>Personal details</value>
+  </data>
+  <data name="contactDetails" xml:space="preserve">
+    <value>Contact Details and Address</value>
+  </data>
+  <data name="shortBiography" xml:space="preserve">
+    <value>Short Biography</value>
+  </data>
+  <data name="deleteSelected" xml:space="preserve">
+    <value>Delete selected</value>
+  </data>
+  <data name="approveSelected" xml:space="preserve">
+    <value>Approve selected</value>
+  </data>
+  <data name="rejectSelected" xml:space="preserve">
+    <value>Reject selected</value>
+  </data>
+  <data name="deleteAll" xml:space="preserve">
+    <value>Delete all</value>
+  </data>
+  <data name="noSpamHere" xml:space="preserve">
+    <value>Hooray, no spam here!</value>
+  </data>
+  <data name="noPendingComments" xml:space="preserve">
+    <value>There are no pending comments.</value>
+  </data>
+  <data name="noApprovedComments" xml:space="preserve">
+    <value>There are no approved comments.</value>
+  </data>
+  <data name="noPingbacksTrackbacks" xml:space="preserve">
+    <value>There are no pingbacks or trackback. Make sure you enabled sending and recieving trackbacks/pingbacks in advanced settings.</value>
+  </data>
+  <data name="thumbnailServiceProvider" xml:space="preserve">
+    <value>Thumbnail service provider</value>
+  </data>
+  <data name="thumbnailServiceProviderHelp" xml:space="preserve">
+    <value>API used to get thumbnail, i.g. http://www.robothumb.com/src/?url={0}</value>
+  </data>
+  <data name="spamProtection" xml:space="preserve">
+    <value>Spam protection</value>
+  </data>
+  <data name="hasRated" xml:space="preserve">
+    <value>You already rated this post.</value>
+  </data>
+  <data name="widgets" xml:space="preserve">
+    <value>Widgets</value>
+  </data>
+  <data name="enableOptimization" xml:space="preserve">
+    <value>Enable optimization</value>
+  </data>
+  <data name="enableOptimizationDesc" xml:space="preserve">
+    <value>Combine and minify scripts and styles (recommended)</value>
+  </data>
+  <data name="removeExtensionsFromUrls" xml:space="preserve">
+    <value>Remove extensions from URLs</value>
+  </data>
+  <data name="removeExtensionsFromUrlsDesc" xml:space="preserve">
+    <value>Removes .aspx file extension from post or page URL</value>
+  </data>
+  <data name="redirectToRemoveFileExtension" xml:space="preserve">
+    <value>Redirect to remove .aspx extension from URLs</value>
+  </data>
+  <data name="redirectToRemoveFileExtensionDesc" xml:space="preserve">
+    <value>Redirects incoming requests containing the .aspx file extension to a URL with the extension removed.  Remove extensions from URLs must also be turned on.</value>
+  </data>
+  <data name="anotherEmail" xml:space="preserve">
+    <value>Please select another email address</value>
+  </data>
+  <data name="anotherUserName" xml:space="preserve">
+    <value>Please select another user name</value>
+  </data>
+  <data name="emailNotExist" xml:space="preserve">
+    <value>Email does not exist in our system</value>
+  </data>
+  <data name="loginFailed" xml:space="preserve">
+    <value>Login failed</value>
+  </data>
+  <data name="passwordNotChanged" xml:space="preserve">
+    <value>Password was not changed</value>
+  </data>
+  <data name="passwordSent" xml:space="preserve">
+    <value>The password has been sent</value>
+  </data>
+  <data name="AllPostsTagged" xml:space="preserve">
+    <value> All posts tagged </value>
+  </data>
+  <data name="fileManager" xml:space="preserve">
+    <value>File Manager</value>
+  </data>
+  <data name="emptyLog" xml:space="preserve">
+    <value>Empty the log file</value>
+  </data>
+  <data name="LangDirection" xml:space="preserve">
+    <value>ltr</value>
+  </data>
+  <data name="apmlDescription" xml:space="preserve">
+    <value>Enter the URL to your website or to your APML document</value>
+  </data>
+  <data name="createBlogOnSelfRegistration" xml:space="preserve">
+    <value>Create new blog for self-regitered user</value>
+  </data>
+  <data name="AllPostsBy" xml:space="preserve">
+    <value>All posts by</value>
+  </data>
+  <data name="Error" xml:space="preserve">
+    <value>Error</value>
+  </data>
+  <data name="PageNotFound" xml:space="preserve">
+    <value>Page not found</value>
+  </data>
+  <data name="ListIsEmpty" xml:space="preserve">
+    <value>This list is empty. You can add new item from the menu above.</value>
+  </data>
+  <data name="authorDispalyCount" xml:space="preserve">
+    <value>Maximum authors in the list</value>
+  </data>
+  <data name="authorDisplayPattern" xml:space="preserve">
+    <value>Display pattern (author, post count)</value>
+  </data>
+  <data name="authorDisplayPatternAggregated" xml:space="preserve">
+    <value>Display pattern in aggregated blog (author, blog, post count)</value>
   </data>
 </root>

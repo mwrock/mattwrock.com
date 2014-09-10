@@ -128,6 +128,8 @@
                 </div>
             </div>
 
+            <div class="info" style="display:<%=DisplayStyle%>"><%=Resources.labels.ListIsEmpty %></div>
+
             <asp:GridView runat="server" ID="grid" CssClass="beTable" BorderStyle="solid"
                 RowStyle-BorderWidth="0" RowStyle-BorderStyle="None" GridLines="None"
                 Width="100%" AlternatingRowStyle-BackColor="#f8f8f8" AlternatingRowStyle-BorderColor="#f8f8f8"

@@ -5,6 +5,7 @@
   <Description>Converts text to formatted syntax highlighted code (beta).</Description>
   <Enabled>true</Enabled>
   <Priority>999</Priority>
+  <SubBlogEnabled>true</SubBlogEnabled>
   <ShowSettings>true</ShowSettings>
   <Version>0.1</Version>
 </ManagedExtension>

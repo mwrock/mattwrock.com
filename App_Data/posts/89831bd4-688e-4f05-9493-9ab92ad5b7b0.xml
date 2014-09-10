@@ -1,0 +1,71 @@
+﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<post>
+  <author>mwrock</author>
+  <title>Released Boxstarter 2.1: Install multiple Windows environments in one command and better pipeline output</title>
+  <description />
+  <content>&lt;p&gt;&lt;a href="http://www.mattwrock.com/image.axd?picture=multibox.png"&gt;&lt;img style="background-image: none; padding-top: 0px; padding-left: 0px; margin: 0px 10px 0px 0px; display: inline; padding-right: 0px; border: 0px;" title="multibox" src="http://www.mattwrock.com/image.axd?picture=multibox_thumb.png" alt="multibox" width="480" height="206" border="0" /&gt;&lt;/a&gt;Today I released &lt;a href="http://boxstarter.org/"&gt;Boxstarter&lt;/a&gt; v2.1.0 which includes support for piping multiple machines to the &lt;a href="https://boxstarter.codeplex.com/wikipage?title=Install-BoxstarterPackage"&gt;Install-BoxstarterPackage&lt;/a&gt; command and much improved options for receiving output on both the standard output pipeline as well as the host console. This release also adds a few bug fixes and some &amp;ldquo;Fit and Finish&amp;rdquo; details for remote installs.&lt;/p&gt;
+&lt;p&gt;These features were originally intended for v2.0, but the core 2.0 remoting integration proved to be much more involved than anticipated and stood well on their own. So in the interest of getting that release out the door sooner, I held off on these rather minor additions. I think this release does provide a better experience but it is the final prerequisite for the VM integration release coming next.&lt;/p&gt;
+&lt;h2&gt;Multiple Machine Installs&lt;/h2&gt;
+&lt;p&gt;While this is possible in v2.0 by simply looping over a list of computer names, connection URIs or PowerShell sessions, the first class support for installing packages on multiple machines does provide some improved efficiencies and an easier way of processing the results. Boxstarter can configure the local Windows PowerShell remoting settings for all machines at once instead of setting and rolling back on each machine.&lt;/p&gt;
+&lt;p&gt;The ComputerName, ConnectionURI and Session parameters of Install-BoxstarterPackage can now be passed in an array and can also be passed in the pipeline input.&lt;/p&gt;
+&lt;pre class="csharpcode"&gt;$cred=Get-Credential=MyTargetMachine\myusername
+Get-WebServerNames | 
+  Install-BoxstarterPackage -PackagNamee WebPackage -Credential $cred &amp;ndash;Force&lt;/pre&gt;
+&lt;p&gt;&amp;nbsp;&lt;/p&gt;
+&lt;p&gt;Assuming Get-WebServerNames returns an array of server names, the above command will install the WebPackage package on each. Boxstarter will ensure that all of those servers are in the local machine&amp;rsquo;s list of trusted hosts and ensures that credentials can be delegated to them as well before establishing the remote session.&lt;/p&gt;
+&lt;h2&gt;Receive installation results as separate objects on the pipeline&lt;/h2&gt;
+&lt;p&gt;For each machine that Boxstarter runs the package, a PSObject is returned with metadata related to the results of the install.&lt;/p&gt;
+&lt;p&gt;&lt;a href="http://www.mattwrock.com/image.axd?picture=result2.png"&gt;&lt;img style="background-image: none; padding-top: 0px; padding-left: 0px; margin: 0px 10px 0px 0px; display: inline; padding-right: 0px; border-width: 0px;" title="result2" src="http://www.mattwrock.com/image.axd?picture=result2_thumb.png" alt="result2" width="710" height="628" border="0" /&gt;&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;The properties included in the PSObject are:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;ComputerName:&lt;/strong&gt; The name of the computer where the package was installed&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;StartTime:&lt;/strong&gt; The time that the installation began&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;FinishTime:&lt;/strong&gt; The time that Boxstarter finished the installation&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Completed:&lt;/strong&gt; True or False indicating if Boxstarter was able to complete the installation without a terminating exception interrupting the install. Even if this value is True, it does not mean that all components installed in the package succeeded. Boxstarter will not terminate an installation if individual &lt;a href="http://chocolatey.org/"&gt;Chocolatey&lt;/a&gt; packages fail. Use the Errors property to discover errors that were raised throughout the installation.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Errors:&lt;/strong&gt; An array of all errors encountered during the duration of the installation.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;There are probably other properties that will be added to this object in future releases. Maybe a list of all chocolatey packages successfully installed.&lt;/p&gt;
+&lt;h2&gt;Adjusting host output verbosity&lt;/h2&gt;
+&lt;p&gt;A lot of the output that Boxstarter would previously output to the console is now sent to the verbose stream. In other words, by default, Boxstarter tries to limit output to things that are either of immediate interest or indicate that something that might take a while is taking place. Everything else is still available, but requires the use of the &amp;ndash;Verbose parameter to be output to the console. However, all verbose content is always written to the Boxstarter.log file in case you want to refer to this information later.&lt;/p&gt;
+&lt;p&gt;If you would like to silence everything except the standard output stream (all verbose and write-host output), you can set $Boxstarter.SuppressLogging to $True.&lt;/p&gt;
+&lt;pre class="csharpcode"&gt;&amp;gt; $Boxstarter.SuppressLogging=$True
+&amp;gt; &lt;span class="str"&gt;"win7"&lt;/span&gt;,&lt;span class="str"&gt;"win2012"&lt;/span&gt; | Install-BoxstarterPackage -PackageName test-package -Credential $cred -Force
+
+Errors       : {}
+ComputerName : win7
+Completed    : True
+FinishTime   : 11/30/2013 9:41:58 PM
+StartTime    : 11/30/2013 9:41:54 PM
+
+Errors       : {}
+ComputerName : win2012
+Completed    : True
+FinishTime   : 11/30/2013 9:42:11 PM
+StartTime    : 11/30/2013 9:41:58 PM&lt;/pre&gt;
+&lt;h2&gt;Other fixes and improvements&lt;/h2&gt;
+&lt;p&gt;In addition to these features added, there are a few additional items worthy of notice:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Don't touch UAC or AutoLogon registry keys on remote installs.&lt;/li&gt;
+&lt;li&gt;Improve Remote Reboot detection and suppressing reapeted connection creations while remote machine is installing windows updates.&lt;/li&gt;
+&lt;li&gt;Fix overriding organization update servers with the public Windows Update server.&lt;/li&gt;
+&lt;li&gt;Fix remoting configuration when client has assigned Trusted Hosts to a global wildcard.&lt;/li&gt;
+&lt;li&gt;Improve reliability of .net 4.5 installation as Chocolatey prerequisite particularly when running on a newly installed OS.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2&gt;Up Next: Boxstarter Virtualization Module&lt;/h2&gt;
+&lt;p&gt;Other than possible bug fix releases, I don&amp;rsquo;t plan on any releases between now and the first version of a new Boxstarter PowerShell module that focuses on VM provisioning. This module should provide support for Hyper-V, AWS, and Azure VMs. Given a VM name, Boxstarter will enable PowerShell remoting on the VM with no user intervention. It will eliminate the need to check and manually configure remoting on target machines. It will return a ConnectionURI that Install-BoxstarterPackage can use to install packages. At least for Hyper-V, this will include the ability to reset the VM to a specified checkpoint as well.&lt;/p&gt;
+&lt;p&gt;So stay tuned&amp;hellip;&lt;/p&gt;</content>
+  <ispublished>True</ispublished>
+  <isdeleted>False</isdeleted>
+  <iscommentsenabled>True</iscommentsenabled>
+  <pubDate>2013-11-30 22:30:00</pubDate>
+  <lastModified>2013-11-30 23:35:47</lastModified>
+  <raters>0</raters>
+  <rating>0</rating>
+  <slug>Released-Boxstarter-21-Install-multiple-Windows-environments-in-one-command-and-better-pipeline-output</slug>
+  <tags />
+  <comments />
+  <categories>
+    <category>219109f8-7b0b-459b-8f25-9ce747eb0851</category>
+  </categories>
+  <notifications />
+</post>

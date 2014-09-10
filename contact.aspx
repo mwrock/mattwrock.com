@@ -34,7 +34,7 @@
       <blog:RecaptchaControl runat="server" ID="recaptcha" />
       <asp:HiddenField runat="server" ID="hfCaptcha" />
       
-      <asp:button runat="server" id="btnSend" Text="Send" OnClientClick="return beginSendMessage();" validationgroup="contact" />    
+      <asp:button runat="server" id="btnSend" Text="<%$Resources:labels, send %>" OnClientClick="return beginSendMessage();" validationgroup="contact" />    
       <asp:label runat="server" id="lblStatus" visible="false">This form does not work at the moment. Sorry for the inconvenience.</asp:label>
     </div>
     

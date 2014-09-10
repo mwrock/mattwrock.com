@@ -44,12 +44,11 @@ namespace App_Code.Controls
         /// </summary>
         static RecentComments()
         {
-            BindComments();
-            Post.CommentAdded += (sender, args) => BindComments();
-            Post.CommentRemoved += (sender, args) => BindComments();
+            Post.CommentAdded += ClearCache;
+            Post.CommentRemoved += ClearCache;
             Post.Saved += PostSaved;
-            Comment.Approved += (sender, args) => BindComments();
-            BlogSettings.Changed += (sender, args) => BindComments();
+            Comment.Approved += ClearCache;
+            BlogSettings.Changed += ClearCache;
         }
 
         #endregion
@@ -68,7 +67,8 @@ namespace App_Code.Controls
                     {
                         if (!blogsComments.ContainsKey(blogId))
                         {
-                            blogsComments[blogId] = new List<Comment>();
+                            List<Comment> comments = BindComments();
+                            blogsComments[blogId] = comments;
                         }
                     }
                 }
@@ -87,7 +87,7 @@ namespace App_Code.Controls
         /// <param name="writer">The <see cref="T:System.Web.UI.HtmlTextWriter"/> object that receives the control content.</param>
         public override void RenderControl(HtmlTextWriter writer)
         {
-            if (Post.Posts.Count <= 0)
+            if (Post.ApplicablePosts.Count <= 0)
             {
                 return;
             }
@@ -101,26 +101,41 @@ namespace App_Code.Controls
 
         #region Methods
 
+        private static void ClearCache(object sender, EventArgs e)
+        {
+            Guid blogId = Blog.CurrentInstance.BlogId;
+            blogsComments.Remove(blogId);
+
+            Blog siteAggregationBlog = Blog.SiteAggregationBlog;
+            if (siteAggregationBlog != null)
+            {
+                blogsComments.Remove(siteAggregationBlog.BlogId);
+            }
+        }
+
         /// <summary>
         /// Binds the comments.
         /// </summary>
-        private static void BindComments()
+        private static List<Comment> BindComments()
         {
-                var comments = (from post in Post.Posts
-                                where post.IsVisible
-                                from comment in post.Comments
-                                where comment.IsApproved
-                                select comment).ToList();
+            var comments = (from post in Post.ApplicablePosts
+                            where post.IsVisible
+                            from comment in post.Comments
+                            where comment.IsApproved
+                            select comment).ToList();
 
-                comments.Sort();
-                comments.Reverse();
+            comments.Sort();
+            comments.Reverse();
 
-                RecentComments.Comments.Clear();
-                foreach (var comment in
-                    comments.Where(comment => comment.Email != "pingback" && comment.Email != "trackback").Take(BlogSettings.Instance.NumberOfRecentComments))
-                {
-                    Comments.Add(comment);
-                }
+            List<Comment> returnComments = new List<Comment>();
+            
+            foreach (var comment in
+                comments.Where(comment => comment.Email != "pingback" && comment.Email != "trackback").Take(BlogSettings.Instance.NumberOfRecentComments))
+            {
+                returnComments.Add(comment);
+            }
+
+            return returnComments;
         }
 
         /// <summary>
@@ -135,7 +150,7 @@ namespace App_Code.Controls
                 return;
             }
 
-            BindComments();
+            ClearCache(null, EventArgs.Empty);
         }
 
         /// <summary>
@@ -159,7 +174,7 @@ namespace App_Code.Controls
                     var li = new HtmlGenericControl("li");
 
                     // The post title
-                    var title = new HtmlAnchor { HRef = comment.Parent.RelativeLink, InnerText = comment.Parent.Title };
+                    var title = new HtmlAnchor { HRef = comment.Parent.RelativeOrAbsoluteLink, InnerText = comment.Parent.Title };
                     title.Attributes.Add("class", "postTitle");
                     li.Controls.Add(title);
 
@@ -204,7 +219,7 @@ namespace App_Code.Controls
                     // The comment link
                     var link = new HtmlAnchor
                         {
-                            HRef = string.Format("{0}#id_{1}", comment.Parent.RelativeLink, comment.Id), InnerHtml = string.Format("[{0}]", labels.more) 
+                            HRef = string.Format("{0}#id_{1}", comment.Parent.RelativeOrAbsoluteLink, comment.Id), InnerHtml = string.Format("[{0}]", labels.more) 
                         };
                     link.Attributes.Add("class", "moreLink");
                     li.Controls.Add(link);

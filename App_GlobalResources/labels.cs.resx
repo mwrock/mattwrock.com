@@ -198,6 +198,9 @@
   <data name="commentLabelText" xml:space="preserve">
     <value>Text označující vyhledávání v komentářích</value>
   </data>
+  <data name="commentRSS" xml:space="preserve">
+    <value>RSS komentářů</value>
+  </data>
   <data name="comments" xml:space="preserve">
     <value>Komentáře</value>
   </data>
@@ -245,6 +248,9 @@
   </data>
   <data name="displayRatingsOnRecentPosts" xml:space="preserve">
     <value>Zobrazit hodnocení</value>
+  </data>
+  <data name="downloadOPML" xml:space="preserve">
+    <value>Stáhnout OPML soubor</value>
   </data>
   <data name="edit" xml:space="preserve">
     <value>Upravit</value>
@@ -348,6 +354,9 @@
   </data>
   <data name="import" xml:space="preserve">
     <value>Import</value>
+  </data>
+  <data name="incorrectSimpleCaptcha" xml:space="preserve">
+    <value>Nezadal jste správnou captcha hodnotu.</value>
   </data>
   <data name="isFrontPage" xml:space="preserve">
     <value>zobrazit jako hlavní stránku</value>
@@ -597,6 +606,9 @@
   </data>
   <data name="trimStylesheetDescription" xml:space="preserve">
     <value>Zmenší velikost souborů s kaskádovými styly</value>
+  </data>
+  <data name="type" xml:space="preserve">
+    <value>Typ</value>
   </data>
   <data name="unapprovedcomments" xml:space="preserve">
     <value>Neschválené komentáře</value>
@@ -1015,9 +1027,6 @@
   <data name="createUser" xml:space="preserve">
     <value>Vytvořit uživatele</value>
   </data>
-  <data name="deleteConfirm" xml:space="preserve">
-    <value>Skutečně chcete smazat tento komentář?</value>
-  </data>
   <data name="developmentMode" xml:space="preserve">
     <value>Vývojový mód</value>
   </data>
@@ -1114,6 +1123,15 @@
   </data>
   <data name="addNewRole" xml:space="preserve">
     <value>Přidat novou roli</value>
+  </data>
+  <data name="areYouSureDeleteComment" xml:space="preserve">
+    <value>Skutečně chcete smazat stránku?</value>
+  </data>
+  <data name="areYouSureDeleteEmail" xml:space="preserve">
+    <value>Jste si jisti, že chcete smazat tento e-mail?</value>
+  </data>
+  <data name="areYouSureDeletePage" xml:space="preserve">
+    <value>Skutečně chcete smazat stránku?</value>
   </data>
   <data name="areYouSureDeleteRow" xml:space="preserve">
     <value>Skutečně chcete smazat tento řádek?</value>
@@ -1746,5 +1764,56 @@
   </data>
   <data name="orderBy" xml:space="preserve">
     <value>Řadit dle</value>
+  </data>
+  <data name="activeThemes" xml:space="preserve">
+    <value>Aktivní témata</value>
+  </data>
+  <data name="enterEmail" xml:space="preserve">
+    <value>Vložte váš e-mail</value>
+  </data>
+  <data name="enterEmailAddress" xml:space="preserve">
+    <value>Prosím vložte e-mailovou adresu</value>
+  </data>
+  <data name="notifyMe" xml:space="preserve">
+    <value>Přihlásit k odběru</value>
+  </data>
+  <data name="thankYou" xml:space="preserve">
+    <value>Děkuji</value>
+  </data>
+  <data name="nowUnsubscribed" xml:space="preserve">
+    <value>Nyní jste odhlášen</value>
+  </data>
+  <data name="viewLargeCalendar" xml:space="preserve">
+    <value>Zobrazit ve velkém kalendáři</value>
+  </data>
+  <data name="followTwitter" xml:space="preserve">
+    <value>Sledujte mne na Twitteru</value>
+  </data>
+  <data name="visitorHi" xml:space="preserve">
+    <value>Ahoj</value>
+  </data>
+  <data name="welcomeBack" xml:space="preserve">
+    <value>Vítejte zpět!</value>
+  </data>
+  <data name="commentsAddedSince" xml:space="preserve">
+    <value>K {0} byly od vašeho posledního komentáře přidány nové komentáře. </value>
+  </data>
+  <data name="writtenCommentsTotal" xml:space="preserve">
+    <value>Celkem jste napsal {0} komentářů.</value>
+  </data>
+  <data name="contactAuthorInformation" xml:space="preserve">
+    <value>Informace o autorovi</value>
+  </data>
+  <data name="countryCode" xml:space="preserve">
+    <value>Kód země</value>
+  </data>
+  <data name="contactIPAddress" xml:space="preserve">
+    <value>IP adresa</value>
+  </data>
+  <data name="contactUserAgent" xml:space="preserve">
+    <value>Použitý prohlížeč</value>
+  </data>
+  <data name="filestorage" xml:space="preserve">
+    <value>Správa souborového úložiště</value>
   </data>
 </root>

@@ -36,9 +36,6 @@ namespace Admin
                 string.Format(
                     "{0}<a href=\"javascript:HideStatus()\" style=\"width:20px;float:right\">X</a>", 
                     this.Server.HtmlEncode(msg));
-
-            // Page.ClientScript.RegisterClientScriptBlock(this.GetType(), "OpenStatus", 
-            // "ShowStatus('" + status + "','" + msg + "');", true);
         }
 
         #endregion
@@ -120,11 +117,9 @@ namespace Admin
                 aLogin.InnerText = Resources.labels.login;
             }
 
+            Page.Header.DataBind();
+
             phRecycleBin.Visible = Security.IsAuthorizedTo(Rights.AccessAdminPages);
-
-            Utils.AddFolderJavaScripts(this.Page, "Scripts", false);
-            Utils.AddJavaScriptInclude(this.Page, string.Format("{0}admin/admin.js", Utils.ApplicationRelativeWebRoot), false, false);
-
             base.OnInit(e);
         }
 

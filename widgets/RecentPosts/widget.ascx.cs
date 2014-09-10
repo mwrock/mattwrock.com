@@ -13,6 +13,7 @@ namespace Widgets.RecentPosts
     using System.Text;
     using System.Web;
     using System.Web.UI;
+    using System.Linq;
 
     using App_Code.Controls;
 
@@ -51,11 +52,11 @@ namespace Widgets.RecentPosts
         /// </summary>
         static Widget()
         {
-            Post.Saved += (sender, args) => Blog.CurrentInstance.Cache.Remove("widget_recentposts");
-            Post.CommentAdded += (sender, args) => Blog.CurrentInstance.Cache.Remove("widget_recentposts");
-            Post.CommentRemoved += (sender, args) => Blog.CurrentInstance.Cache.Remove("widget_recentposts");
-            Post.Rated += (sender, args) => Blog.CurrentInstance.Cache.Remove("widget_recentposts");
-            BlogSettings.Changed += (sender, args) => Blog.CurrentInstance.Cache.Remove("widget_recentposts");
+            Post.Saved += ClearCache;
+            Post.CommentAdded += ClearCache;
+            Post.CommentRemoved += ClearCache;
+            Post.Rated += ClearCache;
+            BlogSettings.Changed += ClearCache;
         }
 
         #endregion
@@ -102,8 +103,8 @@ namespace Widgets.RecentPosts
             }
 
             if (Blog.CurrentInstance.Cache["widget_recentposts"] == null)
-            {
-                var visiblePosts = Post.Posts.FindAll(p => p.IsVisibleToPublic);
+            {   
+                var visiblePosts = Post.ApplicablePosts.FindAll(p => p.IsVisibleToPublic);
 
                 var max = Math.Min(visiblePosts.Count, numberOfPosts);
                 var list = visiblePosts.GetRange(0, max);
@@ -121,6 +122,17 @@ namespace Widgets.RecentPosts
         #endregion
 
         #region Methods
+
+        private static void ClearCache(object sender, EventArgs e)
+        {
+            Blog.CurrentInstance.Cache.Remove("widget_recentposts");
+
+            Blog siteAggregationBlog = Blog.SiteAggregationBlog;
+            if (siteAggregationBlog != null)
+            {
+                siteAggregationBlog.Cache.Remove("widget_recentposts");
+            }
+        }
 
         /// <summary>
         /// Renders the posts.
@@ -158,6 +170,11 @@ namespace Widgets.RecentPosts
                     continue;
                 }
 
+                // in rear case when aggregated blog has cached list of posts
+                // and child blog was deleted, skip this post
+                // TODO: remove posts from aggregated cache on child blog delete
+                try { var link = post.RelativeLink; } catch { continue; }
+
                 var rating = Math.Round(post.Rating, 1).ToString(CultureInfo.InvariantCulture);
 
                 const string LinkFormat = "<li><a href=\"{0}\">{1}</a>{2}{3}</li>";
@@ -186,7 +203,7 @@ namespace Widgets.RecentPosts
                     rate = string.Format("<span>{0}</span>", labels.notRatedYet);
                 }
 
-                sb.AppendFormat(LinkFormat, post.RelativeLink, HttpUtility.HtmlEncode(post.Title), comments, rate);
+                sb.AppendFormat(LinkFormat, post.RelativeOrAbsoluteLink, HttpUtility.HtmlEncode(post.Title), comments, rate);
             }
 
             sb.Append("</ul>");

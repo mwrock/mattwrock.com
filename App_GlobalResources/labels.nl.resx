@@ -112,10 +112,10 @@
     <value>2.0</value>
   </resheader>
   <resheader name="reader">
-    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <resheader name="writer">
-    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="add" xml:space="preserve">
     <value>Toevoegen</value>
@@ -579,5 +579,8 @@
   </data>
   <data name="notifiedPublished" xml:space="preserve">
     <value>Krijg een E-mail als een nieuwe post gepubliceerd wordt</value>
+  </data>
+  <data name="emptyLog" xml:space="preserve">
+    <value>Maak het logbestand leeg</value>
   </data>
 </root>

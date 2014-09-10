@@ -244,7 +244,7 @@ namespace App_Code.Controls
 
             sb.Append("</div>");
             sb.Append("</div>");
-            RelatedPostsCache.Add(this.Item.Id, sb.ToString());
+            RelatedPostsCache[this.Item.Id] = sb.ToString();
         }
 
 

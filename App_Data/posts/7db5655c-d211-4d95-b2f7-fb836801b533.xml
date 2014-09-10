@@ -1,0 +1,59 @@
+﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<post>
+  <author>mwrock</author>
+  <title>www.orangelightning.co.uk makes 40% improvement in page load performance using RequestReduce</title>
+  <description />
+  <content>&lt;p&gt;This week I worked with &lt;a href="http://psjones.co.uk/"&gt;Phil Jones&lt;/a&gt; (@philjones88) of to get &lt;a href="http://requestreduce.com/"&gt;RequestReduce&lt;/a&gt; up and running on his web site hosted on AppHarbor. There was a couple issues specific to AppHarbor&amp;rsquo;s configuration that prevented &lt;a href="http://requestreduce.com/"&gt;RequestReduce&amp;rsquo;s&lt;/a&gt; default configuration from working. Its actually a fairly typical situation where their load balancers forward requests to their web servers on different ports. &lt;a href="http://requestreduce.com/"&gt;RequestReduce&lt;/a&gt; then assumes that the site is publicly accessible on this non standard port which it is not and things quickly begin to not work too well. In fact they did not work well at all. It was easy to work around this and by doing so, I was able to make my app all the more accessible.&lt;/p&gt;
+&lt;p&gt;So now that Phil has got &lt;a href="http://www.orangelightning.co.uk"&gt;orangelightning&lt;/a&gt; up and running on &lt;a href="http://requestreduce.com/"&gt;RequestReduce&lt;/a&gt;, their Google Page speed score went from 81 to 96 and their Yslow grade went from a low B at 83 to a solid A at 95.&lt;/p&gt;
+&lt;table style="width: 556px;" border="0" cellspacing="20" cellpadding="2"&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td valign="top" width="247"&gt;&lt;a href="http://www.mattwrock.com/image.axd?picture=image.png"&gt;&lt;img style="background-image: none; margin: 0px; padding-left: 0px; padding-right: 0px; display: inline; padding-top: 0px; border: 0px;" title="image" src="http://www.mattwrock.com/image.axd?picture=image_thumb.png" alt="image" width="244" height="99" border="0" /&gt;&lt;/a&gt;&lt;/td&gt;
+&lt;td valign="top" width="247"&gt;
+&lt;p&gt;&lt;a href="http://www.mattwrock.com/image.axd?picture=image_1.png"&gt;&lt;img style="background-image: none; margin: 0px; padding-left: 0px; padding-right: 0px; display: inline; padding-top: 0px; border: 0px;" title="image" src="http://www.mattwrock.com/image.axd?picture=image_thumb_1.png" alt="image" width="244" height="174" border="0" /&gt;&lt;/a&gt;&lt;/p&gt;
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;p&gt;&amp;nbsp;&lt;/p&gt;
+&lt;p&gt;Total number of HTTP requests were cut in half from 13 to 6 requests. And a page size of 93K to 54K.&lt;/p&gt;
+&lt;p&gt;And of course the bottom line is page load times. Using &lt;a href="http://www.webpagetest.org"&gt;http://www.webpagetest.org&lt;/a&gt;, I tested from the Eastern United States (&lt;a href="http://www.orangelightning.co.uk"&gt;orangelightning&lt;/a&gt;&amp;nbsp; is in the UK) over three runs here are the median results:&lt;/p&gt;
+&lt;table style="width: 785px;" border="0" cellspacing="0" cellpadding="2"&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td valign="top" width="783"&gt;
+&lt;p align="center"&gt;&lt;strong&gt;With RequestReduce&lt;/strong&gt;&lt;/p&gt;
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td valign="top" width="783"&gt;&lt;a href="http://www.mattwrock.com/image.axd?picture=image_6.png"&gt;&lt;img style="background-image: none; margin: 0px 10px 0px 0px; padding-left: 0px; padding-right: 0px; display: inline; padding-top: 0px; border: 0px;" title="image" src="http://www.mattwrock.com/image.axd?picture=image_thumb_6.png" alt="image" width="671" height="137" border="0" /&gt;&lt;/a&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td valign="top" width="783"&gt;
+&lt;p align="center"&gt;&amp;nbsp;&lt;/p&gt;
+&lt;p align="center"&gt;&lt;strong&gt;Without RequestReduce&lt;/strong&gt;&lt;/p&gt;
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td valign="top" width="783"&gt;&lt;a href="http://www.mattwrock.com/image.axd?picture=image_7.png"&gt;&lt;img style="background-image: none; margin: 0px 10px 0px 0px; padding-left: 0px; padding-right: 0px; display: inline; padding-top: 0px; border: 0px;" title="image" src="http://www.mattwrock.com/image.axd?picture=image_thumb_7.png" alt="image" width="673" height="135" border="0" /&gt;&lt;/a&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;p&gt;RequestReduce is free, Requires very little effort to install and supports both small blogs and large multi server, CDN based enterprises. You can download it from &lt;a href="http://requestreduce.com/"&gt;http://requestreduce.com/&lt;/a&gt; or even easier, simply enter:&lt;/p&gt;
+&lt;pre&gt;Install-Package RequestReduce&lt;/pre&gt;
+&lt;p&gt;From the Nuget Packet Console right inside Visual Studio. Source code, wiki with thorough documentation and bug reporting is available from my github page at &lt;a href="https://github.com/mwrock/RequestReduce"&gt;https://github.com/mwrock/RequestReduce&lt;/a&gt;.&lt;/p&gt;</content>
+  <ispublished>True</ispublished>
+  <isdeleted>False</isdeleted>
+  <iscommentsenabled>True</iscommentsenabled>
+  <pubDate>2011-09-22 05:43:00</pubDate>
+  <lastModified>2011-12-12 23:14:20</lastModified>
+  <raters>0</raters>
+  <rating>0</rating>
+  <slug>wwworangelightningcouk-makes-strong-gains-in-page-load-performance-using-RequestReduce</slug>
+  <tags />
+  <comments />
+  <categories>
+    <category>2f8206f0-95a4-449e-bf74-3b2cb761de04</category>
+  </categories>
+  <notifications />
+</post>

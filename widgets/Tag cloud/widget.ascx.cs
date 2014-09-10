@@ -167,6 +167,12 @@ namespace Widgets.TagCloud
                 {
                     weightedList.Remove(Blog.CurrentInstance.Id);
                 }
+
+                Blog siteAggregationBlog = Blog.SiteAggregationBlog;
+                if (siteAggregationBlog != null && weightedList.ContainsKey(siteAggregationBlog.Id))
+                {
+                    weightedList.Remove(siteAggregationBlog.Id);
+                }
             }
         }
 
@@ -205,7 +211,7 @@ namespace Widgets.TagCloud
         private static SortedDictionary<string, int> CreateRawList()
         {
             var dic = new SortedDictionary<string, int>(StringComparer.InvariantCultureIgnoreCase);
-            foreach (var tag in Post.Posts.Where(post => post.IsVisibleToPublic).SelectMany(post => post.Tags))
+            foreach (var tag in Post.ApplicablePosts.Where(post => post.IsVisibleToPublic).SelectMany(post => post.Tags))
             {
                 if (dic.ContainsKey(tag))
                 {

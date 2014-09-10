@@ -57,7 +57,7 @@ namespace App_Code.Controls
                         var widgetId = this.Widget.WidgetId;
 
                         sb.AppendFormat("<a class=\"delete\" href=\"#\" onclick=\"BlogEngine.widgetAdmin.removeWidget('{0}');return false\" title=\"{1} widget\"><span class=\"widgetImg imgDelete\">&nbsp;</span></a>", widgetId, labels.delete);
-                        sb.AppendFormat("<a class=\"edit\" href=\"#\" onclick=\"BlogEngine.widgetAdmin.editWidget('{0}', '{1}');return false\" title=\"{2} widget\"><span class=\"widgetImg imgEdit\">&nbsp;</span>", this.Widget.Name, widgetId, labels.edit);
+                        sb.AppendFormat("<a class=\"edit\" href=\"#\" onclick=\"BlogEngine.widgetAdmin.editWidget('{0}', '{1}');return false\" title=\"{2} widget\"><span class=\"widgetImg imgEdit\">&nbsp;</span></a>", this.Widget.Name, widgetId, labels.edit);
                         sb.AppendFormat("<a class=\"move\" href=\"#\" onclick=\"BlogEngine.widgetAdmin.initiateMoveWidget('{0}');return false\" title=\"{1} widget\"><span class=\"widgetImg imgMove\">&nbsp;</span></a>", widgetId, labels.move);
 
                         return sb.ToString();

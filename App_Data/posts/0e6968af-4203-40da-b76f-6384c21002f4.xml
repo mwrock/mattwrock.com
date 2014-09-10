@@ -1,0 +1,168 @@
+﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<post>
+  <author>mwrock</author>
+  <title>Peering into the future of windows automation testing with  Chef, Vagrant and Test-Kitchen – Look mom, no SSH!</title>
+  <description />
+  <content>&lt;p&gt;&lt;a href="http://www.mattwrock.com/image.axd?picture=tablet_converge.jpg"&gt;&lt;img title="tablet_converge" style="border-left-width: 0px; border-right-width: 0px; background-image: none; border-bottom-width: 0px; padding-top: 0px; padding-left: 0px; margin: 0px 10px 0px 0px; display: inline; padding-right: 0px; border-top-width: 0px" border="0" alt="tablet_converge" src="http://www.mattwrock.com/image.axd?picture=tablet_converge_thumb.jpg" width="432" height="245" /&gt;&lt;/a&gt;Linux automation testing has been supported for a while now using many great tools like &lt;a href="http://www.getchef.com/"&gt;chef&lt;/a&gt;, &lt;a href="http://puppetlabs.com/"&gt;puppet&lt;/a&gt;, &lt;a href="http://kitchen.ci/"&gt;Test-Kitchen&lt;/a&gt;,&amp;#160; &lt;a href="http://serverspec.org"&gt;ServerSpec&lt;/a&gt;, &lt;a href="https://github.com/seattlerb/minitest"&gt;MiniTest&lt;/a&gt;, &lt;a href="https://blog.engineyard.com/2014/bats-test-command-line-tools"&gt;Bats&lt;/a&gt;, &lt;a href="http://www.vagrantup.com/"&gt;Vagrant&lt;/a&gt;, etc. If you were willing to install an &lt;a href="http://en.wikipedia.org/wiki/Secure_Shell"&gt;SSH&lt;/a&gt; server on Windows, you could get most of these tools to work but if you wanted to stay “native” you were on your own.&lt;/p&gt;  &lt;p&gt;&lt;strong&gt;Pictured above&lt;/strong&gt;: Testing node convergence on an 8 inch tablet.&lt;/p&gt;  &lt;p&gt;I’m not at all morally opposed to installing SSH on windows. I love SSH. We spoon regularly. But while SSH is “just there” on linux, it incurs an extra install step for windows that must either be done manually or included in initial provisioning or image creation. Also, for some windows-only shops, the unfamiliarity of SSH may add a layer of unwanted friction in an automation ecosystem where windows is often an after thought.&lt;/p&gt;  &lt;p&gt;Well recent efforts to make Windows testing a first class experience are beginning to take shape. Its still early days and some of the bits are not yet “officially” released but are available to use by pulling the latest bits from source control. I know…I know…to many that will still spell “friction” in bold. However, I want to share that one can today test windows machine builds via &lt;a href="http://msdn.microsoft.com/en-us/library/aa384426(v=vs.85).aspx"&gt;winrm&lt;/a&gt; with no SSH server installed, and I also want to offer a glimpse to those who prefer to wait until everything is fully baked of what is to come, and inform you that the wheels are in motion so please keep abreast of these developments.&lt;/p&gt; &lt;p&gt;&lt;strong&gt;Note&lt;/strong&gt;: I presented much of this material and several Boxstarter demos to the &lt;a href="http://powershell.org/wp/user-groups/philadelphia-powershell-user-group/"&gt;Philadelphia PowerShell User Group&lt;/a&gt; last week, the &lt;a href="https://www.youtube.com/watch?v=olY1g07E8mk"&gt;video is available here&lt;/a&gt;.&lt;/p&gt; &lt;h2&gt;Its not automated until it is tested&lt;/h2&gt;  &lt;p&gt;I work for &lt;a href="http://www.centurylinkcloud.com/"&gt;CenturyLink Cloud&lt;/a&gt; and infrastructure automation is front and center to our business. Like many shops, we have a mixed environment and central to our principals is the belief that testing our automation is just as important as building our automation. In fact they are not even two separate concepts. Untested automation is not finished being built. So I am going to share with you here how we test our Windows server infrastructure along with some other bits I have been working with on the side.&lt;/p&gt;  &lt;h2&gt;Vagrant&lt;/h2&gt;  &lt;p&gt;If you have not heard of Vagrant, just stop reading right now and mosey on over to &lt;a href="http://vagrantup.com"&gt;http://vagrantup.com&lt;/a&gt;. Vagrant is a hypervisor agnostic way of spinning up and provisioning servers that is particularly suited for developing and testing. It completely abstracts both the VM infrastructure as well as many possible provisioning systems (chef, puppet, plain shell scripts, &lt;a href="https://www.docker.com/"&gt;docker&lt;/a&gt; and many many more) so that one can provision and share the same machine among a team using different platforms.&lt;/p&gt;  &lt;p&gt;To illustrate the usefulness here, where I work we have a diverse team where some prefer MACs, others work on Windows and others (like myself) run a Linux desktop. We use Chef to automate our infrastructure and anyone who needs to create or edit chef artifacts needs all sorts of dependencies installed with specific versions in order to be successful. Vagrant plays a key role here. Anyone can download our Ubuntu 12.04 base image via &lt;a href="https://www.virtualbox.org/"&gt;VirtualBox&lt;/a&gt;, &lt;a href="http://www.vmware.com/"&gt;VMWare&lt;/a&gt; or &lt;a href="http://www.microsoft.com/en-us/server-cloud/solutions/virtualization.aspx"&gt;Hyper-V&lt;/a&gt; and then use its Chef provisioner plugin to build that image to a state that mirrors the one used by the entire team. all this is done by including a small file of metadata that serves as a pointer to here the base images can be found as well as the chef recipes. If this sounds interesting, again I refer you to Vagrant’s documentation for the details What I want to point out here is its windows support.&lt;/p&gt;  &lt;h3&gt;Added support for WinRM and Hyper-V&lt;/h3&gt;  &lt;p&gt;Until fairly recently, Vagrant only supported SSH as a transport mechanism to provision a VM. It also lacked official Hyper-V support as a VM provider. This changed in &lt;a href="http://www.vagrantup.com/blog/vagrant-1-6.html"&gt;version 1.6&lt;/a&gt; with a WinRM “Communicator” and a Hyper-V provider plugin included in the box. While I don’t really use Hyper-V at work, I have some windows based personal projects at home and I prefer to use Hyper-V. So I quickly tested out this new plugin and was happy to see it available. There are still some kinks in the current version but work is underway to improve the experience. I’m trying to to personally contribute to issues that are blocking my own work and a couple have been accepted into Vagrant Master. Overall that has been a lot of fun. Here are the issues that have come up for me:&lt;/p&gt;  &lt;ul&gt;   &lt;li&gt;Only .vhdx image files are supported and .vhd files cannot be imported. I hit a wall with this when trying to use the .vhd files freely available for testing &lt;a href="http://www.microsoft.com/en-us/evalcenter/evaluate-windows-server-2012-r2"&gt;here on Technet&lt;/a&gt;. I have since added a &lt;a href="https://github.com/mitchellh/vagrant/commit/efd7c619d1a88f9ea23ba4f4999d6f2c7dbbab20"&gt;patch&lt;/a&gt; which has been accepted to fix this. &lt;/li&gt;    &lt;li&gt;Generation 2 Hyper-V VMs are imported as Generation 1 VMs and fail to boot. Oddly, most .vhdx images tend to be generation 2. &lt;a href="https://github.com/mitchellh/vagrant/commit/be75702f35d2ec9bf42f58015efa61b1772c21bb"&gt;My PR&lt;/a&gt; for this issue was just accepted yesterday. &lt;/li&gt;    &lt;li&gt;Synced folders over SMB (this is the norm for a windows host/windows guest setup) fail. I’m hoping &lt;a href="https://github.com/mitchellh/vagrant/pull/4209"&gt;my PR&lt;/a&gt; for this issue is accepted.&lt;/li&gt; &lt;/ul&gt;  &lt;p&gt;If these same issues become blockers for you, the first two can be immediately fixed by pulling the latest copy of Vagrant’s master branch and copying the lib and plugin directories onto the installed version and you are welcome to pull my smb_sync branch which includes all of the fixes:&lt;/p&gt;  &lt;div id="codeSnippetWrapper"&gt;   &lt;pre id="codeSnippet" style="border-top-style: none; overflow: visible; font-size: 8pt; font-family: &amp;#39;Courier New&amp;#39;, courier, monospace; width: 100%; border-bottom-style: none; color: black; padding-bottom: 0px; direction: ltr; text-align: left; padding-top: 0px; border-right-style: none; padding-left: 0px; margin: 0em; border-left-style: none; line-height: 12pt; padding-right: 0px; background-color: #f4f4f4"&gt;git clone -b smb_sync https://github.com/mwrock/vagrant&lt;br /&gt;copy-item vagrant\lib C:\HashiCorp\Vagrant\embedded\gems\gems\vagrant-1.6.3 -recurse -force&lt;br /&gt;copy-item vagrant\plugins C:\HashiCorp\Vagrant\embedded\gems\gems\vagrant-1.6.3 -recurse -force&lt;br /&gt;&lt;/pre&gt;
+
+  &lt;br /&gt;&lt;/div&gt;
+
+&lt;p&gt;Having worked with Vagrant for the past few months, I’ve been finding myself wishing there was a remote powershell equivilent to the vagrant SSH command which drops you into an ssh session on the guest box. So today I banged out a first draft of a &lt;a href="https://github.com/mitchellh/vagrant/pull/4330"&gt;vagrant ps command&lt;/a&gt; that does just that and will submit once it is more polished. You can expect it to look like this:&lt;/p&gt;
+
+&lt;div id="codeSnippetWrapper"&gt;
+  &lt;pre id="codeSnippet" style="border-top-style: none; overflow: visible; font-size: 8pt; font-family: &amp;#39;Courier New&amp;#39;, courier, monospace; width: 100%; border-bottom-style: none; color: black; padding-bottom: 0px; direction: ltr; text-align: left; padding-top: 0px; border-right-style: none; padding-left: 0px; margin: 0em; border-left-style: none; line-height: 12pt; padding-right: 0px; background-color: #f4f4f4"&gt;C:\dev\vagrant\win8.1x64&amp;gt; vagrant ps&lt;br /&gt;    &lt;span style="color: #0000ff"&gt;default&lt;/span&gt;: Creating powershell session to 192.168.1.14:5985&lt;br /&gt;    &lt;span style="color: #0000ff"&gt;default&lt;/span&gt;: Username: vagrant&lt;br /&gt;[192.168.1.14]: PS C:\Users\vagrant\Documents&amp;gt;&lt;/pre&gt;
+
+  &lt;br /&gt;&lt;/div&gt;
+
+&lt;h3&gt;A base box for testing&lt;/h3&gt;
+
+&lt;p&gt;I’ve been playing with creating windows vagrant boxes. Unfortunately for Hyper-V, the vagrant package command is &lt;a href="http://docs.vagrantup.com/v2/hyperv/limitations.html"&gt;not yet implemented&lt;/a&gt; so I have to “manually” create the base box. Perhaps I’ll work on an implementation for my next contribution. My Windows 2012R2 Hyper-V box requires all the above fixes to install without error. You could use this Vagrantfile to test:&lt;/p&gt;
+
+&lt;div id="codeSnippetWrapper"&gt;
+  &lt;pre id="codeSnippet" style="border-top-style: none; overflow: visible; font-size: 8pt; font-family: &amp;#39;Courier New&amp;#39;, courier, monospace; width: 100%; border-bottom-style: none; color: black; padding-bottom: 0px; direction: ltr; text-align: left; padding-top: 0px; border-right-style: none; padding-left: 0px; margin: 0em; border-left-style: none; line-height: 12pt; padding-right: 0px; background-color: #f4f4f4"&gt;&lt;span style="color: #008000"&gt;# -*- mode: ruby -*-&lt;/span&gt;&lt;br /&gt;&lt;span style="color: #008000"&gt;# vi: set ft=ruby :&lt;/span&gt;&lt;br /&gt;&lt;br /&gt;VAGRANTFILE_API_VERSION = &lt;span style="color: #006080"&gt;&amp;quot;2&amp;quot;&lt;/span&gt;&lt;br /&gt;&lt;br /&gt;Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|&lt;br /&gt;  config.vm.box = &lt;span style="color: #006080"&gt;&amp;quot;mwrock/Windows2012R2&amp;quot;&lt;/span&gt;&lt;br /&gt;  config.vm.box_url = &lt;span style="color: #006080"&gt;&amp;quot;https://vagrantcloud.com/mwrock/Windows2012R2/version/1/provider/hyperv.box&amp;quot;&lt;/span&gt;&lt;br /&gt;  &lt;span style="color: #008000"&gt;# Change &amp;quot;.&amp;quot; below with your own folder you would like to sync&lt;/span&gt;&lt;br /&gt;  config.vm.synced_folder &lt;span style="color: #006080"&gt;&amp;quot;.&amp;quot;&lt;/span&gt;, &lt;span style="color: #006080"&gt;&amp;quot;/chocolateypackages&amp;quot;&lt;/span&gt;, disabled: true&lt;br /&gt;  config.vm.guest = :windows&lt;br /&gt;  config.vm.communicator = &lt;span style="color: #006080"&gt;&amp;quot;winrm&amp;quot;&lt;/span&gt;&lt;br /&gt;  config.winrm.username = &lt;span style="color: #006080"&gt;&amp;quot;administrator&amp;quot;&lt;/span&gt;&lt;br /&gt;  config.winrm.password = &lt;span style="color: #006080"&gt;&amp;quot;Pass@word1&amp;quot;&lt;/span&gt;&lt;br /&gt;&lt;span style="color: #0000ff"&gt;end&lt;/span&gt;&lt;br /&gt;&lt;/pre&gt;
+
+  &lt;br /&gt;&lt;/div&gt;
+
+&lt;p&gt;Note here that you need to specify :windows as the guest. Vagrant will not infer that on its own nor will it assume you are using winrm if you are using a windows guest so make sure to add that to your boxes as well if you intend to use winrm.&lt;/p&gt;
+
+&lt;h2&gt;Test-Kitchen&lt;/h2&gt;
+
+&lt;p&gt;&lt;a href="http://kitchen.ci/"&gt;Test-Kitchen&lt;/a&gt; is a testing framework most often used for testing Chef recipes (hence – kitchen). However I understand it is also compatible with Puppet as well. Like many tools in this space such as Vagrant above, it is highly plugin driven. Test-Kitchen by itself doesn’t really do much. What Test-Kitchen brings to the table (Ha Ha! I said table. get it?) is the ability to bring together a provisioning configuration management system like Chef and Puppet, a myriad of different cloud and hypervisor platforms and several testing frameworks. In the end it will spin up a machine, run your provisioning code and then run your tests. Further you can integrate this in your builds providing quick feedback as to the quality of your automation upon committing changes.&lt;/p&gt;
+
+&lt;h3&gt;“Official” support for windows guests coming soon&lt;/h3&gt;
+
+&lt;p&gt;Currently the “official” release of Test-Kitchen does not support winrm and must go through SSH on windows. However, &lt;a href="https://twitter.com/afiune"&gt;Salim Afiune&lt;/a&gt; (@afiune), a developer with Chef has been working on adding winrm support. I have plumbed this into our Windows testing at CenturyLink cloud and have also used it developing my &lt;a href="https://community.opscode.com/cookbooks/boxstarter"&gt;Boxstarter cookbook&lt;/a&gt;, which allows one to embed &lt;a href="http://boxstarter.org"&gt;boxstarter&lt;/a&gt; based powershell in a recipe and provides all the reboot resiliency and windows config functions available in Boxstarter core. Salim has also contributed corresponding changes to the vagrant and EC2 Test-Kitchen drivers.&lt;/p&gt;
+
+&lt;p&gt;At CenturyLink, we use vmware and a customized vsphere driver to test with Test-Kitchen. It was trivial to add support for Salim’s branch.. With the Boxstarter cookbook, I use his vagrant plugin without issue. According to &lt;a href="http://www.getchef.com/blog/2014/07/15/release-chef-development-kit-0-2-0/"&gt;this Chef blog post&lt;/a&gt;, all of this windows work will likely be pulled into the next release of Test-Kitchen.&lt;/p&gt;
+
+&lt;h3&gt;But I just cant wait. I must try this today!&lt;/h3&gt;
+
+&lt;p&gt;So for those interested in “kicking the tires” today, here is how you can install all the bits needed:&lt;/p&gt;
+
+&lt;div id="codeSnippetWrapper"&gt;
+  &lt;div id="codeSnippetWrapper"&gt;
+    &lt;div id="codeSnippetWrapper"&gt;
+      &lt;div id="codeSnippetWrapper"&gt;
+        &lt;div id="codeSnippetWrapper"&gt;
+          &lt;div id="codeSnippetWrapper"&gt;
+            &lt;pre id="codeSnippet" style="border-top-style: none; overflow: visible; font-size: 8pt; font-family: &amp;#39;Courier New&amp;#39;, courier, monospace; width: 100%; border-bottom-style: none; color: black; padding-bottom: 0px; direction: ltr; text-align: left; padding-top: 0px; border-right-style: none; padding-left: 0px; margin: 0em; border-left-style: none; line-height: 12pt; padding-right: 0px; background-color: #f4f4f4"&gt;cinst chefdk&lt;br /&gt;cinst vagrant&lt;br /&gt;git clone -b transport https://github.com/afiune/test-kitchen&lt;br /&gt;git clone -b transport https://github.com/mwrock/kitchen-vagrant&lt;br /&gt;&lt;br /&gt;copy-item test-kitchen\lib C:\opscode\chefdk\embedded\apps\test-kitchen `&lt;br /&gt;  -recurse -force&lt;br /&gt;copy-item test-kitchen\support C:\opscode\chefdk\embedded\apps\test-kitchen `&lt;br /&gt;  -recurse -force&lt;br /&gt;copy-item -Path kitchen-vagrant\lib `&lt;br /&gt;  -Destination C:\opscode\chefdk\embedded\lib\ruby\gems\2.0.0\gems\kitchen-vagrant-0.15.0 `&lt;br /&gt;  -recurse -force&lt;br /&gt;&lt;br /&gt;cd test-kitchen&lt;br /&gt;gem build .\Test-kitchen.gemspec&lt;br /&gt;chef gem install test-kitchen-1.3.0.gem&lt;br /&gt;&lt;/pre&gt;
+
+            &lt;br /&gt;&lt;/div&gt;
+
+          &lt;br /&gt;This will install the &lt;a href="http://downloads.getchef.com/chef-dk/windows/#/"&gt;Chef Development Kit&lt;/a&gt; and vagrant via &lt;a href="http://chocolatey.org/"&gt;Chocolatey&lt;/a&gt; and I’m assuming you have chocolatey installed. Otherwise you can download these from their respective download pages &lt;a href="http://downloads.getchef.com/chef-dk/windows"&gt;here&lt;/a&gt; and &lt;a href="http://www.vagrantup.com/downloads.html"&gt;here&lt;/a&gt;. Then it clones the winrm based test-kitchen and kitchen-vagrant projects and copies them over the current bits.&lt;/div&gt;
+
+        &lt;div&gt;&amp;#160;&lt;/div&gt;
+      &lt;/div&gt;
+    &lt;/div&gt;
+  &lt;/div&gt;
+&lt;/div&gt;
+
+&lt;p&gt;Note that my instructions here are assuming you are testing on Windows. However, the winrm functionality is most certainly capable of running on Linux as I do at work. If you were doing this on Linux, I’d suggest running bundle install and bundle exec instead of copying over the chef directories. However this has caused me too many problems on Windows to recommend to others and purely copying the bits has not caused me any problems.&lt;/p&gt;
+
+&lt;h3&gt;Hyper-V&lt;/h3&gt;
+
+&lt;p&gt;Now you can pull down the boxstarter cookbook to test from &lt;a title="https://github.com/mwrock/boxstarter-cookbook" href="https://github.com/mwrock/boxstarter-cookbook"&gt;https://github.com/mwrock/boxstarter-cookbook&lt;/a&gt;. If you run Hyper-V, you will want to install my vagrant fixes according to the instructions above since the box inside the boxstarter cookbook’s kitchen config is on a vhd file. You can then simply navigate to the boxstarer cookbook directory and run:&lt;/p&gt;
+
+&lt;div id="codeSnippetWrapper"&gt;
+  &lt;pre id="codeSnippet" style="border-top-style: none; overflow: visible; font-size: 8pt; font-family: &amp;#39;Courier New&amp;#39;, courier, monospace; width: 100%; border-bottom-style: none; color: black; padding-bottom: 0px; direction: ltr; text-align: left; padding-top: 0px; border-right-style: none; padding-left: 0px; margin: 0em; border-left-style: none; line-height: 12pt; padding-right: 0px; background-color: #f4f4f4"&gt;kitchen test&lt;/pre&gt;
+
+  &lt;br /&gt;&lt;/div&gt;
+
+&lt;p&gt;This will build a win 2012 R2 box and install and test a very simple cookbook via Test-Kitchen.&lt;/p&gt;
+
+&lt;h3&gt;Virtual Box&lt;/h3&gt;
+
+&lt;p&gt;If you run VirtualBox, you will need to make a couple changes. Replace the VagrantfileWinrm.erb content with this:&lt;/p&gt;
+
+&lt;div id="codeSnippetWrapper"&gt;
+  &lt;div id="codeSnippetWrapper"&gt;
+    &lt;pre id="codeSnippet" style="border-top-style: none; overflow: visible; font-size: 8pt; font-family: &amp;#39;Courier New&amp;#39;, courier, monospace; width: 100%; border-bottom-style: none; color: black; padding-bottom: 0px; direction: ltr; text-align: left; padding-top: 0px; border-right-style: none; padding-left: 0px; margin: 0em; border-left-style: none; line-height: 12pt; padding-right: 0px; background-color: #f4f4f4"&gt;&lt;span style="color: #008000"&gt;# -*- mode: ruby -*-&lt;/span&gt;&lt;br /&gt;&lt;span style="color: #008000"&gt;# vi: set ft=ruby :&lt;/span&gt;&lt;br /&gt;&lt;br /&gt;VAGRANTFILE_API_VERSION = &lt;span style="color: #006080"&gt;&amp;quot;2&amp;quot;&lt;/span&gt;&lt;br /&gt;&lt;br /&gt;Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|&lt;br /&gt;  config.vm.box = &lt;span style="color: #006080"&gt;&amp;quot;&amp;lt;%= config[:box] %&amp;gt;&amp;quot;&lt;/span&gt;&lt;br /&gt;  config.vm.box_url = &lt;span style="color: #006080"&gt;&amp;quot;&amp;lt;%= config[:box_url] %&amp;gt;&amp;quot;&lt;/span&gt;&lt;br /&gt;  config.vm.guest = :windows&lt;br /&gt;  config.winrm.username = &lt;span style="color: #006080"&gt;&amp;quot;vagrant&amp;quot;&lt;/span&gt;&lt;br /&gt;  config.winrm.password = &lt;span style="color: #006080"&gt;&amp;quot;vagrant&amp;quot;&lt;/span&gt;&lt;br /&gt;  config.winrm.port = 55985&lt;br /&gt;&lt;span style="color: #0000ff"&gt;end&lt;/span&gt;&lt;br /&gt;&lt;/pre&gt;
+
+    &lt;br /&gt;You would also replace the .kitchen.yml content with:&lt;/div&gt;
+
+  &lt;div&gt;&amp;#160;&lt;/div&gt;
+&lt;/div&gt;
+
+&lt;div id="codeSnippetWrapper"&gt;
+  &lt;div&gt;
+    &lt;pre id="codeSnippet" style="border-top-style: none; overflow: visible; font-size: 8pt; font-family: &amp;#39;Courier New&amp;#39;, courier, monospace; width: 100%; border-bottom-style: none; color: black; padding-bottom: 0px; direction: ltr; text-align: left; padding-top: 0px; border-right-style: none; padding-left: 0px; margin: 0em; border-left-style: none; line-height: 12pt; padding-right: 0px; background-color: #f4f4f4"&gt;---&lt;br /&gt;driver:&lt;br /&gt;  name: vagrant&lt;br /&gt;&lt;br /&gt;provisioner:&lt;br /&gt;  name: chef_zero&lt;br /&gt;&lt;br /&gt;platforms:&lt;br /&gt;  - name: windows-81&lt;br /&gt;    transport:&lt;br /&gt;      name: winrm&lt;br /&gt;      max_threads: 1&lt;br /&gt;    driver:&lt;br /&gt;      port: 55985&lt;br /&gt;      username: vagrant&lt;br /&gt;      password: vagrant&lt;br /&gt;      guest: :windows&lt;br /&gt;      box: mwrock/Windows8.1-amd64&lt;br /&gt;      vagrantfile_erb: VagrantfileWinrm.erb&lt;br /&gt;      box_url: https://wrock.blob.core.windows.net/vhds/win8.1-vbox-amd64.box&lt;br /&gt;&lt;br /&gt;suites:&lt;br /&gt;  - name: &lt;span style="color: #0000ff"&gt;default&lt;/span&gt;&lt;br /&gt;    run_list:&lt;br /&gt;      - recipe[boxstarter_test::simple]&lt;br /&gt;    attributes:&lt;br /&gt;&lt;/pre&gt;
+  &lt;/div&gt;
+
+  &lt;div&gt;&amp;#160;&lt;/div&gt;
+
+  &lt;div&gt;The test included in the boxstarter cookbook is not very interesting but illustrates that you can indeed run kitchen tests against windows machines with no ssh installed.&lt;/div&gt;
+
+  &lt;h2&gt;Looking at a more interesting ServerSpec test&lt;/h2&gt;
+
+  &lt;p&gt;For those reading who might want to see what a more interesting test would look like, lets take a look at this Chef recipe:&lt;/p&gt;
+
+  &lt;div id="codeSnippetWrapper"&gt;
+    &lt;pre id="codeSnippet" style="border-top-style: none; overflow: visible; font-size: 8pt; font-family: &amp;#39;Courier New&amp;#39;, courier, monospace; width: 100%; border-bottom-style: none; color: black; padding-bottom: 0px; direction: ltr; text-align: left; padding-top: 0px; border-right-style: none; padding-left: 0px; margin: 0em; border-left-style: none; line-height: 12pt; padding-right: 0px; background-color: #f4f4f4"&gt;include_recipe &lt;span style="color: #006080"&gt;'boxstarter::default'&lt;/span&gt;&lt;br /&gt;&lt;br /&gt;boxstarter &lt;span style="color: #006080"&gt;&amp;quot;boxstarter run&amp;quot;&lt;/span&gt; do&lt;br /&gt;  password &lt;span style="color: #006080"&gt;'Pass@word1'&lt;/span&gt;&lt;br /&gt;  code &amp;lt;&amp;lt;-EOH&lt;br /&gt;    Update-ExecutionPolicy Unrestricted&lt;br /&gt;    Set-WindowsExplorerOptions -EnableShowHiddenFilesFoldersDrives `&lt;br /&gt;      -EnableShowProtectedOSFiles -EnableShowFileExtensions&lt;br /&gt;    Enable-RemoteDesktop&lt;br /&gt;    cinst console2&lt;br /&gt;&lt;br /&gt;    cinst IIS-WebServerRole -source windowsfeatures    &lt;br /&gt;    &lt;span style="color: #008000"&gt;#Install-WindowsUpdate -acceptEula&lt;/span&gt;&lt;br /&gt;  EOH&lt;br /&gt;end&lt;/pre&gt;
+
+    &lt;br /&gt;&lt;/div&gt;
+
+  &lt;div&gt;This is a sample recipe I include with the Boxstarter cookbook but I have commented out the call that runs windows updates. This recipe will run the included Boxstarter resource and perform the following:&lt;/div&gt;
+
+  &lt;ul&gt;
+    &lt;li&gt;Update the powershell execution policy&lt;/li&gt;
+
+    &lt;li&gt;Adjust the windows explorer settings&lt;/li&gt;
+
+    &lt;li&gt;enable remote desktop&lt;/li&gt;
+
+    &lt;li&gt;install the console2 command line console&lt;/li&gt;
+
+    &lt;li&gt;Install IIS&lt;/li&gt;
+  &lt;/ul&gt;
+
+  &lt;p&gt;Here is a test file that will check most of the items changed by the recipe:&lt;/p&gt;
+
+  &lt;p&gt;
+    &lt;div id="codeSnippetWrapper"&gt;
+      &lt;div id="codeSnippetWrapper"&gt;
+        &lt;pre id="codeSnippet" style="border-top-style: none; overflow: visible; font-size: 8pt; font-family: &amp;#39;Courier New&amp;#39;, courier, monospace; width: 100%; border-bottom-style: none; color: black; padding-bottom: 0px; direction: ltr; text-align: left; padding-top: 0px; border-right-style: none; padding-left: 0px; margin: 0em; border-left-style: none; line-height: 12pt; padding-right: 0px; background-color: #f4f4f4"&gt;require &lt;span style="color: #006080"&gt;'serverspec'&lt;/span&gt;&lt;br /&gt;&lt;br /&gt;include Serverspec::Helper::Cmd&lt;br /&gt;include Serverspec::Helper::Windows&lt;br /&gt;&lt;br /&gt;describe file(&lt;span style="color: #006080"&gt;'C:\\programdata\\chocolatey\\bin\\console.exe'&lt;/span&gt;) do&lt;br /&gt;  it { should be_file }&lt;br /&gt;&lt;span style="color: #0000ff"&gt;end&lt;/span&gt;&lt;br /&gt;describe windows_feature(&lt;span style="color: #006080"&gt;'Web-Server'&lt;/span&gt;) do&lt;br /&gt;  it{ should be_installed.by(&lt;span style="color: #006080"&gt;&amp;quot;powershell&amp;quot;&lt;/span&gt;) }&lt;br /&gt;&lt;span style="color: #0000ff"&gt;end&lt;/span&gt;&lt;br /&gt;describe windows_registry_key(&lt;br /&gt;  &lt;span style="color: #006080"&gt;'HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\advanced'&lt;/span&gt;) do&lt;br /&gt;  it { should have_property_value(&lt;span style="color: #006080"&gt;'Hidden'&lt;/span&gt;, :type_dword, &lt;span style="color: #006080"&gt;'1'&lt;/span&gt;) }&lt;br /&gt;&lt;span style="color: #0000ff"&gt;end&lt;/span&gt;&lt;br /&gt;describe command(&lt;span style="color: #006080"&gt;'Get-ExecutionPolicy'&lt;/span&gt;) do&lt;br /&gt;  it { should return_stdout &lt;span style="color: #006080"&gt;'Unrestricted'&lt;/span&gt; }&lt;br /&gt;&lt;span style="color: #0000ff"&gt;end&lt;/span&gt;&lt;br /&gt;&lt;/pre&gt;
+
+        &lt;br /&gt;&lt;/div&gt;
+
+      &lt;br /&gt;&lt;/div&gt;
+
+    &lt;div&gt;Serverspec provides a nice Ruby DSL for testing the state of a server. Although the test is pure ruby code, in most cases you don’t really need to know ruby. Familiarity with the cut and paste features will be very helpful so please review those as necessary. &lt;/div&gt;
+
+    &lt;div&gt;&amp;#160;&lt;/div&gt;
+
+    &lt;div&gt;The documentation on the &lt;a href="http://serverspec.org/"&gt;ServerSpec.org&lt;/a&gt; page does a decent job of describing the different resources that can be tested. Above are just a few:&amp;#160; a file resource, windows feature resource, a windows registry resource and a command resource that you can use to issue any powershell necessary to test your server.&lt;/div&gt;
+
+    &lt;div&gt;
+      &lt;br /&gt;All of these tests, as we do at CenturyLink can be fed into a Continuous Integration server (Jenkins, TeamCity, TFS, etc.) to give your team speedy feedback on the state of your automation codebase.&lt;/div&gt;
+
+    &lt;br /&gt;&lt;/p&gt;
+&lt;/div&gt;
+
+&lt;p&gt;I hope you find this helpful and I look forward to these features making it into the official vagrant and test-kitchen installs soon.&lt;/p&gt;</content>
+  <ispublished>True</ispublished>
+  <isdeleted>False</isdeleted>
+  <iscommentsenabled>True</iscommentsenabled>
+  <pubDate>2014-08-12 03:45:00</pubDate>
+  <lastModified>2014-08-12 04:11:33</lastModified>
+  <raters>0</raters>
+  <rating>0</rating>
+  <slug>Peering-into-the-future-of-windows-automation-testing-with-Chef-Vagrant-and-Test-Kitchen-Look-mom-no-SSH!</slug>
+  <tags />
+  <comments>
+    <comment id="93f4f10c-0396-4d36-accd-481fced214fa" parentid="00000000-0000-0000-0000-000000000000" approved="True" spam="False" deleted="False">
+      <date>2014-08-12 09:55:42</date>
+      <author>getchef.com</author>
+      <email>pingback</email>
+      <country />
+      <ip>184.106.28.76</ip>
+      <website>http://www.getchef.com/blog/2014/08/12/windows-automation-testing-wchef-by-mwrockx/</website>
+      <content>Pingback from getchef.com
+
+Windows Automation Testing w/Chef by @mwrockx &amp;#124; Chef Blog</content>
+    </comment>
+  </comments>
+  <categories>
+    <category>219109f8-7b0b-459b-8f25-9ce747eb0851</category>
+  </categories>
+  <notifications />
+</post>

@@ -93,7 +93,12 @@
         /// </summary>
         private void BindPosts()
         {
-            if (this.Posts == null || this.Posts.Count == 0)
+			if (this.Posts == null) {
+				// no posts provided, load all posts by default
+				Posts = Post.ApplicablePosts.ConvertAll(new Converter<Post, IPublishable>(delegate(Post p) { return p as IPublishable; }));
+			}
+			
+            if (this.Posts.Count == 0)
             {
                 this.hlPrev.Visible = false;
                 return;

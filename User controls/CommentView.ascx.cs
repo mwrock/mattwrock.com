@@ -7,7 +7,6 @@
     using System.Globalization;
     using System.IO;
     using System.Linq;
-    using System.Security.Cryptography;
     using System.Text;
     using System.Web;
     using System.Web.Security;
@@ -40,8 +39,8 @@
         /// </summary>
         public CommentView()
         {
-            this.NameInputId = string.Empty;
-            this.DefaultName = string.Empty;
+            NameInputId = string.Empty;
+            DefaultName = string.Empty;
         }
 
         #endregion
@@ -55,11 +54,11 @@
         {
             get
             {
-                if (!this.nestingSupported.HasValue)
+                if (!nestingSupported.HasValue)
                 {
                     if (!BlogSettings.Instance.IsCommentNestingEnabled)
                     {
-                        this.nestingSupported = false;
+                        nestingSupported = false;
                     }
                     else
                     {
@@ -67,13 +66,13 @@
                             "{0}themes/{1}/CommentView.ascx", Utils.ApplicationRelativeWebRoot, BlogSettings.Instance.GetThemeWithAdjustments(null));
 
                         // test comment control for nesting placeholder (for backwards compatibility with older themes)
-                        var commentTester = (CommentViewBase)this.LoadControl(path);
+                        var commentTester = (CommentViewBase)LoadControl(path);
                         var subComments = commentTester.FindControl("phSubComments") as PlaceHolder;
-                        this.nestingSupported = subComments != null;
+                        nestingSupported = subComments != null;
                     }
                 }
 
-                return this.nestingSupported.Value;
+                return nestingSupported.Value;
             }
         }
 
@@ -204,16 +203,15 @@
 
             col.Sort();
 
-            this.ddlCountry.Items.Add(new ListItem("[Not specified]", string.Empty));
+            ddlCountry.Items.Add(new ListItem("[Not specified]", string.Empty));
             foreach (var key in col)
             {
-                this.ddlCountry.Items.Add(new ListItem(key, dic[key]));
+                ddlCountry.Items.Add(new ListItem(key, dic[key]));
             }
 
-            if (this.ddlCountry.SelectedIndex == 0)
+            if (ddlCountry.SelectedIndex == 0)
             {
-                this.ddlCountry.SelectedValue = ResolveRegion().TwoLetterISORegionName.ToLowerInvariant();
-                this.SetFlagImageUrl();
+                ddlCountry.SelectedValue = ResolveRegion().TwoLetterISORegionName.ToLowerInvariant();
             }
         }
 
@@ -231,7 +229,7 @@
         /// </returns>
         public string GetCallbackResult()
         {
-            return this.callback;
+            return callback;
         }
 
         /// <summary>
@@ -266,29 +264,29 @@
 
             var simpleCaptchaChallenge = args[12];
 
-            this.recaptcha.UserUniqueIdentifier = this.hfCaptcha.Value;
-            if (!preview && this.AnyCaptchaEnabled && this.AnyCaptchaNecessary)
+            recaptcha.UserUniqueIdentifier = hfCaptcha.Value;
+            if (!preview && AnyCaptchaEnabled && AnyCaptchaNecessary)
             {
-                if (this.ReCaptchaEnabled)
+                if (ReCaptchaEnabled)
                 {
-                    if (!this.recaptcha.ValidateAsync(recaptchaResponse, recaptchaChallenge))
+                    if (!recaptcha.ValidateAsync(recaptchaResponse, recaptchaChallenge))
                     {
-                        this.callback = "RecaptchaIncorrect";
+                        callback = "RecaptchaIncorrect";
                         return;
                     }
                 }
                 else
                 {
-                    this.simplecaptcha.Validate(simpleCaptchaChallenge);
-                    if (!this.simplecaptcha.IsValid)
+                    simplecaptcha.Validate(simpleCaptchaChallenge);
+                    if (!simplecaptcha.IsValid)
                     {
-                        this.callback = "SimpleCaptchaIncorrect";
+                        callback = "SimpleCaptchaIncorrect";
                         return;
                     }
                 }
             }
 
-            var storedCaptcha = this.hfCaptcha.Value;
+            var storedCaptcha = hfCaptcha.Value;
 
             if (sentCaptcha != storedCaptcha)
             {
@@ -299,15 +297,15 @@
                 {
                     Id = Guid.NewGuid(),
                     ParentId = replyToCommentId,
-                    Author = this.Server.HtmlEncode(author),
-                    Email = email,
-                    Content = this.Server.HtmlEncode(content),
-                    IP = this.Request.UserHostAddress,
-                    Country = country,
+                    Author = Server.HtmlEncode(author),
+                    Email = Server.HtmlEncode(email),
+                    Content = Server.HtmlEncode(content),
+                    IP = Utils.GetClientIP(),
+                    Country = Server.HtmlEncode(country),
                     DateCreated = DateTime.Now,
-                    Parent = this.Post,
+                    Parent = Post,
                     IsApproved = !BlogSettings.Instance.EnableCommentsModeration,
-                    Avatar = avatar.Trim()
+                    Avatar = Server.HtmlEncode(avatar.Trim())
                 };
 
             if (Security.IsAuthenticated && BlogSettings.Instance.TrustAuthenticatedUsers)
@@ -334,35 +332,35 @@
 
             if (!preview)
             {
-                if (notify && !this.Post.NotificationEmails.Contains(email))
+                if (notify && !Post.NotificationEmails.Contains(email))
                 {
-                    this.Post.NotificationEmails.Add(email);
+                    Post.NotificationEmails.Add(email);
                 }
-                else if (!notify && this.Post.NotificationEmails.Contains(email))
+                else if (!notify && Post.NotificationEmails.Contains(email))
                 {
-                    this.Post.NotificationEmails.Remove(email);
+                    Post.NotificationEmails.Remove(email);
                 }
 
-                this.Post.AddComment(comment);
-                this.SetCookie(author, email, website, country);
-                if (this.ReCaptchaEnabled)
+                Post.AddComment(comment);
+                SetCookie(author, email, website, country);
+                if (ReCaptchaEnabled)
                 {
-                    this.recaptcha.UpdateLog(comment);
+                    recaptcha.UpdateLog(comment);
                 }
             }
 
             var path = string.Format(
                 "{0}themes/{1}/CommentView.ascx", Utils.ApplicationRelativeWebRoot, BlogSettings.Instance.GetThemeWithAdjustments(null));
 
-            var control = (CommentViewBase)this.LoadControl(path);
+            var control = (CommentViewBase)LoadControl(path);
             control.Comment = comment;
-            control.Post = this.Post;
+            control.Post = Post;
             control.RenderComment();
 
             using (var sw = new StringWriter())
             {
                 control.RenderControl(new HtmlTextWriter(sw));
-                this.callback = sw.ToString();
+                callback = sw.ToString();
             }
         }
 
@@ -387,19 +385,19 @@
             if (Security.IsAuthenticated)
             {
                 var sb = new StringBuilder();
-                foreach (var comment in this.Post.Comments.Where(comment => comment.Id.ToString() == id))
+                foreach (var comment in Post.Comments.Where(comment => comment.Id.ToString() == id))
                 {
                     sb.AppendFormat(" | <a href=\"mailto:{0}\">{0}</a>", comment.Email);
                 }
 
                 if (Security.IsAuthorizedTo(Rights.ModerateComments))
                 {
-                    const string ConfirmDelete = "Are you sure you want to delete the comment?";
+                    string ConfirmDelete = Resources.labels.areYouSureDeleteComment;
                     sb.AppendFormat(
                         " | <a href=\"?deletecomment={0}\" onclick=\"return confirm('{1}?')\">{2}</a>",
                         id,
                         ConfirmDelete,
-                        "Delete");
+                        Resources.labels.delete);
 
                 }
                 return sb.ToString();
@@ -456,37 +454,37 @@
             base.OnLoad(e);
             bool isOdd = true;
 
-            if (this.Post == null)
+            if (Post == null)
             {
-                this.Response.Redirect(Utils.RelativeWebRoot);
+                Response.Redirect(Utils.RelativeWebRoot);
                 return;
             }
 
-            this.NameInputId = string.Format("txtName{0}", DateTime.Now.Ticks);
-            this.EnableCaptchas();
+            NameInputId = string.Format("txtName{0}", DateTime.Now.Ticks);
+            EnableCaptchas();
 
-            if (!this.Page.IsPostBack && !this.Page.IsCallback)
+            if (!Page.IsPostBack && !Page.IsCallback)
             {
                 if (Security.IsAuthorizedTo(Rights.ModerateComments))
                 {
-                    if (this.Request.QueryString["deletecomment"] != null)
+                    if (Request.QueryString["deletecomment"] != null)
                     {
-                        this.DeleteComment();
+                        DeleteComment();
                     }
 
-                    else if (this.Request.QueryString["deletecommentandchildren"] != null)
+                    else if (Request.QueryString["deletecommentandchildren"] != null)
                     {
-                        this.DeleteCommentAndChildren();
+                        DeleteCommentAndChildren();
                     }
 
-                    else if (!string.IsNullOrEmpty(this.Request.QueryString["approvecomment"]))
+                    else if (!string.IsNullOrEmpty(Request.QueryString["approvecomment"]))
                     {
-                        this.ApproveComment();
+                        ApproveComment();
                     }
 
-                    else if (!string.IsNullOrEmpty(this.Request.QueryString["approveallcomments"]))
+                    else if (!string.IsNullOrEmpty(Request.QueryString["approveallcomments"]))
                     {
-                        this.ApproveAllComments();
+                        ApproveAllComments();
                     }
                 }
 
@@ -495,12 +493,12 @@
 
                 bool canViewUnpublishedPosts = Security.IsAuthorizedTo(AuthorizationCheck.HasAny, new[] { Rights.ViewUnmoderatedComments, Rights.ModerateComments });
 
-                if (this.NestingSupported)
+                if (NestingSupported)
                 {
                     // newer, nested comments
-                    if (this.Post != null)
+                    if (Post != null)
                     {
-                        this.AddNestedComments(path, this.Post.NestedComments, this.phComments, canViewUnpublishedPosts);
+                        AddNestedComments(path, Post.NestedComments, phComments, canViewUnpublishedPosts);
                     }
                 }
                 else
@@ -511,12 +509,12 @@
                     isOdd = true;
 
                     foreach (var comment in
-                        this.Post.Comments.Where(
+                        Post.Comments.Where(
                             comment => comment.Email != "pingback" && comment.Email != "trackback"))
                     {
                         if (comment.IsApproved)
                         {
-                            this.CommentCounter++;
+                            CommentCounter++;
                         }
 
                         if (!comment.IsApproved && BlogSettings.Instance.EnableCommentsModeration)
@@ -525,17 +523,17 @@
                         }
 
                         isOdd = !isOdd;
-                        var control = (CommentViewBase)this.LoadControl(path);
+                        var control = (CommentViewBase)LoadControl(path);
                         control.Comment = comment;
-                        control.Post = this.Post;
+                        control.Post = Post;
                         control.IsOdd = isOdd;
-                        this.phComments.Controls.Add(control);
+                        phComments.Controls.Add(control);
                     }
 
                     // Add unapproved comments
                     if (canViewUnpublishedPosts)
                     {
-                        foreach (var comment in this.Post.Comments)
+                        foreach (var comment in Post.Comments)
                         {
                             if (comment.Email == "pingback" || comment.Email == "trackback")
                             {
@@ -548,11 +546,11 @@
                             }
 
                             isOdd = !isOdd;
-                            var control = (CommentViewBase)this.LoadControl(path);
+                            var control = (CommentViewBase)LoadControl(path);
                             control.Comment = comment;
-                            control.Post = this.Post;
+                            control.Post = Post;
                             control.IsOdd = isOdd;
-                            this.phComments.Controls.Add(control);
+                            phComments.Controls.Add(control);
                         }
                     }
                 }
@@ -560,9 +558,9 @@
                 var pingbacks = new List<CommentViewBase>();
 
                 isOdd = true;
-                foreach (var comment in this.Post.Comments)
+                foreach (var comment in Post.Comments)
                 {
-                    var control = (CommentViewBase)this.LoadControl(path);
+                    var control = (CommentViewBase)LoadControl(path);
 
                     if (comment.Email != "pingback" && comment.Email != "trackback")
                     {
@@ -571,7 +569,7 @@
 
                     isOdd = !isOdd;
                     control.Comment = comment;
-                    control.Post = this.Post;
+                    control.Post = Post;
                     control.IsOdd = isOdd;
                     pingbacks.Add(control);
                 }
@@ -586,44 +584,44 @@
                     sb.Append(" href=\"javascript:toggle_visibility('trackbacks','trackbacktoggle');\">+</a>");
                     sb.Append("</h3><div id=\"trackbacks\" style=\"display:none\">");
                     litTrackback.Text = sb.ToString();
-                    this.phTrckbacks.Controls.Add(litTrackback);
+                    phTrckbacks.Controls.Add(litTrackback);
 
                     foreach (var c in pingbacks)
                     {
-                        this.phTrckbacks.Controls.Add(c);
+                        phTrckbacks.Controls.Add(c);
                     }
 
                     var closingDiv = new Literal { Text = @"</div>" };
-                    this.phTrckbacks.Controls.Add(closingDiv);
+                    phTrckbacks.Controls.Add(closingDiv);
                 }
                 else
                 {
-                    this.phTrckbacks.Visible = false;
+                    phTrckbacks.Visible = false;
                 }
 
                 if (BlogSettings.Instance.IsCommentsEnabled && Security.IsAuthorizedTo(Rights.CreateComments))
                 {
-                    if (this.Post != null &&
-                        (!this.Post.HasCommentsEnabled ||
+                    if (Post != null &&
+                        (!Post.HasCommentsEnabled ||
                          (BlogSettings.Instance.DaysCommentsAreEnabled > 0 &&
-                          this.Post.DateCreated.AddDays(BlogSettings.Instance.DaysCommentsAreEnabled) <
+                          Post.DateCreated.AddDays(BlogSettings.Instance.DaysCommentsAreEnabled) <
                           DateTime.Now.Date)))
                     {
-                        this.phAddComment.Visible = false;
-                        this.lbCommentsDisabled.Visible = true;
+                        phAddComment.Visible = false;
+                        lbCommentsDisabled.Visible = true;
                     }
 
-                    this.BindCountries();
-                    this.GetCookie();
-                    this.recaptcha.UserUniqueIdentifier = this.hfCaptcha.Value = Guid.NewGuid().ToString();
+                    BindCountries();
+                    GetCookie();
+                    recaptcha.UserUniqueIdentifier = hfCaptcha.Value = Guid.NewGuid().ToString();
                 }
                 else
                 {
-                    this.phAddComment.Visible = false;
+                    phAddComment.Visible = false;
                 }
             }
 
-            this.Page.ClientScript.GetCallbackEventReference(this, "arg", null, string.Empty);
+            Page.ClientScript.GetCallbackEventReference(this, "arg", null, string.Empty);
         }
 
         /// <summary>
@@ -664,14 +662,14 @@
 
                 isOdd = !isOdd;
 
-                var control = (CommentViewBase)this.LoadControl(path);
+                var control = (CommentViewBase)LoadControl(path);
                 control.Comment = comment;
-                control.Post = this.Post;
+                control.Post = Post;
                 control.IsOdd = isOdd;
 
                 if (comment.IsApproved)
                 {
-                    this.CommentCounter++;
+                    CommentCounter++;
                 }
 
                 if (comment.Comments.Count > 0)
@@ -680,7 +678,7 @@
                     var subCommentsPlaceHolder = control.FindControl("phSubComments") as PlaceHolder;
                     if (subCommentsPlaceHolder != null)
                     {
-                        this.AddNestedComments(path, comment.Comments, subCommentsPlaceHolder, canViewUnpublishedPosts);
+                        AddNestedComments(path, comment.Comments, subCommentsPlaceHolder, canViewUnpublishedPosts);
                     }
                 }
 
@@ -695,11 +693,11 @@
         {
             Security.DemandUserHasRight(Rights.ModerateComments, true);
 
-            this.Post.ApproveAllComments();
+            Post.ApproveAllComments();
 
-            var index = this.Request.RawUrl.IndexOf("?");
-            var url = this.Request.RawUrl.Substring(0, index);
-            this.Response.Redirect(url, true);
+            var index = Request.RawUrl.IndexOf("?");
+            var url = Request.RawUrl.Substring(0, index);
+            Response.Redirect(url, true);
         }
 
         /// <summary>
@@ -710,14 +708,14 @@
             Security.DemandUserHasRight(Rights.ModerateComments, true);
 
             foreach (var comment in
-                this.Post.NotApprovedComments.Where(
-                    comment => comment.Id == new Guid(this.Request.QueryString["approvecomment"])))
+                Post.NotApprovedComments.Where(
+                    comment => comment.Id == new Guid(Request.QueryString["approvecomment"])))
             {
-                this.Post.ApproveComment(comment);
+                Post.ApproveComment(comment);
 
-                var index = this.Request.RawUrl.IndexOf("?");
-                var url = this.Request.RawUrl.Substring(0, index);
-                this.Response.Redirect(url, true);
+                var index = Request.RawUrl.IndexOf("?");
+                var url = Request.RawUrl.Substring(0, index);
+                Response.Redirect(url, true);
             }
         }
 
@@ -737,7 +735,7 @@
             // recursive collection
             foreach (var subComment in comment.Comments)
             {
-                this.CollectCommentToDelete(subComment, commentsToDelete);
+                CollectCommentToDelete(subComment, commentsToDelete);
             }
         }
 
@@ -749,13 +747,13 @@
             Security.DemandUserHasRight(Rights.ModerateComments, true);
 
             foreach (var comment in
-                this.Post.Comments.Where(comment => comment.Id == new Guid(this.Request.QueryString["deletecomment"])))
+                Post.Comments.Where(comment => comment.Id == new Guid(Request.QueryString["deletecomment"])))
             {
-                this.Post.RemoveComment(comment);
+                Post.RemoveComment(comment);
 
-                var index = this.Request.RawUrl.IndexOf("?");
-                var url = string.Format("{0}#comment", this.Request.RawUrl.Substring(0, index));
-                this.Response.Redirect(url, true);
+                var index = Request.RawUrl.IndexOf("?");
+                var url = string.Format("{0}#comment", Request.RawUrl.Substring(0, index));
+                Response.Redirect(url, true);
             }
         }
 
@@ -766,9 +764,9 @@
         {
             Security.DemandUserHasRight(Rights.ModerateComments, true);
 
-            var deletecommentandchildren = new Guid(this.Request.QueryString["deletecommentandchildren"]);
+            var deletecommentandchildren = new Guid(Request.QueryString["deletecommentandchildren"]);
 
-            foreach (var comment in this.Post.Comments)
+            foreach (var comment in Post.Comments)
             {
                 if (comment.Id != deletecommentandchildren)
                 {
@@ -778,16 +776,16 @@
                 // collect comments to delete first so the Nesting isn't lost
                 var commentsToDelete = new List<Comment>();
 
-                this.CollectCommentToDelete(comment, commentsToDelete);
+                CollectCommentToDelete(comment, commentsToDelete);
 
                 foreach (var commentToDelete in commentsToDelete)
                 {
-                    this.Post.RemoveComment(commentToDelete);
+                    Post.RemoveComment(commentToDelete);
                 }
 
-                var index = this.Request.RawUrl.IndexOf("?");
-                var url = string.Format("{0}#comment", this.Request.RawUrl.Substring(0, index));
-                this.Response.Redirect(url, true);
+                var index = Request.RawUrl.IndexOf("?");
+                var url = string.Format("{0}#comment", Request.RawUrl.Substring(0, index));
+                Response.Redirect(url, true);
             }
         }
 
@@ -796,28 +794,28 @@
         /// </summary>
         private void EnableCaptchas()
         {
-            this.ReCaptchaEnabled = ExtensionManager.ExtensionEnabled("Recaptcha");
-            this.SimpleCaptchaEnabled = ExtensionManager.ExtensionEnabled("SimpleCaptcha");
-            if (this.ReCaptchaEnabled && this.SimpleCaptchaEnabled)
+            ReCaptchaEnabled = ExtensionManager.ExtensionEnabled("Recaptcha");
+            SimpleCaptchaEnabled = ExtensionManager.ExtensionEnabled("SimpleCaptcha");
+            if (ReCaptchaEnabled && SimpleCaptchaEnabled)
             {
                 var simpleCaptchaExtension = ExtensionManager.GetExtension("SimpleCaptcha");
                 var recaptchaExtension = ExtensionManager.GetExtension("Recaptcha");
                 if (simpleCaptchaExtension.Priority < recaptchaExtension.Priority)
                 {
-                    this.EnableRecaptcha();
+                    EnableRecaptcha();
                 }
                 else
                 {
-                    this.EnableSimpleCaptcha();
+                    EnableSimpleCaptcha();
                 }
             }
-            else if (this.ReCaptchaEnabled)
+            else if (ReCaptchaEnabled)
             {
-                this.EnableRecaptcha();
+                EnableRecaptcha();
             }
-            else if (this.SimpleCaptchaEnabled)
+            else if (SimpleCaptchaEnabled)
             {
-                this.EnableSimpleCaptcha();
+                EnableSimpleCaptcha();
             }
         }
 
@@ -826,11 +824,11 @@
         /// </summary>
         private void EnableRecaptcha()
         {
-            this.AnyCaptchaEnabled = true;
-            this.AnyCaptchaNecessary = this.recaptcha.RecaptchaNecessary;
-            this.recaptcha.Visible = true;
-            this.simplecaptcha.Visible = false;
-            this.SimpleCaptchaEnabled = false;
+            AnyCaptchaEnabled = true;
+            AnyCaptchaNecessary = recaptcha.RecaptchaNecessary;
+            recaptcha.Visible = true;
+            simplecaptcha.Visible = false;
+            SimpleCaptchaEnabled = false;
         }
 
         /// <summary>
@@ -838,11 +836,11 @@
         /// </summary>
         private void EnableSimpleCaptcha()
         {
-            this.AnyCaptchaEnabled = true;
-            this.AnyCaptchaNecessary = this.simplecaptcha.SimpleCaptchaNecessary;
-            this.simplecaptcha.Visible = true;
-            this.recaptcha.Visible = false;
-            this.ReCaptchaEnabled = false;
+            AnyCaptchaEnabled = true;
+            AnyCaptchaNecessary = simplecaptcha.SimpleCaptchaNecessary;
+            simplecaptcha.Visible = true;
+            recaptcha.Visible = false;
+            ReCaptchaEnabled = false;
         }
 
         /// <summary>
@@ -851,27 +849,26 @@
         /// </summary>
         private void GetCookie()
         {
-            var cookie = this.Request.Cookies["comment"];
+            var cookie = Request.Cookies["comment"];
             try
             {
                 if (cookie != null)
                 {
-                    this.DefaultName = this.Server.UrlDecode(cookie.Values["name"]);
-                    this.txtEmail.Text = cookie.Values["email"];
-                    this.txtWebsite.Text = cookie.Values["url"];
-                    this.ddlCountry.SelectedValue = cookie.Values["country"];
-                    this.SetFlagImageUrl();
+                    DefaultName = Server.UrlDecode(cookie.Values["name"]);
+                    txtEmail.Text = cookie.Values["email"];
+                    txtWebsite.Text = cookie.Values["url"];
+                    ddlCountry.SelectedValue = cookie.Values["country"];
                 }
                 else if (Security.IsAuthenticated)
                 {
                     var user = Membership.GetUser();
                     if (user != null)
                     {
-                        this.DefaultName = user.UserName;
-                        this.txtEmail.Text = user.Email;
+                        DefaultName = user.UserName;
+                        txtEmail.Text = user.Email;
                     }
 
-                    this.txtWebsite.Text = this.Request.Url.Host;
+                    txtWebsite.Text = Request.Url.Host;
                 }
             }
             catch (Exception)
@@ -899,24 +896,21 @@
         private void SetCookie(string name, string email, string website, string country)
         {
             var cookie = new HttpCookie("comment") { Expires = DateTime.Now.AddMonths(24) };
-            cookie.Values.Add("name", this.Server.UrlEncode(name.Trim()));
+            cookie.Values.Add("name", Server.UrlEncode(name.Trim()));
             cookie.Values.Add("email", email.Trim());
             cookie.Values.Add("url", website.Trim());
             cookie.Values.Add("country", country);
-            this.Response.Cookies.Add(cookie);
+            Response.Cookies.Add(cookie);
         }
 
         /// <summary>
         /// Sets the flag image URL.
         /// </summary>
-        private void SetFlagImageUrl()
+        protected string FlagUrl()
         {
-            this.imgFlag.ImageUrl = !string.IsNullOrEmpty(this.ddlCountry.SelectedValue)
-                                        ? string.Format(
-                                            "{0}pics/flags/{1}.png",
-                                            Utils.RelativeWebRoot,
-                                            this.ddlCountry.SelectedValue)
-                                        : string.Format("{0}pics/pixel.png", Utils.RelativeWebRoot);
+            return !string.IsNullOrEmpty(ddlCountry.SelectedValue)
+                ? string.Format("{0}pics/flags/{1}.png", Utils.RelativeWebRoot, ddlCountry.SelectedValue)
+                : string.Format("{0}pics/pixel.png", Utils.RelativeWebRoot);
         }
 
         #endregion

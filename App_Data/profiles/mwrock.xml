@@ -8,10 +8,10 @@
   <RegionState />
   <Country />
   <Birthday>1001-01-01</Birthday>
-  <AboutMe />
-  <PhotoURL>http://www.gravatar.com/avatar/e5fb65a7b4450654a358adbcc82a2612?s=128&amp;d=identicon&amp;r=PG</PhotoURL>
+  <AboutMe>I'm Matt Wrock with over ten years of experience architecting scalable, distributed, high traffic web applications. I currently live in Woodinville, WA with my wife, two daughters, three dogs and cat. I work for Microsoft as a Sr. Software Engineer working on MSDN and Technet Gallery platform including the Visual Studio Gallery, MSDN Code Samples gallery and more.</AboutMe>
+  <PhotoURL>http://en.gravatar.com/userimage/10676682/14ca466b7a0e60e770047e070eb65d88.jpg?size=200</PhotoURL>
   <Company />
-  <EmailAddress />
+  <EmailAddress>matt@mattwrock.com</EmailAddress>
   <PhoneMain />
   <PhoneMobile />
   <PhoneFax />

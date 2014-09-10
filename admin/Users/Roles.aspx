@@ -44,7 +44,7 @@
     <script type="text/javascript" src="../jquery.colorbox.js"></script>
     <script type="text/javascript">
         $(document).ready(function () {
-            $(".addNew").colorbox({ width: "300px", inline: true, href: "#frmAddNew" });
+            $(".new").colorbox({ width: "300px", inline: true, href: "#frmAddNew" });
         });
 
         function closeOverlay() {
@@ -57,12 +57,14 @@
 	<div class="content-box-outer">
 		<div class="content-box-right">
             <ul>
+                <li><a href="#" class="new"><%=Resources.labels.addNewRole %></a></li>
 			    <li><a href="Users.aspx"><%=Resources.labels.users %></a></li>
 			    <li class="content-box-selected"><a href="Roles.aspx" class="selected"><%=Resources.labels.roles %></a></li>
+                <li><a href="Profile.aspx?id=<%=BlogEngine.Core.Security.CurrentMembershipUser.UserName %>"><%=Resources.labels.profile %></a></li>
             </ul>
 		</div>
 		<div class="content-box-left">
-            <h1><%=Resources.labels.roles %><a href="#" class="addNew"><%=Resources.labels.addNewRole %></a></h1>
+            <h1><%=Resources.labels.roles %></h1>
             <div  style="display:none;">
             <div id="frmAddNew" class="overlaypanel">
                 <h2><%=Resources.labels.addNewRole %></h2>

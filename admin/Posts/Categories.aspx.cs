@@ -95,7 +95,7 @@ namespace Admin.Posts
         /// </summary>
         /// <param name="sender">The source of the event.</param>
         /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.</param>
-        void btnAdd_Click(object sender, EventArgs e)
+        protected void btnAdd_Click(object sender, EventArgs e)
         {
             if (Page.IsValid)
             {
@@ -109,6 +109,10 @@ namespace Admin.Posts
 
                 cat.Save();
                 Response.Redirect(Request.RawUrl, true);
+            }
+            else
+            {
+                Master.SetStatus("warning", "Duplicate category");
             }
         }
 

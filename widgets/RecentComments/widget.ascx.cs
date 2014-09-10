@@ -42,9 +42,10 @@ namespace Widgets.RecentComments
         /// </summary>
         static Widget()
         {
-            Post.CommentAdded += (sender, args) => Blog.CurrentInstance.Cache.Remove("widget_recentcomments");
-            Post.CommentRemoved += (sender, args) => Blog.CurrentInstance.Cache.Remove("widget_recentcomments");
-            BlogSettings.Changed += (sender, args) => Blog.CurrentInstance.Cache.Remove("widget_recentcomments");
+            Post.CommentAdded += ClearCache;
+            Post.CommentRemoved += ClearCache;
+            Post.CommentUpdated += ClearCache;
+            BlogSettings.Changed += ClearCache;
         }
 
         #endregion
@@ -76,7 +77,7 @@ namespace Widgets.RecentComments
         #endregion
 
         #region Public Methods
-
+        
         /// <summary>
         /// This method works as a substitute for Page_Load. You should use this method for
         ///     data binding etc. instead of Page_Load.
@@ -94,7 +95,7 @@ namespace Widgets.RecentComments
             {
                 var comments = new List<Comment>();
 
-                foreach (var post in Post.Posts.Where(post => post.IsVisible))
+                foreach (var post in Post.ApplicablePosts.Where(post => post.IsVisible))
                 {
                     comments.AddRange(
                         post.Comments.FindAll(c => c.IsApproved && c.Email.Contains("@")));
@@ -120,6 +121,17 @@ namespace Widgets.RecentComments
 
         #region Methods
 
+        private static void ClearCache(object sender, EventArgs e)
+        {
+            Blog.CurrentInstance.Cache.Remove("widget_recentcomments");
+
+            Blog siteAggregationBlog = Blog.SiteAggregationBlog;
+            if (siteAggregationBlog != null)
+            {
+                siteAggregationBlog.Cache.Remove("widget_recentcomments");
+            }
+        }
+
         /// <summary>
         /// Renders the comments.
         /// </summary>
@@ -144,7 +156,7 @@ namespace Widgets.RecentComments
                     var li = new HtmlGenericControl("li");
 
                     // The post title
-                    var title = new HtmlAnchor { HRef = comment.Parent.RelativeLink, InnerText = comment.Parent.Title };
+                    var title = new HtmlAnchor { HRef = comment.Parent.RelativeOrAbsoluteLink, InnerText = comment.Parent.Title };
                     title.Attributes.Add("class", "postTitle");
                     li.Controls.Add(title);
 
@@ -198,7 +210,7 @@ namespace Widgets.RecentComments
                     using (
                         var link = new HtmlAnchor
                             {
-                                HRef = string.Format("{0}#id_{1}", comment.Parent.RelativeLink, comment.Id), 
+                                HRef = string.Format("{0}#id_{1}", comment.Parent.RelativeOrAbsoluteLink, comment.Id), 
                                 InnerHtml = string.Format("[{0}]", labels.more)
                             })
                     {
@@ -213,9 +225,9 @@ namespace Widgets.RecentComments
             var sw = new StringWriter();
             ul.RenderControl(new HtmlTextWriter(sw));
 
-            const string Ahref =
-                "<a href=\"{0}syndication.axd?comments=true\">Comment RSS <img src=\"{0}pics/rssButton.png\" alt=\"\" /></a>";
-            var rss = string.Format(Ahref, Utils.RelativeWebRoot);
+            string Ahref =
+                String.Concat ("<a href=\"{0}syndication.axd?comments=true\">", labels.commentRSS, " <img src=\"{0}pics/rssButton.png\" alt=\"\" /></a>");
+            var rss = string.Format(Ahref, Utils.RelativeOrAbsoluteWebRoot);
             sw.Write(rss);
             return sw.ToString();
 

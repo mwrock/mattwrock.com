@@ -11,6 +11,8 @@
 
     public partial class Blogroll : System.Web.UI.Page
     {
+        protected string DisplayStyle { get { return BlogRollItem.BlogRolls == null ? "block" : "none"; } }
+
         protected void Page_Load(object sender, EventArgs e)
         {
             WebUtils.CheckRightsForAdminSettingsPage(false);

@@ -19,6 +19,14 @@
                     <br />
                 </li>
             </ul>
+            <ul class="fl">
+                <li>
+                    <label for="<%=txtBatchPingService.ClientID %>" class="lbl"><%=Resources.labels.pingServiceUrlBatch %></label>
+                    <asp:TextBox runat="Server" ID="txtBatchPingService" Width="300" TextMode="MultiLine"/>
+                    <asp:Button runat="server" ID="btnBatchAdd" CssClass="btn" />
+                    <asp:Literal runat="server" ID="liBatchOutput" />
+                </li>
+            </ul>
             <asp:GridView runat="server" ID="grid" BorderColor="#f8f8f8" BorderStyle="solid"
                 BorderWidth="1px" RowStyle-BorderWidth="0" RowStyle-BorderStyle="None" GridLines="None"
                 Width="100%" AlternatingRowStyle-BackColor="#f8f8f8" AlternatingRowStyle-BorderColor="#f8f8f8"

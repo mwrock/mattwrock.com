@@ -1,2 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
-<categories />
+<categories>
+    <category id="219109f8-7b0b-459b-8f25-9ce747eb0851" description="Posts regarding Boxstarter Release announcements, tutorials and technical deep dives." parent="">Boxstarter</category>
+    <category id="2f8206f0-95a4-449e-bf74-3b2cb761de04" description="Posts regarding RequestReduce releases, upcoming features, case studies, critical bugs and technical implementation details." parent="">RequestReduce</category>
+</categories>

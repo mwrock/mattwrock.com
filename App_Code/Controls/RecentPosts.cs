@@ -46,10 +46,10 @@ namespace App_Code.Controls
         {
             BuildPostList();
             Post.Saved += PostSaved;
-            Post.CommentAdded += (sender, args) => BuildPostList();
-            Post.CommentRemoved += (sender, args) => BuildPostList();
-            Post.Rated += (sender, args) => BuildPostList();
-            BlogSettings.Changed += (sender, args) => BuildPostList();
+            Post.CommentAdded += ClearCache;
+            Post.CommentRemoved += ClearCache;
+            Post.Rated += ClearCache;
+            BlogSettings.Changed += ClearCache;
         }
 
         #endregion
@@ -68,7 +68,8 @@ namespace App_Code.Controls
                     {
                         if (!blogsPosts.ContainsKey(blogId))
                         {
-                            blogsPosts[blogId] = new List<Post>();
+                            List<Post> posts = BuildPostList();
+                            blogsPosts[blogId] = posts;
                         }
                     }
                 }
@@ -100,18 +101,32 @@ namespace App_Code.Controls
 
         #region Methods
 
+        private static void ClearCache(object sender, EventArgs e)
+        {
+            Guid blogId = Blog.CurrentInstance.BlogId;
+            blogsPosts.Remove(blogId);
+            
+            Blog siteAggregationBlog = Blog.SiteAggregationBlog;
+            if (siteAggregationBlog != null)
+            {
+                blogsPosts.Remove(siteAggregationBlog.BlogId);
+            }
+        }
+
         /// <summary>
         /// Builds the post list.
         /// </summary>
-        private static void BuildPostList()
+        private static List<Post> BuildPostList()
         {
-            var number = Math.Min(BlogSettings.Instance.NumberOfRecentPosts, Post.Posts.Count);
+            var number = Math.Min(BlogSettings.Instance.NumberOfRecentPosts, Post.ApplicablePosts.Count);
 
-            Posts.Clear();
-            foreach (var post in Post.Posts.Where(post => post.IsVisibleToPublic).Take(number))
+            List<Post> returnPosts = new List<Post>();
+            foreach (var post in Post.ApplicablePosts.Where(post => post.IsVisibleToPublic).Take(number))
             {
-                Posts.Add(post);
+                returnPosts.Add(post);
             }
+
+            return returnPosts;
         }
 
         /// <summary>
@@ -126,7 +141,7 @@ namespace App_Code.Controls
                 return;
             }
 
-            BuildPostList();
+            ClearCache(null, EventArgs.Empty);
         }
 
         /// <summary>
@@ -166,7 +181,7 @@ namespace App_Code.Controls
                     rate = string.Format("<span>{0}</span>", labels.notRatedYet);
                 }
 
-                sb.AppendFormat(Link, post.RelativeLink, HttpUtility.HtmlEncode(post.Title), comments, rate);
+                sb.AppendFormat(Link, post.RelativeOrAbsoluteLink, HttpUtility.HtmlEncode(post.Title), comments, rate);
             }
 
             sb.Append("</ul>");

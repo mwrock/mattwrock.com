@@ -1,16 +1,31 @@
 ﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <page>
-  <title>Example page</title>
-  <description>The description is used as meta description</description>
-  <content>&lt;p&gt;This is an example page.&lt;/p&gt;
-&lt;p&gt;&amp;nbsp;For more information about pages and how to use them,&amp;nbsp;visit the &lt;a href="http://www.dotnetblogengine.net/wiki/"&gt;BlogEngine.NET wiki&lt;/a&gt;.&lt;/p&gt;</content>
-  <keywords>Is, added, to, meta, keywords</keywords>
-  <slug>Example-page</slug>
+  <title>About Matt</title>
+  <description>Matt Wrock is a Software Engineer with deep experience building high traffic, high availability platforms on the World Wide Web.</description>
+  <content>&lt;h1&gt;Lets talk about Me!&lt;/h1&gt;
+&lt;p&gt;At last, an entire page on the internet devoted to Meeee! Won&amp;rsquo;t be long now before the web is saturated with these so consider yourself one of the lucky ones who read about Matt Wrock before it was cool.&lt;/p&gt;
+&lt;h2&gt;A Rising Star in the High Traffic Online Advertising Space&lt;/h2&gt;
+&lt;p&gt;I am a Software Engineer with deep experience building high traffic, high availability platforms on the World Wide Web. That&amp;rsquo;s &amp;ldquo;World Wide&amp;rdquo; son. Until fairly recently in December of 2009, most of this experience was in the online advertising space. From 2000 to late 2009 I began developing &amp;ldquo;advergames&amp;rdquo; in a very different Javascript from the jQuery coated one we know today. Then I built a display advertising server in Java on Sun Solaris servers and served a ton of Friendster and other rich, highly compelling and quality of life boosting banners and popups (Remember Friendster?) &amp;ndash; about 20,000,000 a day at its peak. Then I built out a domain parking platform using ASP.NET that rode a profitable search engine marketing wave. At one point this platform owned 1% of the domain names on the internet and purchased over 100k domains a day. Until ICANN put an end to &amp;ldquo;domain tasting.&amp;rdquo; Stupid ICANN. No&amp;hellip;no&amp;hellip;just kidding about that. ICANN: you guys are the best.&lt;/p&gt;
+&lt;p&gt;I&amp;rsquo;ve managed and built out multi terabyte data warehouses. I&amp;rsquo;ve lead agile teams championing short release cycles, Test Driven Development and Continuous Integration. So in late 2009, I found myself the VP of technology for a national online ad company in Southern California and growing increasingly dissatisfied with the trajectory of my career path. I&amp;rsquo;ve also been a very hands on technologist. I love to build cool impactful solutions and I mean BUILD. I have nothing against managing and good managers are absolutely crucial to good technology, but I was silently dying as a manager (please queue moving and inspiring string track now). So one day I said enough, I don&amp;rsquo;t Need this salary and lets face it, if my stock options are still worth nothing now then they will likely be worth nothing next year and so on and so on.I strongly believe that we most excel at doing what we love and are passionate about so I decided to pursue just that.&lt;/p&gt;
+&lt;h2&gt;So Where is Matt Today?&lt;/h2&gt;
+&lt;p&gt;Today I live in lovely Woodinville Washington working as a Sr. Software Development Engineer for Microsoft. I work in the MSDN org and am a technical lead for our Gallery platform which builds and maintains such sites as the &lt;a href="http://visualstudiogallery.msdn.microsoft.com/"&gt;Visual Studio Gallery&lt;/a&gt; and the &lt;a href="http://code.msdn.microsoft.com/"&gt;MSDN Samples Gallery&lt;/a&gt;. I also work on a lot of the common infrastructure that renders our Forums and Search applications.&lt;/p&gt;
+&lt;h1&gt;Side Projects and Open Source&lt;/h1&gt;
+&lt;p&gt;Along the way I&amp;rsquo;ve worked on several side projects because to me, developing cool and beautiful software is not just a job but something I love to do. A love I acquired learning BASIC on the Apple II developing games with a lot of line numbers and GOTOs. I did mention &amp;ldquo;beautiful&amp;rdquo; right? Unfortunately it was not until rather late in my career when I discovered Open Source. Now I&amp;rsquo;m a huge advocate and have begun contributing as well.&lt;/p&gt;
+&lt;p&gt;Here are a few projects I am proud of:&lt;/p&gt;
+&lt;h2&gt;AboveCalifornia.com&lt;/h2&gt;
+&lt;p&gt;Way back in 2001 to 2003 I designed a web based topographical map server using Java and MySQL technologies from scratch for a personal web site on a Linux server. This included classes used to convert geographic coordinates among differing map projections (Albers/UTM/Lat Long), image resampling tools to convert standard, collared GEOTIFF images into a seamless mosaic of .gif map tiles merging adjacent USGS quads, and database schema to track coordinates of each tile. I integrated this technology with a GIS system to geocode USGS place names, weather stations, photographs, etc. These could be searched and rendered as icons on an interactive, online map.&lt;/p&gt;
+&lt;h2&gt;&lt;a href="http://RequestReduce.com"&gt;RequestReduce&lt;/a&gt; - On the fly CSS merging, minification, and Spriting Module&lt;/h2&gt;
+&lt;p&gt;This is the project I currently run today. &lt;a href="http://RequestReduce.com"&gt;RequestReduce&lt;/a&gt; allows any IIS based website (Web Forms or any MVC version) to automatically sprite background images into a single optimized PNG as well as combine and minify all CSS and most Javascript on a web page. It does this in such a way that requires no extra coding or configuration for the basic functionality. RequestReduce provides several configuration options to support CDN hosting, multiple server environments and more. Grab it now off of Nuget an make your website faster.&lt;/p&gt;
+&lt;h2&gt;&lt;a href="http://nquant.codeplex.com"&gt;nQuant&lt;/a&gt; - .net PNG Quantizer&lt;/h2&gt;
+&lt;p&gt;nQuant is a .net color quantizer that produces high quality 256 color 8 bit PNG images. nQuant often reduces the size of a 32 bit image to a size 3 times smaller than its original with quality surpassing what the standard C command line utilities produce.&lt;/p&gt;
+&lt;p&gt;nQuant was originally developed as part of RequestReduce. I wanted the sprited files to be optimized and I was not satisfied with the size of the 32 bit images that the .net library was producing nor was the quantization output of such quantizers as PNGQuant and PNGNQ of acceptable quality. I set out to create this quantizer and the results are images 3x smaller than their 32 bit originals with practically no perceptible quality loss.&lt;/p&gt;</content>
+  <keywords />
+  <slug>About-Matt</slug>
   <parent>00000000-0000-0000-0000-000000000000</parent>
   <isfrontpage>False</isfrontpage>
   <showinlist>True</showinlist>
-  <ispublished>False</ispublished>
+  <ispublished>True</ispublished>
   <isdeleted>False</isdeleted>
   <datecreated>2007-07-14 08:06:59</datecreated>
-  <datemodified>2010-12-26 01:28:27</datemodified>
+  <datemodified>2011-11-24 22:25:27</datemodified>
 </page>

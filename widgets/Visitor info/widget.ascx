@@ -13,14 +13,14 @@
 		function checkApml()
 		{
 			var apml_url = '<asp:literal runat="server" id="ltWebsite" />';
-			BlogEngine.createCallback(BlogEngine.webRoot + 'widgets/visitor info/apmlchecker.ashx?url=' + apml_url, 
+			BlogEngine.createCallback(BlogEngineRes.webRoot + 'widgets/visitor info/apmlchecker.ashx?url=' + apml_url, 
 			function(response) 
 			{
 				if (response.length > 10)
 				{
 					var text = 'I can see you have an APML file at <a href=\"'+apml_url+'">'+apml_url+'</a>. ';
 					text += 'Do you wish to filter the content of this blog based on your APML file? ';
-					text += '<a href="javascript:void(location.href=\''+BlogEngine.webRoot+'?apml='+encodeURIComponent(response)+'\')">Apply filter</a>';
+					text += '<a href="javascript:void(location.href=\''+BlogEngineRes.webRoot+'?apml='+encodeURIComponent(response)+'\')">Apply filter</a>';
 					BlogEngine.$('visitor_widget_apml').innerHTML = text;
 				}
 			});

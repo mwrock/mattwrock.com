@@ -11,12 +11,9 @@
 			<menu:TabMenu ID="TabMenu" runat="server" />
 		</div>
 		<div class="content-box-left">
-            <h1><%=Resources.labels.approvedComments %></h1>
-            <div class="tableToolBox">
-                <div class="Pager"></div>
-            </div>
+            <h1><%=Resources.labels.approvedComments %><span class="Pager"></span></h1>
             <div id="Container"></div>
-            <div class="Pager"></div>
+            <div id="pager-lower" class="Pager"></div>
 		</div>
 	</div>      
 </asp:Content>

@@ -1,0 +1,61 @@
+﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<post>
+  <author>mwrock</author>
+  <title>Released AutoWrockTestable: Making test class composition easier</title>
+  <description />
+  <content>&lt;p&gt;&lt;a href="http://www.mattwrock.com/image.axd?picture=bird.png"&gt;&lt;img style="background-image: none; border-right-width: 0px; margin: 0px 10px 0px 0px; padding-left: 0px; padding-right: 0px; display: inline; border-top-width: 0px; border-bottom-width: 0px; border-left-width: 0px; padding-top: 0px" title="bird" border="0" alt="bird" src="http://www.mattwrock.com/image.axd?picture=bird_thumb.png" width="129" height="132" /&gt;&lt;/a&gt;Late last year I &lt;a href="http://www.mattwrock.com/post/2011/12/07/Unit-Testing-ASPNet-Http-Handlers-and-a-discussion-of-Auto-Mocking-and-the-Testable-pattern.aspx"&gt;blogged&lt;/a&gt; about a unit testing pattern I have been using for the past couple years. It’s a pattern that I initially learned from &lt;a href="http://matthewmanela.com/"&gt;Matt Manela&lt;/a&gt; (@&lt;a href="http://twitter.com/mmanela"&gt;mmanela&lt;/a&gt;). I adapted the pattern to use Automocking with &lt;a href="http://elegantcode.com/2009/11/30/wrapping-up-the-structuremap-automocking-container/"&gt;Richard Cirerol’s&lt;/a&gt; wrapper. Over the last week I have been working to plug this in to Visual Studio as a template that can easily add test classes and make one’s unit testing work flow more efficient.&lt;/p&gt;  &lt;p&gt;I could, should, maybe will, but probably won’t write a separate post dedicated to making the Visual Studio extension. Ironically, while I am a member of the Visual Studio Gallery team, this is my first public extension I have written. While it is a trivial extension as extensions go, there were some interesting learnings that made what I thought would be a couple night’s worth of work into a week of my spare time. Despite some frustrating incidents, it was a lot of fun.&lt;/p&gt;  &lt;p&gt;Now lets dive into AutoWrockTestable!&lt;/p&gt;  &lt;p&gt;&lt;strong&gt;Whats better than AutoMocking? Why of course, AutoWrocking!&lt;/strong&gt;     &lt;br /&gt;yo.&lt;/p&gt;  &lt;h2&gt;Visual Studio integration makes composing tests a snap!&lt;/h2&gt;  &lt;p&gt;Here is how to effortlessly add test classes to your solution with all mockable dependencies mocked:    &lt;br /&gt;    &lt;br /&gt;1. You can download The Visual Studio Extension from &lt;a href="http://autowrocktestable.codeplex.com/releases/view/87326"&gt;Codeplex&lt;/a&gt; or &lt;a href="http://visualstudiogallery.msdn.microsoft.com/ea3a37c9-1c76-4628-803e-b10a109e7943"&gt;the Visual Studio Gallery&lt;/a&gt;.     &lt;br /&gt;The extension will also install Nuget if you do not already have it and will add Structuremap, Structuremap.Automocking and Moq to your Nuget repository.     &lt;br /&gt;    &lt;br /&gt;2. Create a skeleton of your implementation class.&lt;/p&gt;  &lt;div id="codeSnippetWrapper"&gt;   &lt;pre style="border-bottom-style: none; text-align: left; padding-bottom: 0px; line-height: 12pt; background-color: #f4f4f4; margin: 0em; border-left-style: none; padding-left: 0px; width: 100%; padding-right: 0px; font-family: &amp;#39;Courier New&amp;#39;, courier, monospace; direction: ltr; border-top-style: none; color: black; border-right-style: none; font-size: 8pt; overflow: visible; padding-top: 0px" id="codeSnippet"&gt;&lt;span style="color: #0000ff"&gt;public&lt;/span&gt; &lt;span style="color: #0000ff"&gt;class&lt;/span&gt; OAuthTokenService&lt;br /&gt;{&lt;br /&gt;    &lt;span style="color: #0000ff"&gt;private&lt;/span&gt; &lt;span style="color: #0000ff"&gt;readonly&lt;/span&gt; IWebClientWrapper webClientWrapper;&lt;br /&gt;    &lt;span style="color: #0000ff"&gt;private&lt;/span&gt; &lt;span style="color: #0000ff"&gt;readonly&lt;/span&gt; IRegistryWrapper registry;&lt;br /&gt;&lt;br /&gt;    &lt;span style="color: #0000ff"&gt;public&lt;/span&gt; OAuthTokenService(IWebClientWrapper webClientWrapper,&lt;br /&gt;        IRegistryWrapper registry)&lt;br /&gt;    {&lt;br /&gt;        &lt;span style="color: #0000ff"&gt;this&lt;/span&gt;.webClientWrapper = webClientWrapper;&lt;br /&gt;        &lt;span style="color: #0000ff"&gt;this&lt;/span&gt;.registry = registry;&lt;br /&gt;    }&lt;br /&gt;    &lt;span style="color: #0000ff"&gt;public&lt;/span&gt; &lt;span style="color: #0000ff"&gt;string&lt;/span&gt; GetAccessToken(&lt;span style="color: #0000ff"&gt;string&lt;/span&gt; clientId, IOauthUrls oauthUrls)&lt;br /&gt;    {&lt;br /&gt;        &lt;span style="color: #0000ff"&gt;return&lt;/span&gt; &lt;span style="color: #0000ff"&gt;null&lt;/span&gt;;&lt;br /&gt;    }&lt;br /&gt;}&lt;/pre&gt;
+
+  &lt;br /&gt;&lt;/div&gt;
+
+&lt;p&gt;
+  &lt;br /&gt;
+
+  &lt;br /&gt;3. Click on the &amp;quot;Add Testable...&amp;quot; menu item in Solution Explorer's &amp;quot;Add&amp;quot; context menu. 
+
+  &lt;br /&gt;&lt;img style="margin: 0px 10px 0px 0px" title="ContextMenu.png" alt="ContextMenu.png" src="http://i3.codeplex.com/Download?ProjectName=autowrocktestable&amp;amp;DownloadId=379092" width="648" height="350" /&gt; 
+
+  &lt;br /&gt;
+
+  &lt;br /&gt;4. Enter the name of the class you want to test. You can enter any name but the text box will auto complete using all class files open in the editor. The first class in the active file is initially selected. 
+
+  &lt;br /&gt;&lt;img style="margin: 0px 10px 0px 0px" title="Wizard.png" alt="Wizard.png" src="http://i3.codeplex.com/Download?ProjectName=autowrocktestable&amp;amp;DownloadId=379093" /&gt; 
+
+  &lt;br /&gt;
+
+  &lt;br /&gt;
+
+  &lt;br clear="all" /&gt;5. AutoWrockTestable creates a new class file with the same name as your implementation class appending &amp;quot;Tests&amp;quot; to the name and containing this code:&lt;/p&gt;
+
+&lt;div id="codeSnippetWrapper"&gt;
+  &lt;pre style="border-bottom-style: none; text-align: left; padding-bottom: 0px; line-height: 12pt; background-color: #f4f4f4; margin: 0em; border-left-style: none; padding-left: 0px; width: 100%; padding-right: 0px; font-family: &amp;#39;Courier New&amp;#39;, courier, monospace; direction: ltr; border-top-style: none; color: black; border-right-style: none; font-size: 8pt; overflow: visible; padding-top: 0px" id="codeSnippet"&gt;&lt;span style="color: #0000ff"&gt;using&lt;/span&gt; AutoWrockTestable;&lt;br /&gt;&lt;br /&gt;&lt;span style="color: #0000ff"&gt;namespace&lt;/span&gt; SkyCli.Facts&lt;br /&gt;{&lt;br /&gt;    &lt;span style="color: #0000ff"&gt;class&lt;/span&gt; OAuthTokenServiceTests&lt;br /&gt;    {&lt;br /&gt;        &lt;span style="color: #0000ff"&gt;class&lt;/span&gt; TestableOAuthTokenService : Testable&amp;lt;SkyCli.OAuth.OAuthTokenService&amp;gt;&lt;br /&gt;        {&lt;br /&gt;            &lt;span style="color: #0000ff"&gt;public&lt;/span&gt; TestableOAuthTokenService()&lt;br /&gt;            {&lt;br /&gt;&lt;br /&gt;            }&lt;br /&gt;        }&lt;br /&gt;    }&lt;br /&gt;}&lt;/pre&gt;
+
+  &lt;br /&gt;&lt;/div&gt;
+
+&lt;h2&gt;Writing tests using Testable&amp;lt;ClassToTest&amp;gt;&lt;/h2&gt;
+
+&lt;p&gt;The Testable class has its dependencies automatically mocked. Now you can start to write test methods using your Testable. I like to use nested classes (a class for every method I want to test) to organize my tests. Here is how a test might look:&lt;/p&gt;
+
+&lt;div id="codeSnippetWrapper"&gt;
+  &lt;pre style="border-bottom-style: none; text-align: left; padding-bottom: 0px; line-height: 12pt; background-color: #f4f4f4; margin: 0em; border-left-style: none; padding-left: 0px; width: 100%; padding-right: 0px; font-family: &amp;#39;Courier New&amp;#39;, courier, monospace; direction: ltr; border-top-style: none; color: black; border-right-style: none; font-size: 8pt; overflow: visible; padding-top: 0px" id="codeSnippet"&gt;&lt;span style="color: #0000ff"&gt;class&lt;/span&gt; OAuthTokenServiceTests&lt;br /&gt;{&lt;br /&gt;    &lt;span style="color: #0000ff"&gt;class&lt;/span&gt; TestableOAuthTokenService : Testable&amp;lt;SkyCli.OAuth.OAuthTokenService&amp;gt;&lt;br /&gt;    {&lt;br /&gt;        &lt;span style="color: #0000ff"&gt;public&lt;/span&gt; TestableOAuthTokenService()&lt;br /&gt;        {&lt;br /&gt;&lt;br /&gt;        }&lt;br /&gt;    }&lt;br /&gt;&lt;br /&gt;    &lt;span style="color: #0000ff"&gt;public&lt;/span&gt; &lt;span style="color: #0000ff"&gt;class&lt;/span&gt; GetAccessToken&lt;br /&gt;    {&lt;br /&gt;        [Fact]&lt;br /&gt;        &lt;span style="color: #0000ff"&gt;public&lt;/span&gt; &lt;span style="color: #0000ff"&gt;void&lt;/span&gt; WillReturnTokenFromRegistryIfAFreshOneIsFoundThere()&lt;br /&gt;        {&lt;br /&gt;            var testable = &lt;span style="color: #0000ff"&gt;new&lt;/span&gt; TestableOAuthTokenService();&lt;br /&gt;            var registryValues = &lt;span style="color: #0000ff"&gt;new&lt;/span&gt; Dictionary&amp;lt;&lt;span style="color: #0000ff"&gt;string&lt;/span&gt;, &lt;span style="color: #0000ff"&gt;string&lt;/span&gt;&amp;gt;();&lt;br /&gt;            registryValues.Add(&lt;span style="color: #006080"&gt;&amp;quot;access_token&amp;quot;&lt;/span&gt;, &lt;span style="color: #006080"&gt;&amp;quot;token&amp;quot;&lt;/span&gt;);&lt;br /&gt;            registryValues.Add(&lt;span style="color: #006080"&gt;&amp;quot;expires_in&amp;quot;&lt;/span&gt;, &lt;span style="color: #006080"&gt;&amp;quot;3600&amp;quot;&lt;/span&gt;);&lt;br /&gt;            registryValues.Add(&lt;span style="color: #006080"&gt;&amp;quot;grant_time&amp;quot;&lt;/span&gt;, DateTime.Now.Ticks.ToString());&lt;br /&gt;            testable.Mock&amp;lt;IRegistryWrapper&amp;gt;().Setup(x =&amp;gt; x.GetValues(&lt;span style="color: #006080"&gt;&amp;quot;path&amp;quot;&lt;/span&gt;))&lt;br /&gt;                .Returns(registryValues);&lt;br /&gt;&lt;br /&gt;            var result = testable.ClassUnderTest.GetAccessToken(&lt;span style="color: #006080"&gt;&amp;quot;clientId&amp;quot;&lt;/span&gt;, &lt;span style="color: #0000ff"&gt;null&lt;/span&gt;);&lt;br /&gt;&lt;br /&gt;            Assert.Equal(&lt;span style="color: #006080"&gt;&amp;quot;token&amp;quot;&lt;/span&gt;, result);&lt;br /&gt;        }&lt;br /&gt;    }&lt;br /&gt;}&lt;/pre&gt;
+
+  &lt;br /&gt;&lt;/div&gt;
+
+&lt;p&gt;
+  &lt;br /&gt;See &lt;a href="http://autowrocktestable.codeplex.com/documentation"&gt;Using the Testable&amp;lt;T&amp;gt; Class&lt;/a&gt; for a complete explanation of the Testable&amp;lt;T&amp;gt; API. 
+
+  &lt;br /&gt;
+
+  &lt;br /&gt;For more information on the Testable pattern and Auto Mocking in general see &lt;a href="http://autowrocktestable.codeplex.com/wikipage?title=The%20Testable%20Pattern%20and%20Auto%20Mocking%20Explained&amp;amp;referringTitle=Documentation"&gt;The Testable Pattern and Auto Mocking Explained&lt;/a&gt; or see my &lt;a href="http://www.mattwrock.com/post/2011/12/07/Unit-Testing-ASPNet-Http-Handlers-and-a-discussion-of-Auto-Mocking-and-the-Testable-pattern.aspx"&gt;previous blog post&lt;/a&gt; on the subject.&lt;/p&gt;</content>
+  <ispublished>True</ispublished>
+  <isdeleted>False</isdeleted>
+  <iscommentsenabled>True</iscommentsenabled>
+  <pubDate>2012-05-15 23:54:53</pubDate>
+  <lastModified>2013-03-06 09:20:13</lastModified>
+  <raters>0</raters>
+  <rating>0</rating>
+  <slug>Released-AutoWrockTestable-Making-test-class-composition-easier</slug>
+  <tags />
+  <comments />
+  <categories />
+  <notifications />
+</post>

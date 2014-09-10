@@ -17,6 +17,7 @@ namespace App_Code.Controls
 
     using BlogEngine.Core;
     using BlogEngine.Core.DataStore;
+	using BlogEngine.Core.Providers.CacheProvider;
 
     using Resources;
     using System.Web.Hosting;
@@ -85,6 +86,73 @@ namespace App_Code.Controls
         #endregion
 
         #region Methods
+
+
+		/// <summary>
+		/// This method is intended to be called once during FirstRequestInitialization
+		/// right before LoadExtension() which is another time consuming routine.
+		/// By preloading the widgets asyncronously in this method, this time consuming
+		/// work is done in a manner that reduces the time to load the first page.  
+		/// </summary>
+		/// <param name="zoneName">Typically "be_WIDGET_ZONE"</param>
+		public static void PreloadWidgetsAsync(string zoneName) {
+			//8/16/11 RonC Method Added 
+
+			//Need to access the Cache to force it to be constructed
+			//while we still have HttpContext.
+			CacheProvider cache = Blog.CurrentInstance.Cache;
+
+			// Need blogSettings to pass to Ping since the current blog instance won't
+			// be detectable once in a BG thread.
+			Guid blogId = Blog.CurrentInstance.Id;
+			ThreadPool.QueueUserWorkItem(delegate {
+				// because HttpContext is not available within this BG thread
+				// needed to determine the current blog instance,
+				// set override value here.
+				Blog.InstanceIdOverride = blogId;
+
+				XmlDocument doc;
+
+				// check the cache for the document. if not loaded yet, load it & put in cache
+				if (Blog.CurrentInstance.Cache[zoneName] == null) {
+					doc = RetrieveXml(zoneName);
+					if (doc != null) {
+						Blog.CurrentInstance.Cache[zoneName] = doc;
+					}
+				} else {
+					doc = (XmlDocument)Blog.CurrentInstance.Cache[zoneName];
+				}
+
+				var zone = doc.SelectNodes("//widget");
+				if (zone == null) {
+					return;
+				}
+
+				System.Web.UI.Page page = new System.Web.UI.Page();
+
+				foreach (XmlNode widget in zone) {
+					var fileName = string.Format("{0}widgets/{1}/widget.ascx", Utils.ApplicationRelativeWebRoot, widget.InnerText);
+					try {
+						bool isAdminWidget = (fileName.ToLower().IndexOf("/administration/widget.ascx") >= 0);
+						if (!isAdminWidget || (isAdminWidget && Security.IsAuthenticated)) {
+
+							//Loading the widget control now, will cause it to be in
+							//memory when a real page request comes in later because
+							//the .Net framework will cached the control.
+							page.LoadControl(fileName);
+						}
+					} catch {
+						//mask the exceptions since we are just preloading controls
+						//Later when the control is loaded for a real page request
+						//The system will show an appropriate error.
+					}
+				}
+
+			});//end delegate
+
+		}//PreloadWidgets
+
+
         
         /// <summary>
         /// Raises the <see cref="E:System.Web.UI.Control.Init"/> event.
@@ -117,7 +185,12 @@ namespace App_Code.Controls
         {
             base.OnLoad(e);
 
-            var zone = this.XmlDocument.SelectNodes("//widget");
+			XmlNodeList zone = null;
+			if (this.XmlDocument != null)
+			{
+				zone = this.XmlDocument.SelectNodes("//widget");
+			}
+
             if (zone == null)
             {
                 return;
@@ -132,25 +205,30 @@ namespace App_Code.Controls
                 var fileName = string.Format("{0}widgets/{1}/widget.ascx", Utils.ApplicationRelativeWebRoot, widget.InnerText);
                 try
                 {
+					//Mod RonC Added this conditional so that the admin widget isn't loaded for non authenticated
+					//         visitors.  This shaves 1 sec off of a cold server first page fetch 
+					//         for a non admin visitor.  
+					bool isAdminWidget = (fileName.ToLower().IndexOf("/administration/widget.ascx") >= 0);	
+					if (!isAdminWidget || (isAdminWidget && Security.IsAuthenticated)) {
 
-                    var control = (WidgetBase)this.Page.LoadControl(fileName);
-                    if (widget.Attributes != null)
-                    {
-                        control.WidgetId = new Guid(widget.Attributes["id"].InnerText);
-                        control.Title = widget.Attributes["title"].InnerText;
-                        control.ShowTitle = control.IsEditable
-                                                ? bool.Parse(widget.Attributes["showTitle"].InnerText)
-                                                : control.DisplayHeader;
-                    }
+						var control = (WidgetBase)this.Page.LoadControl(fileName);
+						if (widget.Attributes != null) {
+							control.WidgetId = new Guid(widget.Attributes["id"].InnerText);
+							control.Title = widget.Attributes["title"].InnerText;
+							control.ShowTitle = control.IsEditable
+													? bool.Parse(widget.Attributes["showTitle"].InnerText)
+													: control.DisplayHeader;
+						}
 
-                    control.ID = control.WidgetId.ToString().Replace("-", string.Empty);
-                    control.Zone = this.zoneName;
+						control.ID = control.WidgetId.ToString().Replace("-", string.Empty);
+						control.Zone = this.zoneName;
 
-                    control.LoadWidget();
+						control.LoadWidget();
 
-                    // This will return the WidgetContainer with the control in it.
-                    var widgetContainer = WidgetContainer.GetWidgetContainer(control, widgetContainerExists, widgetContainerVirtualPath);
-                    this.Controls.Add(widgetContainer);
+						// This will return the WidgetContainer with the control in it.
+						var widgetContainer = WidgetContainer.GetWidgetContainer(control, widgetContainerExists, widgetContainerVirtualPath);
+						this.Controls.Add(widgetContainer);
+					}
                 }
                 catch (Exception ex)
                 {

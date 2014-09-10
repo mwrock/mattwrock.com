@@ -11,7 +11,7 @@ public partial class error_occurred : BlogBasePage
 {
     protected void Page_Load(object sender, EventArgs e)
     {
-        Page.Title = "Error";
+        Page.Title = Resources.labels.Error;
         OutputErrorDetails();
     }
 

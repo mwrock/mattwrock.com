@@ -1,0 +1,80 @@
+﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<post>
+  <author>mwrock</author>
+  <title>Three pitfalls to avoid when writing a response filter</title>
+  <description />
+  <content>&lt;p&gt;I was looking at a response filter that someone else had written yesterday and I noticed a few things it was doing that ideally you want to avoid in a response filter. This is a particularly fresh topic for me since I am nearing the end of V1 development on a &lt;a href="http://www.RequestReduce.com"&gt;response filter&lt;/a&gt; that will automatically find a response's css, merge them, find their background images, sprite the ones it can then create a new and minified css with these sprites. I'll be blogging much more on that next month.&lt;/p&gt;
+&lt;p&gt;Now, in order to write a good filter that will work with any site and be performant is not particularly easy. If your filter is limited to a small or smaller sites, this advise may be considered to lie in the category of preoptimization. But real quick...before I elaborate on these pitfalls...&lt;/p&gt;
+&lt;h2&gt;What is a response&amp;nbsp;filter?&lt;/h2&gt;
+&lt;p&gt;A response filter is simply a class that derives from System.IO.Stream. This class is attached to an HttpResponse's Filter property like so:&lt;/p&gt;
+&lt;pre class="brush: c-sharp;"&gt;Response.Filter = new MyFilter(HttpContext.Current.Response.Filter, &lt;/pre&gt;
+&lt;pre class="brush: c-sharp;"&gt;    HttpContext.Current.Response.ContentEncoding);&lt;/pre&gt;
+&lt;p class="brush: c-sharp;"&gt;As the underlying response outputs to its&amp;nbsp;OutputStream, this output is sent to the filter which has the opportunity to examine and manipulate the response before it gets to the browser. The filter does this by overriding Stream's Write method:&lt;/p&gt;
+&lt;pre class="brush: c-sharp;"&gt;void Wite(byte[] buffer, int offset, int count);&lt;/pre&gt;
+&lt;p class="brush: c-sharp;"&gt;When the filter is ready to send its transformed response to the browser or just forward the buffer on unchanged, it then calls the underlying stream's write method. So your filter might have code like this:&lt;/p&gt;
+&lt;pre class="brush: c-sharp;"&gt;        public ResponseFilter(Stream baseStream, Encoding encoding)
+        {
+            this.encoding = encoding;
+            BaseStream = baseStream;
+        }
+
+	protected Stream BaseStream { get; private set; }
+
+        public override void Write(byte[] buffer, int offset, int count)
+        {
+		var header = encoding.GetBytes("I am wrapping");
+		var footer = encoding.GetBytes("your response");
+		BaseStream.Write(header, 0, header.Length);
+		BaseStream.Write(buffer, offset, count);
+		BaseStream.Write(footer, 0, footer.Length);
+         }&lt;/pre&gt;
+&lt;p&gt;This is a common implementation used for adding compression to a site or ensuring that a site's content is always wrapped in a common header and footer.&lt;/p&gt;
+&lt;p&gt;So with that background, here are some things to try and avoid in a solid filter:&amp;nbsp;&lt;/p&gt;
+&lt;h2&gt;Assuming UTF-8&lt;/h2&gt;
+&lt;p&gt;This is easy to overlook and honestly it will work most of the time, but if you think that your filter will ever be dropped on a Japanese website, or a website that is intended to be localized to a double byte unicode locale you might be disapointed. Very disapointed. Avoid doing something like this:&lt;/p&gt;
+&lt;pre class="brush: c-sharp;"&gt;BaseStream.Write(encoding.GetBytes("I am wrapping"), 0, &lt;/pre&gt;
+&lt;pre class="brush: c-sharp;"&gt;    "I am wrapping".Length);&lt;/pre&gt;
+&lt;p class="brush: c-sharp;"&gt;In a Japanese locale, the underlying encoding will be unicode and the length of the byte array will be twice the size of&amp;nbsp;&amp;nbsp;"I am wrapping".Length which is likely UTF-8. So the users see just half the stream. But thats ok, the first half was way better.&lt;/p&gt;
+&lt;h2 class="brush: c-sharp;"&gt;Copying the buffer to a string&lt;/h2&gt;
+&lt;p class="brush: c-sharp;"&gt;&amp;nbsp;You might be tempted to do something like this:&lt;/p&gt;
+&lt;pre class="brush: c-sharp;"&gt;public override void Write(byte[] buffer, int offset, int count)
+{
+    var output = encoding.GetString(buffer, offset, count)
+    var newOut = encoding.GetBytes("header" + output + "footer");
+    BaseStream.Write(newOut, 0, newOut.Length);
+}&lt;/pre&gt;
+&lt;p class="brush: c-sharp;"&gt;You have now managed to double the memory footprint of the original response by copying it to a new variable. This can be a sensitive issue with filters since they often process almost ALL output in a site. Unfortunately, if you need to do alot of text searching and replacing on the original byte array and you want to be efficient, this can be difficult and tedious code to write, read and test. I intend to devote a future post to this topic exclisively.&lt;/p&gt;
+&lt;h2 class="brush: c-sharp;"&gt;Ignoring the offset and count parameters&lt;/h2&gt;
+&lt;p class="brush: c-sharp;"&gt;You might think that using the offset and count parameters in your Write override is not necessary. After all, you are confident that your transformations can go to the browser as is because you don't have any code that would need to do further processing on the buffer.&amp;nbsp;Well maybe you don't but someone else might. You may have no control over the fact that someday another HttpModule will be added to the site that registers another filters. Response filtering fully supports the ability to chain several filters together. Someone elses module might have have the code mentioned above in their own class:&lt;/p&gt;
+&lt;pre class="brush: c-sharp;"&gt;Response.Filter = new MyFilter(HttpContext.Current.Response.Filter, &lt;/pre&gt;
+&lt;pre class="brush: c-sharp;"&gt;    HttpContext.Current.Response.ContentEncoding);&lt;/pre&gt;
+&lt;p class="brush: c-sharp;"&gt;So if this is called after your own filter was added to the response, then YOU are&amp;nbsp;HttpContext.Current.Response.Filter. That new filter might do something like:&lt;/p&gt;
+&lt;pre class="brush: c-sharp;"&gt;public override void Write(byte[] buffer, int offset, int count)
+{
+    int[1] headBoundaryIndexes = FindOpeningHead(buffer, offset, count);
+    BaseStream.Write(buffer, 0, headBoundaryIndexes[0]);
+    BaseStream.Write(anEvenBetterHead, 0, anEvenBetterHead.Length);
+    BaseStream.Write(buffer, headBoundaryIndexes[1], (offset + count) - headBoundaryIndexes[1]);
+}&lt;/pre&gt;
+&lt;p class="brush: c-sharp;"&gt;So if your filter is this filter's BaseStream and your Write looks like this:&lt;/p&gt;
+&lt;pre class="brush: c-sharp;"&gt;public override void Write(byte[] buffer, int offset, int count)
+{
+    var output = Encoding.UTF8.GetString(buffer);
+    var newOut = output.Replace("super", "super duper");
+    BaseStream.Write(Encoding.UTF8.GetBytes(newOut), 0, newOut.Length);
+}&lt;/pre&gt;
+&lt;p class="brush: c-sharp;"&gt;Ouch. Your users are probably looking at something other than what you intended.&amp;nbsp;The upstream filter was trying to replace the head but now they three.&amp;nbsp;After several years in the industry and meticulous experimentation, I have found that 1 is the perfect number of heads in a web page.&lt;/p&gt;
+&lt;p class="brush: c-sharp;"&gt;Oh and look, this code managed to violate all three admonitions in one blow.&lt;/p&gt;</content>
+  <ispublished>True</ispublished>
+  <isdeleted>False</isdeleted>
+  <iscommentsenabled>True</iscommentsenabled>
+  <pubDate>2011-07-22 13:06:00</pubDate>
+  <lastModified>2011-07-22 14:24:03</lastModified>
+  <raters>0</raters>
+  <rating>0</rating>
+  <slug>Three-pitfalls-to-avoid-when-writing-a-response-filter</slug>
+  <tags />
+  <comments />
+  <categories />
+  <notifications />
+</post>

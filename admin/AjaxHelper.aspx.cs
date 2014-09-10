@@ -106,8 +106,8 @@ namespace Admin
                 {
                     if (c.Id == gId)
                     {
-                        c.Author = author;
-                        c.Email = email;
+                        c.Author = HttpUtility.HtmlEncode(author);
+                        c.Email = HttpUtility.HtmlEncode(email);
                         c.Website = string.IsNullOrEmpty(website) ? null : new Uri(website);
                         c.Content = HttpUtility.HtmlEncode(cont);
 
@@ -231,10 +231,12 @@ namespace Admin
                 post.Content = content;
                 post.Description = desc;
 
-                if (!string.IsNullOrEmpty(slug))
+                if (string.IsNullOrEmpty(slug))
                 {
-                    post.Slug = Utils.RemoveIllegalCharacters(slug.Trim());
+                    slug = title;
                 }
+
+                post.Slug = Post.GetUniqueSlug(slug, post.Id);
 
                 post.DateCreated =
                 DateTime.ParseExact(date + " " + time, "yyyy-MM-dd HH\\:mm", null).AddHours(
@@ -265,13 +267,7 @@ namespace Admin
                 }
                
                 post.Save();
-
-                // If this is an unpublished post and the user does not have rights to
-                // view unpublished posts, then redirect to the Posts list.
-                if (post.IsVisible)
-                    response.Data = post.RelativeLink;
-                else
-                    response.Data = string.Format("{0}admin/Posts/Posts.aspx", Utils.RelativeWebRoot);
+                response.Data = post.Id.ToString();
 
                 HttpContext.Current.Session.Remove("content");
                 HttpContext.Current.Session.Remove("title");
@@ -371,14 +367,7 @@ namespace Admin
                     page.Parent = new Guid(parent);
 
                 page.Save();
-
-                // If this is an unpublished page and the user does not have rights to
-                // view unpublished pages, then redirect to the Pages list.
-                if (page.IsVisible)
-                    response.Data = page.RelativeLink;
-                else
-                    response.Data = string.Format("{0}admin/Pages/Pages.aspx", Utils.RelativeWebRoot);
-
+                response.Data = page.Id.ToString();
             }
             catch (Exception ex)
             {
@@ -472,9 +461,6 @@ namespace Admin
 
                 BlogSettings.Instance.Save();
 
-                // reset cache
-                Blog.CurrentInstance.Cache.Remove("Installed-Themes");
-
                 return true;
             }
             catch (Exception ex)
@@ -485,12 +471,12 @@ namespace Admin
         }
 
         [WebMethod]
-        public static IEnumerable LoadGalleryPage(string pkgType, int page, PackageManager.OrderType sortOrder, string searchVal)
+        public static IEnumerable LoadGalleryPage(string pkgType, int page, Gallery.OrderType sortOrder, string searchVal)
         {
             if (!WebUtils.CheckRightsForAdminSettingsPage(false)) { return null; }
             if (!WebUtils.CheckIfPrimaryBlog(false)) { return null; }
 
-            return JsonPackages.GetPage(pkgType, page, sortOrder, searchVal);
+            return PackageRepository.FromGallery(pkgType, page, sortOrder, searchVal);
         }
 
         [WebMethod]
@@ -499,7 +485,7 @@ namespace Admin
             if (!WebUtils.CheckRightsForAdminSettingsPage(false)) { return null; }
             if (!WebUtils.CheckIfPrimaryBlog(false)) { return null; }
 
-            return PackageManager.GalleryPager == null ? null : PackageManager.GalleryPager.PageItems;
+            return Gallery.GalleryPager == null ? null : Gallery.GalleryPager.PageItems;
         }
 
         [WebMethod]
@@ -508,7 +494,7 @@ namespace Admin
             if (!WebUtils.CheckRightsForAdminSettingsPage(false)) { return null; }
             if (!WebUtils.CheckIfPrimaryBlog(false)) { return null; }
 
-            return PackageManager.InstallPackage(pkgId);
+            return Installer.InstallPackage(pkgId);
         }
 
         [WebMethod]
@@ -517,7 +503,7 @@ namespace Admin
             if (!WebUtils.CheckRightsForAdminSettingsPage(false)) { return null; }
             if (!WebUtils.CheckIfPrimaryBlog(false)) { return null; }
 
-            return PackageManager.UninstallPackage(pkgId);
+            return Installer.UninstallPackage(pkgId);
         }
 
     }

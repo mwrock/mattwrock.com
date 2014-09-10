@@ -123,7 +123,7 @@
       <ParamType>Boolean</ParamType>
       <Required>false</Required>
       <SelectedValue />
-      <Values>False</Values>
+      <Values>True</Values>
     </Parameters>
     <Parameters>
       <KeyField>false</KeyField>
@@ -188,7 +188,7 @@
       <ParamType>Boolean</ParamType>
       <Required>false</Required>
       <SelectedValue />
-      <Values>False</Values>
+      <Values>True</Values>
     </Parameters>
     <Parameters>
       <KeyField>false</KeyField>
@@ -336,85 +336,9 @@
   </Settings>
   <Settings>
     <Delimiter>44</Delimiter>
-    <Help>&lt;span  style="font-weight: bold;"&gt;Tweetmeme&lt;/span&gt; (http://www.tweetmeme.com/) is a Twitter counter and publishing service. The button can be displayed in a small and a large version, a static version with counter isn't supported.&lt;br/&gt;&lt;br/&gt;If you enter a username is entered this user will be @ mentioned in the suggested Tweet (leave &amp;lt;anonymous&amp;gt; if you don't want to mention someone).&lt;br/&gt;&lt;br/&gt;If you want to add the button only in some posts, simply add the HTML comment &amp;lt;!--[TweetMeme]--&amp;gt; to the your post in the HTML view.</Help>
-    <Hidden>false</Hidden>
-    <Index>2</Index>
-    <IsScalar>true</IsScalar>
-    <KeyField>TwitterName</KeyField>
-    <Name>TweetMeme</Name>
-    <Parameters>
-      <KeyField>false</KeyField>
-      <Label>Twitter Name</Label>
-      <MaxLength>50</MaxLength>
-      <Name>TwitterName</Name>
-      <ParamType>String</ParamType>
-      <Required>false</Required>
-      <SelectedValue />
-      <Values>&lt;anonymous&gt;</Values>
-    </Parameters>
-    <Parameters>
-      <KeyField>false</KeyField>
-      <Label>Style</Label>
-      <MaxLength>50</MaxLength>
-      <Name>Style</Name>
-      <ParamType>DropDown</ParamType>
-      <Required>false</Required>
-      <SelectedValue>compact</SelectedValue>
-      <Values>compact</Values>
-      <Values>large</Values>
-    </Parameters>
-    <Parameters>
-      <KeyField>false</KeyField>
-      <Label>Alignment</Label>
-      <MaxLength>30</MaxLength>
-      <Name>Alignment</Name>
-      <ParamType>DropDown</ParamType>
-      <Required>false</Required>
-      <SelectedValue>TopRight</SelectedValue>
-      <Values>BottomLeft</Values>
-      <Values>BottomRight</Values>
-      <Values>TopLeft</Values>
-      <Values>TopRight</Values>
-    </Parameters>
-    <Parameters>
-      <KeyField>false</KeyField>
-      <Label>Order Number</Label>
-      <MaxLength>5</MaxLength>
-      <Name>OrderNumber</Name>
-      <ParamType>Integer</ParamType>
-      <Required>false</Required>
-      <SelectedValue />
-      <Values>98</Values>
-    </Parameters>
-    <Parameters>
-      <KeyField>false</KeyField>
-      <Label>Enabled</Label>
-      <MaxLength>30</MaxLength>
-      <Name>Enabled</Name>
-      <ParamType>Boolean</ParamType>
-      <Required>false</Required>
-      <SelectedValue />
-      <Values>False</Values>
-    </Parameters>
-    <Parameters>
-      <KeyField>false</KeyField>
-      <Label>Hide in post list</Label>
-      <MaxLength>30</MaxLength>
-      <Name>HidePostList</Name>
-      <ParamType>Boolean</ParamType>
-      <Required>false</Required>
-      <SelectedValue />
-      <Values>False</Values>
-    </Parameters>
-    <ShowAdd>true</ShowAdd>
-    <ShowDelete>true</ShowDelete>
-    <ShowEdit>true</ShowEdit>
-  </Settings>
-  <Settings>
-    <Delimiter>44</Delimiter>
     <Help>&lt;span  style="font-weight: bold;"&gt;Twitter&lt;/span&gt; (http://www.twitter.com/) provides counter and publishing service. The button can be displayed in a small and a large version, a static version with counter isn't supported by Twitter. &lt;br/&gt;&lt;br/&gt;If you enter a username is entered this user will be @ mentioned in the suggested Tweet (leave &amp;lt;anonymous&amp;gt; if you don't want to mention someone).&lt;br/&gt;&lt;br/&gt;If you want to add the button only in some posts, simply add the HTML comment &amp;lt;!--[Twitter]--&amp;gt; to the your post in the HTML view.</Help>
     <Hidden>false</Hidden>
-    <Index>3</Index>
+    <Index>2</Index>
     <IsScalar>true</IsScalar>
     <KeyField>TwitterName</KeyField>
     <Name>Twitter</Name>
@@ -488,12 +412,154 @@
   </Settings>
   <Settings>
     <Delimiter>44</Delimiter>
-    <Help>&lt;span  style="font-weight: bold;"&gt;Digg&lt;/span&gt; (http://www.digg.com) is a famous social bookmarking service. The button can be displayed in a small and a large version, a static version with counter isn't supported by digg.&lt;br/&gt;&lt;br/&gt;If you want to add the button only in some posts, simply add the HTML comment &amp;lt;!--[Digg]--&amp;gt; to the your post in the HTML view.</Help>
+    <Help>&lt;span  style="font-weight: bold;"&gt;Tweetmeme&lt;/span&gt; (http://www.tweetmeme.com/) is a Twitter counter and publishing service. The button can be displayed in a small and a large version, a static version with counter isn't supported.&lt;br/&gt;&lt;br/&gt;If you enter a username is entered this user will be @ mentioned in the suggested Tweet (leave &amp;lt;anonymous&amp;gt; if you don't want to mention someone).&lt;br/&gt;&lt;br/&gt;If you want to add the button only in some posts, simply add the HTML comment &amp;lt;!--[TweetMeme]--&amp;gt; to the your post in the HTML view.</Help>
+    <Hidden>false</Hidden>
+    <Index>3</Index>
+    <IsScalar>true</IsScalar>
+    <KeyField>TwitterName</KeyField>
+    <Name>TweetMeme</Name>
+    <Parameters>
+      <KeyField>false</KeyField>
+      <Label>Twitter Name</Label>
+      <MaxLength>50</MaxLength>
+      <Name>TwitterName</Name>
+      <ParamType>String</ParamType>
+      <Required>false</Required>
+      <SelectedValue />
+      <Values>&lt;anonymous&gt;</Values>
+    </Parameters>
+    <Parameters>
+      <KeyField>false</KeyField>
+      <Label>Style</Label>
+      <MaxLength>50</MaxLength>
+      <Name>Style</Name>
+      <ParamType>DropDown</ParamType>
+      <Required>false</Required>
+      <SelectedValue>compact</SelectedValue>
+      <Values>compact</Values>
+      <Values>large</Values>
+    </Parameters>
+    <Parameters>
+      <KeyField>false</KeyField>
+      <Label>Alignment</Label>
+      <MaxLength>30</MaxLength>
+      <Name>Alignment</Name>
+      <ParamType>DropDown</ParamType>
+      <Required>false</Required>
+      <SelectedValue>TopRight</SelectedValue>
+      <Values>BottomLeft</Values>
+      <Values>BottomRight</Values>
+      <Values>TopLeft</Values>
+      <Values>TopRight</Values>
+    </Parameters>
+    <Parameters>
+      <KeyField>false</KeyField>
+      <Label>Order Number</Label>
+      <MaxLength>5</MaxLength>
+      <Name>OrderNumber</Name>
+      <ParamType>Integer</ParamType>
+      <Required>false</Required>
+      <SelectedValue />
+      <Values>98</Values>
+    </Parameters>
+    <Parameters>
+      <KeyField>false</KeyField>
+      <Label>Enabled</Label>
+      <MaxLength>30</MaxLength>
+      <Name>Enabled</Name>
+      <ParamType>Boolean</ParamType>
+      <Required>false</Required>
+      <SelectedValue />
+      <Values>False</Values>
+    </Parameters>
+    <Parameters>
+      <KeyField>false</KeyField>
+      <Label>Hide in post list</Label>
+      <MaxLength>30</MaxLength>
+      <Name>HidePostList</Name>
+      <ParamType>Boolean</ParamType>
+      <Required>false</Required>
+      <SelectedValue />
+      <Values>False</Values>
+    </Parameters>
+    <ShowAdd>true</ShowAdd>
+    <ShowDelete>true</ShowDelete>
+    <ShowEdit>true</ShowEdit>
+  </Settings>
+  <Settings>
+    <Delimiter>44</Delimiter>
+    <Help>&lt;span  style="font-weight: bold;"&gt;StumbleUpon&lt;/span&gt; (http://www.stumbleupon.com) is a rapidly growing social bookmarking and counter service. The button can be displayed in a small and a large version, a static version with counter isn't supported by StumbleUpon.&lt;br/&gt;&lt;br/&gt;If you want to add the button only in some posts, simply add the HTML comment &amp;lt;!--[StumbeUpon]--&amp;gt; to the your post in the HTML view.</Help>
     <Hidden>false</Hidden>
     <Index>4</Index>
     <IsScalar>true</IsScalar>
     <KeyField>Style</KeyField>
-    <Name>Digg</Name>
+    <Name>StumbeUpon</Name>
+    <Parameters>
+      <KeyField>false</KeyField>
+      <Label>Style</Label>
+      <MaxLength>50</MaxLength>
+      <Name>Style</Name>
+      <ParamType>DropDown</ParamType>
+      <Required>false</Required>
+      <SelectedValue>compact</SelectedValue>
+      <Values>compact</Values>
+      <Values>large</Values>
+    </Parameters>
+    <Parameters>
+      <KeyField>false</KeyField>
+      <Label>Alignment</Label>
+      <MaxLength>30</MaxLength>
+      <Name>Alignment</Name>
+      <ParamType>DropDown</ParamType>
+      <Required>false</Required>
+      <SelectedValue>TopRight</SelectedValue>
+      <Values>BottomLeft</Values>
+      <Values>BottomRight</Values>
+      <Values>TopLeft</Values>
+      <Values>TopRight</Values>
+    </Parameters>
+    <Parameters>
+      <KeyField>false</KeyField>
+      <Label>Order Number</Label>
+      <MaxLength>5</MaxLength>
+      <Name>OrderNumber</Name>
+      <ParamType>Integer</ParamType>
+      <Required>false</Required>
+      <SelectedValue />
+      <Values>99</Values>
+    </Parameters>
+    <Parameters>
+      <KeyField>false</KeyField>
+      <Label>Enabled</Label>
+      <MaxLength>30</MaxLength>
+      <Name>Enabled</Name>
+      <ParamType>Boolean</ParamType>
+      <Required>false</Required>
+      <SelectedValue />
+      <Values>False</Values>
+    </Parameters>
+    <Parameters>
+      <KeyField>false</KeyField>
+      <Label>Hide in post list</Label>
+      <MaxLength>30</MaxLength>
+      <Name>HidePostList</Name>
+      <ParamType>Boolean</ParamType>
+      <Required>false</Required>
+      <SelectedValue />
+      <Values>False</Values>
+    </Parameters>
+    <ShowAdd>true</ShowAdd>
+    <ShowDelete>true</ShowDelete>
+    <ShowEdit>true</ShowEdit>
+  </Settings>
+  <Settings>
+    <Delimiter>44</Delimiter>
+    <Help>&lt;span  style="font-weight: bold;"&gt;Facebook Like&lt;/span&gt; (http://www.facebook.com/) is a counter service (no bookmarking service) and shows how many readers like your article. The button can be displayed in a small and a large version, a static version with counter isn't supported by facebook.&lt;br/&gt;&lt;br/&gt;If you want to add the button only in some posts, simply add the HTML comment &amp;lt;!--[FacebookLike]--&amp;gt; to the your post in the HTML view.</Help>
+    <Hidden>false</Hidden>
+    <Index>5</Index>
+    <IsScalar>true</IsScalar>
+    <KeyField>Style</KeyField>
+    <Name>FacebookLike</Name>
     <Parameters>
       <KeyField>false</KeyField>
       <Label>Style</Label>
@@ -556,7 +622,7 @@
     <Delimiter>44</Delimiter>
     <Help>&lt;span  style="font-weight: bold;"&gt;Facebook Share&lt;/span&gt; (http://www.facebook.com/) is a counter and publishing service. The button can be displayed in a small and a large version, a static version with counter isn't supported by facebook.&lt;br/&gt;&lt;br/&gt;If you want to add the button only in some posts, simply add the HTML comment &amp;lt;!--[FacebookShare]--&amp;gt; to the your post in the HTML view.</Help>
     <Hidden>false</Hidden>
-    <Index>5</Index>
+    <Index>6</Index>
     <IsScalar>true</IsScalar>
     <KeyField>Style</KeyField>
     <Name>FacebookShare</Name>
@@ -622,7 +688,7 @@
     <Delimiter>44</Delimiter>
     <Help>&lt;span  style="font-weight: bold;"&gt;Google +1&lt;/span&gt; is a counter and publishing service provided by Google (http://www.google.com/+1/button). It can be displayed in a medium and a large version, a static version with counter isn't supported by Google.&lt;br/&gt;&lt;br/&gt;If you want to add the button only in some posts, simply add the HTML comment &amp;lt;!--[PlusOne]--&amp;gt; to the your post in the HTML view.</Help>
     <Hidden>false</Hidden>
-    <Index>6</Index>
+    <Index>7</Index>
     <IsScalar>true</IsScalar>
     <KeyField>Style</KeyField>
     <Name>PlusOne</Name>
@@ -686,78 +752,12 @@
   </Settings>
   <Settings>
     <Delimiter>44</Delimiter>
-    <Help>&lt;span  style="font-weight: bold;"&gt;Facebook Like&lt;/span&gt; (http://www.facebook.com/) is a counter service (no bookmarking service) and shows how many readers like your article. The button can be displayed in a small and a large version, a static version with counter isn't supported by facebook.&lt;br/&gt;&lt;br/&gt;If you want to add the button only in some posts, simply add the HTML comment &amp;lt;!--[FacebookLike]--&amp;gt; to the your post in the HTML view.</Help>
-    <Hidden>false</Hidden>
-    <Index>7</Index>
-    <IsScalar>true</IsScalar>
-    <KeyField>Style</KeyField>
-    <Name>FacebookLike</Name>
-    <Parameters>
-      <KeyField>false</KeyField>
-      <Label>Style</Label>
-      <MaxLength>50</MaxLength>
-      <Name>Style</Name>
-      <ParamType>DropDown</ParamType>
-      <Required>false</Required>
-      <SelectedValue>compact</SelectedValue>
-      <Values>compact</Values>
-      <Values>large</Values>
-    </Parameters>
-    <Parameters>
-      <KeyField>false</KeyField>
-      <Label>Alignment</Label>
-      <MaxLength>30</MaxLength>
-      <Name>Alignment</Name>
-      <ParamType>DropDown</ParamType>
-      <Required>false</Required>
-      <SelectedValue>TopRight</SelectedValue>
-      <Values>BottomLeft</Values>
-      <Values>BottomRight</Values>
-      <Values>TopLeft</Values>
-      <Values>TopRight</Values>
-    </Parameters>
-    <Parameters>
-      <KeyField>false</KeyField>
-      <Label>Order Number</Label>
-      <MaxLength>5</MaxLength>
-      <Name>OrderNumber</Name>
-      <ParamType>Integer</ParamType>
-      <Required>false</Required>
-      <SelectedValue />
-      <Values>99</Values>
-    </Parameters>
-    <Parameters>
-      <KeyField>false</KeyField>
-      <Label>Enabled</Label>
-      <MaxLength>30</MaxLength>
-      <Name>Enabled</Name>
-      <ParamType>Boolean</ParamType>
-      <Required>false</Required>
-      <SelectedValue />
-      <Values>False</Values>
-    </Parameters>
-    <Parameters>
-      <KeyField>false</KeyField>
-      <Label>Hide in post list</Label>
-      <MaxLength>30</MaxLength>
-      <Name>HidePostList</Name>
-      <ParamType>Boolean</ParamType>
-      <Required>false</Required>
-      <SelectedValue />
-      <Values>False</Values>
-    </Parameters>
-    <ShowAdd>true</ShowAdd>
-    <ShowDelete>true</ShowDelete>
-    <ShowEdit>true</ShowEdit>
-  </Settings>
-  <Settings>
-    <Delimiter>44</Delimiter>
-    <Help>&lt;span  style="font-weight: bold;"&gt;StumbleUpon&lt;/span&gt; (http://www.stumbleupon.com) is a rapidly growing social bookmarking and counter service. The button can be displayed in a small and a large version, a static version with counter isn't supported by StumbleUpon.&lt;br/&gt;&lt;br/&gt;If you want to add the button only in some posts, simply add the HTML comment &amp;lt;!--[StumbeUpon]--&amp;gt; to the your post in the HTML view.</Help>
+    <Help>&lt;span  style="font-weight: bold;"&gt;Buzz&lt;/span&gt; is a counter and publishing service provided by Google (http://www.google.com/buzz). It can be displayed in a small and a large version, a static version with counter isn't supported by Google.&lt;br/&gt;&lt;br/&gt;If you want to add the button only in some posts, simply add the HTML comment &amp;lt;!--[Buzz]--&amp;gt; to the your post in the HTML view.</Help>
     <Hidden>false</Hidden>
     <Index>8</Index>
     <IsScalar>true</IsScalar>
     <KeyField>Style</KeyField>
-    <Name>StumbeUpon</Name>
+    <Name>Buzz</Name>
     <Parameters>
       <KeyField>false</KeyField>
       <Label>Style</Label>
@@ -818,12 +818,12 @@
   </Settings>
   <Settings>
     <Delimiter>44</Delimiter>
-    <Help>&lt;span  style="font-weight: bold;"&gt;Buzz&lt;/span&gt; is a counter and publishing service provided by Google (http://www.google.com/buzz). It can be displayed in a small and a large version, a static version with counter isn't supported by Google.&lt;br/&gt;&lt;br/&gt;If you want to add the button only in some posts, simply add the HTML comment &amp;lt;!--[Buzz]--&amp;gt; to the your post in the HTML view.</Help>
+    <Help>&lt;span  style="font-weight: bold;"&gt;Digg&lt;/span&gt; (http://www.digg.com) is a famous social bookmarking service. The button can be displayed in a small and a large version, a static version with counter isn't supported by digg.&lt;br/&gt;&lt;br/&gt;If you want to add the button only in some posts, simply add the HTML comment &amp;lt;!--[Digg]--&amp;gt; to the your post in the HTML view.</Help>
     <Hidden>false</Hidden>
     <Index>9</Index>
     <IsScalar>true</IsScalar>
     <KeyField>Style</KeyField>
-    <Name>Buzz</Name>
+    <Name>Digg</Name>
     <Parameters>
       <KeyField>false</KeyField>
       <Label>Style</Label>

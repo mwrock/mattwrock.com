@@ -8,7 +8,7 @@
 }
 
 function HideStatus() {
-    $("[id$='_AdminStatus']").fadeOut('slow', function () { });
+    $("[id$='AdminStatus']").fadeOut('slow', function () { });
 }
 
 function Hide(element) {
@@ -97,6 +97,14 @@ function ValidateNewUser() {
     }
     if ($("[id$='Password']").val() != $("[id$='ConfirmPassword']").val()) {
         ShowStatus('warning', accountResources.passwordAndConfirmPasswordIsMatch);
+        return false;
+    }
+    return true;
+}
+
+function ValidateNewBlog() {
+    if ($("[id$='UserName']").val().length == 0) {
+        ShowStatus('warning', accountResources.userNameIsRequired);
         return false;
     }
     return true;

@@ -1150,4 +1150,238 @@
   <data name="virtualPath" xml:space="preserve">
     <value>Виртуальный адрес</value>
   </data>
+  <data name="enterEmail" xml:space="preserve">
+    <value>Введите ваш e-mail адрес</value>
+  </data>
+  <data name="enterEmailAddress" xml:space="preserve">
+    <value>Пожалуйста введите адрес электронной почты</value>
+  </data>
+  <data name="notifyMe" xml:space="preserve">
+    <value>Сообщать об изменениях</value>
+  </data>
+  <data name="thankYou" xml:space="preserve">
+    <value>Спасибо</value>
+  </data>
+  <data name="nowUnsubscribed" xml:space="preserve">
+    <value>Подписка отменена</value>
+  </data>
+  <data name="viewLargeCalendar" xml:space="preserve">
+    <value>Большой календарь</value>
+  </data>
+  <data name="followTwitter" xml:space="preserve">
+    <value>Дружить на Твитере!</value>
+  </data>
+  <data name="visitorHi" xml:space="preserve">
+    <value>Привет</value>
+  </data>
+  <data name="welcomeBack" xml:space="preserve">
+    <value>Добро пожаловать!</value>
+  </data>
+  <data name="commentsAddedSince" xml:space="preserve">
+    <value>Новые комментарии были добавлены к {0}. </value>
+  </data>
+  <data name="writtenCommentsTotal" xml:space="preserve">
+    <value>Вы написали {0} комментариев.</value>
+  </data>
+  <data name="contactAuthorInformation" xml:space="preserve">
+    <value>Информация об авторе</value>
+  </data>
+  <data name="countryCode" xml:space="preserve">
+    <value>Код стараны</value>
+  </data>
+  <data name="contactIPAddress" xml:space="preserve">
+    <value>IP адрес</value>
+  </data>
+  <data name="contactUserAgent" xml:space="preserve">
+    <value>Параметр User-agent</value>
+  </data>
+  <data name="filestorage" xml:space="preserve">
+    <value>Управление файлами</value>
+  </data>
+  <data name="galleryFeedUrl" xml:space="preserve">
+    <value>URL адрес галереи</value>
+  </data>
+  <data name="galleryFeedUrlDescription" xml:space="preserve">
+    <value>Адрес галереи содержащей пакеты для загрузки</value>
+  </data>
+  <data name="enableQuickNotes" xml:space="preserve">
+    <value>Включить Quick Notes</value>
+  </data>
+  <data name="tools" xml:space="preserve">
+    <value>Инструменты</value>
+  </data>
+  <data name="youHaveNotAddedAnyUserSoFar" xml:space="preserve">
+    <value>Вы пока не создали ни одного пользователя. Используйте линк в правом верхнем углу чтобы добавить пользователя.</value>
+  </data>
+  <data name="rights" xml:space="preserve">
+    <value>Права</value>
+  </data>
+  <data name="youHaveNotDefinedAnyRolesSoFar" xml:space="preserve">
+    <value>Вы пока не создали ни одной роли. Используйте линк в верхнем правом углу чтобы добавить роль.</value>
+  </data>
+  <data name="primary" xml:space="preserve">
+    <value>Основной</value>
+  </data>
+  <data name="textBeforeHostName" xml:space="preserve">
+    <value>Техт перед именем хоста</value>
+  </data>
+  <data name="noBlogsWereFound" xml:space="preserve">
+    <value>Не найдено ни одного блога.</value>
+  </data>
+  <data name="unapprove" xml:space="preserve">
+    <value>Отменить</value>
+  </data>
+  <data name="type" xml:space="preserve">
+    <value>Тип</value>
+  </data>
+  <data name="restore" xml:space="preserve">
+    <value>Восстановить</value>
+  </data>
+  <data name="purge" xml:space="preserve">
+    <value>Очистить</value>
+  </data>
+  <data name="createdOn" xml:space="preserve">
+    <value>Создано</value>
+  </data>
+  <data name="trashIsEmpty" xml:space="preserve">
+    <value>Мусор убран.</value>
+  </data>
+  <data name="restoreSelected" xml:space="preserve">
+    <value>Восстановить выбранное</value>
+  </data>
+  <data name="purgeSelected" xml:space="preserve">
+    <value>Очистить выбранное</value>
+  </data>
+  <data name="purgeAll" xml:space="preserve">
+    <value>Очистить всё</value>
+  </data>
+  <data name="count" xml:space="preserve">
+    <value>Счёт</value>
+  </data>
+  <data name="view" xml:space="preserve">
+    <value>Посмотреть</value>
+  </data>
+  <data name="youHaveNoTaggedPosts" xml:space="preserve">
+    <value>Помеченных постов не найдено.</value>
+  </data>
+  <data name="youHaveNotWrittenAnyPosts" xml:space="preserve">
+    <value>У вас пока нет ни одной записи. Для создания новой записи используйте линк в правом верхнем углу страницы.</value>
+  </data>
+  <data name="youHaveNoWrittenAnyPages" xml:space="preserve">
+    <value>У вас пока не создано ни одной страницы. Для создания новой страницы используйте линк в правом верхнем углу.</value>
+  </data>
+  <data name="size" xml:space="preserve">
+    <value>Размер</value>
+  </data>
+  <data name="noFilesFound" xml:space="preserve">
+    <value>Файлов не найдено.</value>
+  </data>
+  <data name="reset" xml:space="preserve">
+    <value>Перезагрузка</value>
+  </data>
+  <data name="enabled" xml:space="preserve">
+    <value>Активизирован</value>
+  </data>
+  <data name="cheked" xml:space="preserve">
+    <value>Проверено</value>
+  </data>
+  <data name="mistakes" xml:space="preserve">
+    <value>Ошибки</value>
+  </data>
+  <data name="accuracy" xml:space="preserve">
+    <value>Точность</value>
+  </data>
+  <data name="noPackagesToDisplay" xml:space="preserve">
+    <value>Результат не найден.</value>
+  </data>
+  <data name="install" xml:space="preserve">
+    <value>Установить</value>
+  </data>
+  <data name="update" xml:space="preserve">
+    <value>Обновить</value>
+  </data>
+  <data name="firstName" xml:space="preserve">
+    <value>Имя</value>
+  </data>
+  <data name="lastName" xml:space="preserve">
+    <value>Фамилия</value>
+  </data>
+  <data name="birthday" xml:space="preserve">
+    <value>Дата рождения</value>
+  </data>
+  <data name="middleName" xml:space="preserve">
+    <value>Отчество</value>
+  </data>
+  <data name="photoURL" xml:space="preserve">
+    <value>Фото URL</value>
+  </data>
+  <data name="displayName" xml:space="preserve">
+    <value>Отображаемое имя</value>
+  </data>
+  <data name="isPrivate" xml:space="preserve">
+    <value>Закрытый</value>
+  </data>
+  <data name="personalDetails" xml:space="preserve">
+    <value>Личные данные</value>
+  </data>
+  <data name="contactDetails" xml:space="preserve">
+    <value>Контактные данные и адрес</value>
+  </data>
+  <data name="shortBiography" xml:space="preserve">
+    <value>Краткая биография</value>
+  </data>
+  <data name="phoneFax" xml:space="preserve">
+    <value>Факс</value>
+  </data>
+  <data name="phoneMain" xml:space="preserve">
+    <value>Основной телефон</value>
+  </data>
+  <data name="phoneMobile" xml:space="preserve">
+    <value>Мобильный телефон</value>
+  </data>
+  <data name="cityTown" xml:space="preserve">
+    <value>Город/деревня</value>
+  </data>
+  <data name="regionState" xml:space="preserve">
+    <value>Область/регион</value>
+  </data>
+  <data name="saveProfile" xml:space="preserve">
+    <value>Сохранить профиль</value>
+  </data>
+  <data name="deleteSelected" xml:space="preserve">
+    <value>Удалить выбранное</value>
+  </data>
+  <data name="approveSelected" xml:space="preserve">
+    <value>Утвердить выбранное</value>
+  </data>
+  <data name="rejectSelected" xml:space="preserve">
+    <value>Отвергнуть выбранное</value>
+  </data>
+  <data name="deleteAll" xml:space="preserve">
+    <value>Удалить всё</value>
+  </data>
+  <data name="noSpamHere" xml:space="preserve">
+    <value>Ура, спама нет!</value>
+  </data>
+  <data name="noPendingComments" xml:space="preserve">
+    <value>Нерешённых комментариев нет.</value>
+  </data>
+  <data name="noApprovedComments" xml:space="preserve">
+    <value>Утверждённых комментариев нет.</value>
+  </data>
+  <data name="noPingbacksTrackbacks" xml:space="preserve">
+    <value>Пингов и трэкбэков нет. Убедитесь что вы включили получение пингбэков и трэкбэков в продвинутых настройках.</value>
+  </data>
+  <data name="custom" xml:space="preserve">
+    <value>Расширения</value>
+  </data>
+  <data name="widgets" xml:space="preserve">
+    <value>Виджеты</value>
+  </data>
+  <data name="hasRated" xml:space="preserve">
+    <value>Вы уже оценили этот пост.</value>
+  </data>
+  <data name="isForSiteAggregation" xml:space="preserve">
+    <value>Сайт агрегатор</value>
+  </data>
 </root>

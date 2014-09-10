@@ -1,0 +1,184 @@
+﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<post>
+  <author>mwrock</author>
+  <title>Adopt RequestReduce and see immediate Yslow and Google Page Speed score improvements not to mention a faster site!</title>
+  <description />
+  <content>&lt;p&gt;Since March I have been working in my &amp;ldquo;free&amp;rdquo; time on a framework to reduce the number and size of HTTP requests incurred from loading a web page. In short it merges and minifies css and javascript on your page and automatically sprites and optimizes css background images. All this is done on the fly (with caching) with no code changes or configuration required. All processed and reduced resources are served with far future caching headers and custom ETags.&lt;/p&gt;
+&lt;p&gt;In August I had something solid enough to push to production on Microsoft&amp;rsquo;s Gallery platform (what brings home my bacon) which hosts the Visual Studio Gallery, the MSDN Code Samples Gallery, the Technet Gallery and Script Center and many more galleries.&lt;/p&gt;
+&lt;p&gt;UPDATE: In November, &lt;a href="http://RequestReduce.com"&gt;RequestReduce&lt;/a&gt; was adopted by MSDN and Technet Forums and Search which serve millions of page views a day.&lt;/p&gt;
+&lt;h2&gt;Results on Microsoft Gallery Platform&lt;/h2&gt;
+&lt;p&gt;I&amp;rsquo;m very pleased with the results. We saw an 18% improvement in global page load times. We have a large international audience and the further you are from Washington state the more you will benefit from this improvement. VisualStudio Gallery raised its YSlow score from a B to an A and went from 41 HTTP requests to 30. Additionally, our workflow for spriting background images is completely automated.&lt;/p&gt;
+&lt;table style="width: 683px;" border="0" cellspacing="0" cellpadding="2"&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td valign="top" width="323"&gt;Results from China Without RequestReduce:&lt;/td&gt;
+&lt;td valign="top" width="358"&gt;Results from China With RequestReduce:&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td valign="top" width="323"&gt;
+&lt;p&gt;&lt;a href="http://www.mattwrock.com/image.axd?picture=ChinaNoRR.png"&gt;&lt;img style="background-image: none; margin: 0px 10px 0px 0px; padding-left: 0px; padding-right: 0px; display: inline; padding-top: 0px; border-width: 0px;" title="ChinaNoRR" src="http://www.mattwrock.com/image.axd?picture=ChinaNoRR_thumb.png" alt="ChinaNoRR" width="244" height="229" border="0" /&gt;&lt;/a&gt;&lt;/p&gt;
+&lt;/td&gt;
+&lt;td valign="top" width="358"&gt;&lt;a href="http://www.mattwrock.com/image.axd?picture=chinarr.png"&gt;&lt;img style="background-image: none; margin: 0px 10px 0px 0px; padding-left: 0px; padding-right: 0px; display: inline; padding-top: 0px; border-width: 0px;" title="chinarr" src="http://www.mattwrock.com/image.axd?picture=chinarr_thumb.png" alt="chinarr" width="244" height="175" border="0" /&gt;&lt;/a&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;p&gt;&amp;nbsp;&lt;/p&gt;
+&lt;h2&gt;Key RequestReduce WebPage Optimizations&lt;/h2&gt;
+&lt;p&gt;RequestReduce will do the following on any page where the RequestReduce HttpModule is loaded:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;Look for background images that it can sprite. This is the process of combining multiple images into a single image and using some CSS syntax to pull in specific images from that single file into a CSS class&amp;rsquo;s background.&lt;/li&gt;
+&lt;li&gt;Merge these images into a single PNG that is quantized down to 256 colors and then run through optipng for lossless compression. Unsatisfied with the quality I was getting from the popular opensource quantizers, I created a quantizer based on the Wu quantization algorithm and have released that separately as &lt;a href="http://nquant.codeplex.com"&gt;nQuant&lt;/a&gt; on codeplex. This often reduces the image size up to 3x smaller than the original.&lt;/li&gt;
+&lt;li&gt;Merges all CSS in the head and minifies it. This includes any text/css resource so it includes files like WebResource.axd.&lt;/li&gt;
+&lt;li&gt;Automatically expands CSS @imports.&lt;/li&gt;
+&lt;li&gt;Minifies and merges all adjacent javascript on the page that do not have a nocache or no-store header and an expired or max-age less than a week. This includes any valid javascript mime type file so ScriptResource.axd and WebResource.axd are included.&lt;/li&gt;
+&lt;li&gt;Manages the downloads of these CSS and image requests using ETag and expires headers to ensure optimal caching on the browser.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h2&gt;Other Great RequestReduce Features&lt;/h2&gt;
+&lt;p&gt;Since I wanted to deploy RequestReduce on Microsoft websites, it obviously needed to scale to Millions of page views and be maintainable in an enterprise environment. To do this RequestReduce supports:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;CDN hosting of the CDN and Sprited images.&lt;/li&gt;
+&lt;li&gt;Synchronizing generated CSS and image files across multiple servers via a Sql Server db or a distributed file replication system.&lt;/li&gt;
+&lt;li&gt;Custom API allowing the addition of your own minifier or filtering out specific pages or resources.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;Of coarse RequestReduce works perfectly on a small site or blog as well. This blog went from a YSlow C to an A after using RequestReduce.&lt;/p&gt;
+&lt;h2&gt;Why I Created RequestReduce&lt;/h2&gt;
+&lt;p&gt;First, I&amp;rsquo;ve been looking for an idea for quite some time to use for an Open Source project. This one struck me while on a run along the Sammamish River in February. Over the past 10 years I have worked on many large, high traffic websites that used somewhat complicated frameworks for organizing CSS. These often make including simple minification an impossible task in a build script especially if CSS can be changed out of band. Also, image spriting has always been difficult to keep up with. New images get rolled in to CSS and we are too busy getting features out the door; so spriting these images falls through the cracks. To have a process that did all of this automatically and at run time (Note: RequestReduce does not block requests while it does this. That would be a perf catastrophe. See &lt;a href="https://github.com/mwrock/RequestReduce/wiki/Will-RequestReduce-impact-server-performance%3F"&gt;here&lt;/a&gt; for details.) seemed ideal. I wanted a plug and play solution. Drop a dll in the bin directory and it just happens.&lt;/p&gt;
+&lt;p&gt;RequestReduce makes this vision come very close to reality. In this version, there are &lt;a href="https://github.com/mwrock/RequestReduce/wiki/Can-I-make-changes-to-my-CSS-classes-to-optimize-RequestReduce-spriting%3F"&gt;some things that RequestReduce expects of the CSS class containing the background image&lt;/a&gt; in order to successfully sprite it. In a future release I will be taking advantage of CSS3 which will mean RequestReduce will be able to sprite more images on modern browsers. The Microsoft Gallery sites have to support IE 7 and 8 so the first release had to be CSS2 compliant.&lt;/p&gt;
+&lt;h2&gt;RequestReduce is now available for community use and contributions&lt;/h2&gt;
+&lt;p&gt;To get started using RequestReduce:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;If you have &lt;a href="http://docs.nuget.org/docs/start-here/installing-nuget"&gt;Nuget&lt;/a&gt;, simply enter this command in the Package Manager Console and skip steps two and three:
+&lt;pre&gt;Install-Package RequestReduce&lt;/pre&gt;
+Otherwise, download the &lt;a href="http://www.requestreduce.com/"&gt;latest RequestReduce version&lt;/a&gt;.&lt;/li&gt;
+&lt;li&gt;Extract the contents of the downloaded zip and copy RequestReduce.dll as well as optipng.exe to your website's bin directory. (If for some reason you cannot put optipng.exe in your bin, RequestReduce will function as expected but will skip the lossless compression of its sprite images.&lt;/li&gt;
+&lt;li&gt;Add the RequestReduceModule to your web.config or using the IIS GUI&lt;/li&gt;
+&lt;li&gt;&lt;a href="http://github.com/mwrock/RequestReduce/wiki/Can-I-make-changes-to-my-CSS-classes-to-optimize-RequestReduce-spriting%3F"&gt;Optimize your CSS&lt;/a&gt; to help RequestReduce better locate your background images&lt;/li&gt;
+&lt;li&gt;Optional: &lt;a href="http://github.com/mwrock/RequestReduce/wiki/RequestReduce-Configuration-options"&gt;Configure RequestReduce&lt;/a&gt;. You can control where generated css and sprites are stored, their size thresholds and specify a CDN host name to reference You may also fork the RequestReduce source code from its &lt;a href="https://github.com/mwrock/RequestReduce"&gt;github site&lt;/a&gt;.&lt;/li&gt;
+&lt;/ol&gt;&lt;ol&gt;&lt;ol&gt;For links to RequestReduce documentation, bug reports and the latest download, you can visit&lt;/ol&gt;&lt;/ol&gt;
+&lt;p&gt;&lt;a href="http://www.RequestReduce.com"&gt;http://www.RequestReduce.com&lt;/a&gt;&lt;/p&gt;
+&lt;ol&gt;. I&amp;rsquo;d be very interested in hearing any feedback on the tool as well as any problems you have implementing it. I plan to be continually adding to this project with more features to reduce HTTP Requests from any web site.&lt;/ol&gt;</content>
+  <ispublished>True</ispublished>
+  <isdeleted>False</isdeleted>
+  <iscommentsenabled>True</iscommentsenabled>
+  <pubDate>2011-09-10 13:08:00</pubDate>
+  <lastModified>2013-04-16 15:48:30</lastModified>
+  <raters>0</raters>
+  <rating>0</rating>
+  <slug>Adopt-RequestReduce-and-see-immediate-Yslow-and-Google-Page-Speed-score-improvements-not-to-mention-a-faster-site!</slug>
+  <tags />
+  <comments>
+    <comment id="1b4e6167-a289-4c6a-8933-2e8b8b3f4a1a" parentid="00000000-0000-0000-0000-000000000000" approved="True" spam="False" deleted="False">
+      <date>2011-09-11 10:45:41</date>
+      <author>DotNetKicks.com</author>
+      <email>trackback</email>
+      <country />
+      <ip>74.86.105.210</ip>
+      <website>http://www.dotnetkicks.com/aspnet/Adopt_RequestReduce_and_make_your_site_faster</website>
+      <content>Adopt RequestReduce and make your site faster
+
+You've been kicked (a good thing) - Trackback from DotNetKicks.com</content>
+    </comment>
+    <comment id="5a5ee9a2-16d9-46ca-8ca2-1f5687d5c53d" parentid="00000000-0000-0000-0000-000000000000" approved="True" spam="False" deleted="False">
+      <date>2011-12-19 16:31:21</date>
+      <author>Peter Bromberg</author>
+      <email>pbromberg@gmail.com</email>
+      <country />
+      <ip>68.205.212.131</ip>
+      <avatar />
+      <content>This has potentially great implications and I plan to test it out shortly. One thing, spell-checkers don&amp;#39;t catch these:
+
+&amp;quot;there size thresholds&amp;quot; in number 5
+should be
+&amp;quot;their size thresholds&amp;quot;.
+Excellent work! </content>
+    </comment>
+    <comment id="c5f98a75-cf8b-4b24-ae36-aa074e0ca486" parentid="00000000-0000-0000-0000-000000000000" approved="True" spam="False" deleted="False">
+      <date>2012-01-12 14:50:46</date>
+      <author>msprogrammer.serviciipeweb.ro</author>
+      <email>pingback</email>
+      <country />
+      <ip>89.38.208.18</ip>
+      <website>http://msprogrammer.serviciipeweb.ro/2012/01/13/friday-links-12/</website>
+      <content>Pingback from msprogrammer.serviciipeweb.ro
+
+friday links 12 &amp;laquo; A Programmer with Microsoft tools</content>
+    </comment>
+    <comment id="51321a0d-f8b7-4fe2-ab1a-db62ded17e12" parentid="00000000-0000-0000-0000-000000000000" approved="True" spam="False" deleted="False">
+      <date>2012-01-20 11:44:08</date>
+      <author>Andrew Csontos</author>
+      <email>andrewcsontos@gmail.com</email>
+      <country />
+      <ip>108.28.25.83</ip>
+      <avatar />
+      <content>This is brilliant. 
+
+I tried getting it to work on a Classic ASP site and it didn&amp;#39;t seem to do anything.  Will it work for Classic ASP in IIS integrated mode?
+
+I imagine the code already resets the Content-length header per (http://weblogs.asp.net/asptest/archive/2009/01/22/using-modules-for-classic-asp-with-ii7-integrated-mode.aspx) since it rewrites the html.
+</content>
+    </comment>
+    <comment id="5bf4df11-9442-489d-9b4b-8f57e858a34a" parentid="00000000-0000-0000-0000-000000000000" approved="True" spam="False" deleted="False">
+      <date>2012-01-22 04:06:07</date>
+      <author>mwrock</author>
+      <email>matt@mattwrock.com</email>
+      <country />
+      <ip>50.46.255.50</ip>
+      <avatar />
+      <content>Hi Andrew,
+
+RequestReduce will work with Classic ASP. While I had never tested this particular use case before, I just validated this using a clean amazon ec2 win 2k8 instance.
+
+I&amp;#39;d encourage you to check out the Request Reduce troubleshooting wiki (https://github.com/mwrock/RequestReduce/wiki/RequestReduce-is-not-working.-I-don%27t-see-any-spriting-or-minification.-How-can-I-troubleshoot-this%3F). That includes alot of the basic &amp;quot;gotchas&amp;quot; with getting RequestReduce up and running.
+
+If that does not point out any obvious problem with your implementation, please open an issue at the github issues page (https://github.com/mwrock/RequestReduce/issues) and Ill be happy to help you to get up and running.
+
+Matt</content>
+    </comment>
+    <comment id="d3c1cf01-0ddd-4aed-be57-4558a06e19e5" parentid="00000000-0000-0000-0000-000000000000" approved="True" spam="False" deleted="False">
+      <date>2012-02-28 17:20:34</date>
+      <author>Sam</author>
+      <email>sam.saffron@gmail.com</email>
+      <country />
+      <ip>124.168.137.95</ip>
+      <avatar />
+      <content>excellent job, I hope this is widely adopted </content>
+    </comment>
+    <comment id="0e30f765-0a61-4347-aa02-5905334c553c" parentid="00000000-0000-0000-0000-000000000000" approved="True" spam="False" deleted="False">
+      <date>2012-02-28 18:31:11</date>
+      <author>mwrock</author>
+      <email>matt@mattwrock.com</email>
+      <country />
+      <ip>131.107.0.81</ip>
+      <avatar />
+      <content>Thanks Sam! Big fan of what you do at Stackoverflow and elsewhere. So this comes as a very welcome compliment.</content>
+    </comment>
+    <comment id="96640458-c2a8-443f-9dbd-ad1692433a67" parentid="00000000-0000-0000-0000-000000000000" approved="True" spam="False" deleted="False">
+      <date>2012-08-30 10:16:25</date>
+      <author>Jeff</author>
+      <email>jefers@gmail.com</email>
+      <country />
+      <ip>99.225.222.10</ip>
+      <moderatedby>mwrock</moderatedby>
+      <avatar />
+      <content>This is great!! Thanks Matt!</content>
+    </comment>
+    <comment id="0681420c-1bb7-4f93-a099-1f41b5c09100" parentid="00000000-0000-0000-0000-000000000000" approved="True" spam="False" deleted="False">
+      <date>2013-04-16 06:48:30</date>
+      <author>Praveen</author>
+      <email>praveen.reddy@jiva.co.in</email>
+      <country />
+      <ip>119.235.51.138</ip>
+      <moderatedby>mwrock</moderatedby>
+      <avatar />
+      <content>When i am try to implement in my project All my css files are combined and minified but all java script files are ignored . All js files are showing in ignore list in dash board</content>
+    </comment>
+  </comments>
+  <categories>
+    <category>2f8206f0-95a4-449e-bf74-3b2cb761de04</category>
+  </categories>
+  <notifications>
+    <email>david@codenoevil.com</email>
+    <email>kobi201204@gmail.com</email>
+    <email>praveen.reddy@jiva.co.in</email>
+  </notifications>
+</post>

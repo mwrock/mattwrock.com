@@ -1,0 +1,104 @@
+﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<post>
+  <author>mwrock</author>
+  <title>Recycling an Application Pool with C# (Part 2)</title>
+  <description />
+  <content>&lt;p&gt;&lt;a href="http://www.mattwrock.com/post/2011/07/26/Recycling-an-Application-Pool-with-C-sharp.aspx"&gt;The other day I shared&lt;/a&gt; how to use the DirectoryServices namespace to restart an app pool via C# code. The code I used had two key flaws:&lt;/p&gt;  &lt;ol&gt;   &lt;li&gt;It used a Thread.Sleep(2000) to wait for the old app pool to be destroyed. &lt;/li&gt;    &lt;li&gt;The use of DirectoryServices required the enabling of the windows feature: IIS Metabase and IIS 6 configuration compatibility. &lt;/li&gt; &lt;/ol&gt;  &lt;p&gt;Also just to recap why you would even want to do this: My use of this code is for writing integration tests of web app functionality. It allows me to test scenarios where I want to ensure a certain outcome after the application restarts. It also helps to isolate test state from one test to another.&lt;/p&gt;  &lt;p&gt;Anyhoo, a coworker of mine, &lt;a href="http://matthewmanela.com" target="_blank"&gt;@mmanela&lt;/a&gt; (Matt Manela) mentioned hosting a powershell script instead of the DirectoryServices implementation. As we discussed it further, we assumed that the PowerShell WebAdministrationiModule was probably using some other API and that it would be interesting to discover what that was and see if you could use that. Well after spending some quality time with reflector and the WebAdministrationModule DLLs, I was not able to tell what that API was. However, I did discover another API that appeared to be a better alternative to DirectoryServices.&lt;/p&gt;  &lt;p&gt;The API can be found in %WinDir%\system32\Inetsrv\Microsoft.Web.Administration.dll. See &lt;a href="http://blogs.msdn.com/b/carlosag/archive/2006/04/17/microsoftwebadministration.aspx" target="_blank"&gt;this post&lt;/a&gt; for a good overview. Here is my new helper method:&lt;/p&gt;  &lt;div id="codeSnippetWrapper"&gt;   &lt;pre style="border-bottom-style: none; text-align: left; padding-bottom: 0px; line-height: 12pt; background-color: #f4f4f4; margin: 0em; border-left-style: none; padding-left: 0px; width: 100%; padding-right: 0px; font-family: &amp;#39;Courier New&amp;#39;, courier, monospace; direction: ltr; border-top-style: none; color: black; border-right-style: none; font-size: 8pt; overflow: visible; padding-top: 0px" id="codeSnippet"&gt;&lt;span style="color: #0000ff"&gt;public&lt;/span&gt; &lt;span style="color: #0000ff"&gt;static&lt;/span&gt; &lt;span style="color: #0000ff"&gt;void&lt;/span&gt; RecyclePool()&lt;br /&gt;{&lt;br /&gt;    &lt;span style="color: #0000ff"&gt;using&lt;/span&gt; (var manager = &lt;span style="color: #0000ff"&gt;new&lt;/span&gt; ServerManager())&lt;br /&gt;    {&lt;br /&gt;        var pool = manager.ApplicationPools[&lt;span style="color: #006080"&gt;&amp;quot;RequestReduce&amp;quot;&lt;/span&gt;];&lt;br /&gt;        Process process = null;&lt;br /&gt;        &lt;span style="color: #0000ff"&gt;if&lt;/span&gt;(pool.WorkerProcesses.Count &amp;gt; 0)&lt;br /&gt;            process = Process.GetProcessById(pool.WorkerProcesses[0].ProcessId);&lt;br /&gt;        pool.Recycle();&lt;br /&gt;        &lt;span style="color: #0000ff"&gt;if&lt;/span&gt;(process != null)&lt;br /&gt;        {&lt;br /&gt;            &lt;span style="color: #0000ff"&gt;while&lt;/span&gt; (!process.HasExited)&lt;br /&gt;                Thread.Sleep(0);&lt;br /&gt;            process.Dispose();&lt;br /&gt;        }&lt;br /&gt;    }&lt;br /&gt;}&lt;br /&gt;&lt;/pre&gt;
+
+  &lt;br /&gt;&lt;/div&gt;
+So in addition to using a different API, I’m also no longer using the hacky Thread.Sleep(2000) to wait for the app pool to die. Instead, I use this API to get the Process ID of the about to be recycled app pool. I then wait for the pool to exit. I have tested this and it works perfectly. So now my tests move on as soon as the app pool is completely destroyed. I don’t have to wait any extra time in case this happens more quickly than two seconds and I don’t risk a failed test if two seconds is not long enough. In case you are wondering why it is so important to wait for the old app pool’s worker process to terminate before proceeding, it is because I may have cleanup code that deletes files and that code will likely fail if the old worker process had a lock on the file.
+
+
+</content>
+  <ispublished>True</ispublished>
+  <isdeleted>False</isdeleted>
+  <iscommentsenabled>True</iscommentsenabled>
+  <pubDate>2011-07-28 03:24:15</pubDate>
+  <lastModified>2012-06-12 15:28:52</lastModified>
+  <raters>0</raters>
+  <rating>0</rating>
+  <slug>Recycling-an-Application-Pool-with-C-(Part-2)</slug>
+  <tags />
+  <comments>
+    <comment id="6dc3fcce-085c-4ac0-8ce5-4d49dee056cc" parentid="00000000-0000-0000-0000-000000000000" approved="True" spam="False" deleted="False">
+      <date>2011-11-29 16:33:50</date>
+      <author>Victor</author>
+      <email>medina5000@gmail.com</email>
+      <country />
+      <ip>67.139.100.234</ip>
+      <moderatedby>mwrock</moderatedby>
+      <avatar />
+      <content>Nice detective work!  I&amp;#39;ve been struggling with this for a couple of days now.  I have to ask though, what&amp;#39;s the significance of 
+
+[quote]Thread.Sleep(0);[/quote]
+
+Is there a reason for not just using empty braces? Or is it just a matter of style preference?</content>
+    </comment>
+    <comment id="3d4b181a-1363-4c5f-bb98-c88869e8fd1c" parentid="00000000-0000-0000-0000-000000000000" approved="True" spam="False" deleted="False">
+      <date>2011-11-30 07:03:13</date>
+      <author>Matt Wrock</author>
+      <email>matt@mattwrock.com</email>
+      <country />
+      <ip>50.46.255.50</ip>
+      <moderatedby>mwrock</moderatedby>
+      <avatar />
+      <content>Hi Victor,
+
+The reason I use Thread.Sleep(0), is that it will allow other processes on the machine to do work while I wait for the app pool to recycle. The danger of not doing this is that I can potentially pin CPU as I hog it while I wait. The risk here is higher, the fewer cores on the machine.
+
+Try running this code and watch cpu in task manager:
+
+   var watch = new Stopwatch();
+   watch.Start();
+   while(watch.ElapsedMilliseconds &amp;lt; 30000){}
+
+You should see ono of your cores max out on cpu for 30 seconds.</content>
+    </comment>
+    <comment id="25d57302-5398-4f09-b13e-fc32acb7221f" parentid="00000000-0000-0000-0000-000000000000" approved="True" spam="False" deleted="False">
+      <date>2012-01-06 09:59:36</date>
+      <author>Passionate Developer</author>
+      <email>xelatek@gmail.com</email>
+      <country />
+      <ip>66.239.31.228</ip>
+      <moderatedby>mwrock</moderatedby>
+      <avatar />
+      <content>Great article.  What namespace is ServerManager under.  I just get a squigly line in my code under &amp;quot;new ServerManager()&amp;quot; and can&amp;#39;t seem to find the correct namespace for c# or add the right reference.  I am running .net 3.5 and running it under IIS 7 on Windows Server 2008 R2.</content>
+    </comment>
+    <comment id="4fa163e9-a6b5-450a-a7eb-fc846e0a98a0" parentid="00000000-0000-0000-0000-000000000000" approved="True" spam="False" deleted="False">
+      <date>2012-01-07 03:27:16</date>
+      <author>Matt Wrock</author>
+      <email>matt@mattwrock.com</email>
+      <country />
+      <ip>50.46.255.50</ip>
+      <avatar />
+      <content>Passionate Developer: The namespace is Microsoft.Web.Administration</content>
+    </comment>
+    <comment id="99880fd5-726f-4cb3-9cf1-466eb490ea06" parentid="00000000-0000-0000-0000-000000000000" approved="True" spam="False" deleted="False">
+      <date>2012-06-11 01:35:54</date>
+      <author>ei theint</author>
+      <email>ei.theint.it@gmail.com</email>
+      <country />
+      <ip>210.23.10.115</ip>
+      <avatar />
+      <content>I cannot see Web.Administration under Microsoft.
+
+Thank you.</content>
+    </comment>
+    <comment id="6bc92f17-3c9d-499b-b812-22a30f3519bd" parentid="00000000-0000-0000-0000-000000000000" approved="True" spam="False" deleted="False">
+      <date>2012-06-12 06:28:52</date>
+      <author>mwrock</author>
+      <email>matt@mattwrock.com</email>
+      <country />
+      <ip>50.46.255.50</ip>
+      <avatar />
+      <content>@ei: You may need to explicitly reference %WinDir%\System32\InetSrv\Microsoft.Web.Administration.dll</content>
+    </comment>
+  </comments>
+  <categories />
+  <notifications>
+    <email>medina5000@gmail.com</email>
+    <email>xelatek@gmail.com</email>
+    <email>ei.theint.it@gmail.com</email>
+    <email>sabaattitute@gmail.com</email>
+  </notifications>
+</post>

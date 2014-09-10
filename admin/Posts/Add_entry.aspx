@@ -4,12 +4,26 @@
 
 <%@ Register Src="~/admin/htmlEditor.ascx" TagPrefix="Blog" TagName="TextEditor" %>
 <%@ Register src="Menu.ascx" tagname="TabMenu" tagprefix="menu" %>
-
+<%@ Register Src="~/admin/FileManager/FileManager.ascx" TagName="FileManager" TagPrefix="con" %>
 <asp:Content ID="Content1" ContentPlaceHolderID="cphAdmin" runat="Server">
 	<div class="content-box-outer">
+        <con:FileManager runat="server" ID="FileManager1" />
 		<div class="content-box-full">
+            <div class="rightligned-top action_buttons">
+                <input type="button" id="btnSave2" value="<%=Resources.labels.savePost %>" class="btn primary rounded" onclick="return SavePost()" /> <%=Resources.labels.or %>
+                <% if (!string.IsNullOrEmpty(Request.QueryString["id"]))
+                    { %>
+                <a href="<%=PostUrl %>" title="<%=Resources.labels.goToPost %>"><%=Resources.labels.goToPost %></a>
+                <%}
+                    else
+                    {%>
+                <a href="Posts.aspx" title="<%=Resources.labels.cancel %>"><%=Resources.labels.cancel %></a>
+                <%} %>
+            </div>
             <h1><%=Resources.labels.addEditPost %></h1>
             <script type="text/javascript">
+                var postId = Querystring('id');
+
                 function GetSlug() {
                     var title = document.getElementById('<%=txtTitle.ClientID %>').value;
                     WebForm_DoCallback('__Page', title, ApplySlug, 'slug', null, false)
@@ -33,7 +47,7 @@
                         WebForm_DoCallback('__Page', '_autosave' + post, null, 'autosave', null, false);
                     }
 
-                    setTimeout("AutoSave()", 5000);
+                    setTimeout("AutoSave()", 15000);
 
                     var currentDate = new Date()
                     document.getElementById('autoSaveLabel').innerHTML = "Autosaved on " + currentDate;
@@ -72,8 +86,6 @@
                     }
                 }
                 function SavePost() {
-                    $('.loader').show();
-
                     var content = document.getElementById('<%=txtRawContent.ClientID %>') != null ? document.getElementById('<%=txtRawContent.ClientID %>').value : tinyMCE.activeEditor.getContent();
 
                     var title = document.getElementById('<%=txtTitle.ClientID %>').value;
@@ -86,7 +98,7 @@
                     var hasCommentsEnabled = $("[id$='cbEnableComments']").is(':checked');
 
                     var cats = "";
-                    var checkedCats = $('.cblCategories input[@type=checkbox]:checked');
+                    var checkedCats = $('.cblCategories input[type="checkbox"]:checked');
                     if (checkedCats.length > 0) {
                         checkedCats.each(function () {
                             var jThis = $(this);
@@ -98,7 +110,7 @@
                     var time = document.getElementById('<%=txtTime.ClientID %>').value;
 
                     var dto = {
-                        "id": Querystring('id'),
+                        "id": postId,
                         "content": content,
                         "title": title,
                         "desc": desc,
@@ -124,18 +136,14 @@
                         success: function (result) {
                             var rt = result.d;
                             if (rt.Success) {
-                                if (rt.Data) {
-                                    window.location.href = rt.Data;
-                                } else {
-                                    ShowStatus("success", rt.Message);
-                                }
+                                ShowStatus("success", rt.Message);
+                                postId = rt.Data;
                             }
-                            else
+                            else {
                                 ShowStatus("warning", rt.Message);
+                            }
                         }
                     });
-
-                    $('.loader').hide();
                     return false;
                 }
             </script>
@@ -174,7 +182,7 @@
                     <ul class="fl" style="margin:0;">
                         <li>
                             <asp:Label ID="lblFileUpload" CssClass="lbl" AssociatedControlID="txtUploadImage" runat="server" Text='<%$ Resources:labels, uploadImage %>' />
-                            <asp:FileUpload runat="server" ID="txtUploadImage" Width="400" size="50" ValidationGroup="imageupload" />
+                            <asp:FileUpload runat="server" ID="txtUploadImage" CssClass="ImageUpload" Width="400" size="50" ValidationGroup="imageupload" />
                             <asp:RequiredFieldValidator ID="RequiredFieldValidator3" runat="Server" ControlToValidate="txtUploadImage" ErrorMessage="<%$ Resources:labels, required %>"
                                 ValidationGroup="imageupload" />
                         </li>
@@ -203,7 +211,7 @@
 
             <table class="tblForm largeForm" style="width:100%; margin:0;">
                 <tr>
-                    <td style="vertical-align:top; padding:0 40px 0 0;">
+                    <td style="vertical-align:top;" class="mainForm">
                         <ul class="fl">
                             <li>
                                 <asp:Label CssClass="lbl" AssociatedControlID="txtTitle" runat="server" Text='<%$ Code: Resources.labels.title %>' />
@@ -217,6 +225,7 @@
                                     <a href="#" id="uploadImage" class="image"><%=Resources.labels.insertImage %></a>
                                     <a href="#" id="uploadVideo" class="video"><%=Resources.labels.insertVideo %></a>
                                     <a href="#" id="uploadFile" class="file"><%=Resources.labels.attachFile %></a>
+                                     <a href="javascript:;" id="fileManager" class="file"><%=Resources.labels.fileManager %></a>
                                 </div>
                                 <Blog:TextEditor runat="server" id="txtContent" />
                                 <asp:TextBox runat="server" ID="txtRawContent" Width="98%" TextMode="multiLine" Height="400px" Visible="false" />
@@ -238,18 +247,7 @@
                                  <asp:CheckBox runat="server" ID="cbPublish" Text="<%$ Resources:labels, publish %>" Checked="true" />
                            </li>
                         </ul>
-                        <div class="action_buttons">
-                            <input type="button" id="btnSave" value="<%=Resources.labels.savePost %>" class="btn primary rounded" onclick="return SavePost()" /> <%=Resources.labels.or %>
-                            <% if (!string.IsNullOrEmpty(Request.QueryString["id"]))
-                               { %>
-                            <a href="<%=PostUrl %>" title="<%=Resources.labels.goToPost %>"><%=Resources.labels.goToPost %></a>
-                            <%}
-                               else
-                               {%>
-                            <a href="Posts.aspx" title="<%=Resources.labels.cancel %>"><%=Resources.labels.cancel %></a>
-                            <%} %>
-                            <span id="autoSaveLabel" style="display:none;"></span>
-                        </div>
+                        
                     </td>
                     <td class="secondaryForm" style="padding:0; vertical-align:top;">
                         <ul class="fl">
@@ -305,10 +303,22 @@
                     </td>
                 </tr>
             </table>
+            <div class="rightligned-bottom action_buttons">
+                            <input type="button" id="btnSave" value="<%=Resources.labels.savePost %>" class="btn primary rounded" onclick="return SavePost()" /> <%=Resources.labels.or %>
+                            <% if (!string.IsNullOrEmpty(Request.QueryString["id"]))
+                               { %>
+                            <a href="<%=PostUrl %>" title="<%=Resources.labels.goToPost %>"><%=Resources.labels.goToPost %></a>
+                            <%}
+                               else
+                               {%>
+                            <a href="Posts.aspx" title="<%=Resources.labels.cancel %>"><%=Resources.labels.cancel %></a>
+                            <%} %>
+                            <span id="autoSaveLabel" style="display:none;"></span>
+                        </div>
             <% if (Request.QueryString["id"] == null)
                { %>
             <script type="text/javascript">
-                setTimeout("AutoSave()", 5000);
+                setTimeout("AutoSave()", 15000);
             </script>
             <% } %>
         </div>

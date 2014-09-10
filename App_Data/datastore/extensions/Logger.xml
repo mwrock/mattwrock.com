@@ -5,6 +5,7 @@
   <Description>Subscribes to Log events and records the events in a file.</Description>
   <Enabled>true</Enabled>
   <Priority>0</Priority>
+  <SubBlogEnabled>false</SubBlogEnabled>
   <ShowSettings>true</ShowSettings>
   <Version>1.0</Version>
 </ManagedExtension>

@@ -73,7 +73,13 @@ namespace Admin
         private static string SubUrl(string url, bool isFromCurrentHttpRequest)
         {
             if (isFromCurrentHttpRequest && Blog.CurrentInstance.IsSubfolderOfApplicationWebRoot)
-                url = Utils.ApplicationRelativeWebRoot + url.Substring(Blog.CurrentInstance.RelativeWebRoot.Length);
+            {
+                if(url.Length > Blog.CurrentInstance.RelativeWebRoot.Length)
+                    url = url.Substring(Blog.CurrentInstance.RelativeWebRoot.Length);
+
+                if(!url.StartsWith(Utils.ApplicationRelativeWebRoot))
+                    url = Utils.ApplicationRelativeWebRoot + url;
+            }
 
             var i = url.LastIndexOf("/");
 
@@ -119,6 +125,13 @@ namespace Admin
                         if (Request.RawUrl.IndexOf(nodeDir, StringComparison.OrdinalIgnoreCase) != -1)
                         {
                             a.Attributes["class"] = "current";
+                        }
+
+                        // select "plugins" tab for extensions with custom admin pages
+                        if (Request.RawUrl.IndexOf("User controls", StringComparison.OrdinalIgnoreCase) != -1)
+                        {
+                            if (nodeDir == "/admin/Extensions/default")
+                                a.Attributes["class"] = "current";
                         }
 
                         // if "page" has its own subfolder (comments, extensions) should 

@@ -1,0 +1,221 @@
+﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<post>
+  <author>mwrock</author>
+  <title>Microsoft blogging platform gains 33% performance boost after adopting RequestReduce</title>
+  <description />
+  <content>&lt;p&gt;Here is a Keynote performance graph covering a few hours before and after launch.&lt;/p&gt;  &lt;p&gt;&lt;img style="margin: 0px 10px 0px 0px" alt="pic.twitter.com/UoqwYVWz" src="http://p.twimg.com/Agq5zDiCIAExIc1.png" width="630" height="310" /&gt;&lt;/p&gt;  &lt;p align="left"&gt;Looks good to me.&lt;/p&gt;  &lt;h2&gt;A win for Microsoft. Another win for the Open Source Community&lt;/h2&gt;  &lt;p&gt;Today Microsoft completed its onboarding of &lt;a href="http://RequestReduce.com"&gt;RequestReduce&lt;/a&gt; on its MSDN and Technet blogging platform. Huge thanks and shout out to &lt;a href="http://weblogs.asp.net/mhawley/" target="_blank"&gt;Matt Hawley(@matthawley)&lt;/a&gt; who played a pivotal roIe in this launch! In fact, he DID launch it. Matt also made a significant contribution to RequestReduce by yanking out the .net 4.0 dependent SqlServer Store into a separate package and tweaking the build script to make it compatible with .net 3.5. &lt;/p&gt;  &lt;p&gt;I am very pleased to report that upon launch, readers can now access a site that is 33% faster than it was before launch. This is a win for Microsoft, the multitudes of readers that visit its content every day and a win for the open source software (OSS) community at large. I like to think that this demonstrates Microsoft’s growing commitment to OSS. In just the past couple of years, Microsoft has made giant strides to fostering the open source ecosystem. This is just another small step forward.&lt;/p&gt;  &lt;p&gt;Just to be clear: I am a Microsoft employee. However, I develop RequestReduce on my own time away from work and there have been non-Microsoft contributions. The features that I build into RequestReduce do not originate from some grand Microsoft Project gnat chart. My releases of RequestReduce downloads do not require multiple levels of sign off from the Microsoft covenant of elders.&lt;/p&gt;  &lt;p&gt;Furthermore, my team and the teams I work closely with use tons or various OSS projects with the full blessing of the Microsoft Legal department (I hear they wear special underwear but am not sure – more on this later). We use nHibernate, StructureMap, Moq, XUnit, Caste Windsor, Service Stack, Json.Net, PSake and a lot more. These are baked into Microsoft properties that many .net devs visit every day like the Visual Studio Gallery, various MSDN properties and even the web service you call when you go to Visual Studio’s Extension Manager.&lt;/p&gt;  &lt;h2&gt;RequestReduce: Optimized for improving performance of brown field apps&lt;/h2&gt;  &lt;p&gt;While RequestReduce is suited to optimize any website, it is particularly ideal for sites that have already been built and suffering from poor, and sometimes extremely poor, performance. The MSDN and Technet blogging platform is a perfect example of this. They are built on top of 3rd party non-Microsoft blogging software that uses asp.net 3.5. Lets just say there were no lack of webresource.axd and scriptresource.axd especially if you are fond of fitting…say…30 or 40 in a single page. I mean why not? Certainly god created the .axd extension for a reason and intended it to multiply and be fruitful.&lt;/p&gt;  &lt;p&gt;RequestReduce is ideally architected for these&amp;#160; scenarios. It follows a simple drop in and just work model. Unlike a lot of the other minify and bundling solutions it filters your page and dynamically locates your JavaScript and CSS regardless if its on your server or twitter’s CDN. It can process any resource with a text/css or JavaScript&amp;#160; mime type even if they are dynamically generated like in the case of ScriptResources. It works well with high traffic, multi server enterprise topologies because it is fast and provides multiple caching solutions including one that caches in a central SqlServer instance.&lt;/p&gt;  &lt;h2&gt;So what exactly does RequestReduce do?&lt;/h2&gt;  &lt;p&gt;Well after helping you lose weight, quit smoking and significantly enhancing your sex life (I did say “significantly” right?…good), it makes your website faster by minimizing your css and JavaScript. Combining your css and what JavaScript it can without breaking your scripts and it attempts to locate background images it can combine into sprite files. It also optimizes the color palette and compression of these sprites. Its like running YSLOW and then clicking the “optimize now” button. Really? You haven’t seen that button?&lt;/p&gt;  &lt;p&gt;The end result is a less bytes and fewer HTTP requests your browser has to handle to render a page with very little work. Do you really want to generate your own sprites each time you are handed a new image or remember you have forgotten to add that new script to your bundling config?&amp;#160; Do you get frustrated when your site goes to production and you realize you forgot to spell Cace-Cntrl and your test team did not catch this because they were busy ensuring your app solved world hunger even if a user entered a space followed by an asterisk in your search box? Well you can get this functionality on your own site now at &lt;a href="http://www.requestreduce.com"&gt;http://www.&lt;/a&gt;&lt;a href="http://RequestReduce.com"&gt;requestreduce&lt;/a&gt;&lt;a href="http://www.requestreduce.com"&gt;.com&lt;/a&gt; or via &lt;a href="http://nuget.org" target="_blank"&gt;Nuget&lt;/a&gt;.&lt;/p&gt;</content>
+  <ispublished>True</ispublished>
+  <isdeleted>False</isdeleted>
+  <iscommentsenabled>True</iscommentsenabled>
+  <pubDate>2011-12-14 23:52:00</pubDate>
+  <lastModified>2013-05-29 00:45:26</lastModified>
+  <raters>0</raters>
+  <rating>0</rating>
+  <slug>Microsoft-blogging-platform-gains-33-performance-boost-after-adopting-RequestReduce</slug>
+  <tags />
+  <comments>
+    <comment id="fa77c228-f3ce-4ece-a358-9b1fef1b1768" parentid="00000000-0000-0000-0000-000000000000" approved="True" spam="False" deleted="False">
+      <date>2011-12-15 00:33:36</date>
+      <author>jaoord.nl</author>
+      <email>pingback</email>
+      <country />
+      <ip>84.243.195.141</ip>
+      <website>http://www.jaoord.nl/requestreduce-minify-sprite-and-bundle-resources-for-iis</website>
+      <content>Pingback from jaoord.nl
+
+RequestReduce, minify, sprite and bundle resources for IIS - jaoord.nl</content>
+    </comment>
+    <comment id="c53bca64-6b4e-40cb-a7d7-f49a3b01be70" parentid="00000000-0000-0000-0000-000000000000" approved="True" spam="False" deleted="False">
+      <date>2011-12-15 00:33:36</date>
+      <author>jaoord.nl</author>
+      <email>pingback</email>
+      <country />
+      <ip>84.243.195.141</ip>
+      <website>http://www.jaoord.nl/requestreduce-minify-sprite-and-bundle-resources-for-iis</website>
+      <content>Pingback from jaoord.nl
+
+RequestReduce, minify, sprite and bundle resources for IIS - jaoord.nl</content>
+    </comment>
+    <comment id="da27a3a8-861f-4d72-ac99-6690810ecc01" parentid="00000000-0000-0000-0000-000000000000" approved="True" spam="False" deleted="False">
+      <date>2011-12-15 00:57:57</date>
+      <author>Demis Bellot</author>
+      <email>demis.bellot@gmail.com</email>
+      <country />
+      <ip>66.65.0.90</ip>
+      <avatar />
+      <content>Hey Nice Work, Always great to see OSS contributions increasing!
+
+BTW by &amp;quot;Service Sack&amp;quot; do you mean &amp;quot;ServiceStack&amp;quot; ?</content>
+    </comment>
+    <comment id="e112c735-ded2-4715-b7ca-6b2c950ce920" parentid="00000000-0000-0000-0000-000000000000" approved="True" spam="False" deleted="False">
+      <date>2011-12-15 04:56:31</date>
+      <author>Matt Wrock</author>
+      <email>matt@mattwrock.com</email>
+      <country />
+      <ip>50.46.255.50</ip>
+      <avatar />
+      <content>@DemisBellot: Thanks. Yes. Service Stack. Corrected the typo.</content>
+    </comment>
+    <comment id="ce8b33bc-0d4a-4603-b2c3-5209b884fd0d" parentid="00000000-0000-0000-0000-000000000000" approved="True" spam="False" deleted="False">
+      <date>2011-12-15 11:47:16</date>
+      <author>Mary Branscombe</author>
+      <email>mary@sandm.co.uk</email>
+      <country />
+      <ip>217.146.112.220</ip>
+      <avatar />
+      <content>Is this also used for the recent improvements to the blog comments that have rolled out?</content>
+    </comment>
+    <comment id="afc8bd23-3101-4899-824d-6ea4b42e0797" parentid="00000000-0000-0000-0000-000000000000" approved="True" spam="False" deleted="False">
+      <date>2011-12-15 19:07:06</date>
+      <author>mwrock</author>
+      <email>matt@mattwrock.com</email>
+      <country />
+      <ip>131.107.0.81</ip>
+      <avatar />
+      <content>Hi Mary: we did introduce this to our forums platform. Their perf gains were not nearly as significant as blogs. Most of their perf issues are on the server end. I don&amp;#39;t think that the roll out was at al related to the commenting. </content>
+    </comment>
+    <comment id="db754199-769e-43ed-a634-20f76584ba3a" parentid="00000000-0000-0000-0000-000000000000" approved="True" spam="False" deleted="False">
+      <date>2011-12-16 04:55:32</date>
+      <author>Rahul</author>
+      <email>rawwool@yahoo.com</email>
+      <country />
+      <ip>193.128.190.100</ip>
+      <avatar />
+      <content>Lovely article and great sense of humour!
+Did you mean Microsoft Project &amp;#39;Gantt&amp;#39; chart by the way?</content>
+    </comment>
+    <comment id="8896e475-fc79-41e3-99c9-7f7dd4a47f48" parentid="00000000-0000-0000-0000-000000000000" approved="True" spam="False" deleted="False">
+      <date>2011-12-16 07:01:49</date>
+      <author>Mary Branscombe</author>
+      <email>mary@sandm.co.uk</email>
+      <country />
+      <ip>217.146.112.220</ip>
+      <avatar />
+      <content>thanks Matt - the platform seems to be getting plenty of updates ;-) </content>
+    </comment>
+    <comment id="eccdfde7-3535-4cf8-9f41-e796380133ea" parentid="00000000-0000-0000-0000-000000000000" approved="True" spam="False" deleted="False">
+      <date>2011-12-19 07:12:40</date>
+      <author>Mike Johnson</author>
+      <email>mikerg87@gmail.com</email>
+      <country />
+      <ip>209.183.142.171</ip>
+      <avatar />
+      <content>Anyone know if this works with Azure? These kinds of savings would be a huge win for hosting on that platform if it works out ok.</content>
+    </comment>
+    <comment id="cfb2a052-7429-4331-b90d-589ff5e62499" parentid="00000000-0000-0000-0000-000000000000" approved="True" spam="False" deleted="False">
+      <date>2011-12-19 09:11:03</date>
+      <author>Nancy Wright</author>
+      <email>Nwright41@cox.net</email>
+      <country />
+      <ip>68.96.91.129</ip>
+      <avatar />
+      <content>This guy is brilliant, funny and so good looking.
+</content>
+    </comment>
+    <comment id="bdf92419-4a94-4d4f-bc6c-155a260dd1a1" parentid="00000000-0000-0000-0000-000000000000" approved="True" spam="False" deleted="False">
+      <date>2011-12-19 09:26:19</date>
+      <author>mwrock</author>
+      <email>matt@mattwrock.com</email>
+      <country />
+      <ip>131.107.0.83</ip>
+      <avatar />
+      <content>@Mike: I have had a couple users report success running RequestReduce on azure. A couple comments on this. Since anything stored on disk when an azure instance is shut down is lost, I suggest using RequestReduce.SqlServer with Sql Azure to allow cached resources to survive when instances are shut down. This will also allow multiple instances to share a single cache. To be clear: using the SqlServer cache does not mean a sql call on every request. It usually means one sql call on app startup.
+
+@Nancy: Thanks Mom!!</content>
+    </comment>
+    <comment id="eecc8796-fac0-4ec6-8087-4e347b4867a7" parentid="00000000-0000-0000-0000-000000000000" approved="True" spam="False" deleted="False">
+      <date>2011-12-19 20:08:36</date>
+      <author>Chirag Patel</author>
+      <email>cp_patel@hotmail.com</email>
+      <country />
+      <ip>208.78.67.43</ip>
+      <avatar />
+      <content>Would it be possible to use this with a SharePoint public facing website?
+
+Thanks,
+
+Chirag</content>
+    </comment>
+    <comment id="9f9803ab-e926-482b-b56f-a1a5d15c12d1" parentid="00000000-0000-0000-0000-000000000000" approved="True" spam="False" deleted="False">
+      <date>2011-12-19 20:29:02</date>
+      <author>Matt Wrock</author>
+      <email>matt@mattwrock.com</email>
+      <country />
+      <ip>50.46.255.50</ip>
+      <avatar />
+      <content>@chirag: It can be used with Sharepoint however with one possibly significant caveat. If you use sharepoint 2010, its output caching is not compatible with response filters which is what RequestReduce uses to transform a site&amp;#39;s original content. To turn off sharepoint output caching, add &amp;lt;remove name=&amp;quot;OutputCache&amp;quot; /&amp;gt; to &amp;lt;system.webServer&amp;gt; &amp;lt;modules&amp;gt;.</content>
+    </comment>
+    <comment id="e06451de-2b78-4b01-9568-d3bc98eaa11c" parentid="00000000-0000-0000-0000-000000000000" approved="True" spam="False" deleted="False">
+      <date>2011-12-19 21:53:33</date>
+      <author>Jalpesh Vadgama</author>
+      <email>jalpesh.vadgama@gmail.com</email>
+      <country />
+      <ip>115.119.237.50</ip>
+      <avatar />
+      <content>Hello Matt,
+
+Congratulations for great work. I have one question for request reduce does it work for the .net framework 2.0?
+
+Thanks,
+Jalpesh Vadgama
+(http://www.dotnetjalps.com)</content>
+    </comment>
+    <comment id="050ef959-0be7-4ef7-b459-c05ca0a1c715" parentid="00000000-0000-0000-0000-000000000000" approved="True" spam="False" deleted="False">
+      <date>2011-12-20 01:34:45</date>
+      <author>Matt Wrock</author>
+      <email>matt@mattwrock.com</email>
+      <country />
+      <ip>50.46.255.50</ip>
+      <moderatedby>mwrock</moderatedby>
+      <avatar />
+      <content>@Jalpesh: The core RequestReduce package is compatible with .net 3.5 (built on the 2.0 runtime). However both the SqlServer and the SassLessCoffee add ons require the 4.0 framework.</content>
+    </comment>
+    <comment id="a68949f8-eacc-4077-9616-c538aa0c06bf" parentid="00000000-0000-0000-0000-000000000000" approved="True" spam="False" deleted="False">
+      <date>2012-01-12 14:50:41</date>
+      <author>msprogrammer.serviciipeweb.ro</author>
+      <email>pingback</email>
+      <country />
+      <ip>89.38.208.18</ip>
+      <website>http://msprogrammer.serviciipeweb.ro/2012/01/13/friday-links-12/</website>
+      <content>Pingback from msprogrammer.serviciipeweb.ro
+
+friday links 12 &amp;laquo; A Programmer with Microsoft tools</content>
+    </comment>
+    <comment id="becb135d-a939-4890-b353-d572b35117b8" parentid="00000000-0000-0000-0000-000000000000" approved="True" spam="False" deleted="False">
+      <date>2012-02-18 23:44:22</date>
+      <author>Sue Robson</author>
+      <email>sue779robson@gmail.com</email>
+      <country />
+      <ip>46.37.172.219</ip>
+      <moderatedby>mwrock</moderatedby>
+      <avatar />
+      <content>Looks good to me too!</content>
+    </comment>
+    <comment id="ebbbba8d-0ffa-48a4-b0a7-88b55c8953bf" parentid="00000000-0000-0000-0000-000000000000" approved="True" spam="False" deleted="False">
+      <date>2012-02-21 02:06:23</date>
+      <author>Mark56</author>
+      <email>mark56@hotmail.com</email>
+      <country />
+      <ip>88.35.36.82</ip>
+      <avatar />
+      <content>I love the Microsoft blogging platform and yes! They improved the performances with this changes, thanks for this post
+
+Thanks
+
+Mark
+
+http://www.tipradar.com</content>
+    </comment>
+  </comments>
+  <categories>
+    <category>2f8206f0-95a4-449e-bf74-3b2cb761de04</category>
+  </categories>
+  <notifications>
+    <email>rawwool@yahoo.com</email>
+    <email>mikerg87@gmail.com</email>
+    <email>cp_patel@hotmail.com</email>
+    <email>emmasters2@gmail.com</email>
+    <email>red.gold786@gmail.com</email>
+    <email>Phillip.macon@yahoo.com</email>
+  </notifications>
+</post>

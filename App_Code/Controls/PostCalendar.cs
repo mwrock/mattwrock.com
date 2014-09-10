@@ -14,6 +14,7 @@ namespace App_Code.Controls
     using System.Web.UI;
     using System.Web.UI.HtmlControls;
     using System.Web.UI.WebControls;
+    using System.Collections.Generic;
 
     using BlogEngine.Core;
 
@@ -111,7 +112,7 @@ namespace App_Code.Controls
                 {
                     cell.Controls.Add(new LiteralControl(day.DayNumberText));
                     foreach (var a in
-                        list.Where(post => post.IsVisible).Select(post => new HtmlAnchor { InnerHtml = string.Format("<br /><br />{0}", post.Title), HRef = post.RelativeLink }))
+                        list.Where(post => post.IsVisible).Select(post => new HtmlAnchor { InnerHtml = string.Format("<br /><br />{0}", post.Title), HRef = post.RelativeOrAbsoluteLink }))
                     {
                         cell.Controls.Add(a);
                     }
@@ -124,7 +125,7 @@ namespace App_Code.Controls
                             {
                                 InnerHtml = day.DayNumberText,
                                 HRef =
-                                    string.Format("{0}{1}/{2}/{3}/default{4}", Utils.RelativeWebRoot, day.Date.Year, day.Date.ToString("MM"), day.Date.ToString("dd"), BlogConfig.FileExtension)
+                                    string.Format("{0}{1}/{2}/{3}/default{4}", Utils.RelativeOrAbsoluteWebRoot, day.Date.Year, day.Date.ToString("MM"), day.Date.ToString("dd"), BlogConfig.FileExtension)
                             };
                         a.Attributes["class"] = "exist";
                         cell.Controls.Add(a);
@@ -252,7 +253,8 @@ namespace App_Code.Controls
         /// <returns>The oldest post date.</returns>
         private static DateTime GetOldestPostDate()
         {
-            return Post.Posts.Count > 0 ? Post.Posts[Post.Posts.Count - 1].DateCreated : DateTime.Now;
+            List<Post> applicablePosts = Post.ApplicablePosts;
+            return applicablePosts.Count > 0 ? applicablePosts[applicablePosts.Count - 1].DateCreated : DateTime.Now;
         }
 
         /// <summary>
@@ -278,7 +280,8 @@ function setupBlogEngineCalendar() {{
   }};
 }}
 </script>",
-                this.Page.ClientScript.GetCallbackEventReference(this, "date", "BlogEngine.updateCalendar", "date"));
+            this.Page.ClientScript.GetCallbackEventReference(this, "date", "BlogEngine.updateCalendar", "date"));
+            this.Page.ClientScript.RegisterStartupScript(this.Page.GetType(), "calendarinit", BlogEngine.Core.Web.Scripting.Helpers.FormatInlineScript("BlogEngine.addLoadEvent(setupBlogEngineCalendar);"), false);
 
             /*
             ");

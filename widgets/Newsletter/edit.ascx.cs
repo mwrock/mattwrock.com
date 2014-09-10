@@ -4,6 +4,8 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
+using System.Collections.Specialized;
+
 namespace Widgets.Newsletter
 {
     using System;
@@ -26,7 +28,8 @@ namespace Widgets.Newsletter
         /// <summary>
         ///     The xml document.
         /// </summary>
-        private XmlDocument doc;
+        private static XmlDocument doc;
+        private static string subjectPrefix;
 
         /// <summary>
         ///     The file name.
@@ -43,6 +46,10 @@ namespace Widgets.Newsletter
         public override void Save()
         {
             SaveEmails();
+
+            var settings = GetSettings();
+            settings["subjectPrefix"] = txtPrefix.Text;
+            SaveSettings(settings);
         }
 
         #endregion
@@ -58,10 +65,19 @@ namespace Widgets.Newsletter
         protected override void OnInit(EventArgs e)
         {
             doc = null;
-            this.BindGrid();
+            BindGrid();
 
-            this.gridEmails.RowDeleting += this.GridEmailsRowDeleting;
-            this.gridEmails.RowDataBound += this.GridEmailsRowDataBound;
+            gridEmails.RowDeleting += GridEmailsRowDeleting;
+            gridEmails.RowDataBound += GridEmailsRowDataBound;
+
+            txtPrefix.Text = "";
+            var settings = GetSettings();
+
+            if (settings != null && settings.ContainsKey("subjectPrefix"))
+            {
+                subjectPrefix = settings["subjectPrefix"];
+                txtPrefix.Text = subjectPrefix;
+            }
 
             base.OnInit(e);
         }
@@ -111,9 +127,9 @@ namespace Widgets.Newsletter
         {
             LoadEmails();
 
-            this.gridEmails.DataKeyNames = new[] { "innertext" };
-            this.gridEmails.DataSource = doc.FirstChild;
-            this.gridEmails.DataBind();
+            gridEmails.DataKeyNames = new[] { "innertext" };
+            gridEmails.DataSource = doc.FirstChild;
+            gridEmails.DataBind();
         }
 
         /// <summary>
@@ -127,7 +143,7 @@ namespace Widgets.Newsletter
         /// </param>
         private void GridEmailsRowDataBound(object sender, GridViewRowEventArgs e)
         {
-            if (e.Row.RowType != DataControlRowType.DataRow || this.Page.IsPostBack)
+            if (e.Row.RowType != DataControlRowType.DataRow || Page.IsPostBack)
             {
                 return;
             }
@@ -135,7 +151,7 @@ namespace Widgets.Newsletter
             var delete = e.Row.Cells[0].Controls[0] as LinkButton;
             if (delete != null)
             {
-                delete.OnClientClick = "return confirm('Are you sure you want to delete this e-mail?')";
+                delete.OnClientClick = "return confirm('"  + Resources.labels.areYouSureDeleteEmail + "')";
             }
         }
 
@@ -151,7 +167,7 @@ namespace Widgets.Newsletter
         private void GridEmailsRowDeleting(object sender, GridViewDeleteEventArgs e)
         {
             LoadEmails();
-            var emails = this.gridEmails.DataKeys[e.RowIndex];
+            var emails = gridEmails.DataKeys[e.RowIndex];
             if (emails == null)
             {
                 return;
@@ -165,7 +181,8 @@ namespace Widgets.Newsletter
             }
 
             doc.FirstChild.RemoveChild(node);
-            this.BindGrid();
+            SaveEmails();
+            BindGrid();
         }
 
         #endregion

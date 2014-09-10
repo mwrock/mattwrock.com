@@ -34,10 +34,10 @@ public partial class page : BlogBasePage
             this.DeletePage(new Guid(qsDeletePage));
         }
 
-        var qsId = queryString["id"];
-        if (qsId != null && qsId.Length == 36)
+		Guid id = GetPageId();
+        if (id != Guid.Empty)
         {
-            this.ServePage(new Guid(qsId));
+            this.ServePage(id);
             this.AddMetaTags();
         }
         else
@@ -48,6 +48,14 @@ public partial class page : BlogBasePage
         base.OnInit(e);
     }
 
+	protected Guid GetPageId()
+	{
+		string id = Request.QueryString["id"];
+		Guid result;
+		return id != null && Guid.TryParse(id, out result) ? result : Guid.Empty;
+	}
+
+
     /// <summary>
     /// Serves the page to the containing DIV tag on the page.
     /// </summary>
@@ -56,8 +64,7 @@ public partial class page : BlogBasePage
     /// </param>
     private void ServePage(Guid id)
     {
-        var pg = BlogEngine.Core.Page.GetPage(id);
-        this.Page = pg;
+		var pg = this.Page;
 
         if (pg == null || (!pg.IsVisible))
         {
@@ -127,10 +134,28 @@ public partial class page : BlogBasePage
 
  
  
+	private Page _page;
+	private bool _pageLoaded;
     /// <summary>
     ///     The Page instance to render on the page.
     /// </summary>
-    public new Page Page;
+	public new Page Page
+	{
+		get
+		{
+			if (!_pageLoaded)
+			{
+				_pageLoaded = true;
+				Guid id = GetPageId();
+				if (id != Guid.Empty)
+				{
+					_page = BlogEngine.Core.Page.GetPage(id);
+				}
+			}
+
+			return _page;
+		}
+	}
 
     /// <summary>
     ///     Gets the admin links to edit and delete a page.
@@ -163,7 +188,7 @@ public partial class page : BlogBasePage
                 if (sb.Length > 0) { sb.Append(" | "); }
 
                 sb.AppendFormat(
-                    "<a href=\"javascript:void(0);\" onclick=\"if (confirm('Are you sure you want to delete the page?')) location.href='?deletepage={0}'\">{1}</a>",
+                    String.Concat("<a href=\"javascript:void(0);\" onclick=\"if (confirm('", labels.areYouSureDeletePage, "')) location.href='?deletepage={0}'\">{1}</a>"),
                     this.Page.Id,
                     labels.delete);
             }

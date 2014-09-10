@@ -2,6 +2,8 @@
 <%@ Import Namespace="System.Threading" %>
 <%@ Import Namespace="System.Globalization" %>
 <%@ Import Namespace="BlogEngine.Core" %>
+<%@ Import Namespace="App_Code.Controls" %>
+<%@ Import Namespace="System.Web.Optimization" %>
 
 <script RunAt="server">
   
@@ -96,7 +98,11 @@
             {
                 if (_initializedAlready) { return; }
 
+                WidgetZone.PreloadWidgetsAsync("be_WIDGET_ZONE"); 
                 Utils.LoadExtensions();
+
+                BundleConfig.RegisterBundles(BundleTable.Bundles);
+                
                 _initializedAlready = true;
             }
         }

@@ -40,7 +40,7 @@
 				"geocodingLongitude": $("[id$='_txtGeocodingLongitude']").val(),
 				"blogChannelBLink": $("[id$='_txtBlogChannelBLink']").val(),
 				"alternateFeedUrl": $("[id$='_txtAlternateFeedUrl']").val(),
-				"enableEnclosures": $("[id$='_cbEnableEnclosures']").attr('checked')
+				"enableEnclosures": $("[id$='_cbEnableEnclosures']").is(':checked')
 			};
 			
             $.ajax({
@@ -68,6 +68,10 @@
 			<menu:TabMenu ID="TabMenu" runat="server" />
 		</div>
 		<div class="content-box-left">
+            <div class="rightligned-top action_buttons">
+                <input type="submit" id="btnSave" class="btn primary" value="<%=Resources.labels.saveSettings %>" />
+            </div>
+
             <h1><%=Resources.labels.settings %></h1>
 
                 <ul class="fl leftaligned">
@@ -123,9 +127,6 @@
                         <label for="<%=cbEnableEnclosures.ClientID %>"><%=Resources.labels.enableEnclosures %></label>
                     </li>
                 </ul>
-            <div class="action_buttons">
-                <input type="submit" id="btnSave" class="btn primary" value="<%=Resources.labels.saveSettings %>" />
-            </div>
        </div>
     </div>
 </asp:Content>

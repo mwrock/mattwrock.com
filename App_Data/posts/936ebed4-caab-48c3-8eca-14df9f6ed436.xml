@@ -1,0 +1,135 @@
+﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<post>
+  <author>mwrock</author>
+  <title>Released: nQuant .net 8 bit PNG Quantizer</title>
+  <description />
+  <content>&lt;p&gt;Last weekend I &lt;a href="http://www.mattwrock.com/post/2011/09/05/Convert-32-bit-PNGs-to-high-quality-8-bit-PNGs-with-C.aspx"&gt;blogged&lt;/a&gt; about the quantization algorithm I had been working on in order optimize images in my &lt;a href="http://www.requestreduce.com"&gt;Auto CSS minification and spriting framework RequestReduce&lt;/a&gt;. Yesterday, I released this code as its own project on &lt;a href="http://nquant.codeplex.com"&gt;nquant.codeplex.com&lt;/a&gt;. While this quantizer provides great value for users of &lt;a href="http://www.RequestReduce.com"&gt;RequestReduce&lt;/a&gt;, I wanted to provide it as a separate component for anyone who would like to take advantage of its ability to dramatically reduce the size of their images. As I mentioned before, I have been seeing 3x reductions in image sizes of the 32bit PNG I produce in &lt;a href="http://www.RequestReduce.com"&gt;RequestReduce&lt;/a&gt;.&lt;/p&gt;  &lt;p&gt;You can incorporate the quantizing DLL into your own code to transform any bitmap and get a 8 bit PNG bitmap back. I also provide a command line wrapper you can use to quantize individual image files from a script.&lt;/p&gt;  &lt;p&gt;You download &lt;a href="http://nquant.codeplex.com"&gt;nQuant&lt;/a&gt; at &lt;a href="http://nquant.codeplex.com"&gt;nquant.codeplex.com&lt;/a&gt; or if you have &lt;a href="http://nuget.org"&gt;Nuget&lt;/a&gt;, simply enter:&lt;/p&gt;  &lt;div id="codeSnippetWrapper"&gt;   &lt;pre style="border-bottom-style: none; text-align: left; padding-bottom: 0px; line-height: 12pt; background-color: #f4f4f4; margin: 0em; border-left-style: none; padding-left: 0px; width: 100%; padding-right: 0px; font-family: &amp;#39;Courier New&amp;#39;, courier, monospace; direction: ltr; border-top-style: none; color: black; border-right-style: none; font-size: 8pt; overflow: visible; padding-top: 0px" id="codeSnippet"&gt;Install-Package nQuant&lt;/pre&gt;
+
+  &lt;br /&gt;&lt;/div&gt;
+
+
+
+&lt;p&gt;from the Package Manager Console.&lt;/p&gt;
+
+&lt;p&gt;I would appreciate any feedback, bug reports or suggestions for added features at &lt;a href="http://nquant.codeplex.com"&gt;nQuant.codeplex.com&lt;/a&gt;. You are also welcome to contribute to the code.&lt;/p&gt;</content>
+  <ispublished>True</ispublished>
+  <isdeleted>False</isdeleted>
+  <iscommentsenabled>True</iscommentsenabled>
+  <pubDate>2011-09-07 06:22:15</pubDate>
+  <lastModified>2012-02-01 06:35:38</lastModified>
+  <raters>0</raters>
+  <rating>0</rating>
+  <slug>Released-nQuant-net-8-bit-PNG-Quantizer</slug>
+  <tags />
+  <comments>
+    <comment id="b4e9ab31-4b4e-4a66-9855-bae96122737c" parentid="00000000-0000-0000-0000-000000000000" approved="True" spam="False" deleted="False">
+      <date>2012-01-12 18:17:18</date>
+      <author>Z</author>
+      <email>sd_zuo@yahoo.com</email>
+      <country />
+      <ip>59.151.98.138</ip>
+      <moderatedby>mwrock</moderatedby>
+      <avatar />
+      <content>The component is excellent.
+Your creative Alpha blending method has nicely improved Wu&amp;#39;s great algorithm. I am including it into my offline CSS Sprites generator and the result is great.
+
+The only thing which I feel can be improved is the performance. Since the CalculateMoments method introduced the Alpha calculation, the time consumption of it is multiplied about 32 times of Wu&amp;#39;s original algorithm. It took about 1.4 seconds to quantize an image of 516*16.
+It is too slow for online processing if the sprites goes bigger. The first request of the sprites can take very long time on the server. The CalculateMoments should be optimized. Would it be helpful if the multi-dimensional arrays being changed to single-dimensional or using Pointers to access and modify values?
+
+There&amp;#39;s a popular scenario of Sprites are to generate 8Bit PNG with 1Bit alpha, which you may have overlooked. That is, all output palette colors are opaque. It does not help saving any bandwidth but to save the appearance of the web pages in IE6, which does not support semi-transparent PNG images.
+Is it possible to introduce such a 1bit alpha transparency quantization? Colors having alpha value under the alphaTreshold will be transfered to Color.Transparent, and other semi-trasparent colors will be converted to opaque colors with the following function.
+
+[quote]
+public static Color ConvertAlpha(Color color)
+{
+    Color result = color;
+
+    if (color.A &amp;lt; 10) {
+        return Color.Transparent;
+    }
+
+    if (color.A &amp;lt; 255)
+    {
+        // performs a alpha blending (second color is BackgroundColor, by default a Control color)
+        Double colorFactor = Factors[color.A];
+        Double backgroundFactor = Factors[255 - color.A];
+        Int32 red = (Int32) (color.R*colorFactor + BackgroundColor.R*backgroundFactor);
+        Int32 green = (Int32) (color.G*colorFactor + BackgroundColor.G*backgroundFactor);
+        Int32 blue = (Int32) (color.B*colorFactor + BackgroundColor.B*backgroundFactor);
+        Int32 argb = 255 &amp;lt;&amp;lt; 24 | red &amp;lt;&amp;lt; 16 | green &amp;lt;&amp;lt; 8 | blue;
+        result = Color.FromArgb(argb);
+    }
+
+    return result;
+}
+[/quote]
+
+Taking that there are only 0 and 255 in the Alpha channel when running the CalculateMoments method. Is it possible to narrow down the alpha look up values so it returns in a much shorter time?
+
+BTW, your component can actually be compiled targeting .NET 2.0 rather than 3.5. The only modification in the code is to change the last two lines in SplitData to return an array:
+[quote]
+Array.Resize (ref cubes, colorCount);
+return cubes;
+[/quote]
+
+I&amp;#39;ve also tweaked the code to provide a static method for easier calling--without creating an instance before use.
+[quote]
+Image IWuQuantizer.QuantizeImage (Bitmap image) {
+    return WuQuantizer.QuantizeImage (image);
+}
+
+public static Image QuantizeImage(Bitmap image)
+{
+    var colorCount = MaxColor;
+    var data = BuildHistogram(image);
+    data = CalculateMoments(data);
+    var cubes = SplitData(ref colorCount, data);
+    var palette = GetQuantizedPalette(colorCount, data, cubes);
+    return ProcessImagePixels(image, palette);
+}
+[/quote]
+</content>
+    </comment>
+    <comment id="7f767e0c-38a2-43ff-98a2-47ade4d3a42b" parentid="00000000-0000-0000-0000-000000000000" approved="True" spam="False" deleted="False">
+      <date>2012-01-12 18:21:39</date>
+      <author>Z</author>
+      <email>sd_zuo@yahoo.com</email>
+      <country />
+      <ip>59.151.98.138</ip>
+      <moderatedby>mwrock</moderatedby>
+      <avatar />
+      <content>Oops, I&amp;#39;ve forgotten the Factors variable in the previous post:
+
+[quote]private static readonly Double[] Factors = PrecalculateFactors();
+private static Double[] PrecalculateFactors()
+{
+	Double[] result = new Double[256];
+
+	for (Int32 value = 0; value &amp;lt; 256; value++)
+	{
+		result[value] = value / 255.0;
+	}
+
+	return result;
+}[/quote]
+
+The above code is taken from a CodeProject article you mentioned in one of your blog.</content>
+    </comment>
+    <comment id="31b72d21-8c61-46d8-841c-0524a9fe2fdd" parentid="00000000-0000-0000-0000-000000000000" approved="True" spam="False" deleted="False">
+      <date>2012-01-31 21:35:38</date>
+      <author>Z</author>
+      <email>sd_zuo@yahoo.com</email>
+      <country />
+      <ip>218.104.173.170</ip>
+      <moderatedby>mwrock</moderatedby>
+      <avatar />
+      <content>The implementation of multi-dimensional array on .NET CLR has a performance issue which causes it much slower than single dimensional array or jagged arrays.
+I&amp;#39;ve changed the implementation from multi-dimensional arrays to single dimensional arrays, and found that the quantization time has reduced from 1.4 seconds to about 1 second for a 20,000-pixel image.</content>
+    </comment>
+  </comments>
+  <categories />
+  <notifications>
+    <email>philly.dilly@gmail.com</email>
+    <email>sabaattitute@gmail.com</email>
+  </notifications>
+</post>

@@ -1,0 +1,38 @@
+﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<post>
+  <author>mwrock</author>
+  <title>Microsoft’s MSDN and Technet Forums and Search adopt RequestReduce for Web Performance Optimization</title>
+  <description />
+  <content>&lt;p&gt;This week &lt;a href="http://RequestReduce.com"&gt;RequestReduce&lt;/a&gt; was launched on Microsoft&amp;rsquo;s MSDN and Technet web sites specifically with the Forums and Search applications. So if you ever land on a Forums page within these sites or conduct a search within the MSDN or Technet environment, &lt;a href="http://RequestReduce.com"&gt;RequestReduce&lt;/a&gt; is crunching and merging the CSS and javascript as well as spriting their background images resulting in about a 25-30% Reduction in the number of HTTP requests made.. &lt;a href="http://RequestReduce.com"&gt;RequestReduce&lt;/a&gt; already services the MSDN and Technet gallery sites which include &lt;a href="http://code.msdn.microsoft.com/"&gt;Code Samples&lt;/a&gt; and the &lt;a href="http://visualstudiogallery.msdn.microsoft.com/"&gt;Visual Studio Gallery&lt;/a&gt;. All of these sites combined represent several million page views a day and prove that RequestReduce can perform under considerable load.&lt;/p&gt;
+&lt;p&gt;This migration process did surface some &amp;ldquo;edge case&amp;rdquo; bugs in the Sql Server cache flushing logic that would likely only surface in high traffic environments. The Sql Server cache is an add on assembly that is aimed to synchronize the RequestReduce generated Scripts, CSS and images across multiple servers and ensure that users do not view different or broken content when moving from one server to another but rather guarantees a consistent user experience throughout a session.&lt;/p&gt;
+&lt;p&gt;The discovery of these bugs provided the bulk of the code that went into this week&amp;rsquo;s 1.4 Release of RequestReduce. The release was largely a fix and polish release but here are some highlights:&lt;/p&gt;
+&lt;h2&gt;Dashboard Page&lt;/h2&gt;
+&lt;p&gt;Troubeshooting issues in the Forums/Search migration inspired me to create a dashboard page to assist in catching and isolating some tough to catch bugs. The page is currently extremely bare bones and rather cryptic. It displays what css and javascript has been processed, what is queued for processing and what is currently in the middle of being processed. It also provides links for flushing individual merged css/js files from the cache. The page can be accessed from:&lt;/p&gt;
+&lt;div id="codeSnippetWrapper"&gt;
+&lt;pre id="codeSnippet" style="text-align: left; line-height: 12pt; background-color: #f4f4f4; margin: 0em; width: 100%; font-family: 'Courier New', courier, monospace; direction: ltr; color: black; font-size: 8pt; overflow: visible; border-style: none; padding: 0px;"&gt;http://&amp;lt;your site&amp;gt;/&amp;lt;RequestReduce &lt;span style="color: #0000ff;"&gt;virtual&lt;/span&gt; directory&amp;gt;/dashboard&lt;/pre&gt;
+&lt;/div&gt;
+&lt;p&gt;Its greatest benefit is to assist in determining what RequestReduce is currently up to if anything and where RequestReduce is in terms of processing all queued content. Expect this page to get much more informative and maybe prettier in coming releases.&lt;/p&gt;
+&lt;h2&gt;Performance Optimization&lt;/h2&gt;
+&lt;p&gt;The javascript processing introduced in release version 1.3, added a lot of work to the Response Filter which has to iterate over every character of the response stream to the browser. This is the single piece of code that needs the most perf optimization since it is the only request blocking activity within RequestReduce. Its speed has a direct impact on the Time to First Byte download of the hosting RequestReduce enabled web page.&lt;/p&gt;
+&lt;p&gt;So I changed some List&amp;lt;T&amp;gt; implementations to arrays and removed some unnecessary lines of code. Granted these are micro optimizations but even 50 &amp;ndash; 100ms of time filtering a page is far too long and this process has to be extremely optimized. Its also a bear to read, write and change which I plan to address in a future release. Sure I could eliminate several lines of code and overly complicated logic by using regular expressions, but that would actually degrade performance significantly.&lt;/p&gt;
+&lt;p&gt;Speaking of regular expressions. I do make extensive use of them in the background processing of content. Especially in CSS parsing for sprites and imports. So I eliminated a lot of my static Regex instances and replaced them with instance member Regex&amp;rsquo;s in a singleton class. .net will cache the most recently used 15 static regular expressions in an application and I do not want to infringe upon that cache especially when I have about 8.Using a singleton allows me to manage my own cache.&lt;/p&gt;
+&lt;h2&gt;Support for CSS @Media&lt;/h2&gt;
+&lt;p&gt;&lt;a href="http://www.w3schools.com/css/css_mediatypes.asp"&gt;CSS media types&lt;/a&gt; is something that can be applied to an entire CSS stylesheet, instructing the browser to use its styles only for specific media. For example: print and screen are the most popular and obvious. RequestReduce had been oblivious to the Media attribute of the Link tag and @import directive. This caused some CSS to break on certain sites. Especially if the last CSS on a page was targeted for Print media and strips out a lot of styling. This was resulting in the web experience having the styles striped out as well. No longer. RequestReduce now wraps the contents of any &amp;lt;Link/&amp;gt; or @import inside @media braces to preserve the media constraints they specify.&lt;/p&gt;
+&lt;h2&gt;Support for ScriptResource.axd scripts and all other Compressed content&lt;/h2&gt;
+&lt;p&gt;RequestReduce already supported the minification and merging of WebResource.axd files. However, RequestReduce always assumed that the content it was requesting was uncompressed text since it did not specify compression in its Accept-Encoding request headers. Well it ends up that &lt;a href="http://msdn.microsoft.com/en-us/library/system.web.handlers.scriptresourcehandler.aspx"&gt;ScriptResource.axd&lt;/a&gt; files violate HTTP by sending GZIP&amp;rsquo;d content regardless of the value in this header. This is a show stopper for an upcoming large RequestReduce adoption in the near future that includes pages with over 30 to 40 CSS and script files including tons of ScriptResource.axd files. RequestReduce now looks to see if a Response is compressed with gzip or deflate and uncompresses accordingly. RequestReduce leaves the recompression up to IIS.&lt;/p&gt;
+&lt;p&gt;This really makes RequestReduce an attractive solution for sites mired in asp.net 2.0/asp.net ajax constructs that had good intentions of encapsulating scripts but horrible perf implications.&lt;/p&gt;</content>
+  <ispublished>True</ispublished>
+  <isdeleted>False</isdeleted>
+  <iscommentsenabled>True</iscommentsenabled>
+  <pubDate>2011-11-06 03:40:00</pubDate>
+  <lastModified>2011-12-12 23:12:49</lastModified>
+  <raters>0</raters>
+  <rating>0</rating>
+  <slug>Microsoft’s-MSDN-and-Technet-Forums-and-Search-adopt-RequestReduce</slug>
+  <tags />
+  <comments />
+  <categories>
+    <category>2f8206f0-95a4-449e-bf74-3b2cb761de04</category>
+  </categories>
+  <notifications />
+</post>

@@ -242,6 +242,7 @@
         public JsonResponse Delete(string[] vals)
         {
             response.Success = false;
+            Comment tmpComment = null;
 
             if (!Security.IsAuthorizedTo(Rights.ModerateComments))
             {
@@ -268,12 +269,13 @@
 
                 foreach (var c in tmp)
                 {
-                    RemoveComment(c);
+                    tmpComment = c;
+                    RemoveComment(tmpComment);
                 }
             }
             catch (Exception ex)
             {
-                Utils.Log("Api.Comments.Delete", ex);
+                Utils.Log(string.Format("Api.Comments.Delete: error deleting comment {0} by {1}", tmpComment.Teaser, tmpComment.Author), ex);
                 response.Message = string.Format(Resources.labels.couldNotDeleteComment, ex.Message);
                 return response;
             }

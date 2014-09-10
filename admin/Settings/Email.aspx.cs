@@ -140,14 +140,14 @@ namespace admin.Settings
                 {
                     body.Append(
                         "<br /><br />_______________________________________________________________________________<br /><br />");
-                    body.AppendFormat("<strong>IP address:</strong> {0}<br />", HttpContext.Current.Request.UserHostAddress);
+                    body.AppendFormat("<strong>IP address:</strong> {0}<br />", Utils.GetClientIP());
                     body.AppendFormat("<strong>User-agent:</strong> {0}", HttpContext.Current.Request.UserAgent);
                 }
 
                 body.Append("</div>");
                 mail.Body = body.ToString();
 
-                string error = Utils.SendMailMessage(mail);
+                string error = Utils.SendMailMessage(mail, smtpServer, smtpServerPort, smtpUserName, smtpPassword, enableSsl.ToString());
                 if (!string.IsNullOrEmpty(error))
                     errorMsg.Append(error);
             }

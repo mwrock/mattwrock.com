@@ -2,10 +2,10 @@
 <ul id="list-pager">
     {#foreach $T.d as p}
         {#if $T.p.Current}
-            <li class="active">{$T.p.PageNumber}</li> 
+            <li class="active">{$T.p.PageNumber + 1}</li> 
         {#else}
-            <li><a href="" onclick="GalleryGetPackages({$T.p.PageNumber}); return false;">{$T.p.PageNumber}</a></li>
+            <li><a href="" onclick="{$T.p.PageLink}">{$T.p.PageNumber + 1}</a></li>
         {#/if}   
     {#/for}
-</ul><img class="page-loader" src="../../pics/ajax-loader.gif" style="display: none;" alt="loader" />
+</ul><img class="page-loader" src="../../pics/ajax-loader.gif" width="24" height="24" style="display: none;" alt="loader" />
 {#/if}

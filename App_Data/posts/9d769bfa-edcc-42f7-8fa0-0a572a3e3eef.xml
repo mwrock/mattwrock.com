@@ -1,0 +1,149 @@
+﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<post>
+  <author>mwrock</author>
+  <title>Windows VM Provisioning Part 1: Inject a ‘startup on boot ‘ script into a VHD.</title>
+  <description />
+  <content>&lt;p&gt;&lt;a href="http://www.mattwrock.com/image.axd?picture=jokescript.png"&gt;&lt;img style="background-image: none; padding-top: 0px; padding-left: 0px; margin: 0px 10px 0px 0px; display: inline; padding-right: 0px; border: 0px;" title="jokescript" src="http://www.mattwrock.com/image.axd?picture=jokescript_thumb.png" alt="jokescript" width="662" height="147" border="0" /&gt;&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;I&amp;rsquo;m currently in the process of adding a Virtualization module to my &lt;a href="http://boxstarter.org/"&gt;Boxstarter&lt;/a&gt; project. This post is part of a three part series covering some of the technicalities involved. Although these posts will document how Boxstarter provisions a Windows VM, I think that there will be information covered to accommodate a wide range of scenarios whether you are interested in using Boxstarter or not.&lt;/p&gt;
+&lt;h2&gt;The Boxstarter Scenario&lt;/h2&gt;
+&lt;p&gt;&lt;a href="https://boxstarter.codeplex.com/Documentation"&gt;Boxstarter is a set of Powershell modules&lt;/a&gt; (or you can simply &lt;a href="https://boxstarter.codeplex.com/wikipage?title=Boxstarter%20from%20web%20via%20ClickOnce&amp;amp;referringTitle=Documentation"&gt;invoke from a URL&lt;/a&gt;) that can deploy a single application or standup a complete environment from a script leveraging &lt;a href="http://chocolatey.org/"&gt;Chocolatey&lt;/a&gt; and &lt;a href="http://www.nuget.org/"&gt;Nuget&lt;/a&gt; packaging technologies. Its target scenario is to bring a Windows machine from bare OS to an environment that is fully patched and has everything you need to get stuff done. Yes, there are lots of cool solutions that can do this at enterprise scale but Boxstarter is designed to be light weight and very simple. It can perform this provisioning on a physical machine but what about VMs?&lt;/p&gt;
+&lt;p&gt;You can of course log on to a VM and use Boxstarter just as you would on any physical machine, but I want to eliminate the need to have to setup network settings and manually RDP or use a Hyper-V console to connect to the VM. Deploying a Boxstarter Install to a VM should be just as simple as any other environment.&lt;/p&gt;
+&lt;h2&gt;How will Boxstarter provision a VM without the need to manually prepare it&lt;/h2&gt;
+&lt;p&gt;Here is the basic flow:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;Inject a script into a VHD that will run under the local machine account with administrative privileges on boot. This script will add a firewall rule and edit the Local Account Token Filter Policy.&lt;/li&gt;
+&lt;li&gt;Use PSEXEC to invoke another script from a user account that will enable powershell Remoting on the VM with credssp authentication so that your credentials in the remote session can be used to access other remote resources from the VM.&lt;/li&gt;
+&lt;li&gt;Use powershell remoting to Invoke a Boxstarter package from the VM Host but that will run on the VM Guest.&lt;/li&gt;
+&lt;li&gt;Wrap all of this up into a single, simple command. that can be extended to be VM Vendor agnostic but will work with Hyper-V and Windows Azure VMs out of the box.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;Ideally, this could even be leveraged to create a &lt;a href="http://www.vagrantup.com/"&gt;Vagrant&lt;/a&gt; Provisioner.&lt;/p&gt;
+&lt;p&gt;This post will cover the zeroth point above. The use cases of plugging a startup script right into a VHD span well beyond Boxstarter and the means of doing it is not particularly difficult but it did take me a while to figure out how to get it done right to accommodate both simple workstation environments as well as Domain topologies.&lt;/p&gt;
+&lt;h2&gt;Requirements on the Host and Guest&lt;/h2&gt;
+&lt;p&gt;The Goal is that this should work on any &amp;ldquo;vanilla&amp;rdquo; bare OS guest install with access to the internet and no &amp;ldquo;special&amp;rdquo; networking configuration. No Firewall tweaking, no need to enable powershell remoting on the host or guest and no installation of software on the guest beyond the operating system. That said, the following are required:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;The VM guest must be able to access the internet unless your boxstarter package installs everything from a local source.&lt;/li&gt;
+&lt;li&gt;The Host must be running at least Powershell v.3 and have the Hyper-V module available.&lt;/li&gt;
+&lt;li&gt;The Guest must be running windows 7, 8, server 2008 R2 or server 2012.&lt;/li&gt;
+&lt;li&gt;The VHD where the script is injected must contain the system volume of the VM (windows\system32).&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h2&gt;The Script Script (the script that installs the script)&lt;/h2&gt;
+&lt;p&gt;The script lives in the &lt;a href="https://boxstarter.codeplex.com/SourceControl/latest?branch=VMDeploy#Boxstarter.VirtualMachine/Add-VHDStartupScript.ps1"&gt;Boxstarter.VirtualMachine module&lt;/a&gt; and can be called like so:&lt;/p&gt;
+&lt;div id="codeSnippetWrapper"&gt;
+&lt;pre id="codeSnippet" style="overflow: visible; font-size: 8pt; font-family: 'Courier New', courier, monospace; width: 100%; color: black; direction: ltr; text-align: left; margin: 0em; line-height: 12pt; background-color: #f4f4f4; border-style: none; padding: 0px;"&gt;$vhd=Get-VMHardDiskDrive -VMName &lt;span style="color: #006080;"&gt;"MyVMName"&lt;/span&gt;&lt;br /&gt;Add-VHDStartupScript $vhd.Path -FilesToCopy &lt;span style="color: #006080;"&gt;"c:\myFiles\file.ps1"&lt;/span&gt;,&lt;span style="color: #006080;"&gt;"..\MyOtherFiles"&lt;/span&gt; {&lt;br /&gt;    $here = Split-Path -Parent $MyInvocation.MyCommand.Path&lt;br /&gt;    . &lt;span style="color: #006080;"&gt;"$here\file.ps1"&lt;/span&gt;&lt;br /&gt;}&lt;/pre&gt;
+&lt;/div&gt;
+&lt;div&gt;This will take the VHD used by the VM on the host named MyVMName, the file c:\myfiles\file.ps1 as well as all files in ..\MyOtherFiles will be copied to the VHD. Furthermore, the script block above will be stored in a file in the same directory as the copied files. A local Group Policy will be added to the Registry stored in the VHD that will call the above script when the VM next boots. To be clear, the script runs at boot time and not login time so that no separate login is necessary to kick things off. The script will run under the local machine account.&lt;/div&gt;
+&lt;h2&gt;Validate and Mount the VHD&lt;/h2&gt;
+&lt;div id="codeSnippetWrapper"&gt;
+&lt;pre id="codeSnippet" style="overflow: visible; font-size: 8pt; font-family: 'Courier New', courier, monospace; width: 100%; color: black; direction: ltr; text-align: left; margin: 0em; line-height: 12pt; background-color: #f4f4f4; border-style: none; padding: 0px;"&gt;function Add-VHDStartupScript {&lt;br /&gt;[CmdletBinding()]&lt;br /&gt;param(&lt;br /&gt;    [Parameter(Position=0,Mandatory=$&lt;span style="color: #0000ff;"&gt;true&lt;/span&gt;)]&lt;br /&gt;    [ValidateScript({Test-Path $_})]&lt;br /&gt;    [ValidatePattern(&lt;span style="color: #006080;"&gt;"\.(a)?vhd(x)?$"&lt;/span&gt;)]&lt;br /&gt;    [&lt;span style="color: #0000ff;"&gt;string&lt;/span&gt;]$VHDPath,&lt;br /&gt;    [Parameter(Position=1,Mandatory=$&lt;span style="color: #0000ff;"&gt;true&lt;/span&gt;)]&lt;br /&gt;    [ScriptBlock]$Script,&lt;br /&gt;    [Parameter(Position=2,Mandatory=$&lt;span style="color: #0000ff;"&gt;false&lt;/span&gt;)]&lt;br /&gt;    [ValidateScript({ $_ | % {Test-Path $_} })]&lt;br /&gt;    [&lt;span style="color: #0000ff;"&gt;string&lt;/span&gt;[]]$FilesToCopy = @()&lt;br /&gt;)&lt;br /&gt;&lt;span style="color: #0000ff;"&gt;if&lt;/span&gt;((Get-ItemProperty $VHDPath -Name IsReadOnly).IsReadOnly){&lt;br /&gt;    &lt;span style="color: #0000ff;"&gt;throw&lt;/span&gt; New-Object -TypeName InvalidOperationException `&lt;br /&gt;      -ArgumentList &lt;span style="color: #006080;"&gt;"The VHD is Read-Only"&lt;/span&gt;&lt;br /&gt;}    &lt;br /&gt;$volume=mount-vhd $VHDPath -Passthru | get-disk | Get-Partition | Get-Volume&lt;br /&gt;&lt;span style="color: #0000ff;"&gt;try&lt;/span&gt;{&lt;br /&gt;    Get-PSDrive | Out-Null&lt;br /&gt;    $winVolume = $volume | ? {&lt;br /&gt;        Test-Path &lt;span style="color: #006080;"&gt;"$($_.DriveLetter):\windows\System32\config"&lt;/span&gt;&lt;br /&gt;    }&lt;br /&gt;    &lt;span style="color: #0000ff;"&gt;if&lt;/span&gt;($winVolume -eq $&lt;span style="color: #0000ff;"&gt;null&lt;/span&gt;){&lt;br /&gt;        &lt;span style="color: #0000ff;"&gt;throw&lt;/span&gt; New-Object -TypeName InvalidOperationException `&lt;br /&gt;          -ArgumentList &lt;span style="color: #006080;"&gt;"The VHD does not contain system volume"&lt;/span&gt;&lt;br /&gt;    }&lt;/pre&gt;
+&lt;/div&gt;
+&lt;div&gt;In the beginning of the script we validate the user input and Mount the VHD. Pretty straight forward stuff.&lt;/div&gt;
+&lt;h2&gt;Copy files and create startup script file&lt;/h2&gt;
+&lt;div id="codeSnippetWrapper"&gt;
+&lt;pre id="codeSnippet" style="overflow: visible; font-size: 8pt; font-family: 'Courier New', courier, monospace; width: 100%; color: black; direction: ltr; text-align: left; margin: 0em; line-height: 12pt; background-color: #f4f4f4; border-style: none; padding: 0px;"&gt;$TargetScriptDirectory = &lt;span style="color: #006080;"&gt;"Boxstarter.Startup"&lt;/span&gt;&lt;br /&gt;mkdir &lt;span style="color: #006080;"&gt;"$($winVolume.DriveLetter):\$targetScriptDirectory"&lt;/span&gt; -Force | &lt;span style="color: #0000ff;"&gt;out&lt;/span&gt;-&lt;span style="color: #0000ff;"&gt;null&lt;/span&gt;&lt;br /&gt;New-Item &lt;span style="color: #006080;"&gt;"$($winVolume.DriveLetter):\$targetScriptDirectory\startup.bat"&lt;/span&gt; -Type File `&lt;br /&gt;  -Value &lt;span style="color: #006080;"&gt;"@echo off`r`npowershell -ExecutionPolicy Bypass -NoProfile -File `"&lt;/span&gt;%~dp0startup.ps1`&lt;span style="color: #006080;"&gt;""&lt;/span&gt;`&lt;br /&gt;  -force | &lt;span style="color: #0000ff;"&gt;out&lt;/span&gt;-&lt;span style="color: #0000ff;"&gt;null&lt;/span&gt;&lt;br /&gt;New-Item &lt;span style="color: #006080;"&gt;"$($winVolume.DriveLetter):\$targetScriptDirectory\startup.ps1"&lt;/span&gt; -Type File `&lt;br /&gt;  -Value $script.ToString() -force | &lt;span style="color: #0000ff;"&gt;out&lt;/span&gt;-&lt;span style="color: #0000ff;"&gt;null&lt;/span&gt;&lt;br /&gt;ForEach($file &lt;span style="color: #0000ff;"&gt;in&lt;/span&gt; $FilesToCopy){&lt;br /&gt;    Copy-Item $file &lt;span style="color: #006080;"&gt;"$($winVolume.DriveLetter):\$targetScriptDirectory"&lt;/span&gt; -Force&lt;br /&gt;}&lt;/pre&gt;
+&lt;/div&gt;
+&lt;p&gt;Here we copy the files provided in the FilesToCopy parameter and create a powershell file to hold the script in the script block and a batch file that will invoke the powershell file.&lt;/p&gt;
+&lt;h2&gt;Load the registry hive in the VHD&lt;/h2&gt;
+&lt;div id="codeSnippetWrapper"&gt;
+&lt;pre id="codeSnippet" style="overflow: visible; font-size: 8pt; font-family: 'Courier New', courier, monospace; width: 100%; color: black; direction: ltr; text-align: left; margin: 0em; line-height: 12pt; background-color: #f4f4f4; border-style: none; padding: 0px;"&gt;reg load HKLM\VHDSYS &lt;span style="color: #006080;"&gt;"$($winVolume.DriveLetter):\windows\system32\config\software"&lt;/span&gt; | &lt;span style="color: #0000ff;"&gt;out&lt;/span&gt;-null&lt;/pre&gt;
+&lt;/div&gt;
+&lt;p&gt;This takes the file in the VHD that contains HKLM\Software, which is where the computer startup group policies reside and Loads its keys into a new hive referencable from HKLM:\VHDSYS. Now we can query and modify the values in the registry as easily as we can any of our local registry information.&lt;/p&gt;
+&lt;h2&gt;Add the Group Policy&lt;/h2&gt;
+&lt;p&gt;Now that the VHD Registry is loaded, we need to add a Local Group Policy that will invoke our startup.bat file upon boot. This is a bit involved to account for various scenarios such as:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;What if you already have different startup scripts&lt;/li&gt;
+&lt;li&gt;What if you have already have added a startup script and do not want to add a duplicate&lt;/li&gt;
+&lt;li&gt;What if you have one or more domain group policies&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;To try and keep things at least somewhat tidy, we will place this logic in a separate function:&lt;/p&gt;
+&lt;div id="codeSnippetWrapper"&gt;
+&lt;pre id="codeSnippet" style="overflow: visible; font-size: 8pt; font-family: 'Courier New', courier, monospace; width: 100%; color: black; direction: ltr; text-align: left; margin: 0em; line-height: 12pt; background-color: #f4f4f4; border-style: none; padding: 0px;"&gt;function Get-RegFile {&lt;br /&gt;    $regFileTemplate = &lt;span style="color: #006080;"&gt;"$($boxstarter.BaseDir)\boxstarter.VirtualMachine\startupScript.reg"&lt;/span&gt;&lt;br /&gt;    $startupRegFile = &lt;span style="color: #006080;"&gt;"$env:Temp\startupScript.reg"&lt;/span&gt;&lt;br /&gt;    $policyKey = &lt;span style="color: #006080;"&gt;"HKLM:\VHDSYS\Microsoft\Windows\CurrentVersion\Group Policy"&lt;/span&gt;&lt;br /&gt;    $scriptNum=0&lt;br /&gt;    $localGPONum=0&lt;br /&gt;    &lt;span style="color: #0000ff;"&gt;if&lt;/span&gt;(Test-Path &lt;span style="color: #006080;"&gt;"$policyKey\Scripts\Startup\0\0"&lt;/span&gt;){&lt;br /&gt;        $localGPO = Get-ChildItem &lt;span style="color: #006080;"&gt;"$policyKey\Scripts\Startup"&lt;/span&gt; | ? {&lt;br /&gt;            (GCI -path $_.PSPath -Name DisplayName).DisplayName -eq &lt;span style="color: #006080;"&gt;"Local Group Policy"&lt;/span&gt;&lt;br /&gt;        }&lt;br /&gt;        &lt;span style="color: #0000ff;"&gt;if&lt;/span&gt;($localGPO -ne $&lt;span style="color: #0000ff;"&gt;null&lt;/span&gt;) {&lt;br /&gt;            $localGPONum = $localGPO.PSChildName&lt;br /&gt;            $localGPO=$&lt;span style="color: #0000ff;"&gt;null&lt;/span&gt; #free the key &lt;span style="color: #0000ff;"&gt;for&lt;/span&gt; GC so it can be unloaded&lt;br /&gt;        }&lt;br /&gt;        &lt;span style="color: #0000ff;"&gt;else&lt;/span&gt;{&lt;br /&gt;            Shift-OtherGPOs &lt;span style="color: #006080;"&gt;"$policyKey\Scripts\Startup"&lt;/span&gt;&lt;br /&gt;            Shift-OtherGPOs &lt;span style="color: #006080;"&gt;"$policyKey\State\Machine\Scripts\Startup"&lt;/span&gt;&lt;br /&gt;        }&lt;br /&gt;        &lt;span style="color: #0000ff;"&gt;if&lt;/span&gt;(test-path &lt;span style="color: #006080;"&gt;"$policyKey\Scripts\Startup\$localGPONum"&lt;/span&gt;){&lt;br /&gt;            $scriptDirs = Get-ChildItem &lt;span style="color: #006080;"&gt;"$policyKey\Scripts\Startup\$localGPONum"&lt;/span&gt;&lt;br /&gt;            $existingScriptDir = $scriptDirs | ? { &lt;br /&gt;                (Get-ItemProperty -path $_.PSPath -Name Script).Script `&lt;br /&gt;                  -like &lt;span style="color: #006080;"&gt;"*\Boxstarter.Startup\startup.bat"&lt;/span&gt;&lt;br /&gt;            }&lt;br /&gt;            &lt;span style="color: #0000ff;"&gt;if&lt;/span&gt;($existingScriptDir -eq $&lt;span style="color: #0000ff;"&gt;null&lt;/span&gt;){&lt;br /&gt;                [&lt;span style="color: #0000ff;"&gt;int&lt;/span&gt;]$scriptNum = $scriptDirs[-1].PSChildName&lt;br /&gt;                $scriptNum += 1&lt;br /&gt;            }&lt;br /&gt;            &lt;span style="color: #0000ff;"&gt;else&lt;/span&gt; {&lt;br /&gt;                $scriptNum = $existingScriptDir.PSChildName&lt;br /&gt;                $existingScriptDir = $&lt;span style="color: #0000ff;"&gt;null&lt;/span&gt; #free the key &lt;span style="color: #0000ff;"&gt;for&lt;/span&gt; GC so it can be unloaded&lt;br /&gt;            }&lt;br /&gt;        }&lt;br /&gt;        $scriptDirs=$&lt;span style="color: #0000ff;"&gt;null&lt;/span&gt;&lt;br /&gt;    }&lt;br /&gt;    (Get-Content $regFileTemplate) | % {&lt;br /&gt;        $_ -Replace &lt;span style="color: #006080;"&gt;"\\0\\0"&lt;/span&gt;, &lt;span style="color: #006080;"&gt;"\$localGPONum\$scriptNum"&lt;/span&gt;&lt;br /&gt;    } | Set-Content $startupRegFile -force&lt;br /&gt;    &lt;span style="color: #0000ff;"&gt;return&lt;/span&gt; $startupRegFile&lt;br /&gt;}&lt;br /&gt;&lt;br /&gt;function Shift-OtherGPOs($parentPath){&lt;br /&gt;    Get-ChildItem $parentPath | Sort-Object -Descending | % {&lt;br /&gt;        [&lt;span style="color: #0000ff;"&gt;int&lt;/span&gt;]$num = $_.PSChildName&lt;br /&gt;        $oldName = $_.Name.Replace(&lt;span style="color: #006080;"&gt;"HKEY_LOCAL_MACHINE"&lt;/span&gt;,&lt;span style="color: #006080;"&gt;"HKLM:"&lt;/span&gt;)&lt;br /&gt;        [&lt;span style="color: #0000ff;"&gt;string&lt;/span&gt;]$newName = &lt;span style="color: #006080;"&gt;"$($num+1)"&lt;/span&gt;&lt;br /&gt;        &lt;span style="color: #0000ff;"&gt;try&lt;/span&gt; {Rename-Item -Path $oldName -NewName $newName} &lt;span style="color: #0000ff;"&gt;catch&lt;/span&gt; [System.InvalidCastException] {&lt;br /&gt;            #possible powershell bug when renaming reg keys that are numeric&lt;br /&gt;            #the key &lt;span style="color: #0000ff;"&gt;is&lt;/span&gt; copied but the old key remains&lt;br /&gt;            Remove-Item $oldName -Recurse -force&lt;br /&gt;        }&lt;br /&gt;    }&lt;br /&gt;}&lt;/pre&gt;
+&lt;/div&gt;
+&lt;div&gt;A couple things to note here. The script Group Policies appear to be mirrored at both:&lt;/div&gt;
+&lt;div&gt;
+&lt;ul&gt;
+&lt;li&gt;HKLM:\VHDSYS\Microsoft\Windows\CurrentVersion\Group Policy\State\Machine\Scripts\Startup&lt;/li&gt;
+&lt;li&gt;HKLM:\VHDSYS\Microsoft\Windows\CurrentVersion\Group Policy\Scripts\Startup &lt;br /&gt;I honestly do not know why or what the significance is of the different locations. These are just the keys I saw that were affected when I manually played with creating startup scripts inside GPEDIT.MSC.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;p&gt;The Script keys maintain the following subkey structure:&lt;/p&gt;
+&lt;p&gt;\Scripts\Startup\{policy node}\{script node}&lt;/p&gt;
+&lt;p&gt;The policy and script nodes are each simple integers starting at 0 and increment for each additional policy scope or script. So a machine with a Local policy containing 1 script and a domain policy containing 2 scripts would look like:&lt;/p&gt;
+&lt;p&gt;\Scripts\Startup\0\0 &amp;ndash; Local policy script&lt;/p&gt;
+&lt;p&gt;\Scripts\Startup\1\0 &amp;ndash; First domain Policy script&lt;/p&gt;
+&lt;p&gt;\Scripts\Startup\1\1 &amp;ndash; Second domain Policy script&lt;/p&gt;
+&lt;p&gt;From what I could tell in my experimentation, the Local Policy always occupied position 0.&lt;/p&gt;
+&lt;p&gt;Here are some surprising and unintuitive findings to be aware of:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;When you are done with the registry you will need to unload it just as we loaded it in order to free up the file. That is not surprising. What is surprising is that if you save any keys to a variable as you are navigating its values, you will need to dereference those variables. It was fun in VB6 and it is still fun today! To add icing to this cake, you also need to do the thing that you should really never do: call GC::Collect() before unloading. Yep, that&amp;rsquo;s right. Unless of coarse you like Access Exceptions.&lt;/li&gt;
+&lt;li&gt;There seems to be a bug in the powershell registry provider when renaming keys that have a numeric value. Doing so raises a invalid cast exception. It also goes ahead and creates the renamed key but it does not delete the old name. This is why I delete it inside of the catch block.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;The call to the above Get-RegFile function and the surrounding import code looks like:&lt;/p&gt;
+&lt;div&gt;
+&lt;pre id="codeSnippet" style="overflow: visible; font-size: 8pt; font-family: 'Courier New', courier, monospace; width: 100%; color: black; direction: ltr; text-align: left; margin: 0em; line-height: 12pt; background-color: #f4f4f4; border-style: none; padding: 0px;"&gt;reg load HKLM\VHDSYS &lt;span style="color: #006080;"&gt;"$($winVolume.DriveLetter):\windows\system32\config\software"&lt;/span&gt; | &lt;span style="color: #0000ff;"&gt;out&lt;/span&gt;-&lt;span style="color: #0000ff;"&gt;null&lt;/span&gt;&lt;br /&gt;$startupRegFile = Get-RegFile&lt;br /&gt;reg import $startupRegFile 2&amp;gt;&amp;amp;1 | &lt;span style="color: #0000ff;"&gt;out&lt;/span&gt;-&lt;span style="color: #0000ff;"&gt;null&lt;/span&gt;&lt;br /&gt;Remove-Item $startupRegFile -force&lt;/pre&gt;
+&lt;/div&gt;
+&lt;div&gt;We use the reg command to import the temp file with the altered template and then dispose of the temp file.&lt;/div&gt;
+&lt;div&gt;&amp;nbsp;&lt;/div&gt;
+&lt;h2&gt;The registry import template&lt;/h2&gt;
+&lt;p&gt;I found it easiest to create a .reg file containing all of the registry modifications instead of using the powershell registry provider to individually modify the tree. I simply needed to determine the correct policy and script nodes and then inject those into the template. Here is the template:&lt;/p&gt;
+&lt;div id="codeSnippetWrapper"&gt;
+&lt;pre id="codeSnippet" style="overflow: visible; font-size: 8pt; font-family: 'Courier New', courier, monospace; width: 100%; color: black; direction: ltr; text-align: left; margin: 0em; line-height: 12pt; background-color: #f4f4f4; border-style: none; padding: 0px;"&gt;Windows Registry Editor Version 5.00&lt;br /&gt;&lt;br /&gt;[HKEY_LOCAL_MACHINE\VHDSYS\Microsoft\Windows\CurrentVersion\Group Policy\State\Machine\Scripts]&lt;br /&gt;&lt;br /&gt;[HKEY_LOCAL_MACHINE\VHDSYS\Microsoft\Windows\CurrentVersion\Group Policy\State\Machine\Scripts\Shutdown]&lt;br /&gt;&lt;br /&gt;[HKEY_LOCAL_MACHINE\VHDSYS\Microsoft\Windows\CurrentVersion\Group Policy\State\Machine\Scripts\Startup]&lt;br /&gt;&lt;br /&gt;[HKEY_LOCAL_MACHINE\VHDSYS\Microsoft\Windows\CurrentVersion\Group Policy\State\Machine\Scripts\Startup\0]&lt;br /&gt;&lt;span style="color: #006080;"&gt;"GPO-ID"&lt;/span&gt;=&lt;span style="color: #006080;"&gt;"LocalGPO"&lt;/span&gt;&lt;br /&gt;&lt;span style="color: #006080;"&gt;"SOM-ID"&lt;/span&gt;=&lt;span style="color: #006080;"&gt;"Local"&lt;/span&gt;&lt;br /&gt;&lt;span style="color: #006080;"&gt;"FileSysPath"&lt;/span&gt;=&lt;span style="color: #006080;"&gt;"%SystemRoot%\\System32\\GroupPolicy\\Machine"&lt;/span&gt;&lt;br /&gt;&lt;span style="color: #006080;"&gt;"DisplayName"&lt;/span&gt;=&lt;span style="color: #006080;"&gt;"Local Group Policy"&lt;/span&gt;&lt;br /&gt;&lt;span style="color: #006080;"&gt;"GPOName"&lt;/span&gt;=&lt;span style="color: #006080;"&gt;"Local Group Policy"&lt;/span&gt;&lt;br /&gt;&lt;span style="color: #006080;"&gt;"PSScriptOrder"&lt;/span&gt;=dword:00000001&lt;br /&gt;&lt;br /&gt;[HKEY_LOCAL_MACHINE\VHDSYS\Microsoft\Windows\CurrentVersion\Group Policy\State\Machine\Scripts\Startup\0\0]&lt;br /&gt;&lt;span style="color: #006080;"&gt;"Script"&lt;/span&gt;=&lt;span style="color: #006080;"&gt;"%SystemDrive%\\Boxstarter.Startup\\startup.bat"&lt;/span&gt;&lt;br /&gt;&lt;span style="color: #006080;"&gt;"Parameters"&lt;/span&gt;=&lt;span style="color: #006080;"&gt;""&lt;/span&gt;&lt;br /&gt;&lt;span style="color: #006080;"&gt;"ExecTime"&lt;/span&gt;=hex(b):00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00&lt;br /&gt;&lt;br /&gt;[HKEY_LOCAL_MACHINE\VHDSYS\Microsoft\Windows\CurrentVersion\Group Policy\Scripts]&lt;br /&gt;&lt;br /&gt;[HKEY_LOCAL_MACHINE\VHDSYS\Microsoft\Windows\CurrentVersion\Group Policy\Scripts\Shutdown]&lt;br /&gt;&lt;br /&gt;[HKEY_LOCAL_MACHINE\VHDSYS\Microsoft\Windows\CurrentVersion\Group Policy\Scripts\Startup]&lt;br /&gt;&lt;br /&gt;[HKEY_LOCAL_MACHINE\VHDSYS\Microsoft\Windows\CurrentVersion\Group Policy\Scripts\Startup\0]&lt;br /&gt;&lt;span style="color: #006080;"&gt;"GPO-ID"&lt;/span&gt;=&lt;span style="color: #006080;"&gt;"LocalGPO"&lt;/span&gt;&lt;br /&gt;&lt;span style="color: #006080;"&gt;"SOM-ID"&lt;/span&gt;=&lt;span style="color: #006080;"&gt;"Local"&lt;/span&gt;&lt;br /&gt;&lt;span style="color: #006080;"&gt;"FileSysPath"&lt;/span&gt;=&lt;span style="color: #006080;"&gt;"%SystemRoot%\\System32\\GroupPolicy\\Machine"&lt;/span&gt;&lt;br /&gt;&lt;span style="color: #006080;"&gt;"DisplayName"&lt;/span&gt;=&lt;span style="color: #006080;"&gt;"Local Group Policy"&lt;/span&gt;&lt;br /&gt;&lt;span style="color: #006080;"&gt;"GPOName"&lt;/span&gt;=&lt;span style="color: #006080;"&gt;"Local Group Policy"&lt;/span&gt;&lt;br /&gt;&lt;span style="color: #006080;"&gt;"PSScriptOrder"&lt;/span&gt;=dword:00000001&lt;br /&gt;&lt;br /&gt;[HKEY_LOCAL_MACHINE\VHDSYS\Microsoft\Windows\CurrentVersion\Group Policy\Scripts\Startup\0\0]&lt;br /&gt;&lt;span style="color: #006080;"&gt;"Script"&lt;/span&gt;=&lt;span style="color: #006080;"&gt;"%SystemDrive%\\Boxstarter.Startup\\startup.bat"&lt;/span&gt;&lt;br /&gt;&lt;span style="color: #006080;"&gt;"Parameters"&lt;/span&gt;=&lt;span style="color: #006080;"&gt;""&lt;/span&gt;&lt;br /&gt;&lt;span style="color: #006080;"&gt;"IsPowershell"&lt;/span&gt;=dword:00000000&lt;br /&gt;&lt;span style="color: #006080;"&gt;"ExecTime"&lt;/span&gt;=hex(b):00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00&lt;br /&gt;&lt;br /&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;h2&gt;Cleaning up&lt;/h2&gt;
+&lt;p&gt;Finally, we unload the registry hive and dismount the VHD:&lt;/p&gt;
+&lt;div id="codeSnippetWrapper"&gt;
+&lt;pre id="codeSnippet" style="overflow: visible; font-size: 8pt; font-family: 'Courier New', courier, monospace; width: 100%; color: black; direction: ltr; text-align: left; margin: 0em; line-height: 12pt; background-color: #f4f4f4; border-style: none; padding: 0px;"&gt;}&lt;br /&gt;&lt;span style="color: #0000ff;"&gt;finally&lt;/span&gt;{&lt;br /&gt;    [GC]::Collect()&lt;br /&gt;    reg unload HKLM\VHDSYS 2&amp;gt;&amp;amp;1 | &lt;span style="color: #0000ff;"&gt;out&lt;/span&gt;-&lt;span style="color: #0000ff;"&gt;null&lt;/span&gt;&lt;br /&gt;    Dismount-VHD $VHDPath&lt;br /&gt;}&lt;/pre&gt;
+&lt;/div&gt;
+&lt;p&gt;Again as noted before, we have the unattractive GC Collect. If anyone discovers a way to avoid this please comment but I was not able to find any other way around this. Failing to call Collect results in an Access Exception when unloading the registry. This is only the case if you have used the powershell registry provider to navigate the loaded hive. Also as noted before, if you have referenced any keys in a variable, you must deallocate those variables before the call to GC::Collect().&lt;/p&gt;
+&lt;h2&gt;Reboot a VM attached to the VHD and see the script run&lt;/h2&gt;
+&lt;p&gt;That&amp;rsquo;s it. Now you can reboot a VM attached to this VHD and its script will execute under the local machine account&amp;rsquo;s credentials with administrative privileges. Since the VHD format is supported by almost all of the major Virtualization vendors, you should be able to leverage this script on most virtualization platforms.&lt;/p&gt;
+&lt;h2&gt;Next: Enable Powershell Remoting&lt;/h2&gt;
+&lt;p&gt;The next post will explore how to use this script to enable powershell remoting on a VM guest. It is not enough to simply have the script enable remoting since remoting must be enabled by a user account. I&amp;rsquo;ll show you the approach I found that works to set that up.&lt;/p&gt;</content>
+  <ispublished>True</ispublished>
+  <isdeleted>False</isdeleted>
+  <iscommentsenabled>True</iscommentsenabled>
+  <pubDate>2013-09-06 02:37:00</pubDate>
+  <lastModified>2013-11-30 22:59:41</lastModified>
+  <raters>0</raters>
+  <rating>0</rating>
+  <slug>Windows-VM-Provisioning-Part-1-Inject-a-startup-on-boot-script-into-a-VHD</slug>
+  <tags />
+  <comments>
+    <comment id="10816f14-7138-433e-9883-4cfa828a5a4d" parentid="00000000-0000-0000-0000-000000000000" approved="True" spam="False" deleted="False">
+      <date>2013-09-12 02:55:43</date>
+      <author>Matt Wrock's Blog</author>
+      <email>trackback</email>
+      <country />
+      <ip>96.31.33.25</ip>
+      <website>http://www.mattwrock.com/post/2013/09/12/.aspx</website>
+      <content>Copy Files From Local Computer to an Azure VM
+
+Copy Files From Local Computer to an Azure VM</content>
+    </comment>
+    <comment id="974bead7-75f6-4b6b-a9b2-ea7750023784" parentid="00000000-0000-0000-0000-000000000000" approved="True" spam="False" deleted="False">
+      <date>2013-09-12 03:19:50</date>
+      <author>Matt Wrock's Blog</author>
+      <email>trackback</email>
+      <country />
+      <ip>131.107.192.79</ip>
+      <website>http://feedproxy.google.com/~r/Wrockblog/~3/V8QMsL6KLGw/post.aspx</website>
+      <content>Copy Files From Local Computer to an Azure VM
+
+I’m currently ironing out my strategy of how my Boxstarter Virtualization module will provision VM’s</content>
+    </comment>
+    <comment id="681f3ca3-f8aa-4a29-8ee6-bcdac0e41d28" parentid="00000000-0000-0000-0000-000000000000" approved="True" spam="False" deleted="False">
+      <date>2014-08-19 01:21:57</date>
+      <author>mattwp.azurewebsites.net</author>
+      <email>pingback</email>
+      <country />
+      <ip>168.62.22.219</ip>
+      <website>http://mattwp.azurewebsites.net/?p=1551</website>
+      <content>Pingback from mattwp.azurewebsites.net
+
+Copy Files From Local Computer to an Azure VM | mattwrock</content>
+    </comment>
+  </comments>
+  <categories>
+    <category>219109f8-7b0b-459b-8f25-9ce747eb0851</category>
+  </categories>
+  <notifications />
+</post>

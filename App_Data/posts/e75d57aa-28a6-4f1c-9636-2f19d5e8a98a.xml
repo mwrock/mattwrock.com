@@ -1,0 +1,176 @@
+﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<post>
+  <author>mwrock</author>
+  <title>Easily Script Machine Reinstalls with Boxstarter</title>
+  <description />
+  <content>&lt;p&gt;&lt;a href="http://www.mattwrock.com/image.axd?picture=boxLogo_1.png"&gt;&lt;img style="background-image: none; padding-top: 0px; padding-left: 0px; margin: 0px 10px 0px 0px; display: inline; padding-right: 0px; border: 0px;" title="boxLogo" src="http://www.mattwrock.com/image.axd?picture=boxLogo_thumb_1.png" alt="boxLogo" width="240" height="194" border="0" /&gt;&lt;/a&gt;Almost a year ago now I started this small project, &lt;a href="http://www.boxstarter.org/"&gt;Boxstarter&lt;/a&gt;.&amp;nbsp; The project has sustained many interruptions as I have had busy spurts at work and involvements with other projects. It has gone through some serious refactorings moving from a scrappy script to a larger codebase organized into a few PowerShell modules and a suite of unit tests. A lot of its original code I moved over to &lt;a href="https://github.com/chocolatey/chocolatey"&gt;Chocolatey&lt;/a&gt; and I plan to continue to contribute to Chocolatey where it makes sense. &lt;a href="http://chocolatey.org/"&gt;Chocolatey&lt;/a&gt; Rocks! So overall, I have probably rewritten this thing twice and now I feel it is far from finished but represents a nice base that makes &amp;ldquo;Box Starting&amp;rdquo; a much simpler and repeatable process.&lt;/p&gt;
+&lt;h1&gt;Repaving Sucks&lt;/h1&gt;
+&lt;p&gt;I think that pretty much says it. The idea of creating Boxstarter came to me when I had a SSD die and had to do a dreaded repaving of my machine shortly followed by installing several Windows 8 revisions from Consumer Preview to RTM. At the time, I was in the middle of a project where I was using powershell to automate a 50 page deployment document. So I knew if I can automate installing AppFabric, network shares, multiple web apps and other infrastructure settings, surely I can script the build of my own PC.&lt;/p&gt;
+&lt;h1&gt;Then I found Chocolatey&lt;/h1&gt;
+&lt;p&gt;So as I was looking in to how I could setup a fully functioning dev environment on one box to be just as&amp;nbsp; I left it on another, I inevitably discovered Chocolatey. Chocolatey is built on top of &lt;a href="http://nuget.org/"&gt;Nuget&lt;/a&gt; but instead of maintaining library packages for you dev project, it manages machine wide software package installations. This is good for several reasons:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Its plain simple to install apps that can be tedious to install on your own. Instead of hunting around the internet for the download page, forgetting to uncheck the animae tool bar download and waiting three minutes to click the next button, just type &lt;em&gt;&lt;a href="https://github.com/chocolatey/chocolatey/wiki/CommandsInstall"&gt;CINST&lt;/a&gt; &amp;lt;your app&amp;gt; &lt;/em&gt;and be done with it. Next time its time for a mega Visual Studio install session, save yourself and use &lt;em&gt;CINST VisualStudioExpress2012Web.&lt;/em&gt;&lt;/li&gt;
+&lt;li&gt;Now lets say you have a bunch of apps you installed with Chocolatey and want to just update everything. Simply type &lt;em&gt;&lt;a href="https://github.com/chocolatey/chocolatey/wiki/CommandsUpdate"&gt;CUP ALL&lt;/a&gt;&lt;/em&gt;.&lt;/li&gt;
+&lt;li&gt;The very best thing of all: create a &amp;ldquo;meta-package&amp;rdquo; or package.config and now you can install all of your apps in one go. Chocolatey just iterates the list and installs everything one by one along with all of their dependencies.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;If you have not heard of or have not used Chocolatey, do yourself a favor and install it now.&lt;/p&gt;
+&lt;h1&gt;What is Boxstarter? Chocolatey Tailored Specifically for Fresh Machine Installs&lt;/h1&gt;
+&lt;p&gt;Chocolatey is awesome, but having done a TON of experimentation with automating new machine setups of all sorts of flavors, OSs and complexity, I have learned that setting up an environment can be much more than simply running a chain of installers.&lt;/p&gt;
+&lt;p&gt;Let me quickly list the benefits of Boxstarter and then I&amp;rsquo;ll dive into a few highlights:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Ensures the entire install session runs as administrator. This avoids occasional prompts to elevate your shell and limits it to just one at the beginning assuming you are not already running as admin.&lt;/li&gt;
+&lt;li&gt;Shuts down the Windows Update Service and Configuration Manager if installed during the install session. These can often interfere with installations causing installs to fail because either an update is blocking the install you are trying to run or they install patches that require a reboot before other software can be installed.&lt;/li&gt;
+&lt;li&gt;Can discover if there is a pending reboot and will reboot the machine and restart the install if asked to reboot. If written correctly, the install will pretty much start from where it left off. Further, Boxstarter can automatically log you in so you don&amp;rsquo;t have to stick around.&lt;/li&gt;
+&lt;li&gt;Boxstarter handles the initial installation of Chocolatey and if you are on a fresh win7 or server 2008R2, it will install .net 4.0 first which is a Chocolatey prerequisite.&lt;/li&gt;
+&lt;li&gt;Provides a bunch of helper functions for tweaking various windows settings.&lt;/li&gt;
+&lt;li&gt;Automates installation of critical windows updates.&lt;/li&gt;
+&lt;li&gt;Makes it easy to setup a local Boxstarter repo on your network so any connected machine can kickoff a install with one command.&lt;/li&gt;
+&lt;li&gt;Provides helper functions making it easy to &lt;a href="http://boxstarter.codeplex.com/wikipage?title=New-BoxstarterPackage&amp;amp;referringTitle=Documentation"&gt;create your own Boxstarter package&lt;/a&gt;.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h1&gt;The Boxstarter Killer Feature: Handling Reboots&lt;/h1&gt;
+&lt;p&gt;I used to spend hours tweaking my install scripts, playing with ordering and various tricks to avoid having to reboot. There finally came a point when I realized this was pointless. Win8/Server2012 are a lot more reboot resistant but are still prone to them. Things get worse here when you are installing patches and more complicated apps like Visual Studio an/or SQL Server. I have realized that Reboots happen and can be unpredictable so the only thing to do is be able to deal with them.&lt;/p&gt;
+&lt;p&gt;The challenges are making sure the install scripts picks up right after restart, ensuring that the script does not spark a UAC prompt and block the setup, have it securely store your credentials so that it automatically logs back on after reboot but turns off auto logins after the script completes.&lt;/p&gt;
+&lt;p&gt;Boxstarter does all of these things. As a Boxstarter package author, you simply need to compose your packages to be repeatable. This means you should be able to run it again and again without error or data loss and ideally it should skip any setup processes that have already been run.&lt;/p&gt;
+&lt;h1&gt;What is a Boxstarter Package?&lt;/h1&gt;
+&lt;p&gt;Its just a Chocolatey package, but its intent is usually to either install a fresh environment or to lay down a complicated install chain that is highly prone to needing one or even several reboots. You can store them locally, on Chocolatey or on &lt;a href="http://boxstarter.codeplex.com/wikipage?title=New-BoxstarterPackage&amp;amp;referringTitle=Documentation"&gt;Myget&lt;/a&gt; or anywhere else you configure Boxstarter to look.&lt;/p&gt;
+&lt;h1&gt;Show me the Code&lt;/h1&gt;
+&lt;p&gt;First. Install Boxstarter.&amp;nbsp; The easiest way to do this is to install &lt;a href="http://chocolatey.org/packages/boxstarter.chocolatey"&gt;Boxstarter.Chocolatey&lt;/a&gt; from Chocolatey or download the zip from the &lt;a href="http://boxstarter.codeplex.com/releases/view/103296"&gt;CodePlex&lt;/a&gt; site and run the setup.bat. This installs all dependent modules and puts them in your user module path.&lt;/p&gt;
+&lt;p&gt;Next create a package, build it and deploy your repository to b consumed from anywhere in your network or even a thumb drive. Like this:&lt;/p&gt;
+&lt;pre class="csharpcode"&gt;&lt;span class="rem"&gt;#After extracting Boxstarter.1.0.0.zip on MYCOMPUTER&lt;/span&gt;
+.\setup.bat
+Import-Module $env:appdata\boxstarter\Boxstarter.Chocolatey\Boxstarter.Chocolatey.psd1
+&lt;span class="rem"&gt;#Create minimal nuspec and chocolateyInstall&lt;/span&gt;
+New-BoxstarterPackage MyPackage
+&lt;span class="rem"&gt;#Edit Install script to customize your environment&lt;/span&gt;
+Notepad Join-Path $Boxstarter.LocalRepo &lt;span class="str"&gt;"tools\ChocolateyInstall.ps1"&lt;/span&gt;
+&lt;span class="rem"&gt;#Pack nupkg&lt;/span&gt;
+Invoke-BoxstarterBuild MyPackage
+
+&lt;span class="rem"&gt;#share Repo&lt;/span&gt;
+Set-BoxstarterShare
+&lt;span class="rem"&gt;#Or Copy to thumb drive G&lt;/span&gt;
+Copy-Item $Boxstarter.BaseDir G:\ -Recurse
+
+&lt;span class="rem"&gt;#Logon to your bare Windows install&lt;/span&gt;
+\\MYCOMPUTER\Boxstarter\Boxstarter Mypackage
+
+#Enter password when prompted and come back later to find all your apps installed&lt;/pre&gt;
+&lt;p&gt;&amp;nbsp;&lt;/p&gt;
+&lt;h2&gt;Now lets look at what an install package might look like&lt;/h2&gt;
+&lt;pre class="csharpcode"&gt;Install-WindowsUpdate -AcceptEula
+Update-ExecutionPolicy Unrestricted
+Move-LibraryDirectory &lt;span class="str"&gt;"Personal"&lt;/span&gt; &lt;span class="str"&gt;"$env:UserProfile\skydrive\documents"&lt;/span&gt;
+Set-ExplorerOptions -showHidenFilesFoldersDrives -showProtectedOSFiles -showFileExtensions
+Set-TaskbarSmall
+Enable-RemoteDesktop
+
+cinstm VisualStudioExpress2012Web
+cinstm fiddler
+cinstm mssqlserver2012express
+cinstm git-credential-winstore
+cinstm console-devel
+cinstm skydrive
+cinstm poshgit
+cinstm windbg
+
+cinst Microsoft-Hyper-V-All -source windowsFeatures
+cinst IIS-WebServerRole -source windowsfeatures
+cinst IIS-HttpCompressionDynamic -source windowsfeatures
+cinst IIS-ManagementScriptingTools -source windowsfeatures
+cinst IIS-WindowsAuthentication -source windowsfeatures
+cinst TelnetClient -source windowsFeatures
+
+Install-ChocolateyPinnedTaskBarItem &lt;span class="str"&gt;"$env:windir\system32\mstsc.exe"&lt;/span&gt;
+Install-ChocolateyPinnedTaskBarItem &lt;span class="str"&gt;"$env:programfiles\console\console.exe"&lt;/span&gt;
+
+copy-item (Join-Path (Get-PackageRoot($MyInvocation)) &lt;span class="str"&gt;'console.xml'&lt;/span&gt;) -Force $env:appdata\console\console.xml
+
+Install-ChocolateyVsixPackage xunit http://visualstudiogallery.msdn.microsoft.com/463c5987-f82b-46c8-a97e-b1cde42b9099/file/66837/1/xunit.runner.visualstudio.vsix
+Install-ChocolateyVsixPackage autowrocktestable &lt;a href="http://visualstudiogallery.msdn.microsoft.com/ea3a37c9-1c76-4628-803e-b10a109e7943/file/73131/1/AutoWrockTestable.vsix"&gt;http://visualstudiogallery.msdn.microsoft.com/ea3a37c9-1c76-4628-803e-b10a109e7943/file/73131/1/AutoWrockTestable.vsix&lt;/a&gt;&lt;/pre&gt;
+&lt;p&gt;&amp;nbsp;&lt;/p&gt;
+&lt;h2&gt;Whats going on here?&lt;/h2&gt;
+&lt;p&gt;Boxstarter installs critical updates, sets your powershell execution policy to unrestricted, makes windows explorer usable, installs some great apps, installs some of your favorite windows features, moves your Documents library to skydrive (I love this for the truly portable desktop), installs your favorite VS extensions and sets up things like pinned items and task bar size preference.&lt;/p&gt;
+&lt;p&gt;A lot of this functionality comes to you compliments of Chocolatey and others are specific to Boxstarter.&lt;/p&gt;
+&lt;h1&gt;What&amp;rsquo;s Next?&lt;/h1&gt;
+&lt;p&gt;As I see it, this is just the absolute base functionality so far. There is so much more to be added to make an installation process truly seamless. Here are some features I plan to begin soon:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Create a Boxstarter package automatically based on software already installed and windows features turned on to mimic these on another machine.&lt;/li&gt;
+&lt;li&gt;While Boxstarter can be installed and run either on bare metal or a VM, I want to make Boxstarter the powershell/hyper-v equivalent of &lt;a href="http://www.vagrantup.com/"&gt;Vagrant&lt;/a&gt;. Making the deployment of scripted VMs simple.&lt;/li&gt;
+&lt;li&gt;Add a one-click installer making a an easy one liner install command possible remotely.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;There is a lot of Boxstarter functionality I have not covered here. I plan to blog fairly regularly providing brief posts describing various ways Boxstarter can augment your automation. If you want to learn more now. Checkout the &lt;a href="http://boxstarter.codeplex.com/"&gt;Boxstarter Codeplex&lt;/a&gt; site which has complete &lt;a href="http://boxstarter.codeplex.com/documentation"&gt;documentation&lt;/a&gt; of all features and commands.&lt;/p&gt;</content>
+  <ispublished>True</ispublished>
+  <isdeleted>False</isdeleted>
+  <iscommentsenabled>True</iscommentsenabled>
+  <pubDate>2013-03-27 23:56:00</pubDate>
+  <lastModified>2013-11-30 23:00:30</lastModified>
+  <raters>0</raters>
+  <rating>0</rating>
+  <slug>Easily-Script-Machine-Reinstalls-with-Boxstarter</slug>
+  <tags />
+  <comments>
+    <comment id="4fe1fd00-d790-46ae-81f1-ae79d9f6048f" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="False">
+      <date>2013-07-15 20:49:27</date>
+      <author>fresh vending</author>
+      <email>porfiriobaxley@yahoo.de</email>
+      <country />
+      <ip>108.27.246.123</ip>
+      <moderatedby>App_Code.Extensions.StopForumSpam</moderatedby>
+      <avatar />
+      <content>Very nice article. I certainly appreciate this site. Stick with it!
+
+Also visit my homepage:  fresh vending - http://www.whitepages.com/business/details?uid=AJ-J62a </content>
+    </comment>
+    <comment id="2a76bb74-c237-48c7-ac17-77ddca3f9bfb" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="False">
+      <date>2013-07-15 20:51:04</date>
+      <author>hornymatches</author>
+      <email>dewittboone@gmail.com</email>
+      <country />
+      <ip>188.165.49.101</ip>
+      <moderatedby>App_Code.Extensions.StopForumSpam</moderatedby>
+      <avatar />
+      <content>We are a group of volunteers and starting a new scheme in our community. Your site offered us with valuable information to work on. You&amp;#39;ve done a formidable job and our entire community will be grateful to you.
+
+Feel free to visit my blog -  hornymatches - http://mediawiki.unicorninternetservice.com/index.php/The_Dynamics_Of_Internet_Dating </content>
+    </comment>
+    <comment id="8dcebf64-1404-4ca4-b858-4d996717778e" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="False">
+      <date>2013-07-15 20:54:22</date>
+      <author>quick payday loans from mrpersonalloans</author>
+      <email>lashondaanglin@gmail.com</email>
+      <country />
+      <ip>87.117.229.110</ip>
+      <moderatedby>App_Code.Extensions.StopForumSpam</moderatedby>
+      <avatar />
+      <content>you&amp;#39;re actually a good webmaster. The web site loading velocity is amazing. It sort of feels that you are doing any unique trick. Also, The contents are masterwork. you have performed a fantastic task in this matter!
+
+Here is my blog post ::  quick payday loans from mrpersonalloans - http://www.mrpersonalloans.co.uk </content>
+    </comment>
+    <comment id="04bb75d0-f7be-49fe-91f4-54ea5127001d" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="False" deleted="False">
+      <date>2013-07-15 21:18:36</date>
+      <author>10 most beautiful places in the world to visit</author>
+      <email>dallasmcginnis@gmail.com</email>
+      <country />
+      <ip>46.105.255.150</ip>
+      <avatar />
+      <content>Very energetic article, I enjoyed that bit. Will there be a part 2?
+
+Feel free to surf to my blog post ...  10 most beautiful places in the world to visit - http://kompresoryklimatyzacji.momaroo.com </content>
+    </comment>
+    <comment id="1af062b7-caf4-49fc-b335-7263e42d4b29" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="False">
+      <date>2013-07-15 21:50:35</date>
+      <author>dating on line</author>
+      <email>alexanderlandis@ownmail.net</email>
+      <country />
+      <ip>188.165.49.101</ip>
+      <moderatedby>Rule:black list</moderatedby>
+      <avatar />
+      <content>Wonderful work! This is the type of info that should be shared around the internet. Shame on Google for not positioning this post higher! Come on over and visit my website . Thanks =)
+
+Feel free to surf to my web-site:  dating on line - http://ce.haw-aw.de/wiki/index.php?title=Benutzer:LeiaSchum </content>
+    </comment>
+  </comments>
+  <categories>
+    <category>219109f8-7b0b-459b-8f25-9ce747eb0851</category>
+  </categories>
+  <notifications />
+</post>

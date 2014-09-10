@@ -5,6 +5,7 @@
     using System.Web.UI.WebControls;
     using System.Linq;
     using BlogEngine.Core;
+    using Resources;
 
     using Page = System.Web.UI.Page;
     using System.Web.UI.HtmlControls;
@@ -23,6 +24,10 @@
         /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.</param>
         protected void Page_Load(object sender, EventArgs e)
         {
+            if (BlogSettings.Instance.CreateBlogOnSelfRegistration && Blog.CurrentInstance.IsPrimary)
+            {
+                Response.Redirect("create-blog.aspx");
+            }
             HtmlAnchor HeadLoginStatus = RegisterUser.CreateUserStep.ContentTemplateContainer.FindControl("HeadLoginStatus") as HtmlAnchor;
             if (HeadLoginStatus != null)
             {
@@ -56,6 +61,8 @@
                 }
             }
 
+            Security.AuthenticateUser(this.RegisterUser.UserName, this.RegisterUser.Password, false);
+
             FormsAuthentication.SetAuthCookie(this.RegisterUser.UserName, false /* createPersistentCookie */);
 
             var continueUrl = this.RegisterUser.ContinueDestinationPageUrl;
@@ -77,15 +84,16 @@
             if (Membership.GetUser(this.RegisterUser.UserName) != null)
             {
                 e.Cancel = true;
-                this.Master.SetStatus("warning", "Please select another user name.");
+                this.Master.SetStatus("warning", Resources.labels.anotherUserName);
             }
             else if (Membership.GetUserNameByEmail(this.RegisterUser.Email) != null)
             {
                 e.Cancel = true;
-                this.Master.SetStatus("warning", "Please select another email address.");
+                this.Master.SetStatus("warning", Resources.labels.anotherEmail);
             }
         }
 
         #endregion
+
     }
 }

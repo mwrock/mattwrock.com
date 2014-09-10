@@ -1,0 +1,93 @@
+﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<post>
+  <author>mwrock</author>
+  <title>Released RequestReduce 1.5 Supporting Custom Minifiers and a Critical Performance Fix for v1.4</title>
+  <description />
+  <content>&lt;p&gt;I just released &lt;a href="http://RequestReduce.com"&gt;RequestReduce&lt;/a&gt; v1.5 on Nuget and on &lt;a href="http://www.RequestReduce.com"&gt;http://www.&lt;/a&gt;&lt;a href="http://RequestReduce.com"&gt;RequestReduce&lt;/a&gt;.com.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;If you are currently on v1.4, you will definitely want to upgrade to this new version. There was a misconfiguration in v1.4 causing a Regex to recompile on every call. The impact will vary depending on the number of scripts and css links on your site but is could well be in the 100s of milliseconds.&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;Enough about that. The key feature that v1.5 adds is a small API allowing you to do the following:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Log &lt;a href="http://RequestReduce.com"&gt;RequestReduce&lt;/a&gt; exceptions thrown from its processing thread to your own error logging implementation including very simple support for Elmah logging.&lt;/li&gt;
+&lt;li&gt;Plug in a custom minifier to replace the &lt;a href="http://RequestReduce.com"&gt;RequestReduce&lt;/a&gt; defaulr Microsoft Ajax Minifier. You can also use this if you want to override the settings that &lt;a href="http://RequestReduce.com"&gt;RequestReduce&lt;/a&gt; uses.&lt;/li&gt;
+&lt;li&gt;Filter out certain CSS, Javascript or Image resources from being processed by &lt;a href="http://RequestReduce.com"&gt;RequestReduce&lt;/a&gt; including entire pages or areas of your site from being processed. The API allows you to evaluate any property in the HttpRequest to decide if a resource should be filtered.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Here are the details on how to use the API:&lt;/p&gt;
+&lt;h2&gt;Logging RequestReduce Errors&lt;/h2&gt;
+&lt;p&gt;Especially if you already have a error logging mechanism, it is advisable that you log any errors encountered by the RequestReduce reduction processing. This will aid in bug reporting and generalk troubleshooting. To do this, you simply need to provide an Action delegate that will take charge of logging the passed Exception. Here is an example of how to use this if you use Elmah for error logging:&lt;/p&gt;
+&lt;div id="codeSnippetWrapper"&gt;
+&lt;pre id="codeSnippet" style="text-align: left; line-height: 12pt; background-color: #f4f4f4; margin: 0em; width: 100%; font-family: 'Courier New', courier, monospace; direction: ltr; color: black; font-size: 8pt; overflow: visible; border-style: none; padding: 0px;"&gt;RequestReduce.Api.Registry.CaptureError(x =&amp;gt; ErrorLog.GetDefault(&lt;span style="color: #0000ff;"&gt;null&lt;/span&gt;).Log(&lt;span style="color: #0000ff;"&gt;new&lt;/span&gt; Error(x)));&lt;/pre&gt;
+&lt;/div&gt;
+&lt;h2&gt;&amp;nbsp;&lt;/h2&gt;
+&lt;h2&gt;Injecting your own CSS or Javascript Minifier&lt;/h2&gt;
+&lt;p&gt;RequestReduce attempts to follow a decoupled architecture which allows developers to swap out certain parts with their own behavior. To override RequestReduce's use of the Micosoft Ajax minifier library, you simply create a class that derrives from IMinifier. There is not much to IMinifier:&lt;/p&gt;
+&lt;div id="codeSnippetWrapper"&gt;
+&lt;pre id="codeSnippet" style="text-align: left; line-height: 12pt; background-color: #f4f4f4; margin: 0em; width: 100%; font-family: 'Courier New', courier, monospace; direction: ltr; color: black; font-size: 8pt; overflow: visible; border-style: none; padding: 0px;"&gt;&lt;span style="color: #0000ff;"&gt;public&lt;/span&gt; &lt;span style="color: #0000ff;"&gt;interface&lt;/span&gt; IMinifier&lt;br /&gt;{&lt;br /&gt;    &lt;span style="color: #0000ff;"&gt;string&lt;/span&gt; Minify&amp;lt;T&amp;gt;(&lt;span style="color: #0000ff;"&gt;string&lt;/span&gt; unMinifiedContent) &lt;span style="color: #0000ff;"&gt;where&lt;/span&gt; T : IResourceType;&lt;br /&gt;}&lt;/pre&gt;
+&lt;/div&gt;
+&lt;p&gt;Here Is RequestReduce's implementation:&lt;/p&gt;
+&lt;div id="codeSnippetWrapper"&gt;
+&lt;pre id="codeSnippet" style="text-align: left; line-height: 12pt; background-color: #f4f4f4; margin: 0em; width: 100%; font-family: 'Courier New', courier, monospace; direction: ltr; color: black; font-size: 8pt; overflow: visible; border-style: none; padding: 0px;"&gt;&lt;span style="color: #0000ff;"&gt;public&lt;/span&gt; &lt;span style="color: #0000ff;"&gt;class&lt;/span&gt; Minifier : IMinifier&lt;br /&gt;{&lt;br /&gt;    &lt;span style="color: #0000ff;"&gt;private&lt;/span&gt; &lt;span style="color: #0000ff;"&gt;readonly&lt;/span&gt; Microsoft.Ajax.Utilities.Minifier minifier = &lt;span style="color: #0000ff;"&gt;new&lt;/span&gt; Microsoft.Ajax.Utilities.Minifier();&lt;br /&gt;    &lt;span style="color: #0000ff;"&gt;private&lt;/span&gt; &lt;span style="color: #0000ff;"&gt;readonly&lt;/span&gt; CodeSettings settings = &lt;span style="color: #0000ff;"&gt;new&lt;/span&gt; CodeSettings {EvalTreatment = EvalTreatment.MakeAllSafe};&lt;br /&gt;&lt;br /&gt;    &lt;span style="color: #0000ff;"&gt;public&lt;/span&gt; &lt;span style="color: #0000ff;"&gt;string&lt;/span&gt; Minify&amp;lt;T&amp;gt;(&lt;span style="color: #0000ff;"&gt;string&lt;/span&gt; unMinifiedContent) &lt;span style="color: #0000ff;"&gt;where&lt;/span&gt; T : IResourceType&lt;br /&gt;    {&lt;br /&gt;        &lt;span style="color: #0000ff;"&gt;if&lt;/span&gt; (&lt;span style="color: #0000ff;"&gt;typeof&lt;/span&gt;(T) == &lt;span style="color: #0000ff;"&gt;typeof&lt;/span&gt;(CssResource))&lt;br /&gt;            &lt;span style="color: #0000ff;"&gt;return&lt;/span&gt; minifier.MinifyStyleSheet(unMinifiedContent);&lt;br /&gt;        &lt;span style="color: #0000ff;"&gt;if&lt;/span&gt; (&lt;span style="color: #0000ff;"&gt;typeof&lt;/span&gt;(T) == &lt;span style="color: #0000ff;"&gt;typeof&lt;/span&gt;(JavaScriptResource))&lt;br /&gt;            &lt;span style="color: #0000ff;"&gt;return&lt;/span&gt; minifier.MinifyJavaScript(unMinifiedContent, settings);&lt;br /&gt;&lt;br /&gt;        &lt;span style="color: #0000ff;"&gt;throw&lt;/span&gt; &lt;span style="color: #0000ff;"&gt;new&lt;/span&gt; ArgumentException(&lt;span style="color: #006080;"&gt;"Cannot Minify Resources of unknown type"&lt;/span&gt;, &lt;span style="color: #006080;"&gt;"unMinifiedContent"&lt;/span&gt;);&lt;br /&gt;    }&lt;br /&gt;}&lt;/pre&gt;
+&lt;/div&gt;
+&lt;p&gt;It's not difficult to imagine how you would change this implementation to use something like the YUI Compressor for.Net. Lets say you had a YuiMinifier class that you want RequestReduce to use instead of its own minifier. It might look something like this:&lt;/p&gt;
+&lt;div id="codeSnippetWrapper"&gt;
+&lt;pre id="codeSnippet" style="text-align: left; line-height: 12pt; background-color: #f4f4f4; margin: 0em; width: 100%; font-family: 'Courier New', courier, monospace; direction: ltr; color: black; font-size: 8pt; overflow: visible; border-style: none; padding: 0px;"&gt;&lt;span style="color: #0000ff;"&gt;public&lt;/span&gt; &lt;span style="color: #0000ff;"&gt;class&lt;/span&gt; YuiMinifier : IMinifier&lt;br /&gt;{&lt;br /&gt;    &lt;span style="color: #0000ff;"&gt;public&lt;/span&gt; &lt;span style="color: #0000ff;"&gt;string&lt;/span&gt; Minify&amp;lt;T&amp;gt;(&lt;span style="color: #0000ff;"&gt;string&lt;/span&gt; unMinifiedContent) &lt;span style="color: #0000ff;"&gt;where&lt;/span&gt; T : IResourceType&lt;br /&gt;    {&lt;br /&gt;        &lt;span style="color: #0000ff;"&gt;if&lt;/span&gt; (&lt;span style="color: #0000ff;"&gt;typeof&lt;/span&gt;(T) == &lt;span style="color: #0000ff;"&gt;typeof&lt;/span&gt;(CssResource))&lt;br /&gt;            &lt;span style="color: #0000ff;"&gt;return&lt;/span&gt; CssCompressor.Compress(unMinifiedContent);&lt;br /&gt;        &lt;span style="color: #0000ff;"&gt;if&lt;/span&gt; (&lt;span style="color: #0000ff;"&gt;typeof&lt;/span&gt;(T) == &lt;span style="color: #0000ff;"&gt;typeof&lt;/span&gt;(JavaScriptResource))&lt;br /&gt;            &lt;span style="color: #0000ff;"&gt;return&lt;/span&gt; JavaScriptCompressor.Compress(unMinifiedContent);&lt;br /&gt;&lt;br /&gt;        &lt;span style="color: #0000ff;"&gt;throw&lt;/span&gt; &lt;span style="color: #0000ff;"&gt;new&lt;/span&gt; ArgumentException(&lt;span style="color: #006080;"&gt;"Cannot Minify Resources of unknown type"&lt;/span&gt;, &lt;span style="color: #006080;"&gt;"unMinifiedContent"&lt;/span&gt;);&lt;br /&gt;    }&lt;br /&gt;}&lt;/pre&gt;
+&lt;/div&gt;
+&lt;p&gt;You would just need to add the following code to your startup code:&lt;/p&gt;
+&lt;div id="codeSnippetWrapper"&gt;
+&lt;pre id="codeSnippet" style="text-align: left; line-height: 12pt; background-color: #f4f4f4; margin: 0em; width: 100%; font-family: 'Courier New', courier, monospace; direction: ltr; color: black; font-size: 8pt; overflow: visible; border-style: none; padding: 0px;"&gt;RequestReduce.Api.Registry.RegisterMinifier&amp;lt;YuiMinifier&amp;gt;();&lt;/pre&gt;
+&lt;/div&gt;
+&lt;p&gt;That's it. Now your minification code will be used.&lt;/p&gt;
+&lt;h2&gt;Filtering Resources from the Reduction Processing&lt;/h2&gt;
+&lt;p&gt;If you would like to have certain CSS or javascript resources filtered from the reduction processing or if you would like to exclude certain images or even entire requests from all response transformations, then use the AddFilter method:&lt;/p&gt;
+&lt;div&gt;
+&lt;pre id="codeSnippet" style="text-align: left; line-height: 12pt; background-color: #f4f4f4; margin: 0em; width: 100%; font-family: 'Courier New', courier, monospace; direction: ltr; color: black; font-size: 8pt; overflow: visible; border-style: none; padding: 0px;"&gt;&lt;span style="color: #0000ff;"&gt;public&lt;/span&gt; &lt;span style="color: #0000ff;"&gt;static&lt;/span&gt; &lt;span style="color: #0000ff;"&gt;void&lt;/span&gt; AddFilter(IFilter filter)&lt;/pre&gt;
+&lt;/div&gt;
+&lt;div&gt;&amp;nbsp;&lt;/div&gt;
+&lt;div&gt;RequestReduce provides four concrete types deriving from IFilter:&lt;/div&gt;
+&lt;div&gt;&amp;nbsp;&lt;/div&gt;
+&lt;div id="codeSnippetWrapper"&gt;
+&lt;pre id="codeSnippet" style="text-align: left; line-height: 12pt; background-color: #f4f4f4; margin: 0em; width: 100%; font-family: 'Courier New', courier, monospace; direction: ltr; color: black; font-size: 8pt; overflow: visible; border-style: none; padding: 0px;"&gt;&lt;span style="color: #0000ff;"&gt;public&lt;/span&gt; &lt;span style="color: #0000ff;"&gt;class&lt;/span&gt; CssFilter : Filter&amp;lt;CssJsFilterContext&amp;gt;&lt;br /&gt;&lt;span style="color: #0000ff;"&gt;public&lt;/span&gt; &lt;span style="color: #0000ff;"&gt;class&lt;/span&gt; JavascriptFilter : Filter&amp;lt;CssJsFilterContext&amp;gt;&lt;br /&gt;&lt;span style="color: #0000ff;"&gt;public&lt;/span&gt; &lt;span style="color: #0000ff;"&gt;class&lt;/span&gt; SpriteFilter : Filter&amp;lt;SpriteFilterContext&amp;gt;&lt;br /&gt;&lt;span style="color: #0000ff;"&gt;public&lt;/span&gt; &lt;span style="color: #0000ff;"&gt;class&lt;/span&gt; PageFilter : Filter&amp;lt;PageFilterContext&amp;gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;p&gt;All of these derrive from:&lt;/p&gt;
+&lt;div id="codeSnippetWrapper"&gt;
+&lt;pre id="codeSnippet" style="text-align: left; line-height: 12pt; background-color: #f4f4f4; margin: 0em; width: 100%; font-family: 'Courier New', courier, monospace; direction: ltr; color: black; font-size: 8pt; overflow: visible; border-style: none; padding: 0px;"&gt;&lt;span style="color: #0000ff;"&gt;public&lt;/span&gt; &lt;span style="color: #0000ff;"&gt;class&lt;/span&gt; Filter&amp;lt;T&amp;gt; : IFilter &lt;span style="color: #0000ff;"&gt;where&lt;/span&gt; T : &lt;span style="color: #0000ff;"&gt;class&lt;/span&gt;, IFilterContext&lt;/pre&gt;
+&lt;/div&gt;
+&lt;p&gt;The IFilter implementations really don't do anything on their own other than pass a IFilterContext which exposes various properties of the request. Each of the IFilter implementations provide a single constructor which takes a Predicate where T is an IFilterContext that RequestReduce populates and provides to the predicate delegate.&lt;/p&gt;
+&lt;p&gt;There are three different implementations of IFilterContext available:&lt;/p&gt;
+&lt;div id="codeSnippetWrapper"&gt;
+&lt;pre id="codeSnippet" style="text-align: left; line-height: 12pt; background-color: #f4f4f4; margin: 0em; width: 100%; font-family: 'Courier New', courier, monospace; direction: ltr; color: black; font-size: 8pt; overflow: visible; border-style: none; padding: 0px;"&gt;&lt;span style="color: #0000ff;"&gt;public&lt;/span&gt; &lt;span style="color: #0000ff;"&gt;class&lt;/span&gt; CssJsFilterContext : IFilterContext&lt;br /&gt;{&lt;br /&gt;    &lt;span style="color: #0000ff;"&gt;public&lt;/span&gt; HttpRequestBase HttpRequest { &lt;span style="color: #0000ff;"&gt;private&lt;/span&gt; set; get; }&lt;br /&gt;    &lt;span style="color: #0000ff;"&gt;public&lt;/span&gt; &lt;span style="color: #0000ff;"&gt;string&lt;/span&gt; FilteredUrl { &lt;span style="color: #0000ff;"&gt;private&lt;/span&gt; set; get; } &lt;span style="color: #008000;"&gt;//The Css or JS url to be processed&lt;/span&gt;&lt;br /&gt;    &lt;span style="color: #0000ff;"&gt;public&lt;/span&gt; &lt;span style="color: #0000ff;"&gt;string&lt;/span&gt; FilteredTag { &lt;span style="color: #0000ff;"&gt;private&lt;/span&gt; set; get; } &lt;span style="color: #008000;"&gt;//The entire HTML tag being processed&lt;/span&gt;&lt;br /&gt;}&lt;br /&gt;&lt;br /&gt;&lt;span style="color: #0000ff;"&gt;public&lt;/span&gt; &lt;span style="color: #0000ff;"&gt;class&lt;/span&gt; PageFilterContext : IFilterContext&lt;br /&gt;{&lt;br /&gt;    &lt;span style="color: #0000ff;"&gt;public&lt;/span&gt; HttpRequestBase HttpRequest { &lt;span style="color: #0000ff;"&gt;private&lt;/span&gt; set; get; }&lt;br /&gt;}&lt;br /&gt;&lt;br /&gt;&lt;span style="color: #0000ff;"&gt;public&lt;/span&gt; &lt;span style="color: #0000ff;"&gt;class&lt;/span&gt; SpriteFilterContext : IFilterContext&lt;br /&gt;{&lt;br /&gt;    &lt;span style="color: #008000;"&gt;//BackgroundImageClass has several properties that include all the CSS background attributes&lt;/span&gt;&lt;br /&gt;    &lt;span style="color: #0000ff;"&gt;public&lt;/span&gt; BackgroundImageClass BackgroundImage { &lt;span style="color: #0000ff;"&gt;private&lt;/span&gt; set; get; } &lt;br /&gt;}&lt;/pre&gt;
+&lt;/div&gt;
+&lt;p&gt;Depending on the type of filter (Page, css, javascript or sprite) for each item that RequestReduce processes, it will provide the appropriate IFilterContext to your predicate. If you return true, RequestReduce will eliminate that resource from being processed. Here is an example of how to have RequestReduce ignore any image over 100px X 100px.&lt;/p&gt;
+&lt;div&gt;
+&lt;pre id="codeSnippet" style="text-align: left; line-height: 12pt; background-color: #f4f4f4; margin: 0em; width: 100%; font-family: 'Courier New', courier, monospace; direction: ltr; color: black; font-size: 8pt; overflow: visible; border-style: none; padding: 0px;"&gt;RequestReduce.Api.Registry.AddFilter(&lt;span style="color: #0000ff;"&gt;new&lt;/span&gt; SpriteFilter(x =&amp;gt; x.Width &amp;gt; 100 &amp;amp;&amp;amp; x.Height &amp;gt; 100));&lt;/pre&gt;
+&lt;/div&gt;
+&lt;div&gt;&amp;nbsp;&lt;/div&gt;
+&lt;div&gt;Make sure to add these filters inside your App start or some other pre application, one time execution block.&lt;/div&gt;</content>
+  <ispublished>True</ispublished>
+  <isdeleted>False</isdeleted>
+  <iscommentsenabled>True</iscommentsenabled>
+  <pubDate>2011-11-11 04:07:00</pubDate>
+  <lastModified>2011-12-12 06:33:02</lastModified>
+  <raters>0</raters>
+  <rating>0</rating>
+  <slug>Released-RequestReduce-15-Supporting-Custom-Minifiers-and-a-Critical-Performance-Fix-for-v14</slug>
+  <tags />
+  <comments>
+    <comment id="e21559ff-3ba5-4ab3-bb1c-f159be126117" parentid="00000000-0000-0000-0000-000000000000" approved="True" spam="False" deleted="False">
+      <date>2011-11-11 13:58:41</date>
+      <author>DotNetKicks.com</author>
+      <email>trackback</email>
+      <country />
+      <ip>74.86.105.210</ip>
+      <website>http://www.dotnetkicks.com/aspnet/Add_a_Custom_Minifier_to_RequestReduce_Auto_Sprite_and_CSS_JS_Cruncher</website>
+      <content>Add a Custom Minifier to RequestReduce Auto Sprite and CSS/JS Cruncher
+
+You've been kicked (a good thing) - Trackback from DotNetKicks.com</content>
+    </comment>
+  </comments>
+  <categories>
+    <category>2f8206f0-95a4-449e-bf74-3b2cb761de04</category>
+  </categories>
+  <notifications>
+    <email>sdfsdf@gmail.cm</email>
+  </notifications>
+</post>

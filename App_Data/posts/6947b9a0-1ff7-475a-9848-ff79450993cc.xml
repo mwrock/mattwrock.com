@@ -1,0 +1,410 @@
+﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<post>
+  <author>mwrock</author>
+  <title>What you should know about running ILMerge on .Net 4.5 assemblies targeting .Net 4.0</title>
+  <description />
+  <content>&lt;p&gt;I might have also entitled this:&lt;/p&gt;
+&lt;h1&gt;&amp;ldquo;How to avoid &lt;em&gt;TypeLoadException: Could not load type 'System.Runtime.CompilerServices.ExtensionAttribute' &amp;ldquo;&lt;/em&gt;&lt;/h1&gt;
+&lt;p&gt;But I didn&amp;rsquo;t.&lt;/p&gt;
+&lt;h2&gt;First, the moral of this story&lt;/h2&gt;
+&lt;p&gt;I am about to take you on a debugging journey that will make some laugh and others cry and a fortunate few will travel through the entire spectrum of human emotion that will take them down into the seven bowels of hades only to be resurrected into the seven celestial states of ultimate being that will consummate in a catharsis that unifies soul, body and mind with your favorite &lt;a href="http://en.wikipedia.org/wiki/My_Little_Pony"&gt;My Little Pony&lt;/a&gt; character. If this does not appeal to you then know this:&lt;/p&gt;
+&lt;p&gt;If you use &lt;a href="http://research.microsoft.com/en-us/people/mbarnett/ilmerge.aspx"&gt;ILMerge&lt;/a&gt; to merge several assemblies into one on a machine with .&lt;a href="http://www.microsoft.com/download/en/details.aspx?displaylang=en&amp;amp;id=28978"&gt;Net 4.5 Beta&lt;/a&gt; installed and intend to have this merged assembly run on a machine running .Net 4.0, DO NOT use the following TargetPlatform switch value:&lt;/p&gt;
+&lt;div&gt;
+&lt;pre id="codeSnippet" style="text-align: left; line-height: 12pt; background-color: #f4f4f4; margin: 0em; width: 100%; font-family: 'Courier New', courier, monospace; direction: ltr; color: black; font-size: 8pt; overflow: visible; border-style: none; padding: 0px;"&gt;/targetplatform:&lt;span style="color: #006080;"&gt;"v4,c:\windows\Microsoft.NET\Framework\v4.0.30319"&lt;/span&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;div&gt;&amp;nbsp;&lt;/div&gt;
+&lt;div&gt;Instead use this:&lt;/div&gt;
+&lt;div id="codeSnippetWrapper"&gt;
+&lt;pre id="codeSnippet" style="text-align: left; line-height: 12pt; background-color: #f4f4f4; margin: 0em; width: 100%; font-family: 'Courier New', courier, monospace; direction: ltr; color: black; font-size: 8pt; overflow: visible; border-style: none; padding: 0px;"&gt;&lt;br /&gt;/targetplatform:&lt;span style="color: #006080;"&gt;"v4,C:\Program Files\Reference &lt;br /&gt;Assemblies\Microsoft\Framework\.NETFramework\v4.0"&lt;/span&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;div&gt;If you are interested in learning some details about targeting different frameworks, some nice IL debugging tips or what that means in an upgrade like 4.5 that is &amp;ldquo;in place&amp;rdquo; or does not officially change the runtime version along with some techniques for debugging such interesting scenarios, then read on. &lt;/div&gt;
+&lt;h2&gt;Twas the night before Beta&lt;/h2&gt;
+&lt;p&gt;So it seems serendipitous that I write this on the eve of the Visual Studio 11 launch. This last weekend I installed the beta bits on my day to day development environments. As a member of the team that owns the &lt;a href="http://visualstudiogallery.msdn.microsoft.com/"&gt;Visual Studio Gallery&lt;/a&gt; and &lt;a href="http://code.msdn.microsoft.com/"&gt;the MSDN Code Samples Gallery&lt;/a&gt; and their integration with the Visual Studio IDE, I&amp;rsquo;ve been viewing bits hot out of the oven for some time now. The product seems stable and everyone seem to feel comfortable installing it side by side with VS 10. You can target .Net 4.0 so why not just dev on it full time to enjoy the full, rich dogfooding experience. At home where I do development on my OSS project &lt;a href="http://RequestReduce.com"&gt;RequestReduce&lt;/a&gt;, I work on a 5 year old Lenovo T60P laptop. Its name is dale. So the perf and memory footprint improvements of VS11 have a special appeal to me. Oh and to Dale too. Right Dale? Thought so.&lt;/p&gt;
+&lt;h2&gt;Most solutions can be loaded in both VS10 and VS11 without migration&lt;/h2&gt;
+&lt;p&gt;So day 1, Saturday after some initial pain of getting a XUnit test runner up and running it looks like I&amp;rsquo;m ready to go. I load up RequestReduce and all projects load up fine. I&amp;rsquo;m also happy that after loading them in VS11, they still load and compile in VS10. Next I build in VS11 and all unit and integration tests pass. Sweet! Lets get to work and make it happen.&lt;/p&gt;
+&lt;h2&gt;Cut on the bleeding edge&lt;/h2&gt;
+&lt;p&gt;So I had been exchanging emails all week with a developer having issues with getting RequestReduce to play nice with the Azure CDN. Turns out Azure handles CDN URLs differently from the other CDNs I have worked with in the past by requiring all CDN content to be placed in a CDN directory on the origin server. However the CDN URL should not include the CDN directory in the path. There were some minor changes I needed to make to get the RequestReduce API to work nice with this setup. Just to be sure my changes were good, I spun up a new Azure instance and created a CDN endpoint. Then I deployed my test app with RequestReduce plugged in to do bundling and minification and WHAT?!&lt;/p&gt;
+&lt;p&gt;&amp;nbsp;&lt;/p&gt;
+&lt;p&gt;&lt;em&gt;[TypeLoadException: Could not load type 'System.Runtime.CompilerServices.ExtensionAttribute' from assembly 'mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089'.]&lt;/em&gt;&lt;/p&gt;
+&lt;p&gt;This doesn&amp;rsquo;t look good and my first reaction is &amp;ldquo;Stupid Azure.&amp;rdquo; But I have users who report that RequestReduce runs fine on azure. To double check I run the same test app on my dev box, all is good. So despite the promises that .net 4.5 and VS11 will run fine on .net 4.0, I create a clean VM with .Net 4.0 and run my test app there. Yep. I get the same error. I promptly shout to my secretary, &amp;ldquo;Marge, get me building 41 and cancel my tennis match with Soma!&amp;rdquo; Perhaps a cunning power play like this will motivate him to light a proverbial fire under the sorry devs that are causing these exceptions to be thrown. Then it all hits me: its Saturday, I have no secretary and lets be honest, I wont be playing tennis with &lt;a href="http://blogs.msdn.com/b/somasegar/"&gt;Soma&lt;/a&gt; (head honcho at MS DevDiv that pumps out Visual Studio) any time soon. I weep.&lt;/p&gt;
+&lt;h2&gt;Debugging Begins&lt;/h2&gt;
+&lt;p&gt;I soon wake up recalling that I don&amp;rsquo;t even like tennis and I&amp;rsquo;m ready to fight. I&amp;rsquo;m gonna win this. From the stack trace I can see that the error is coming from my StructureMap container setup. &lt;a href="http://structuremap.net/structuremap/"&gt;StructureMap&lt;/a&gt; is a very cool IOC container used for managing Dependency Injection. It allows you to write code that references types by their interfaces so that you can easily swap out concrete implementation classes via configuration or API. There are many reasons for doing this that is beyond the scope of this post, but the most widely used application I use it for is testing. If I have all my services and dependencies handed to me from StructureMap as Interfaces, then I can create tests that also pass in interfaces with mock implementations. Now I have tests that don&amp;rsquo;t have to worry if all that code in the dependent services actually works. I have other tests that test those. I can control the data that these services will pass into the method I am testing and that allows my test to hyper focus on just the code in my method I&amp;rsquo;m testing. If this sounds unfamiliar or confusing, I urge you to &lt;a href="http://en.wikipedia.org/wiki/Test-driven_development"&gt;research the topic&lt;/a&gt;. It transformed the way I write code for the better.&lt;/p&gt;
+&lt;p&gt;So one thing StructureMap has to do to make all of this possible at app startup time is scan my assemblies for interfaces and the concrete classes that I tell it to use. It is here where I am running into this TypeLoadException. So who are you 'System.Runtime.CompilerServices.ExtensionAttribute' and what is your game? Why do you play with me?&lt;/p&gt;
+&lt;p&gt;After some googling, I get a little dirt on this Type. Apparently it is an Attribute that decorates any class that contains an &lt;a href="http://msdn.microsoft.com/en-us/library/bb383977.aspx"&gt;extension method&lt;/a&gt; In C#, you will never have to include this attribute directly. The compiler will do it for you. You will see it in the IL. Well this type has moved assemblies in .Net 4.5. Apparently it was too good for System.Core and has moved to an executive suite in mscorelib. This is all complicated by the fact that&amp;nbsp; the upgrade from 4.0 to 4.5 is what they call in &amp;ldquo;the industry&amp;rdquo; an In Place Upgrade. That means that you will not see a v4.5.078362849 folder in your c:\windows\Microsoft.Net\Framework directory. No. The 4.5 upgrade gets paved over the 4.0 bits and simply updates the DLLs in the C:\Windows\Microsoft.NET\Framework\v4.0.30319 folder. Not a real fan of this and I don&amp;rsquo;t know what the reasoning is but that&amp;rsquo;s how its done.&lt;/p&gt;
+&lt;p&gt;So now I&amp;rsquo;m thinking that this must be some edge case caused by StructureMap using Reflection in such a way where it demands to load types from what assemblies are there at compile time. I should also mention that I have a class in my assembly that has an extension method. So I find a way to tell StructureMap to go ahead and scan the assemblies but just don&amp;rsquo;t worry about any attributes. Since you can decorate classes with special StructureMap attributes that tell StructureMap that a class is a type that can be plugged into a specific interface, it will try to load all attributes it finds to see if it is one of these special attributes. Well I don&amp;rsquo;t use those so I tell StructureMap IgnoreStructureMapAttributes().&lt;/p&gt;
+&lt;p&gt;Ahhh. I am convinced that I &amp;ldquo;have it.&amp;rdquo; while my code builds and deploys to my VM all on my 5 year old laptop (remember Dale?), I have time to file a &lt;a href="https://connect.microsoft.com/VisualStudio/feedback/details/726702/moving-system-runtime-compilerservices-extensionattribute-to-mscorlib-breaks-structuremap-scans-of-namespaces-containing-extensionmethods-and-possibly-other-ioc-scenarios#details"&gt;Connect bug&lt;/a&gt; nice and snug in the self righteous knowledge that I am doing the right thing. I have been wronged by these bleeding edge bits but I&amp;rsquo;m not angry. I am simply informing the authorities of the incident in the hopes that others will not need to suffer the same fate.&lt;/p&gt;
+&lt;p&gt;Ok. My code has now been built and deployed and is ready to run. Its gonna be great. I&amp;rsquo;ll see my asp.net web page with bundled and minified javascript and I can move on with my weekend chores. I launch the test app in a browser and&amp;hellip;Criminey! Same error but different stack trace. Now its coming from code that Instantiates a ResourceManager. This is not instilling confidence. This isn&amp;rsquo;t even technically my code. It is code auto generated by VS when you &lt;a href="http://msdn.microsoft.com/en-us/library/3xhwfctz(v=vs.80).aspx"&gt;add Resources to the Resources tabs in the VS Project properties&lt;/a&gt;. Really? VS&amp;rsquo;s own code isn&amp;rsquo;t even backwards compatible? The rubbish I have to work with. So it turns out the ResourceManager does something similar as StructureMap&amp;rsquo;s initialization, it scans an assembly for resources. It iterates over every type to see if it matches what you have told the ResourceManager what to look for. Ok Ok. I guess I&amp;rsquo;m just gonna have to refactor this too. And what next? When does it stop? When is enough enough?!&lt;/p&gt;
+&lt;p&gt;So I do refactor my Resource.&lt;/p&gt;
+&lt;div id="codeSnippetWrapper"&gt;
+&lt;pre id="codeSnippet" style="text-align: left; line-height: 12pt; background-color: #f4f4f4; margin: 0em; width: 100%; font-family: 'Courier New', courier, monospace; direction: ltr; color: black; font-size: 8pt; overflow: visible; border-style: none; padding: 0px;"&gt;&lt;span style="color: #0000ff;"&gt;using&lt;/span&gt; (var myStream = Assembly.GetExecutingAssembly()&lt;br /&gt;    .GetManifestResourceStream(&lt;span style="color: #006080;"&gt;"RequestReduce.Resources.Dashboard.html"&lt;/span&gt;))&lt;br /&gt;{&lt;br /&gt;    &lt;span style="color: #0000ff;"&gt;using&lt;/span&gt; (var myReader = &lt;span style="color: #0000ff;"&gt;new&lt;/span&gt; StreamReader(myStream))&lt;br /&gt;    {&lt;br /&gt;        dashboard = myReader.ReadToEnd();&lt;br /&gt;    }&lt;br /&gt;}&lt;/pre&gt;
+&lt;/div&gt;
+&lt;p&gt;If you are familiar with RequestReduce, this is the HTML page that is the &lt;a href="https://github.com/mwrock/RequestReduce/wiki/The-RequestReduce-Dashboard"&gt;RequestReduce Dashboard&lt;/a&gt;. I embed this as a resource in the RequestReduce DLL.&amp;nbsp; Now I load it through a ManifestResourceStream into a static string and to be honest this does seem much more efficient than scanning every class for resources when I know exactly which file contains my resource&amp;nbsp; and only need to load the contents of that file.&lt;/p&gt;
+&lt;p&gt;So I build and deploy again. And now, sweet victory, I see the beautiful blue background that is the default ASP.NET project home page and I see my minified CSS. But wait&amp;hellip;oh no&amp;hellip;something&amp;rsquo;s not right. The navigation tabs are stacked on top of each other and don&amp;rsquo;t look like tabs at all. Where is my JavascriptjQuery152004988980293273926_1358662903428 It is completely gone? If RequestReduce has a zero byte string after minification (maybe it was just a comment that gets minified out) then it will remove the script all together. So diving into the code deeper and running several tests to narrow the possibilities, I discover that the call into the &lt;a href="http://ajaxmin.codeplex.com/"&gt;MS Ajax minifier&lt;/a&gt; returns an empty string. Now that&amp;rsquo;s Minification!!&lt;/p&gt;
+&lt;h2&gt;Its not .net 4.5&amp;rsquo;s fault&lt;/h2&gt;
+&lt;p&gt;So all of the sudden I begin to wonder. Oh no! Is this not the Framework itself causing this mayhem but perhaps related to my use of ILMerge.exe which takes RequestReduce.dll, AjaxMin.dll, Structuremap.Dll and &lt;a href="http://nquant.codeplex.com/"&gt;nQuant&lt;/a&gt;.dll and merges them all into one RequestReduce.Dll? I do this because the principle behind RequestReduce is to make Website optimizations as easy and automatic as dropping a single DLL into your bin. After I replace my merged DLL with the original unmerged ones in my test app on my .Net 4.0 VM, everything magically works. So I know now that it is either a problem in ILMerge or perhaps still a problem in the framework that is surfaced when interacting with ILMerge. Either way I want to get back up and running so I need to figure out what is going on with AjaxMin specifically. Is there something I can fix with the way I use AjaxMin or can I figure the more root problem with the Framework or ILMerge? Wouldn&amp;rsquo;t it be great if I were using an old version of ILMerge and simply updating it would fix everything?&lt;/p&gt;
+&lt;p&gt;I am using a &lt;a href="http://research.microsoft.com/en-us/people/mbarnett/changehistory.aspx"&gt;version&lt;/a&gt; of ILMerge that was last updated in May and there have been two updates since the last being in November. I&amp;rsquo;m hopeful that since November was after the Preview Release of Visual Studio 11, this latest update will address .Net 4.5 issues. I update my ILMerge bits and alas, the problem still exists. So now I&amp;rsquo;m hoping that some thumbing through the ILMerge documentation or searching online will turn up some clues. Nothing. This is always the problem with working with bleeding edge bits. You don&amp;rsquo;t often get to learn from other peoples problems. You are the other people. I write this today as that &amp;ldquo;other person&amp;rdquo; who will hopefully shine light on your problem.&lt;/p&gt;
+&lt;p&gt;In a last ditch effort I send an email to &lt;a href="http://research.microsoft.com/en-us/people/mbarnett/default.aspx"&gt;Mike Barnett&lt;/a&gt;, the creator of ILMerge in hopes he may have come across this before and can provide guidance to get me around the issue and on my way to running code. He responded as I expected. He hadn&amp;rsquo;t played with the 4.5 bits yet and was not surprised that there would be issues especially given the fact of the in place upgrade. He was gracious enough to offer to look at the problem if I could provide him with the breaking code and access to a machine with.Net 4.5 installed.&lt;/p&gt;
+&lt;p&gt;I&amp;rsquo;m not one to quickly hand off problems on to someone else. First because it is rude and second I enjoy being able to solve problems on my own especially these kinds. In fact I had walked into the exact kind of problem that (while frustrated that my code was not running) I enjoy the most and often have a nack for getting to the bottom of figuring out what is going on. This is not because I am smart but because I am stubborn and off balance and will stick with problems long after smarter people have moved on with their lives.&lt;/p&gt;
+&lt;p&gt;The first thing I do is pull down the source code of the Ajax Minifier. I have a suspicion that the minifier is stumbling on the same exception I have been fighting with and it simply catches it and gracefully returns nothing. I discover that if there are any internal errors in the minification of content given to the minifier, it will store these errors away in a collection accessible from the minifier&amp;rsquo;s ErrorList property. When I inspect this property, there is one error reporting a type initialization error in Microsoft.Ajax.Utilities.StringMgr. So I look up that class and bang:&lt;/p&gt;
+&lt;div id="codeSnippetWrapper"&gt;
+&lt;pre id="codeSnippet" style="text-align: left; line-height: 12pt; background-color: #f4f4f4; margin: 0em; width: 100%; font-family: 'Courier New', courier, monospace; direction: ltr; color: black; font-size: 8pt; overflow: visible; border-style: none; padding: 0px;"&gt;&lt;span style="color: #008000;"&gt;// resource manager for retrieving strings&lt;/span&gt;&lt;br /&gt;&lt;span style="color: #0000ff;"&gt;private&lt;/span&gt; &lt;span style="color: #0000ff;"&gt;static&lt;/span&gt; &lt;span style="color: #0000ff;"&gt;readonly&lt;/span&gt; ResourceManager s_resourcesJScript = &lt;br /&gt;    GetResourceManager(&lt;span style="color: #006080;"&gt;".JavaScript.JScript"&lt;/span&gt;);&lt;br /&gt;&lt;span style="color: #0000ff;"&gt;private&lt;/span&gt; &lt;span style="color: #0000ff;"&gt;static&lt;/span&gt; &lt;span style="color: #0000ff;"&gt;readonly&lt;/span&gt; ResourceManager s_resourcesApplication = &lt;br /&gt;    GetResourceManager(&lt;span style="color: #006080;"&gt;".AjaxMin"&lt;/span&gt;);&lt;br /&gt;&lt;br /&gt;&lt;span style="color: #008000;"&gt;// get the resource manager for our strings&lt;/span&gt;&lt;br /&gt;&lt;span style="color: #0000ff;"&gt;private&lt;/span&gt; &lt;span style="color: #0000ff;"&gt;static&lt;/span&gt; ResourceManager GetResourceManager(&lt;span style="color: #0000ff;"&gt;string&lt;/span&gt; resourceName)&lt;br /&gt;{&lt;br /&gt;  &lt;span style="color: #0000ff;"&gt;string&lt;/span&gt; ourNamespace = MethodInfo.GetCurrentMethod().DeclaringType.Namespace;&lt;br /&gt;  &lt;span style="color: #008000;"&gt;// create our resource manager&lt;/span&gt;&lt;br /&gt;  &lt;span style="color: #0000ff;"&gt;return&lt;/span&gt; &lt;span style="color: #0000ff;"&gt;new&lt;/span&gt; ResourceManager(&lt;br /&gt;    ourNamespace + resourceName,&lt;br /&gt;    Assembly.GetExecutingAssembly()&lt;br /&gt;    );&lt;br /&gt;}&lt;/pre&gt;
+&lt;/div&gt;
+&lt;p&gt;My friend the &lt;a href="http://msdn.microsoft.com/en-us/library/system.resources.resourcemanager.aspx"&gt;ResourceManager&lt;/a&gt; again. Unfortunately because this is not my code, I cant refactor it as easily. Sure it is an open source project that I think takes pull requests and whose owner, &lt;a href="http://www.codeplex.com/site/users/view/ronlo"&gt;Ron Logan&lt;/a&gt;, is very responsive to bug fixes, but refactoring these run ins with ExtensionAttribute is beginning to feel like an unwinnable game of &lt;a href="http://en.wikipedia.org/wiki/Whac-A-Mole"&gt;Whack-A-Mole&lt;/a&gt; and since the error does not occur without ILMerge, I need to figure out what is going on there instead of cleaning up after the mess. As far as I&amp;rsquo;m concerned at this point, the only viable options are to find a way to work with ILMerge that will prevent these errors or gather enough data that I can give to either Mike Barnett or the .net team to pursue further. I&amp;rsquo;m hoping for the former but thinking the later scenario is more likely.&lt;/p&gt;
+&lt;h2&gt;Isolate and minify the problem space&lt;/h2&gt;
+&lt;p&gt;I often find with these sorts of problems, the best thing to do at this point is to widdle down the problem space to as small of a surface area as possible. I create a new VS11 solution with two projects:&lt;/p&gt;
+&lt;h4&gt;Project 1&lt;/h4&gt;
+&lt;div&gt;
+&lt;pre id="codeSnippet" style="text-align: left; line-height: 12pt; background-color: #f4f4f4; margin: 0em; width: 100%; font-family: 'Courier New', courier, monospace; direction: ltr; color: black; font-size: 8pt; overflow: visible; border-style: none; padding: 0px;"&gt;&lt;span style="color: #0000ff;"&gt;static&lt;/span&gt; &lt;span style="color: #0000ff;"&gt;class&lt;/span&gt; Program&lt;br /&gt;{&lt;br /&gt;    &lt;span style="color: #0000ff;"&gt;static&lt;/span&gt; &lt;span style="color: #0000ff;"&gt;void&lt;/span&gt; Main()&lt;br /&gt;    {&lt;br /&gt;        System.Console.Out.WriteLine(Resources.String1);&lt;br /&gt;    }&lt;br /&gt;&lt;br /&gt;    &lt;span style="color: #0000ff;"&gt;public&lt;/span&gt; &lt;span style="color: #0000ff;"&gt;static&lt;/span&gt; &lt;span style="color: #0000ff;"&gt;string&lt;/span&gt; AnotherTrim2(&lt;span style="color: #0000ff;"&gt;this&lt;/span&gt; &lt;span style="color: #0000ff;"&gt;string&lt;/span&gt; someString)&lt;br /&gt;    {&lt;br /&gt;        &lt;span style="color: #0000ff;"&gt;return&lt;/span&gt; someString.Trim();&lt;br /&gt;    }&lt;br /&gt;}&lt;/pre&gt;
+&lt;/div&gt;
+&lt;div&gt;&amp;nbsp;&lt;/div&gt;
+&lt;div&gt;This project also contains a simple resource string and the auto generated file produced by Visual Studio that contains the following line of code that reproduces the error:&lt;/div&gt;
+&lt;div id="codeSnippetWrapper"&gt;
+&lt;pre id="codeSnippet" style="text-align: left; line-height: 12pt; background-color: #f4f4f4; margin: 0em; width: 100%; font-family: 'Courier New', courier, monospace; direction: ltr; color: black; font-size: 8pt; overflow: visible; border-style: none; padding: 0px;"&gt;global::System.Resources.ResourceManager temp = &lt;br /&gt;    &lt;span style="color: #0000ff;"&gt;new&lt;/span&gt; global::System.Resources.ResourceManager(&lt;br /&gt;        &lt;span style="color: #006080;"&gt;"ReourceManUnMerged.Properties.Resources"&lt;/span&gt;, &lt;br /&gt;        &lt;span style="color: #0000ff;"&gt;typeof&lt;/span&gt;(Resources).Assembly&lt;br /&gt;    );&lt;/pre&gt;
+&lt;/div&gt;
+&lt;h4&gt;Project 2&lt;/h4&gt;
+&lt;p&gt;An empty class file. I just need a second assembly produced that I can merge.&lt;/p&gt;
+&lt;p&gt;I ILMerge them together on my .Net 4.5 machine and then I copy ILMerge.exe and my unmerged bits to my .Net 4.0 VM and merge the same bits on the 4.0 platform. I then run both merged versions on .net 4.0 and sure enough the one that was merged on the .Net 4.5 machine breaks and the one merged on .Net 4.0 runs just fine. I now know I can work with these assemblies to troubleshoot. With the minimal code, there is a lot les to look at and get confused by. I did mention that I get easily confused right? Hell I&amp;rsquo;m confused as I type right now. Did I also mention that I am one of the individuals responsible for deploying MSDN Win 8/Vs11 Beta documentation in the next hour? Don&amp;rsquo;t let my boss know about the whole confusion thing. Some things are better kept a secret.&lt;/p&gt;
+&lt;h2&gt;Pop open the hood and look at IL&lt;/h2&gt;
+&lt;p&gt;The first thing I want to do is look at both assemblies using a new tool put out by &lt;a href="http://www.jetbrains.com/"&gt;JetBrains&lt;/a&gt;, the makers of such popular tools like &lt;a href="http://www.jetbrains.com/resharper/"&gt;Resharper&lt;/a&gt;, called &lt;a href="http://www.jetbrains.com/decompiler/"&gt;DotPeek&lt;/a&gt;. This is the equivilent of the highly popular tool &lt;a href="http://www.reflector.net/"&gt;Reflector&lt;/a&gt; except it is free. It lets you view the C# source code of the disassembled IL of any .net assembly. A very handy tool when you cannot access the source of an assembly and want to peek inside. I&amp;rsquo;m curious if ILMerge reassembled these assemblies in such a way that they have different source that would clue me in to something useful.&lt;/p&gt;
+&lt;p&gt;They do not. The only difference between the two sets of source code is that the assembly that works includes a reference to System.Core &amp;ndash; the .Net 4.0 home of the offending ExtensionAttribute. While this is interesting at one level, its not very actionable data since my source code explicitly references System.Core. So I cant just add the reference and expect things to fix themselves.&lt;/p&gt;
+&lt;p&gt;Next thing I do is I use &lt;a href="http://msdn.microsoft.com/en-us/library/f7dy01k1(v=vs.100).aspx"&gt;ILDasm.exe&lt;/a&gt;, a tool that ships with the .Net SDK that can decompile a .Net DLL down to its IL code. Ive mentioned &lt;a href="http://en.wikipedia.org/wiki/Common_Intermediate_Language"&gt;IL&lt;/a&gt; a couple of times now. This is the Intermediate Language that all .net languages get compiled to. I use this tool to view the actual IL emitted by ILMerge&amp;rsquo;s compile. You can access this tool from any VS command prompt or from C:\Program Files\Microsoft SDKs\Windows. Now I&amp;rsquo;m seeing something more interesting. The two sets of IL are identical except the one merged on 4.5 contains three instances of this line:&lt;/p&gt;
+&lt;div id="codeSnippetWrapper"&gt;
+&lt;pre id="codeSnippet" style="text-align: left; line-height: 12pt; background-color: #f4f4f4; margin: 0em; width: 100%; font-family: 'Courier New', courier, monospace; direction: ltr; color: black; font-size: 8pt; overflow: visible; border-style: none; padding: 0px;"&gt;.custom instance &lt;span style="color: #0000ff;"&gt;void&lt;/span&gt; [mscorlib]&lt;br /&gt;    System.Runtime.CompilerServices.ExtensionAttribute::.ctor() &lt;br /&gt;    = ( 01 00 00 00 )&lt;/pre&gt;
+&lt;/div&gt;
+&lt;p&gt;and the one merged on 4.0 has the same line but slightly different:&lt;/p&gt;
+&lt;div id="codeSnippetWrapper"&gt;
+&lt;pre id="codeSnippet" style="text-align: left; line-height: 12pt; background-color: #f4f4f4; margin: 0em; width: 100%; font-family: 'Courier New', courier, monospace; direction: ltr; color: black; font-size: 8pt; overflow: visible; border-style: none; padding: 0px;"&gt;.custom instance &lt;span style="color: #0000ff;"&gt;void&lt;/span&gt; [System.Core]&lt;br /&gt;    System.Runtime.CompilerServices.ExtensionAttribute::.ctor() &lt;br /&gt;    = ( 01 00 00 00 )&lt;/pre&gt;
+&lt;/div&gt;
+&lt;p&gt;See the difference? Now I&amp;rsquo;m thinking that one option I have is to modify my build script to use ILDasm to extract the IL, do a simple string replacement to get ExtensionAttribute to load from System.Core and then use &lt;a href="http://msdn.microsoft.com/en-us/library/496e4ekx(v=vs.100).aspx"&gt;ILAsm&lt;/a&gt; to reassemble the transformed IL back to a usable assembly. This is certainly a workable option but it does not feel ideal. What would be ideal is to find some way to tell ILMerge to use System.Core instead of mscorelib. Oh ILMerge, can&amp;rsquo;t we work together on this. Why must we fight. I love you, you love me, we&amp;rsquo;re a happy fam&amp;hellip; Whoa. Where am I&amp;hellip;oh yeah. When do I need to deploy those Beta bits?&lt;/p&gt;
+&lt;h2&gt;What&amp;rsquo;s the compiler doing and how to get it to target 4.0&lt;/h2&gt;
+&lt;p&gt;So I ask myself what is VS doing that is different when you tell it to target .Net 4.0 as opposed to 4.5? Since it seems that the outdated 4.0 bits are simply blown away when you install 4.5, how does the compiler know to use mscorelib when targeting 4.0? If I could answer this question, maybe that would reveal something I could work with. To discover this I go to Tools/Options&amp;hellip; in VS11 and then I select Projects and Solutions &amp;ndash;&amp;gt; Build and Run on the left. This gives me options to adjust the verbosity of the MSBuild output displayed in the output window at compile time. I switch this from Detailed to Diagnostic. I want to see the actual call to &lt;a href="http://msdn.microsoft.com/en-us/library/78f4aasd.aspx"&gt;CSC.exe, the C# compiler&lt;/a&gt; and what switches Visual Studio is passing into it. Thankfully I get just that. When targeting 4.0, the command line call looks like this:&lt;/p&gt;
+&lt;div id="codeSnippetWrapper"&gt;
+&lt;pre id="codeSnippet" style="text-align: left; line-height: 12pt; background-color: #f4f4f4; margin: 0em; width: 100%; font-family: 'Courier New', courier, monospace; direction: ltr; color: black; font-size: 8pt; overflow: visible; border-style: none; padding: 0px;"&gt;C:\Windows\Microsoft.NET\Framework\v4.0.30319\Csc.exe &lt;br /&gt;    /noconfig &lt;br /&gt;    /nowarn:1701,1702,2008 &lt;br /&gt;    /nostdlib+ &lt;br /&gt;    /platform:AnyCPU &lt;br /&gt;    /errorreport:prompt &lt;br /&gt;    /warn:4 &lt;br /&gt;    /define:DEBUG;TRACE &lt;br /&gt;    /errorendlocation &lt;br /&gt;    /highentropyva- &lt;br /&gt;    /reference:&lt;span style="color: #006080;"&gt;"C:\Program Files\Reference Assemblies\Microsoft\Framework&lt;br /&gt; \.NETFramework\v4.0\Microsoft.CSharp.dll"&lt;/span&gt; &lt;br /&gt;    /reference:&lt;span style="color: #006080;"&gt;"C:\Program Files\Reference Assemblies\Microsoft\Framework&lt;br /&gt; \.NETFramework\v4.0\mscorlib.dll"&lt;/span&gt; &lt;br /&gt;    /reference:&lt;span style="color: #006080;"&gt;"C:\Program Files\Reference Assemblies\Microsoft\Framework&lt;br /&gt; \.NETFramework\v4.0\System.Core.dll"&lt;/span&gt; &lt;br /&gt;    /reference:&lt;span style="color: #006080;"&gt;"C:\Program Files\Reference Assemblies\Microsoft\Framework&lt;br /&gt; \.NETFramework\v4.0\System.Data.DataSetExtensions.dll"&lt;/span&gt; &lt;br /&gt;    /reference:&lt;span style="color: #006080;"&gt;"C:\Program Files\Reference Assemblies\Microsoft\Framework&lt;br /&gt; \.NETFramework\v4.0\System.Data.dll"&lt;/span&gt; &lt;br /&gt;    /reference:&lt;span style="color: #006080;"&gt;"C:\Program Files\Reference Assemblies\Microsoft\Framework&lt;br /&gt; \.NETFramework\v4.0\System.dll"&lt;/span&gt; &lt;br /&gt;    /reference:&lt;span style="color: #006080;"&gt;"C:\Program Files\Reference Assemblies\Microsoft\Framework&lt;br /&gt; \.NETFramework\v4.0\System.Xml.dll"&lt;/span&gt; &lt;br /&gt;    /reference:&lt;span style="color: #006080;"&gt;"C:\Program Files\Reference Assemblies\Microsoft\Framework&lt;br /&gt; \.NETFramework\v4.0\System.Xml.Linq.dll"&lt;/span&gt; &lt;br /&gt;    /debug+ &lt;br /&gt;    /debug:full &lt;br /&gt;    /filealign:512 &lt;br /&gt;    /optimize- &lt;br /&gt;    /&lt;span style="color: #0000ff;"&gt;out&lt;/span&gt;:obj\Debug\ReourceManUnMerged.exe &lt;br /&gt;    /resource:obj\Debug\ReourceManUnMerged.Properties.Resources.resources &lt;br /&gt;    /target:exe &lt;br /&gt;    /utf8output &lt;br /&gt;    Program.cs &lt;br /&gt;    Properties\AssemblyInfo.cs &lt;br /&gt;    Properties\Resources.Designer.cs &lt;br /&gt;    &lt;span style="color: #006080;"&gt;"C:\Users\mwrock\AppData\Local\Temp\.NETFramework,&lt;br /&gt; Version=v4.0.AssemblyAttributes.cs"&lt;/span&gt; (TaskId:26)&lt;/pre&gt;
+&lt;/div&gt;
+&lt;p&gt;When targeting 4.5 I get this:&lt;/p&gt;
+&lt;div id="codeSnippetWrapper"&gt;
+&lt;pre id="codeSnippet" style="text-align: left; line-height: 12pt; background-color: #f4f4f4; margin: 0em; width: 100%; font-family: 'Courier New', courier, monospace; direction: ltr; color: black; font-size: 8pt; overflow: visible; border-style: none; padding: 0px;"&gt;C:\Windows\Microsoft.NET\Framework\v4.0.30319\Csc.exe &lt;br /&gt;    /noconfig &lt;br /&gt;    /nowarn:1701,1702,2008 &lt;br /&gt;    /nostdlib+ &lt;br /&gt;    /platform:AnyCPU &lt;br /&gt;    /errorreport:prompt &lt;br /&gt;    /warn:4 &lt;br /&gt;    /define:DEBUG;TRACE &lt;br /&gt;    /errorendlocation &lt;br /&gt;    /highentropyva+ &lt;br /&gt;    /reference:&lt;span style="color: #006080;"&gt;"C:\Program Files\Reference Assemblies\Microsoft\Framework&lt;br /&gt; \.NETFramework\v4.5\Microsoft.CSharp.dll"&lt;/span&gt; &lt;br /&gt;    /reference:&lt;span style="color: #006080;"&gt;"C:\Program Files\Reference Assemblies\Microsoft\Framework&lt;br /&gt; \.NETFramework\v4.5\mscorlib.dll"&lt;/span&gt; &lt;br /&gt;    /reference:&lt;span style="color: #006080;"&gt;"C:\Program Files\Reference Assemblies\Microsoft\Framework&lt;br /&gt; \.NETFramework\v4.5\System.Core.dll"&lt;/span&gt; &lt;br /&gt;    /reference:&lt;span style="color: #006080;"&gt;"C:\Program Files\Reference Assemblies\Microsoft\Framework&lt;br /&gt; \.NETFramework\v4.5\System.Data.DataSetExtensions.dll"&lt;/span&gt; &lt;br /&gt;    /reference:&lt;span style="color: #006080;"&gt;"C:\Program Files\Reference Assemblies\Microsoft\Framework&lt;br /&gt; \.NETFramework\v4.5\System.Data.dll"&lt;/span&gt; &lt;br /&gt;    /reference:&lt;span style="color: #006080;"&gt;"C:\Program Files\Reference Assemblies\Microsoft\Framework&lt;br /&gt; \.NETFramework\v4.5\System.dll"&lt;/span&gt; &lt;br /&gt;    /reference:&lt;span style="color: #006080;"&gt;"C:\Program Files\Reference Assemblies\Microsoft\Framework&lt;br /&gt; \.NETFramework\v4.5\System.Xml.dll"&lt;/span&gt; &lt;br /&gt;    /reference:&lt;span style="color: #006080;"&gt;"C:\Program Files\Reference Assemblies\Microsoft\Framework&lt;br /&gt; \.NETFramework\v4.5\System.Xml.Linq.dll"&lt;/span&gt; &lt;br /&gt;    /debug+ &lt;br /&gt;    /debug:full &lt;br /&gt;    /filealign:512 &lt;br /&gt;    /optimize- &lt;br /&gt;    /&lt;span style="color: #0000ff;"&gt;out&lt;/span&gt;:obj\Debug\ReourceManUnMerged.exe &lt;br /&gt;    /resource:obj\Debug\ReourceManUnMerged.Properties.Resources.resources &lt;br /&gt;    /target:exe &lt;br /&gt;    /utf8output &lt;br /&gt;    Program.cs &lt;br /&gt;    Properties\AssemblyInfo.cs &lt;br /&gt;    Properties\Resources.Designer.cs &lt;br /&gt;    &lt;span style="color: #006080;"&gt;"C:\Users\mwrock\AppData\Local\Temp\.NETFramework,Version=v4.5.AssemblyAttributes.cs"&lt;/span&gt; &lt;br /&gt;    obj\Debug\\TemporaryGeneratedFile_E7A71F73-0F8D-4B9B-B56E-8E70B10BC5D3.cs &lt;br /&gt;    obj\Debug\\TemporaryGeneratedFile_036C0B5B-1481-4323-8D20-8F5ADCB23D92.cs (TaskId:21)&lt;/pre&gt;
+&lt;/div&gt;
+&lt;h2&gt;Telling ILMerge where to find mscorelib &amp;ndash; the devil in the details&lt;/h2&gt;
+&lt;p&gt;There are a few differences here. The one that is most notable is where the framework references are being pulled from. They are not pulled from the Framework directory in c:\windows\Microsoft.Net which is where I would expect and where one usually looks for framework bits. Instead they are coming from c:\Program Files\Reference Assemblies. The MSBuild team talks about this folder &lt;a href="http://blogs.msdn.com/b/msbuild/archive/2007/04/12/new-reference-assemblies-location.aspx"&gt;here&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;When you call ILMerge to merge your assemblies, you pass it a /targetplatform swich which tells it which platform to build for. Currently this switch can take v1, v1.1, v2 or v4 followed by the Framework directory. When I build for 4.0 I use this command line call via powershell:&lt;/p&gt;
+&lt;div id="codeSnippetWrapper"&gt;
+&lt;pre id="codeSnippet" style="text-align: left; line-height: 12pt; background-color: #f4f4f4; margin: 0em; width: 100%; font-family: 'Courier New', courier, monospace; direction: ltr; color: black; font-size: 8pt; overflow: visible; border-style: none; padding: 0px;"&gt;.\Tools\ilmerge.exe &lt;br /&gt;    /t:library &lt;br /&gt;    /internalize &lt;br /&gt;    /targetplatform:&lt;span style="color: #006080;"&gt;"v4,$env:windir\Microsoft.NET\Framework$bitness\v4.0.30319"&lt;/span&gt; &lt;br /&gt;    /wildcards &lt;br /&gt;    /&lt;span style="color: #0000ff;"&gt;out&lt;/span&gt;:$baseDir\RequestReduce\Nuget\Lib\net40\RequestReduce.dll &lt;br /&gt;    &lt;span style="color: #006080;"&gt;"$baseDir\RequestReduce\bin\v4.0\$configuration\RequestReduce.dll"&lt;/span&gt; &lt;br /&gt;    &lt;span style="color: #006080;"&gt;"$baseDir\RequestReduce\bin\v4.0\$configuration\AjaxMin.dll"&lt;/span&gt; &lt;br /&gt;    &lt;span style="color: #006080;"&gt;"$baseDir\RequestReduce\bin\v4.0\$configuration\StructureMap.dll"&lt;/span&gt; &lt;br /&gt;    &lt;span style="color: #006080;"&gt;"$baseDir\RequestReduce\bin\v4.0\$configuration\nquant.core.dll"&lt;/span&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;p&gt;Most point the directory like I am to the actual platform directory that can always be located off of %windir%\Microsoft.net It&amp;rsquo;s the obvious location to use. Oh wait&amp;hellip;hold on&amp;hellip;&lt;/p&gt;
+&lt;p&gt;Ok I&amp;rsquo;m back. The win8 and VS11 beta docs are now deployed. Now where was I. Oh yeah&amp;hellip;the framework directory passed to ILMerge. According to the ILMerge documentation it just needs the directory containing the correct version of mscorelib.dll. So I&amp;rsquo;m thinking, lets use this Reference Assemblies directory. I do that and re merge on .Net 4.5. I run on my 40 VM and&amp;hellip;Hallelujah!! There&amp;rsquo;s my javascript in all of its minified glory.&lt;/p&gt;
+&lt;p&gt;I hope this helps someone out because I didn&amp;rsquo;t find any help on this error.&lt;/p&gt;
+&lt;p&gt;Also, if you have made it this far, as I promised in the beginning, you should now have a sense of unity with your favorite My Little Pony character. Mine is Bon Bon what's yours?&lt;/p&gt;
+&lt;p&gt;&lt;img style="margin: 0px 10px 0px 0px;" src="https://encrypted-tbn0.google.com/images?q=tbn:ANd9GcRhDtQwJ5aYk1BPTCBQaSZHZTQCnIDoU6Niwp8Ssixa96Bv78f2Rw" alt="" /&gt;&lt;/p&gt;</content>
+  <ispublished>True</ispublished>
+  <isdeleted>False</isdeleted>
+  <iscommentsenabled>True</iscommentsenabled>
+  <pubDate>2012-02-29 09:14:00</pubDate>
+  <lastModified>2013-02-25 07:20:31</lastModified>
+  <raters>0</raters>
+  <rating>0</rating>
+  <slug>What-you-should-know-about-running-ILMerge-on-Net-45-Beta-assemblies-targeting-Net-40</slug>
+  <tags />
+  <comments>
+    <comment id="cbc53de3-6d0b-4ddd-a951-a6b54eeeb763" parentid="00000000-0000-0000-0000-000000000000" approved="True" spam="False" deleted="False">
+      <date>2012-02-29 09:25:51</date>
+      <author>DotNetKicks.com</author>
+      <email>trackback</email>
+      <country />
+      <ip>74.86.105.210</ip>
+      <website>http://www.dotnetkicks.com/csharp/What_you_should_know_about_running_ILMerge_on_Net_4_5_Beta_assemblies</website>
+      <content>What you should know about running ILMerge on .Net 4.5 Beta assemblies
+
+You've been kicked (a good thing) - Trackback from DotNetKicks.com</content>
+    </comment>
+    <comment id="bd13197e-a424-435f-b35b-ad7a84afce7e" parentid="00000000-0000-0000-0000-000000000000" approved="True" spam="False" deleted="False">
+      <date>2012-02-29 11:03:17</date>
+      <author>Richard</author>
+      <email>hfdxftxcubsjxb@mailinator.com</email>
+      <country />
+      <ip>80.45.168.41</ip>
+      <avatar />
+      <content>An &amp;quot;in-place&amp;quot; upgrade which moves an essential attribute to a different assembly seems like a terrible idea to me. What happened to guaranteeing backwards compatibility?</content>
+    </comment>
+    <comment id="f0f976d3-8203-4adb-8f8b-4db843548ef4" parentid="00000000-0000-0000-0000-000000000000" approved="True" spam="False" deleted="False">
+      <date>2012-03-12 20:40:22</date>
+      <author>Robin</author>
+      <email>robin.luiten+mattwrock@gmail.com</email>
+      <country />
+      <ip>101.165.3.48</ip>
+      <avatar />
+      <content>Thanky ou so much for this post I just hit this and was seriously lost.
+Trying all sorts of things to figure out what was going on.
+Much web searching turned this up :).
+
+I am on a new install of windows 7 and installed vs11 beta and I do not have a folder &amp;quot;C:\Program Files\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.0&amp;quot;. I am not allowed to install .Net 4 as I have a later version ugh.
+
+I think I will have to remove vs11beta and .net 4.5 and install .Net 4 etc then install vs11 beta.
+</content>
+    </comment>
+    <comment id="8e8179aa-6411-422e-abb7-51cde86268be" parentid="00000000-0000-0000-0000-000000000000" approved="True" spam="False" deleted="False">
+      <date>2012-03-12 20:57:37</date>
+      <author>Robin</author>
+      <email>robin.luiten+mattwrock@gmail.com</email>
+      <country />
+      <ip>101.165.3.48</ip>
+      <moderatedby>mwrock</moderatedby>
+      <avatar />
+      <content>For me the path was &amp;quot;C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.0&amp;quot; phew, saved myself some hassle.</content>
+    </comment>
+    <comment id="67b320ed-a004-4558-990c-fd5468860feb" parentid="00000000-0000-0000-0000-000000000000" approved="True" spam="False" deleted="False">
+      <date>2012-03-28 01:28:02</date>
+      <author>Robert S</author>
+      <email>robsilveruk@gmail.com</email>
+      <country />
+      <ip>194.72.121.2</ip>
+      <avatar />
+      <content>Matt,
+
+Have you ever thought about doing a master class in how to debug?  I only ask because I&amp;#39;ve been using .Net for a few years now, but I&amp;#39;ve never been shown how to debug to the level that you talked about in this article.
+
+Just a thought.  But thanks for your excellent articles.
+
+Robert</content>
+    </comment>
+    <comment id="30c67921-a897-471c-8de2-47b1edafc5be" parentid="00000000-0000-0000-0000-000000000000" approved="True" spam="False" deleted="False">
+      <date>2012-06-09 11:47:55</date>
+      <author>Chris K</author>
+      <email>chris.kadel@polarissolutions.com</email>
+      <country />
+      <ip>71.11.140.70</ip>
+      <avatar />
+      <content>Awesome post, I&amp;#39;m running into this myself.  In my case, i&amp;#39;m using Team Build (2012 RC), and deploying a targeted 4.0 application to a server that has *only* 4.0 installed.  I&amp;#39;ve been scouring Microsoft.CSharp.targets, and am thinking I must not be on the right path to capture this and change this behavior.  I hate being given an answer; but i&amp;#39;ve been digging for awhile, any idea, Matt, where I should be looking to override this property?</content>
+    </comment>
+    <comment id="ebc9f9d1-580e-485a-8052-dc33b4a3c29a" parentid="00000000-0000-0000-0000-000000000000" approved="True" spam="False" deleted="False">
+      <date>2012-06-29 11:19:44</date>
+      <author>Daniel Plaisted</author>
+      <email>dsplaisted@gmail.com</email>
+      <country />
+      <ip>71.227.156.161</ip>
+      <avatar />
+      <content>Great and entertaining post.
+
+In .NET 4.5, We moved ExtensionAttribute to mscorlib so that we could put extension methods in mscorlib.  When we move a type we use type forwards to keep compatible with code built against previous versions (which means in this case there is a type forward for ExtensionAttribute from System.Core to mscorlib).
+
+The issue here is that when pointing ILMerge at the implementation directory, it is essentially compiling against .NET 4.5.  The reference assemblies are for compiling against a different framework than the one on the machine.
+
+One small issue, the reference assemblies are in Program Files (x86) on 64-bit machines, so you&amp;#39;d need to modify the path in the /targetplatform switch to build on a 64-bit machine.</content>
+    </comment>
+    <comment id="7f6f68ae-de43-41e6-ae0b-2145326eb831" parentid="00000000-0000-0000-0000-000000000000" approved="True" spam="False" deleted="False">
+      <date>2012-06-29 20:21:27</date>
+      <author>mwrock</author>
+      <email>matt@mattwrock.com</email>
+      <country />
+      <ip>32.142.204.212</ip>
+      <avatar />
+      <content>@chris: If Team Build is calling ILMerge, then this should simply be a matter of passing the path to the reference assemblies. If you are running into this doing a non ilmerge build with Team Build, then msbuild should use the reference assemblies of the framework being targeted. I&amp;#39;d make sure that your project  in VS is targeting .Net 4.0 and not 4.5.</content>
+    </comment>
+    <comment id="1cce14fe-fa1c-4085-b407-5e1abb30875f" parentid="00000000-0000-0000-0000-000000000000" approved="True" spam="False" deleted="False">
+      <date>2012-07-02 13:50:47</date>
+      <author>Steve</author>
+      <email>srasmussen@dynamicmethods.com</email>
+      <country />
+      <ip>66.104.72.66</ip>
+      <moderatedby>mwrock</moderatedby>
+      <avatar />
+      <content>You&amp;#39;re the MAN!!!  Thanks for the hilarious, and very informative blog which helped save me this morning.  Updating the path for ilmerge to use worked like a charm.  Thanks again!</content>
+    </comment>
+    <comment id="2357046b-4994-4ae2-af32-f547eaff2d96" parentid="00000000-0000-0000-0000-000000000000" approved="True" spam="False" deleted="False">
+      <date>2012-08-24 08:36:45</date>
+      <author>Paul</author>
+      <email>pcurrit@hotmail.com</email>
+      <country />
+      <ip>24.22.166.166</ip>
+      <moderatedby>mwrock</moderatedby>
+      <avatar />
+      <content>If you&amp;#39;re running ILMerge.exe as a post-build event, you can use the msbuild property $(FrameworkPathOverride) rather than hard code a machine-specific path. Something like /targetplatform:v4,&amp;quot;$(FrameworkPathOverride)&amp;quot;</content>
+    </comment>
+    <comment id="3d9a4d67-ac6d-464a-baf3-f3ae012edd02" parentid="00000000-0000-0000-0000-000000000000" approved="True" spam="False" deleted="False">
+      <date>2012-10-04 16:09:39</date>
+      <author>Angelo Bestetti</author>
+      <email>angelobestetti@gmail.com</email>
+      <country />
+      <ip>177.140.112.115</ip>
+      <moderatedby>mwrock</moderatedby>
+      <avatar />
+      <content>Stupid question :)
+
+Where I can change the targetplatform to use this:
+
+/targetplatform:&amp;quot;v4,C:\Program Files\Reference 
+Assemblies\Microsoft\Framework\.NETFramework\v4.0&amp;quot;
+
+I&amp;#180;m Running VS2010 and targeting .net 4.0 but I have installed vs2012 and you know what happens. </content>
+    </comment>
+    <comment id="d746717d-2b3a-45bd-9e20-30dc2bf6c74a" parentid="00000000-0000-0000-0000-000000000000" approved="True" spam="False" deleted="False">
+      <date>2012-10-11 02:57:20</date>
+      <author>Hesham</author>
+      <email>hdesouky@gmail.com</email>
+      <country />
+      <ip>41.32.146.14</ip>
+      <moderatedby>mwrock</moderatedby>
+      <avatar />
+      <content>I am using aspnet_merge.exe form windows 8.0a sdk  C:\Program Files (x86)\Microsoft SDKs\Windows\v8.0A\bin\NETFX 4.0 Tools folder and facing the same problem with deployed website
+
+aspnet_merge.exe didn&amp;#39;t have input argument with targetversion, how can this be done for aspnet_merge.exe</content>
+    </comment>
+    <comment id="f6f40ea4-8166-4cd0-a093-07d65a881244" parentid="00000000-0000-0000-0000-000000000000" approved="True" spam="False" deleted="False">
+      <date>2012-11-09 07:47:54</date>
+      <author>JK Dennis</author>
+      <email>joelkdennis@gmail.com</email>
+      <country />
+      <ip>69.164.93.100</ip>
+      <moderatedby>mwrock</moderatedby>
+      <avatar />
+      <content>Great post. This has helped me immensely. Just one note.  If the 4.5 framework is installed on your working machine prior to the 4.0 framework and your intended target is 4.0, your machine may not have the 4.0 libraries it needs at C:\Program Files\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.0. I did not have the .NETFramework folder at all.  I had to connect to another machine that had 4.0 installed, copy the .NETFramework folder to my working machine, then run my ILMerge statement.  It worked beautifully.  I&amp;#39;m sure I could&amp;#39;ve uninstalled 4.5, then installed 4.0 followed by 4.5, but that would&amp;#39;ve been more work.  But Matt, your solution was fantastic and allowed me to complete my project. I enjoyed reading the explanation even more. Thanks.</content>
+    </comment>
+    <comment id="58452e7a-269d-4c90-9403-f10b468d17f1" parentid="00000000-0000-0000-0000-000000000000" approved="True" spam="False" deleted="False">
+      <date>2012-11-20 00:46:26</date>
+      <author>Siyavash</author>
+      <email>siyavash.g@outlook.com</email>
+      <country />
+      <ip>203.125.157.62</ip>
+      <avatar />
+      <content>Sorry if this is so naive, but can ILMerge also help to get rid of installing .net framework on the target machine?
+I have been searching for some facility like that and I came to ILMerge.
+Even a yes or no reply would be enough for me.
+thanks</content>
+    </comment>
+    <comment id="bf7e5dd3-e67e-408e-8667-db59617cd045" parentid="00000000-0000-0000-0000-000000000000" approved="True" spam="False" deleted="False">
+      <date>2012-11-21 14:42:05</date>
+      <author>mwrock</author>
+      <email>matt@mattwrock.com</email>
+      <country />
+      <ip>166.147.89.147</ip>
+      <avatar />
+      <content>Hi siyavash,
+
+No. Ilmerge cannot be used to also merge the runtime. I&amp;#39;ve heard that you can do something like that with mono but I don&amp;#39;t know the details.
+
+Matt </content>
+    </comment>
+    <comment id="f421f931-43e8-4b12-ba04-4e303607606c" parentid="00000000-0000-0000-0000-000000000000" approved="True" spam="False" deleted="False">
+      <date>2012-11-28 19:08:00</date>
+      <author>Siyavash</author>
+      <email>siyavash.g@outlook.com</email>
+      <country />
+      <ip>203.125.157.62</ip>
+      <avatar />
+      <content>Thanks a lot.</content>
+    </comment>
+    <comment id="a40624f1-a52f-4415-81e4-6385b47958e6" parentid="00000000-0000-0000-0000-000000000000" approved="True" spam="False" deleted="False">
+      <date>2013-01-03 05:59:16</date>
+      <author>Christian Fredh</author>
+      <email>christian.fredh@gmail.com</email>
+      <country />
+      <ip>213.115.150.70</ip>
+      <avatar />
+      <content>Now that .NET 4.5 has been is out for some time, does the same information still apply? The title says &amp;quot;.Net 4.5 Beta&amp;quot;.
+
+Thanks,
+Christian</content>
+    </comment>
+    <comment id="23eadfd0-b7d1-4451-8cd1-e240269e6e23" parentid="00000000-0000-0000-0000-000000000000" approved="True" spam="False" deleted="False">
+      <date>2013-01-03 09:31:13</date>
+      <author>siteduct.com</author>
+      <email>pingback</email>
+      <country />
+      <ip>199.188.200.60</ip>
+      <website>http://www.siteduct.com/blogs.php?pg=256236</website>
+      <content>Pingback from siteduct.com
+
+ASP.Net Script Installation Service</content>
+    </comment>
+    <comment id="8c711459-bae9-4676-a3f5-9beb63b4f43d" parentid="00000000-0000-0000-0000-000000000000" approved="True" spam="False" deleted="False">
+      <date>2013-02-19 17:31:05</date>
+      <author>Murray</author>
+      <email>murray@roke.co.nz</email>
+      <country />
+      <ip>210.48.100.210</ip>
+      <avatar />
+      <content>Hi Matt,
+I&amp;#39;m getting similar symptoms after starting using VS2012 (same exception, same fixes work such as install .net 4.5 or compile on 4.0)
+However we&amp;#39;re not using ILMerge at all, and we still want to target machines which do not have framework version 4.5
+
+Cheers.
+Murray.</content>
+    </comment>
+    <comment id="103ea809-a2e4-4dd6-a42e-9acae4ee3272" parentid="00000000-0000-0000-0000-000000000000" approved="True" spam="False" deleted="False">
+      <date>2013-02-19 17:40:53</date>
+      <author>mwrock</author>
+      <email>matt@mattwrock.com</email>
+      <country />
+      <ip>131.107.174.122</ip>
+      <avatar />
+      <content>Hi Murray,
+
+Are you doing anything out of the ordinary in your build process that might tamper with the IL?</content>
+    </comment>
+    <comment id="973a6c02-d595-4abc-b630-cf3061e547dd" parentid="00000000-0000-0000-0000-000000000000" approved="True" spam="False" deleted="False">
+      <date>2013-02-19 17:51:23</date>
+      <author>Murray</author>
+      <email>murray@roke.co.nz</email>
+      <country />
+      <ip>210.48.100.210</ip>
+      <avatar />
+      <content>No, but perhaps one of the 3rd party DLLs is, see one case&amp;#39;s stack trace here: http://issues.umbraco.org/issue/U4-1708</content>
+    </comment>
+    <comment id="9831fed0-eb01-4c3f-86e1-7f4c2fc27320" parentid="00000000-0000-0000-0000-000000000000" approved="True" spam="False" deleted="False">
+      <date>2013-02-20 01:46:00</date>
+      <author>Oliver Flint</author>
+      <email>trackback</email>
+      <country />
+      <ip>31.172.248.234</ip>
+      <website>http://www.oliverflint.co.uk/post/2013/02/20/ccrewrite-exited-with-code-532462766</website>
+      <content>ccrewrite exited with code -532462766
+
+ccrewrite exited with code -532462766</content>
+    </comment>
+    <comment id="b0ab1590-0b08-4ff8-91f3-5516f8a61c92" parentid="00000000-0000-0000-0000-000000000000" approved="True" spam="False" deleted="False">
+      <date>2013-02-20 14:53:29</date>
+      <author>Oliver Flint</author>
+      <email>oliverflint@gmail.com</email>
+      <country />
+      <ip>86.131.110.46</ip>
+      <avatar />
+      <content>Great post and info. Helped me with my problem... http://oliverflint.co.uk/post/2013/02/20/ccrewrite-exited-with-code-532462766
+
+Thanks very much!</content>
+    </comment>
+    <comment id="0c033680-172f-4d52-93f9-10360e8a1691" parentid="00000000-0000-0000-0000-000000000000" approved="True" spam="False" deleted="False">
+      <date>2013-02-24 22:20:31</date>
+      <author>dark side</author>
+      <email>dark_side@itwizzard.com</email>
+      <country />
+      <ip>111.94.216.86</ip>
+      <moderatedby>mwrock</moderatedby>
+      <avatar />
+      <content>great info, however I dont use ILMerge. Hope this page helps other.
+_____________________
+All about [b][i][u]sekretaris[/u][/i][/b]: http://www.sekertarisku.com/sekretaris-profesional.html</content>
+    </comment>
+    <comment id="68bcf0f0-8caa-4533-8a3c-4f7539276466" parentid="00000000-0000-0000-0000-000000000000" approved="True" spam="False" deleted="False">
+      <date>2013-05-20 23:44:16</date>
+      <author>Witek</author>
+      <email>witekbulak@gmail.com</email>
+      <country />
+      <ip>77.253.182.148</ip>
+      <moderatedby>mwrock</moderatedby>
+      <avatar />
+      <content>I&amp;#39;ve got same question as @Hesham, I&amp;#39;d like to use something like that for aspnet_merge - is there any possibility to make that?</content>
+    </comment>
+  </comments>
+  <categories />
+  <notifications>
+    <email>touhid3h@gmail.com</email>
+    <email>angelobestetti@gmail.com</email>
+    <email>hdesouky@gmail.com</email>
+    <email>joelkdennis@gmail.com</email>
+    <email>christian.fredh@gmail.com</email>
+    <email>murray@roke.co.nz</email>
+    <email>dark_side@itwizzard.com</email>
+    <email>witekbulak@gmail.com</email>
+    <email>jalbao@gmail.com</email>
+  </notifications>
+</post>

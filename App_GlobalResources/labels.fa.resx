@@ -1,7 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <root>
   <!-- 
-	Translation done by Kamyar Paykhan (http://www.devzone.ir) - 05/11/2011 - BE.NET 2.0
     Microsoft ResX Schema 
     
     Version 2.0
@@ -113,10 +112,10 @@
     <value>2.0</value>
   </resheader>
   <resheader name="reader">
-    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <resheader name="writer">
-    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="add" xml:space="preserve">
     <value>اضافه کردن</value>
@@ -167,7 +166,7 @@
     <value>ابتدایی</value>
   </data>
   <data name="beTheFirstToRate" xml:space="preserve">
-    <value>اولین کسی باشید که به این موضوع رای می دهد</value>
+    <value>اولین کسی باشید که به این پست رای میدهید</value>
   </data>
   <data name="blogMLDescription" xml:space="preserve">
     <value>BlogEngine.NET از &lt;a href="http://blogml.codeplex.com/" target="_blank"&gt;BlogML&lt;/a&gt; به عنوان قابل برای صدور مطالب استفاده می کند. ورود مطالب هم از طریق BlogML و هم از طریق RSS پشتیبانی می شود.</value>
@@ -771,7 +770,7 @@
     <value>تعداد کاراکترها</value>
   </data>
   <data name="ratingHasBeenRegistered" xml:space="preserve">
-    <value>نظر شما ثبت شد. متشکریم</value>
+    <value>امتیاز شما ثبت شده است. با تشکر از شما!</value>
   </data>
   <data name="rateThisXStars" xml:space="preserve">
     <value>به این {0} {1} ستاره از 5 ستاره بدهید</value>
@@ -780,7 +779,7 @@
     <value>انتقال</value>
   </data>
   <data name="moveWidgetTo" xml:space="preserve">
-    <value>انتقال Widget به</value>
+    <value>انتقال ویجت به</value>
   </data>
   <data name="link" xml:space="preserve">
     <value>پیوند</value>
@@ -957,7 +956,7 @@
     <value>مدیریت نشده</value>
   </data>
   <data name="action" xml:space="preserve">
-    <value>Action</value>
+    <value>حرکت</value>
   </data>
   <data name="automoderation" xml:space="preserve">
     <value>مدیریت و اداره خودکار</value>
@@ -1014,7 +1013,7 @@
     <value>آیا از حذف این نظر مطمئنید؟</value>
   </data>
   <data name="developmentMode" xml:space="preserve">
-    <value>وضعیت Development</value>
+    <value>وضعیت توسعه دهنده</value>
   </data>
   <data name="developmentModeCheckboxMessage" xml:space="preserve">
     <value>هنگام تست disqus به صورت local، این گزینه را تیک بزنید</value>
@@ -1093,10 +1092,10 @@
     <value>وب سایت برای چند ثانیه، غیر قابل دسترسی خواهد شد.\nآیا مطمئنید؟</value>
   </data>
   <data name="source" xml:space="preserve">
-    <value>Source</value>
+    <value>منبع</value>
   </data>
   <data name="sourceViewer" xml:space="preserve">
-    <value>Source نمایشگر</value>
+    <value>منبع نمایشگر</value>
   </data>
   <data name="status" xml:space="preserve">
     <value>وضعیت</value>
@@ -1183,7 +1182,7 @@
     <value>نمایش انتخاب کننده</value>
   </data>
   <data name="slug" xml:space="preserve">
-    <value>Slug (اختیاری)</value>
+    <value>آدرس این پست -  اختیاری</value>
   </data>
   <data name="specifyPingService" xml:space="preserve">
     <value>لطفا یک سرویس Ping را مشخص کنید</value>
@@ -1307,7 +1306,7 @@
     <value>بخش نام کاربری باید پر شود</value>
   </data>
   <data name="tracking" xml:space="preserve">
-    <value>Tracking</value>
+    <value>پیگیری</value>
   </data>
   <data name="welcome" xml:space="preserve">
     <value>خوش آمدید</value>
@@ -1334,7 +1333,7 @@
     <value>آمار</value>
   </data>
   <data name="trash" xml:space="preserve">
-    <value>Trash</value>
+    <value>سطل زباله</value>
   </data>
   <data name="unapproved" xml:space="preserve">
     <value>تایید نشده</value>
@@ -1535,7 +1534,7 @@
     <value>ویرایش صفحه</value>
   </data>
   <data name="excerpt" xml:space="preserve">
-    <value>خلاصه (اختیاری)</value>
+    <value>خلاصه  - اختیاری</value>
   </data>
   <data name="goToPage" xml:space="preserve">
     <value>رفتن به صفحه</value>
@@ -1583,7 +1582,7 @@
     <value>معلق</value>
   </data>
   <data name="pingbacksAndTrackbacks" xml:space="preserve">
-    <value>Pingbacks و Trackbacks</value>
+    <value>پینگ بک ها فعال و ترک بک ها</value>
   </data>
   <data name="viewSource" xml:space="preserve">
     <value>مشاهده Source</value>
@@ -1601,7 +1600,7 @@
     <value>رونویسی اجازه ها از</value>
   </data>
   <data name="customCode" xml:space="preserve">
-    <value>Custom code</value>
+    <value>کد دستی</value>
   </data>
   <data name="defaultAnonymousRole" xml:space="preserve">
     <value>نقش پیش فرض کاربران احراز هویت نشده</value>
@@ -1613,7 +1612,7 @@
     <value>ویرایش اجازه ها برای یک نقش</value>
   </data>
   <data name="feed" xml:space="preserve">
-    <value>Feed</value>
+    <value>خوراک</value>
   </data>
   <data name="newUserRoles" xml:space="preserve">
     <value>نقش های کاربر جدید</value>
@@ -1653,5 +1652,170 @@
   </data>
   <data name="toDisableSetTo0" xml:space="preserve">
     <value>برای غیر فعال کردن، مقدار "0" وارد کنید</value>
+  </data>
+  <data name="acceptAnyTextBeforeHostname" xml:space="preserve">
+    <value>هر متنی را قبل از نام هاست قبول کن</value>
+  </data>
+  <data name="active" xml:space="preserve">
+    <value>فعال</value>
+  </data>
+  <data name="activeThemes" xml:space="preserve">
+    <value>تم های فعال</value>
+  </data>
+  <data name="allowMobileTheme" xml:space="preserve">
+    <value>سایت موبایل</value>
+  </data>
+  <data name="alphaNumeric" xml:space="preserve">
+    <value>الفبایی یا عددی</value>
+  </data>
+  <data name="available" xml:space="preserve">
+    <value>قابل استفاده</value>
+  </data>
+  <data name="blogAdded" xml:space="preserve">
+    <value>بلاگ "{0}" ایجاد شد</value>
+  </data>
+  <data name="blogDeleted" xml:space="preserve">
+    <value>بلاگ "{0}" حذف شد</value>
+  </data>
+  <data name="blogs" xml:space="preserve">
+    <value>بلاگها</value>
+  </data>
+  <data name="cannotDeleteLastAdmin" xml:space="preserve">
+    <value>شما نمی توانید آخرین کاربر با دسترسی ایجاد و ویرایش بقیه کاربران را پاک کنید. قبل از حذف این کاربر، ابتدا این دسترسی را به کاربر دیگری بدهید.</value>
+  </data>
+  <data name="couldNotDeleteBlog" xml:space="preserve">
+    <value>خطا در حذف بلاگ: {0}</value>
+  </data>
+  <data name="currentTheme" xml:space="preserve">
+    <value>تم فعلی</value>
+  </data>
+  <data name="downloads" xml:space="preserve">
+    <value>دانلودها</value>
+  </data>
+  <data name="editExistingBlog" xml:space="preserve">
+    <value>ویرایش بلاگ</value>
+  </data>
+  <data name="existingBlogToCreateNewBlogFrom" xml:space="preserve">
+    <value>بلاگ موجود، برای ایجاد بلاگ جدید از روی آن</value>
+  </data>
+  <data name="forceMainTheme" xml:space="preserve">
+    <value>سایت عادی</value>
+  </data>
+  <data name="gallery" xml:space="preserve">
+    <value>گالری</value>
+  </data>
+  <data name="hostName" xml:space="preserve">
+    <value>نام هاست (اختیاری)</value>
+  </data>
+  <data name="installed" xml:space="preserve">
+    <value>نصب شده</value>
+  </data>
+  <data name="invalidBlogId" xml:space="preserve">
+    <value>id بلاگ نامعتبر</value>
+  </data>
+  <data name="itemsPerPage" xml:space="preserve">
+    <value>تعداد آیتمها/صفحه</value>
+  </data>
+  <data name="latestFromTheGallery" xml:space="preserve">
+    <value>آخرین های گالری</value>
+  </data>
+  <data name="newest" xml:space="preserve">
+    <value>جدیدترین</value>
+  </data>
+  <data name="orderBy" xml:space="preserve">
+    <value>مرتب سازی بر اساس</value>
+  </data>
+  <data name="savedByAtTime" xml:space="preserve">
+    <value>ذخیره شده توسط{0} در {1}</value>
+  </data>
+  <data name="setAsCurrentTheme" xml:space="preserve">
+    <value>ذخیره به عنوان تم فعلی</value>
+  </data>
+  <data name="setAsMobileTheme" xml:space="preserve">
+    <value>ذخیره به عنوان تم موبایل</value>
+  </data>
+  <data name="showEnableWebsiteInComments" xml:space="preserve">
+    <value>اجازه درج وبسایت در نظرات</value>
+  </data>
+  <data name="showEnableWebsiteInCommentsDescription" xml:space="preserve">
+    <value>مشخص کنید که آیا اجازه درج وبسایت در نظرات را میدهید یا نه</value>
+  </data>
+  <data name="storageContainerName" xml:space="preserve">
+    <value>نام مکان ذخیره سازی</value>
+  </data>
+  <data name="themes" xml:space="preserve">
+    <value>تمها</value>
+  </data>
+  <data name="virtualPath" xml:space="preserve">
+    <value>مسیر مجازی</value>
+  </data>
+  <data name="LangDirection" xml:space="preserve">
+    <value>rtl</value>
+  </data>
+  <data name="AllPostsTagged" xml:space="preserve">
+    <value>تمامی پست ها با برچسب</value>
+  </data>
+  <data name="count" xml:space="preserve">
+    <value>شمار</value>
+  </data>
+  <data name="createdOn" xml:space="preserve">
+    <value>ایجاد شده در</value>
+  </data>
+  <data name="deleteSelected" xml:space="preserve">
+    <value>حذف انتخاب شده ها</value>
+  </data>
+  <data name="enableOptimization" xml:space="preserve">
+    <value>فعال کردن بهینه سازی</value>
+  </data>
+  <data name="enableOptimizationDesc" xml:space="preserve">
+    <value>ترکیب و فشرده سازی استایل ها و اسکریپت ها . پیشنهاد میشوند فعال کنید</value>
+  </data>
+  <data name="fileManager" xml:space="preserve">
+    <value>مدیریت فایل</value>
+  </data>
+  <data name="galleryFeedUrl" xml:space="preserve">
+    <value>آدرس اتصال به گالری</value>
+  </data>
+  <data name="galleryFeedUrlDescription" xml:space="preserve">
+    <value>آدرس گالری معتبر که حاوی بسته های دانلود هستند</value>
+  </data>
+  <data name="personalDetails" xml:space="preserve">
+    <value>اطلاعات شخصی</value>
+  </data>
+  <data name="redirectToRemoveFileExtension" xml:space="preserve">
+    <value>با ورود به صفحاتی که پسوند دارند، آن صفحه را به بدون پسوند منتقل کند</value>
+  </data>
+  <data name="redirectToRemoveFileExtensionDesc" xml:space="preserve">
+    <value>تغییر مسیر صفحاتی که پسوند دارند به همان صفحه ولی بدون پسوند. (برای روشن کردن این گزینه حتما باید گزینه بالا روشن باشد</value>
+  </data>
+  <data name="rejectSelected" xml:space="preserve">
+    <value>رد کردن انتخاب شده ها</value>
+  </data>
+  <data name="removeExtensionsFromUrls" xml:space="preserve">
+    <value>حذف پسوند از آدرس ها</value>
+  </data>
+  <data name="removeExtensionsFromUrlsDesc" xml:space="preserve">
+    <value>حذف پسوند فایل از آدرس پست ها یا صفحات</value>
+  </data>
+  <data name="rights" xml:space="preserve">
+    <value>دسترسی</value>
+  </data>
+  <data name="spamProtection" xml:space="preserve">
+    <value>محافظت از هرزنامه</value>
+  </data>
+  <data name="tools" xml:space="preserve">
+    <value>ابزار</value>
+  </data>
+  <data name="unapprove" xml:space="preserve">
+    <value>رد کردن</value>
+  </data>
+  <data name="enterEmail" xml:space="preserve">
+    <value>ایمیل خود را وارد کنید</value>
+  </data>
+  <data name="notifyMe" xml:space="preserve">
+    <value>ثبت نام</value>
+  </data>
+  <data name="youHaveNoTaggedPosts" xml:space="preserve">
+    <value>شما هیچ برچسبی در پست ها ندارید</value>
   </data>
 </root>

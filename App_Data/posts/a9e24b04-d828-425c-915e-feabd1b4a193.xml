@@ -1,0 +1,151 @@
+﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<post>
+  <author>mwrock</author>
+  <title>Comparing RequestReduce with other popular minifiers</title>
+  <description />
+  <content>&lt;p&gt;I have been asked several times now how &lt;a href="http://RequestReduce.com"&gt;RequestReduce&lt;/a&gt; compares or is different to such popular minification and bundling solutions like &lt;a href="http://www.codethinked.com/squishit-the-friendly-aspnet-javascript-and-css-squisher" target="_blank"&gt;squishit&lt;/a&gt;, &lt;a href="http://getcassette.net/" target="_blank"&gt;cassette&lt;/a&gt; and the upcoming &lt;a href="http://weblogs.asp.net/scottgu/archive/2011/11/27/new-bundling-and-minification-support-asp-net-4-5-series.aspx"&gt;Asp.Net 4.5 Minification and Bundling&lt;/a&gt; features. Before I say anything let me comment that RequestReduce is an OSS project and I make no money from this project and in fact lose quite a bit of time to it. This comparison is not at all intended to make a statement that the other solutions out there suck and therefore you should use my super cool Wrock star solution. The solutions currently out there are all great tools written by great developers. Also, I am a Microsoft employee and do not in any way wish to compete with my employer. I am nothing but supportive of the asp.net team&amp;rsquo;s progress in enhancing performance out of the box with ASP.NET 4.5. That all said, RequestReduce does take a unique approach to bundling and minification that I want to point out in this post.&lt;/p&gt;
+&lt;h2&gt;Automatically Discovers CSS and Javascript with no code or config&lt;/h2&gt;
+&lt;p&gt;One of my primary objectives with RequestReduce is to have it optimize a website with absolutely no coding intervention. My philosophy is that a developer or team should not have to adjust their style or conventions to work with an auto minifying tool. Currently most of the popular tools require you to either inject code or a control into your asp.net page or MVC view to act as the touch point that defines what should be minimized.&lt;/p&gt;
+&lt;p&gt;Being able to avoid adding suvh code is obviously ideal for legacy apps where you might not even have the ability to change code or have no idea where to begin. I also like it for green field projects. I just don&amp;rsquo;t think that a tool like RequestReduce should have a noticeable presence in your code.&lt;/p&gt;
+&lt;p&gt;RequestReduce uses a response filter to scan your response for all &amp;lt;link&amp;gt; tags in the head and all &amp;lt;script&amp;gt; tags in the page. As long as the href or src points to a url that returns a css or javascript content type, it will be processed by RequestReduce. The exception to this rule is javascript with no-store or no-chache in their response or that expire in less than a week. RequestReduce ignores those. Also, RequestReduce, by default, ignores javascript pulled from the google or Microsoft CDNs. The idea there is that such content has a high likelihood of already being cached on the user&amp;rsquo;s browser. RequestReduce does expose configuration settings and an API to give more fine tuned control of what CSS and Javascript to filter.&lt;/p&gt;
+&lt;h2&gt;Minifies and Combines External and Dynamic Content&lt;/h2&gt;
+&lt;p&gt;Most of the popular minification and bundling solutions are file based. In other words, they pull down the original unminified resources via the file system and assume everything is already on your server. While this obviously covers most cases it does not cover external scripts or things like WebResource.axd and ScriptResource.axd which are generated dynamically.&lt;/p&gt;
+&lt;p&gt;RequestReduce is HTTP based. It pulls down original content via http which means it can pull down any css or javascript as long as it is publicly available from a url. This is great for a lot of blog and cms systems that heavily rely on Webresources and scriptresources. It is also great for external content. Now, as started above, RequestReduce ignores &amp;ldquo;near future&amp;rdquo; expiring scripts. However, toward the top end of my backlog is a feature to handle those. Imagine being able to include those pesky social media scripts.&lt;/p&gt;
+&lt;h2&gt;Automatically Sprites CSS Background images&lt;/h2&gt;
+&lt;p&gt;Anyone who has created sprite sheets from scratch knows how tedious that process can be. As a site adds images on new releases, those sprite sheets have to be revised which has an engineering cost and a risk of being forgotten. Ask your engineering team who wants to do the spriting and don&amp;rsquo;t expect a huge show of hands. RequestReduce parses the CSS and looks for images that it thinks it can sprite and then generates the sprite sheets on the fly.&lt;/p&gt;
+&lt;p&gt;There are limitations in what RequestReduce will find and potential to distort the page rendering in some cases when images are already sprited. Much of that can be easily mitigated. Please see &lt;a href="https://github.com/mwrock/RequestReduce/wiki/Why-do-my-background-images-appear-distorted-after-adding-RequestReduce%3F"&gt;this&lt;/a&gt; wiki and also &lt;a href="https://github.com/mwrock/RequestReduce/wiki/Can-I-make-changes-to-my-CSS-classes-to-optimize-RequestReduce-spriting%3F"&gt;this one&lt;/a&gt; for hints and explanations on how to improve and optimize the RequestReduce spriting experience. The very next feature I am working on should alleviate a lot of the mess that can sometimes occur with a fraction of sites that already have sprites and will also allow RequestReduce to sprite even more images. I have a few upgrades planned to address sprites. I also plan to address spriting foreground images. How cool would that be?&lt;/p&gt;
+&lt;h2&gt;Deferred Processing&lt;/h2&gt;
+&lt;p&gt;RequestReduce never blocks a request while waiting to minify and bundle resources. If RequestReduce has not already done the minification and bundling, it will send the original response and queue the resources for processing. In the case of RequestReduce this is particularly important since the spriting can be quite costly. Once resources have been processed, all subsequent requests for those resources will serve the optimized content using optimized caching headers and etags.&lt;/p&gt;
+&lt;h2&gt;SqlServer Content Synchronization and easy integration with CDNs and Cookie-Less domains&lt;/h2&gt;
+&lt;p&gt;RequestReduce allows you to easily configure an alternate hostname where you would like requests for static resources to be sent. This works great for CDNs and cookie less domains and it supports web performance best practices.&lt;/p&gt;
+&lt;p&gt;Also, since RequestReduce can synchronize optimized content via sql server, it becomes an ideal solution for many web farm implementations. A common problem in a web farm scenario is a request for the base page provides Urls for scripts and CSS that point to the optimized files. Then a different server receives these requests and if those resources have not been processed yet on that server, a 404 can ensue. This can also be handled with a common static file share. See &lt;a href="https://github.com/mwrock/RequestReduce/wiki/Will-RequestReduce-sync-css%2C-javascript-and-sprite-image-files-accross-all-of-the-web-servers-in-my-web-farm%3F"&gt;this wiki&lt;/a&gt; for more into on this.&lt;/p&gt;
+&lt;p&gt;Now a lot of the current solutions out there do provide integration points for you to extend their processing and plug in these kinds of features into their frameworks. RequestReduce attempts to provide these features out of the box.&lt;/p&gt;
+&lt;h2&gt;Why not just do all of this at Build Time?&lt;/h2&gt;
+&lt;p&gt;This is another common and somewhat related question I get. On the one hand, I totally agree. In fact in probably most scenarios out their on the net today, a build time solution will suffice. Most sites don&amp;rsquo;t deal with dynamic or external content which are the areas where a build time solution simply won&amp;rsquo;t work. A build time solution also imposes a lot less risk. There are no extra moving parts running in production to minify and bundle your code that can break. If this breakage interferes with your sites ability to serve its css and Javascript ,the results can be akin to total down time. Also, with a build time solution, you know exactly what is going into production and your test team can confidently sign off on what they tested.&lt;/p&gt;
+&lt;p&gt;I intend to eventually add features to RequestReduce to provide a better build time experience. To me, the beauty of a run time solution is not having to worry about declaratively adding new resources to the build tasks. As long as the tool is stable, I can have confidence that the new resources (images, css and javascript) will get picked up in the optimization. Also, the potential for optimizing external resources can potentially be huge. There is a fair amount to be done here to fully leverage this potential but it is a fact that much of a web&amp;rsquo;s performance degradation can be blamed on resources served from external sites.&lt;/p&gt;
+&lt;p&gt;I really hope this answers many of the questions about what makes RequestReduce different from other similar tool. Please do not hesitate to ask for more clarification in the comments if it does not or if you feel like I have missed anything significant&lt;/p&gt;</content>
+  <ispublished>True</ispublished>
+  <isdeleted>False</isdeleted>
+  <iscommentsenabled>True</iscommentsenabled>
+  <pubDate>2011-12-19 07:10:00</pubDate>
+  <lastModified>2013-05-29 12:28:01</lastModified>
+  <raters>0</raters>
+  <rating>0</rating>
+  <slug>Comparing-of-RequestReduce-with-other-popular-minifiers</slug>
+  <tags />
+  <comments>
+    <comment id="434753f2-462b-4c3c-86b6-ff0314d5d46f" parentid="00000000-0000-0000-0000-000000000000" approved="True" spam="False" deleted="False">
+      <date>2011-12-20 08:23:53</date>
+      <author>Dan</author>
+      <email>ddelucie@hotmail.com</email>
+      <country />
+      <ip>208.18.84.1</ip>
+      <avatar />
+      <content>You need a snazzier name for your blog.  May I suggest &amp;quot;Wrock Star Developer&amp;quot;  :-)
+
+Congrats on the success of RequestReduce.</content>
+    </comment>
+    <comment id="5a175590-f893-4742-984d-b2d133995322" parentid="00000000-0000-0000-0000-000000000000" approved="True" spam="False" deleted="False">
+      <date>2011-12-20 08:45:55</date>
+      <author>Matt Wrock</author>
+      <email>matt@mattwrock.com</email>
+      <country />
+      <ip>50.46.255.50</ip>
+      <moderatedby>mwrock</moderatedby>
+      <avatar />
+      <content>@Dan: Thanks Dan! That is a great name. I could change my avatar too to one of the KISS band members and create a whole new online persona modeled around that image. I would invent all sorts of catchy and amusing phrases filled with rock n&amp;#39; roll angst but craftily related to software development. Oh I&amp;#39;m liking it. I&amp;#39;m liking it alot!
+
+I&amp;#39;m thinking maybe a side kick lemur that is always by my side and dressed in a suit to play the role of square alter ego.</content>
+    </comment>
+    <comment id="6ad71f7c-a034-4a2c-b5e9-71b59d7234cd" parentid="00000000-0000-0000-0000-000000000000" approved="True" spam="False" deleted="False">
+      <date>2011-12-20 09:01:22</date>
+      <author>Marcus Greenwood</author>
+      <email>chickerino@gmail.com</email>
+      <country />
+      <ip>81.159.128.210</ip>
+      <avatar />
+      <content>I agree with Dan. It would be so post-ironic!
+
+Congrats and thanks for inventing RequestReduce. It&amp;#39;s a brilliant tool and even more brilliant that it just works without having to change a thing!</content>
+    </comment>
+    <comment id="309b83f5-638b-440a-a70d-930a0b0c5649" parentid="00000000-0000-0000-0000-000000000000" approved="True" spam="False" deleted="False">
+      <date>2011-12-20 09:28:43</date>
+      <author>mwrock</author>
+      <email>matt@mattwrock.com</email>
+      <country />
+      <ip>131.107.0.115</ip>
+      <moderatedby>mwrock</moderatedby>
+      <avatar />
+      <content>OK. I have the nicest blog readers on the internet!</content>
+    </comment>
+    <comment id="441f9db2-d784-44b7-890f-1d5e1c525280" parentid="00000000-0000-0000-0000-000000000000" approved="True" spam="False" deleted="False">
+      <date>2011-12-21 10:45:59</date>
+      <author>Dan</author>
+      <email>ddelucie@hotmail.com</email>
+      <country />
+      <ip>208.18.84.1</ip>
+      <moderatedby>mwrock</moderatedby>
+      <avatar />
+      <content>Matt:
+
+I hope you are serious because those are great ideas!!  Maybe you could photoshop your avatar with KISS makeup.  Or really put on KISS makeup and take a photo.  And you need a logo...
+http://www.1001fonts.com/font_preview_ttf.php?font_id=1061&amp;amp;text=Wrock+Star+Developer
+</content>
+    </comment>
+    <comment id="98ec1b62-30b8-4494-adb3-3d8b01b76e45" parentid="00000000-0000-0000-0000-000000000000" approved="True" spam="False" deleted="False">
+      <date>2012-02-28 01:38:58</date>
+      <author>Bauke</author>
+      <email>info@psdtohtmlshop.com</email>
+      <country />
+      <ip>82.73.36.230</ip>
+      <avatar />
+      <content>Great article and I agree with Dan. The name &amp;quot;Wrock Star Developer&amp;quot; would really fit your blog!
+
+www.psdtohtmlshop.com</content>
+    </comment>
+    <comment id="7b3b4ee4-2348-438a-b4d9-ae3483c67613" parentid="00000000-0000-0000-0000-000000000000" approved="True" spam="False" deleted="False">
+      <date>2012-08-21 06:16:11</date>
+      <author>Simon</author>
+      <email>sim0nalexander@hotmail.com</email>
+      <country />
+      <ip>86.137.198.231</ip>
+      <moderatedby>mwrock</moderatedby>
+      <avatar />
+      <content>Hi there,
+
+I have this working nicely on my site but gzip no longer seems to work on the reduced css and js files?
+
+Cheers
+
+Simon</content>
+    </comment>
+    <comment id="05a1ecbd-33cd-4e39-b3a0-5519ae13ddb4" parentid="00000000-0000-0000-0000-000000000000" approved="True" spam="False" deleted="False">
+      <date>2013-01-17 04:34:09</date>
+      <author>Sakshi Batra</author>
+      <email>cletusjoseph66@gmail.com</email>
+      <country />
+      <ip>120.61.50.176</ip>
+      <moderatedby>mwrock</moderatedby>
+      <avatar />
+      <content>Its really good one..
+
+
+
+
+http://www.psdtohtml5wordpress.com/psd-to-wordpress/
+
+</content>
+    </comment>
+  </comments>
+  <categories>
+    <category>2f8206f0-95a4-449e-bf74-3b2cb761de04</category>
+  </categories>
+  <notifications>
+    <email>chickerino@gmail.com</email>
+    <email>ddelucie@hotmail.com</email>
+    <email>emmasters2@gmail.com</email>
+    <email>prelet22@hotmail.com</email>
+    <email>sim0nalexander@hotmail.com</email>
+    <email>cletusjoseph66@gmail.com</email>
+  </notifications>
+</post>

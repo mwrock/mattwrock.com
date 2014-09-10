@@ -1,0 +1,88 @@
+﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<post>
+  <author>mwrock</author>
+  <title>Setting Response.Filter after Response.Redirect can cause a Filtering is not allowed HttpException</title>
+  <description />
+  <content>&lt;p&gt;&lt;img style="margin: 0px 10px 0px 0px;" src="http://www.malwaredictionary.com/wp-content/uploads/2011/04/A-Quick-Browser-Redirect-Fix.jpg" alt="" /&gt;&lt;/p&gt;
+&lt;p&gt;I ran into this error on a &lt;a href="http://RequestReduce.com"&gt;RequestReduce&lt;/a&gt; bug and there was not a whole lot of information pointing to a cause and remedy. So I&amp;rsquo;m posting this in the hopes that it will help the Google Lords find a solution more quickly for others.&lt;/p&gt;
+&lt;p&gt;So if you are using Razor templates in Asp.Net and you issue a Response.Redirect at some point either in the template itself or from a method that the template calls like Html.RenderAction for example, and then you later set a response&amp;nbsp; filter by calling Response.Filter, you will receive an HttpException stating &amp;ldquo;Filtering is not allowed.&amp;rdquo; It may look a little like this friendly message:&lt;/p&gt;
+&lt;div id="codeSnippetWrapper"&gt;
+&lt;div id="codeSnippetWrapper"&gt;
+&lt;pre id="codeSnippet" style="text-align: left; line-height: 12pt; background-color: #f4f4f4; margin: 0em; width: 100%; font-family: 'Courier New', courier, monospace; direction: ltr; color: black; font-size: 8pt; overflow: visible; border-style: none; padding: 0px;"&gt;System.Web.HttpException (0x80004005): Filtering &lt;span style="color: #0000ff;"&gt;is&lt;/span&gt; not allowed.&lt;br /&gt;at System.Web.HttpResponse.set_Filter(Stream &lt;span style="color: #0000ff;"&gt;value&lt;/span&gt;)&lt;br /&gt;at RequestReduce.Module.RequestReduceModule.InstallFilter(HttpContextBase context) &lt;br /&gt;&lt;span style="color: #0000ff;"&gt;in&lt;/span&gt; c:\RequestReduce\RequestReduce\Module\RequestReduceModule.cs:line 223&lt;br /&gt;at System.Web.HttpApplication.SendResponseExecutionStep.System.Web.HttpApplication.IExecutionStep.Execute()&lt;br /&gt;at System.Web.HttpApplication.ExecuteStep(IExecutionStep step, Boolean&amp;amp; completedSynchronously)&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;p&gt;For example, consider this Razor page:&lt;/p&gt;
+&lt;div id="codeSnippetWrapper"&gt;
+&lt;pre id="codeSnippet" style="text-align: left; line-height: 12pt; background-color: #f4f4f4; margin: 0em; width: 100%; font-family: 'Courier New', courier, monospace; direction: ltr; color: black; font-size: 8pt; overflow: visible; border-style: none; padding: 0px;"&gt;@{&lt;br /&gt;    Layout = &lt;span style="color: #0000ff;"&gt;null&lt;/span&gt;;&lt;br /&gt;}&lt;br /&gt;&lt;br /&gt;&amp;lt;!DOCTYPE html&amp;gt;&lt;br /&gt;&lt;br /&gt;&amp;lt;html&amp;gt;&lt;br /&gt;&amp;lt;head runat=&lt;span style="color: #006080;"&gt;"server"&lt;/span&gt;&amp;gt;&lt;br /&gt;    &amp;lt;title&amp;gt;index&amp;lt;/title&amp;gt;&lt;br /&gt;&amp;lt;/head&amp;gt;&lt;br /&gt;&amp;lt;body&amp;gt;&lt;br /&gt;    &amp;lt;div&amp;gt;&lt;br /&gt;@{ Html.RenderAction(&lt;span style="color: #006080;"&gt;"Redirect"&lt;/span&gt;); }&lt;br /&gt;    &amp;lt;/div&amp;gt;&lt;br /&gt;&amp;lt;/body&amp;gt;&lt;br /&gt;&amp;lt;/html&amp;gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;p&gt;Now assume we have a very simple action method like this:&lt;/p&gt;
+&lt;div id="codeSnippetWrapper"&gt;
+&lt;pre id="codeSnippet" style="text-align: left; line-height: 12pt; background-color: #f4f4f4; margin: 0em; width: 100%; font-family: 'Courier New', courier, monospace; direction: ltr; color: black; font-size: 8pt; overflow: visible; border-style: none; padding: 0px;"&gt;&lt;span style="color: #0000ff;"&gt;public&lt;/span&gt; ActionResult Redirect()&lt;br /&gt;{&lt;br /&gt;    Response.Redirect(&lt;span style="color: #006080;"&gt;"/Home/target"&lt;/span&gt;);&lt;br /&gt;    &lt;span style="color: #0000ff;"&gt;return&lt;/span&gt; View();&lt;br /&gt;}&lt;/pre&gt;
+&lt;/div&gt;
+&lt;p&gt;Ok. That&amp;rsquo;s kind of silly code but this is just to illustrate an example. And besides, who doesn&amp;rsquo;t like to be silly sometimes. Now it so happens that You have an HttpModule that sets a Response Filter. Here is what you should do:&lt;/p&gt;
+&lt;div id="codeSnippetWrapper"&gt;
+&lt;pre id="codeSnippet" style="text-align: left; line-height: 12pt; background-color: #f4f4f4; margin: 0em; width: 100%; font-family: 'Courier New', courier, monospace; direction: ltr; color: black; font-size: 8pt; overflow: visible; border-style: none; padding: 0px;"&gt;&lt;span style="color: #0000ff;"&gt;if&lt;/span&gt;(!Response.IsRequestBeingRedirected)&lt;br /&gt;    Response.Filter = myFilter;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;p&gt;If you neglect to use the If statement checking for a redirect, you will be sorry. Unless of course you enjoy a white background with black text inside yellow boxes.&lt;/p&gt;
+&lt;p&gt;While my encounter to this has been with Razor templates and this does not reproduce using Web Forms views, I would still check for redirects before setting a Response Filter in any context. There is no reason that I can think of to ever filter a response that is being redirected.&lt;/p&gt;</content>
+  <ispublished>True</ispublished>
+  <isdeleted>False</isdeleted>
+  <iscommentsenabled>True</iscommentsenabled>
+  <pubDate>2011-12-17 10:02:00</pubDate>
+  <lastModified>2012-05-10 06:56:26</lastModified>
+  <raters>0</raters>
+  <rating>0</rating>
+  <slug>Setting-ResponseFilter-after-ResponseRedirect-can-cause-a-Filtering-is-not-allowed-HttpException</slug>
+  <tags />
+  <comments>
+    <comment id="b0deed33-3b22-473e-b788-72f90a48e9ff" parentid="00000000-0000-0000-0000-000000000000" approved="True" spam="False" deleted="False">
+      <date>2012-02-15 08:52:18</date>
+      <author>john v.</author>
+      <email>johnv@vnhojliame.com</email>
+      <country />
+      <ip>195.174.24.122</ip>
+      <avatar />
+      <content>redirect works fine with filters in asp.net 2.0</content>
+    </comment>
+    <comment id="1ec8854e-8c0c-4884-b55c-ea7c02fdf5f3" parentid="00000000-0000-0000-0000-000000000000" approved="True" spam="False" deleted="False">
+      <date>2012-02-15 09:09:10</date>
+      <author>mwrock</author>
+      <email>matt@mattwrock.com</email>
+      <country />
+      <ip>50.46.255.50</ip>
+      <avatar />
+      <content>Yes. This seems to be an issue unique to Razor. At least as far as I could tell. </content>
+    </comment>
+    <comment id="f05611cd-d767-418b-8232-9b4085e05ece" parentid="00000000-0000-0000-0000-000000000000" approved="True" spam="False" deleted="False">
+      <date>2012-05-09 13:42:22</date>
+      <author>Craig</author>
+      <email>candrews@integralblue.com</email>
+      <country />
+      <ip>204.128.220.10</ip>
+      <moderatedby>mwrock</moderatedby>
+      <avatar />
+      <content>Instead of using:
+if(Response.StatusCode != 302 &amp;amp;&amp;amp; Response.StatusCode != 301)
+Would:
+if(Response.IsRequestBeingRedirected)
+be better? It seems a bit more clear and readable, more abstracted, and does the same thing.</content>
+    </comment>
+    <comment id="d6dcb0c0-c7e7-465f-8096-11b09304058a" parentid="00000000-0000-0000-0000-000000000000" approved="True" spam="False" deleted="False">
+      <date>2012-05-10 06:54:15</date>
+      <author>mwrock</author>
+      <email>matt@mattwrock.com</email>
+      <country />
+      <ip>50.46.255.50</ip>
+      <avatar />
+      <content>Craig,
+
+Great observation. You are right. I will edit this post to reflect that.
+
+Thanks!</content>
+    </comment>
+  </comments>
+  <categories />
+  <notifications>
+    <email>candrews@integralblue.com</email>
+  </notifications>
+</post>

@@ -112,11 +112,100 @@
     <value>2.0</value>
   </resheader>
   <resheader name="reader">
-    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <resheader name="writer">
-    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="displayName" xml:space="preserve">
+    <value>Nombre para mostrar</value>
+  </data>
+  <data name="moderator" xml:space="preserve">
+    <value>Moderador</value>
+  </data>
+  <data name="blogs" xml:space="preserve">
+    <value>Blogs</value>
+  </data>
+  <data name="itemsPerPage" xml:space="preserve">
+    <value>Items/Page</value>
+  </data>
+  <data name="couldNotDeleteBlog" xml:space="preserve">
+    <value>No se pudo eliminar el blog: {0}</value>
+  </data>
+  <data name="blogDeleted" xml:space="preserve">
+    <value>El blog "{0}" ha sido eliminado</value>
+  </data>
+  <data name="blogAdded" xml:space="preserve">
+    <value>El blog "{0}" ha sido creado</value>
+  </data>
+  <data name="invalidBlogId" xml:space="preserve">
+    <value>Id de Blog no válido</value>
+  </data>
+  <data name="editExistingBlog" xml:space="preserve">
+    <value>Modificar blog</value>
+    <comment>'Modificar' is most accurated than 'Editar'</comment>
+  </data>
+  <data name="storageContainerName" xml:space="preserve">
+    <value>Contenedor de almacenamiento</value>
+    <comment>"Nombre del Contenedor de Almacenamiento" is too long</comment>
+  </data>
+  <data name="virtualPath" xml:space="preserve">
+    <value>Ruta de Acceso Virtual</value>
+  </data>
+  <data name="active" xml:space="preserve">
+    <value>Activo</value>
+  </data>
+  <data name="existingBlogToCreateNewBlogFrom" xml:space="preserve">
+    <value>Crear un nuevo Blog a partir de</value>
+  </data>
+  <data name="hostName" xml:space="preserve">
+    <value>Nombre del Host (opcional)</value>
+  </data>
+  <data name="acceptAnyTextBeforeHostname" xml:space="preserve">
+    <value>Aceptar cualquier texto antes del nombre del Host</value>
+  </data>
+  <data name="latestFromTheGallery" xml:space="preserve">
+    <value>Lo más reciente de la galería</value>
+  </data>
+  <data name="savedByAtTime" xml:space="preserve">
+    <value>Guardado por {0} en {1}</value>
+  </data>
+  <data name="available" xml:space="preserve">
+    <value>Disponible</value>
+  </data>
+  <data name="currentTheme" xml:space="preserve">
+    <value>Tema actual</value>
+  </data>
+  <data name="gallery" xml:space="preserve">
+    <value>Galería</value>
+  </data>
+  <data name="installed" xml:space="preserve">
+    <value>Instalados</value>
+  </data>
+  <data name="setAsCurrentTheme" xml:space="preserve">
+    <value>Establecer como tema actual</value>
+  </data>
+  <data name="setAsMobileTheme" xml:space="preserve">
+    <value>Establecer como tema móvil</value>
+  </data>
+  <data name="themes" xml:space="preserve">
+    <value>Temas</value>
+  </data>
+  <data name="alphaNumeric" xml:space="preserve">
+    <value>Alfanumérico</value>
+  </data>
+  <data name="downloads" xml:space="preserve">
+    <value>Descargas</value>
+  </data>
+  <data name="newest" xml:space="preserve">
+    <value>Lo mas nuevo</value>
+  </data>
+  <data name="orderBy" xml:space="preserve">
+    <value>Ordenar por</value>
+  </data>
+  <data name="activeThemes" xml:space="preserve">
+    <value>Temas Activos</value>
+  </data>
   <data name="add" xml:space="preserve">
     <value>Agregar</value>
   </data>
@@ -191,9 +280,6 @@
   </data>
   <data name="closeCommetsAfter" xml:space="preserve">
     <value>No aceptar nuevos comentarios después de </value>
-  </data>
-  <data name="combine" xml:space="preserve">
-    <value>Combinación</value>
   </data>
   <data name="comment" xml:space="preserve">
     <value>Comentario</value>
@@ -385,9 +471,6 @@
   <data name="themeCookieName" xml:space="preserve">
     <value>Nombre de la cookie del tema</value>
   </data>
-  <data name="monster" xml:space="preserve">
-    <value>Monstruo</value>
-  </data>
   <data name="more" xml:space="preserve">
     <value>Más</value>
   </data>
@@ -449,7 +532,7 @@
     <value>Publicaciones</value>
   </data>
   <data name="postsPerFeed" xml:space="preserve">
-    <value>No. de elementos mostrados</value>
+    <value>Nº de elementos mostrados</value>
   </data>
   <data name="previousPost" xml:space="preserve">
     <value>Publicación anterior</value>
@@ -471,7 +554,7 @@
   </data>
   <data name="recentComments" xml:space="preserve">
     <value>Comentarios recientes</value>
-  </data> 
+  </data>
   <data name="recentPosts" xml:space="preserve">
     <value>Publicaciones recientes</value>
   </data>
@@ -494,13 +577,13 @@
     <value>Guardar</value>
   </data>
   <data name="saveComment" xml:space="preserve">
-    <value>Guardar comentario</value>
+    <value>Guardar comentario </value>
   </data>
   <data name="savePage" xml:space="preserve">
-    <value>Guardar página</value>
+    <value>Guardar página </value>
   </data>
   <data name="savePost" xml:space="preserve">
-    <value>Guardar publicación</value>
+    <value>Guardar publicación </value>
   </data>
   <data name="saveSettings" xml:space="preserve">
     <value>Guardar configuración</value>
@@ -530,7 +613,7 @@
     <value>Enviar</value>
   </data>
   <data name="sendCommentEmail" xml:space="preserve">
-    <value>Enviar correos electrónicos con los comentario</value>
+    <value>Enviar correos electrónicos con los comentarios</value>
   </data>
   <data name="separateTagsWitComma" xml:space="preserve">
     <value>Separe una etiqueta de otra con una coma</value>
@@ -662,7 +745,7 @@
     <value>Intereses</value>
   </data>
   <data name="isPrivate" xml:space="preserve">
-    <value>Es Privade</value>
+    <value>Es Privado</value>
   </data>
   <data name="lastName" xml:space="preserve">
     <value>Apellido</value>
@@ -671,19 +754,19 @@
     <value>Ocupación</value>
   </data>
   <data name="photoURL" xml:space="preserve">
-    <value>FotoURL</value>
+    <value>URL Foto</value>
   </data>
   <data name="regionState" xml:space="preserve">
     <value>Estado/Región</value>
   </data>
   <data name="saveProfile" xml:space="preserve">
-    <value>Guardar Pefile</value>
+    <value>Guardar Perfil </value>
   </data>
   <data name="switchUserProfile" xml:space="preserve">
     <value>Cambiar al perfil de usuario</value>
   </data>
   <data name="company" xml:space="preserve">
-    <value>Compañia</value>
+    <value>Compañía</value>
   </data>
   <data name="middleName" xml:space="preserve">
     <value>Segundo Nombre</value>
@@ -691,11 +774,8 @@
   <data name="phoneFax" xml:space="preserve">
     <value>Número de Fax</value>
   </data>
-  <data name="phoneMain" xml:space="preserve">
-    <value>Télefono</value>
-  </data>
   <data name="phoneMobile" xml:space="preserve">
-    <value>Télefono movil</value>
+    <value>Teléfono móvil</value>
   </data>
   <data name="profile" xml:space="preserve">
     <value>Perfil</value>
@@ -773,10 +853,10 @@
     <value>Cancelar respuesta al comentario</value>
   </data>
   <data name="numberOfCharacters" xml:space="preserve">
-    <value>Número de comentarios</value>
+    <value>Número de caracteres</value>
   </data>
   <data name="ratingHasBeenRegistered" xml:space="preserve">
-    <value>Su votación ha sido procesada. Gracias!</value>
+    <value>Su votación ha sido procesada. ¡Gracias!</value>
   </data>
   <data name="rateThisXStars" xml:space="preserve">
     <value>Calificar este {0} {1}/5 estrellas</value>
@@ -988,7 +1068,6 @@
   <data name="applyChanges" xml:space="preserve">
     <value>Aplicar cambios</value>
   </data>
-
   <data name="clickToDisable" xml:space="preserve">
     <value>Clic para deshabilitar</value>
   </data>
@@ -1037,10 +1116,10 @@
   </value>
   </data>
   <data name="dontHaveAccount" xml:space="preserve">
-    <value>Todavía no tiene una cuenta?</value>
+    <value>¿Todavía no tiene una cuenta?</value>
   </data>
   <data name="forgotPassword" xml:space="preserve">
-    <value>Olvidó su contraseñá?</value>
+    <value>¿Olvidó su contraseña?</value>
   </data>
   <data name="isAlreadyExists" xml:space="preserve">
     <value>ya existe</value>
@@ -1057,7 +1136,6 @@
   <data name="moderatedByDisqus" xml:space="preserve">
     <value>Moderado por Disqus.</value>
   </data>
-
   <data name="myProfile" xml:space="preserve">
     <value>Mi Perfil</value>
   </data>
@@ -1096,7 +1174,7 @@
     <value>Regresar al blog</value>
   </data>
   <data name="siteUnavailableConfirm" xml:space="preserve">
-    <value>La página web no estará disponible por unos segundos.\nEstá seguro que desea continuar?</value>
+    <value>La página web no estará disponible por unos segundos.\n¿Está seguro que desea continuar?</value>
   </data>
   <data name="source" xml:space="preserve">
     <value>Fuente</value>
@@ -1128,7 +1206,6 @@
   <data name="createRole" xml:space="preserve">
     <value>Crear Rol</value>
   </data>
-
   <data name="download" xml:space="preserve">
     <value>Descargar</value>
   </data>
@@ -1148,13 +1225,13 @@
     <value>Por favor introduce una fecha válida (yyyy-mm-dd hh:mm)</value>
   </data>
   <data name="enterValidName" xml:space="preserve">
-    <value>Por favor introduce un nombre valido</value>
+    <value>Por favor introduce un nombre válido</value>
   </data>
   <data name="enterValidNumber" xml:space="preserve">
     <value>Por favor introduce un número válido</value>
   </data>
   <data name="enterValidNumberPositiveNegative" xml:space="preserve">
-    <value>Por favor especifica un número valido (positivo o negativo)</value>
+    <value>Por favor especifica un número válido (positivo o negativo)</value>
   </data>
   <data name="extractFromTitle" xml:space="preserve">
     <value>Extraer del título</value>
@@ -1183,7 +1260,6 @@
   <data name="preview" xml:space="preserve">
     <value>Vista previa</value>
   </data>
-
   <data name="roles" xml:space="preserve">
     <value>Roles</value>
   </data>
@@ -1213,12 +1289,11 @@
     <value>Subir</value>
   </data>
   <data name="usernameAlreadyTaken" xml:space="preserve">
-    <value>Ese nombre de usuario ya está en uso</value>
+    <value>El nombre de usuario ya está en uso</value>
   </data>
   <data name="notifiedPublished" xml:space="preserve">
-    <value>Notificarme cuando una haya una nueva publicación.</value>
+    <value>Reciba una notificación cuando haya una nueva publicación.</value>
   </data>
-
   <data name="pendingApproval" xml:space="preserve">
     <value>Los comentarios quedarán pendientes a la aprobación del administrador</value>
   </data>
@@ -1260,21 +1335,16 @@
     <value>El tamaño máximo en bytes de los archivos remotos que puede descargar el servidor. Asigne 0 para ilimitado.</value>
   </data>
   <data name="selfRegistrationInitialRole" xml:space="preserve">
-    <value>Rol inicial para el auto registro</value>
+    <value>Rol inicial para el auto-registro</value>
   </data>
   <data name="enableRecaptcha" xml:space="preserve">
     <value>Habilitar Recaptcha</value>
   </data>
-  
-  <data name="notifiedPublished" xml:space="preserve">
-    <value>Reciba una notificación cuando haya una nueva publicación.</value>
-  </data>
-
   <data name="recaptchaConfigureReminder" xml:space="preserve">
-    <value>Asegúrse de que la extensión Recaptcha habilitada y configurada correctamente.</value>
+    <value>Asegúrese de que la extensión Recaptcha está habilitada y configurada correctamente</value>
   </data>
   <data name="whitelistIpOnCommentApproval" xml:space="preserve">
-    <value>Automáticamente agregar la Dirección IP de los comentarios que aprobó a la lista blanca</value>
+    <value>Agregar automáticamente la dirección IP de los comentarios que aprobó a la lista blanca</value>
   </data>
   <data name="blacklistIpOnCommentRejection" xml:space="preserve">
     <value>Automáticamente agregar la Direccion IP de los comentarios que rechazó a la lista negra.</value>
@@ -1286,10 +1356,10 @@
     <value>Agrupar por año</value>
   </data>
   <data name="recentDatesAtTop" xml:space="preserve">
-    <value>Fechas recientes arriba</value>
+    <value>Fechas recientes primero</value>
   </data>
   <data name="confirmPasswordIsRequired" xml:space="preserve">
-    <value>Se requiere contraseñá confirmada</value>
+    <value>Se requiere confirmación de contraseña</value>
   </data>
   <data name="emailIsInvalid" xml:space="preserve">
     <value>La direccion de correo electrónico no es válida</value>
@@ -1316,7 +1386,7 @@
     <value>Se requiere la contraseña</value>
   </data>
   <data name="passwordAndConfirmPasswordIsMatch" xml:space="preserve">
-    <value>La contraseña y la contraseña de confirmación deben no concuerdan</value>
+    <value>La contraseña y la contraseña de confirmación no coinciden</value>
   </data>
   <data name="userNameIsRequired" xml:space="preserve">
     <value>Se requiere el nombre de usuario</value>
@@ -1369,7 +1439,6 @@
   <data name="notAuthorized" xml:space="preserve">
     <value>No autorizado.</value>
   </data>
-
   <data name="userAlreadyExists" xml:space="preserve">
     <value>El usuario "{0}" ya existe.</value>
   </data>
@@ -1422,7 +1491,7 @@
     <value>No regresar valores que tegan valores en falso.</value>
   </data>
   <data name="emailArgumentInvalid" xml:space="preserve">
-    <value>El argumento del la dirección de correo electrónico es inválido.</value>
+    <value>El valor de la dirección de correo electrónico no es válido</value>
   </data>
   <data name="errorApprovingComment" xml:space="preserve">
     <value>Error al aprobar el comentario: {0}</value>
@@ -1434,10 +1503,10 @@
     <value>el id del argumento es nulo.</value>
   </data>
   <data name="invalidPageId" xml:space="preserve">
-    <value>Id ináalido de la página</value>
+    <value>Id de la página inválido</value>
   </data>
   <data name="invalidPostId" xml:space="preserve">
-    <value>Id inválido de la publicación</value>
+    <value>Id de la publicación inválido</value>
   </data>
   <data name="invalidRoleName" xml:space="preserve">
     <value>Nombre de rol inválido</value>
@@ -1452,7 +1521,7 @@
     <value>El Id de la página es requerido</value>
   </data>
   <data name="passwordArgumentInvalid" xml:space="preserve">
-    <value>El argumento del password es inválido.</value>
+    <value>El valor de la contraseña no es válido.</value>
   </data>
   <data name="postDeleted" xml:space="preserve">
     <value>Publicación eliminada</value>
@@ -1461,16 +1530,16 @@
     <value>Perfil {0} actualizado</value>
   </data>
   <data name="rightsCanNotBeNull" xml:space="preserve">
-    <value>El argumento de la Coleccion de Privilegios no puede ser nulo.</value>
+    <value>El valor de la colección de Privilegios no puede ser nulo.</value>
   </data>
   <data name="rightsUpdatedForRole" xml:space="preserve">
     <value>Privilegios actualizados para el rol: "{0}"</value>
   </data>
   <data name="roleAlreadyExists" xml:space="preserve">
-    <value>El role "{0}" ya existe</value>
+    <value>El rol "{0}" ya existe</value>
   </data>
   <data name="roleHasBeenCreated" xml:space="preserve">
-    <value>El role "{0}" ha sido creado</value>
+    <value>El rol "{0}" ha sido creado</value>
   </data>
   <data name="roleHasBeenDeleted" xml:space="preserve">
     <value>El rol "{0}" ha sido eliminado</value>
@@ -1503,7 +1572,7 @@
     <value>La etiqueta es un campo requerido.</value>
   </data>
   <data name="userArgumentInvalid" xml:space="preserve">
-    <value>El argumento del usuario es invalido.</value>
+    <value>El nombre del usuario no es válido</value>
   </data>
   <data name="userHasBeenCreated" xml:space="preserve">
     <value>El usuario "{0}" ha sido creado</value>
@@ -1596,7 +1665,7 @@
     <value>Habilitar</value>
   </data>
   <data name="pending" xml:space="preserve">
-    <value>Pentiente</value>
+    <value>Pendiente</value>
   </data>
   <data name="pingbacksAndTrackbacks" xml:space="preserve">
     <value>Pingbacks &amp;amp; Trackbacks</value>
@@ -1620,10 +1689,10 @@
     <value>Código personalizado</value>
   </data>
   <data name="defaultAnonymousRole" xml:space="preserve">
-    <value>rol Anónimo por default</value>
+    <value>rol Anónimo por defecto</value>
   </data>
   <data name="defaultEditorsRole" xml:space="preserve">
-    <value>role de Editores por default</value>
+    <value>rol de Editores por defecto</value>
   </data>
   <data name="editingRightsForRole" xml:space="preserve">
     <value>Privilegios de edición para el rol</value>
@@ -1632,7 +1701,7 @@
     <value>Feed</value>
   </data>
   <data name="newUserRoles" xml:space="preserve">
-    <value>Nuevo role para usuarios</value>
+    <value>Roles para el nuevo usuario</value>
   </data>
   <data name="otherSettings" xml:space="preserve">
     <value>Otras configuraciones</value>
@@ -1641,7 +1710,7 @@
     <value>Servidor SMTP</value>
   </data>
   <data name="turnDisqusOnOff" xml:space="preserve">
-    <value>Apagar o enender Disqus</value>
+    <value>Activar o desactivar Disqus</value>
   </data>
   <data name="useDisqusAsCommentProvider" xml:space="preserve">
     <value>Usar Disqus como provedor de comentarios</value>
@@ -1671,7 +1740,7 @@
     <value>Para deshabilitar, asigne "0"</value>
   </data>
   <data name="cannotDeleteLastAdmin" xml:space="preserve">
-    <value>No puede borrar el último usuari con privilegios para crear o editar usuarios. Asigne estos privilegios a otro usuario antes de borrar este usuario.</value>
+    <value>No puede borrar el último usuario con privilegios para crear o editar usuarios. Asigne estos privilegios a otro usuario antes de borrar este usuario.</value>
   </data>
   <data name="forceMainTheme" xml:space="preserve">
     <value>Sitio regular</value>
@@ -1681,5 +1750,8 @@
   </data>
   <data name="showPostNavigation" xml:space="preserve">
     <value>Mostrar los links de navegación</value>
+  </data>
+  <data name="phoneMain" xml:space="preserve">
+    <value>Teléfono</value>
   </data>
 </root>

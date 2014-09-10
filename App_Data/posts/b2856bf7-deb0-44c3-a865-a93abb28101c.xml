@@ -1,0 +1,103 @@
+﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<post>
+  <author>mwrock</author>
+  <title>VerificationException: “Operation could destabilize the runtime” An exception with a bark much worse than its bite</title>
+  <description />
+  <content>&lt;p&gt;As a software engineer my greatest ambition is to produce code that will have a lasting impact on my fellow humans. I want to make good things happen to both good and bad people. The last thing I want to do is destabilize the runtime. Whether it be my runtime or your runtime, if you cant run and there is no time…hmmm…sounds kinda like death which of course has its own baggage and negative set of connotations.&lt;/p&gt;  &lt;p&gt;So, you can now understand the horror I must have experienced yesterday morning when I got this:&lt;/p&gt;  &lt;p&gt;&lt;a href="http://www.mattwrock.com/image.axd?picture=image_12.png"&gt;&lt;img style="background-image: none; border-right-width: 0px; margin: 0px 10px 0px 0px; padding-left: 0px; padding-right: 0px; display: inline; border-top-width: 0px; border-bottom-width: 0px; border-left-width: 0px; padding-top: 0px" title="image" border="0" alt="image" src="http://www.mattwrock.com/image.axd?picture=image_thumb_12.png" width="706" height="434" /&gt;&lt;/a&gt;&lt;/p&gt;  &lt;p&gt;&amp;#160;&lt;/p&gt;  &lt;p&gt;Couple things worth noting here: “[No relevant source lines]”. Oh that’s helpful. Is the source so potentially harmful that the runtime has deemed the offending code “irrelevant.” Yeah? Well I think YOU are irrelevent .NET! I’m gonna put your worker threads in a warehouse and shut down your I/O completion ports. Minutes pass. Absolute silence. .Net remains unmoved by my threats and I realize that I must use what little intelligence I have to slog through this and figure it out for myself. The rest of this post is a narrative account of just that process. So sit back, reach for that glass of pinot and enjoy this tale of Verification Exceptions in Medium Trust on the .Net 2.0 runtime. Mmmm. You can tell already its gonna be good.&lt;/p&gt;  &lt;h2&gt;What is a Verification Exception&lt;/h2&gt;  &lt;p&gt;According to &lt;a href="http://msdn.microsoft.com/en-us/library/system.security.verificationexception.aspx"&gt;the official MSDN Library documentation&lt;/a&gt;, a VerificationException is “The exception that is thrown when the security policy requires code to be type safe and the verification process is unable to verify that the code is type safe.” Good enough for me. But for the obtuse, we will explore further.&lt;/p&gt;  &lt;p&gt;Well unfortunately it doesn’t take much exploring to discover that there is not a lot of detailed explanation on this error and that it can also be raised by a large variety of very different scenarios. From what I can gather from all the fragments of blogs and forums I found that touched on various permutations of my scenario.&lt;/p&gt;  &lt;p&gt;So what is my Scenario?&lt;/p&gt;  &lt;h2&gt;Occurs in .net 2.0 runtime under Medium Trust on x64&lt;/h2&gt;  &lt;p&gt;I have an assembly that I want to be able to run in .net 3.5 and up and in hosting environments that are restricted to Medium Trust. Here is the line that triggers this exception:&lt;/p&gt;  &lt;div id="codeSnippetWrapper"&gt;   &lt;pre style="border-bottom-style: none; text-align: left; padding-bottom: 0px; line-height: 12pt; background-color: #f4f4f4; margin: 0em; border-left-style: none; padding-left: 0px; width: 100%; padding-right: 0px; font-family: &amp;#39;Courier New&amp;#39;, courier, monospace; direction: ltr; border-top-style: none; color: black; border-right-style: none; font-size: 8pt; overflow: visible; padding-top: 0px" id="codeSnippet"&gt;AuthorizedUserList = config == &lt;span style="color: #0000ff"&gt;null&lt;/span&gt; || &lt;span style="color: #0000ff"&gt;string&lt;/span&gt;.IsNullOrEmpty(config.AuthorizedUserList)&lt;br /&gt;                                     ? Anonymous&lt;br /&gt;                                     : config.AuthorizedUserList.Split(&lt;span style="color: #006080"&gt;','&lt;/span&gt;).Length == 0&lt;br /&gt;                                           ? Anonymous&lt;br /&gt;                                           : config.AuthorizedUserList.Split(&lt;span style="color: #006080"&gt;','&lt;/span&gt;);&lt;/pre&gt;
+
+  &lt;br /&gt;&lt;/div&gt;
+
+
+
+&lt;p&gt;Its note worthy that variables AuthorizedUserList and Anonymous are both typed IEnumerable&amp;lt;string&amp;gt;. &lt;/p&gt;
+
+&lt;p&gt;This exception is only thrown when running this line on .net 3.5 in Medium trust. What I find particularly odd and don’t have an explanation for is that it worked fine in .net 3.5 Medium trust on my 32 bit machine but throws this exception on my 64 bit work laptop. I’m not convinced that it is the bitness level and not some other environment issue that makes the difference here. Sometimes things are just more fun when they remain a mystery. Especially in software don’t you think?&lt;/p&gt;
+
+&lt;h2&gt;How to find the root of the problem&lt;/h2&gt;
+
+&lt;p&gt;So looking at the above line of code my first reaction was that there was something wrong with the debug symbol mapping to the assembly I was using. I mean how does this line look harmful. Wrap it in fur and stuff it with cotton and you’d want to do no less than squeeze it close to your bosom and sing soft lullabies to it. So I proceeded to play with compiling configurations and changing references which proved entirely futile.&lt;/p&gt;
+
+&lt;p&gt;The golden nugget that I was missing was a tool that ships with the .net SDK called PEVerify. I made this connection reading &lt;a href="http://stackoverflow.com/a/6921208/173768"&gt;this StackOverflow answer&lt;/a&gt;. One key thing to be aware of is that each version of the .NET runtime has its own version of PEVerify so make sure to use the one that ships with the version of the runtime you are getting this exception with. In my case I needed the .Net 2.0 SDK which you can find &lt;a href="http://www.microsoft.com/download/en/details.aspx?displaylang=en&amp;amp;id=19988"&gt;here&lt;/a&gt;.&lt;/p&gt;
+
+&lt;p&gt;PEVerify is a Command line utility that verifies that the IL in an assembly is type safe in a particular runtime environment. Why the .net 2 compiler cant report these as warnings, I do not know. So entering:&lt;/p&gt;
+
+&lt;div id="codeSnippetWrapper"&gt;
+  &lt;pre style="border-bottom-style: none; text-align: left; padding-bottom: 0px; line-height: 12pt; background-color: #f4f4f4; margin: 0em; border-left-style: none; padding-left: 0px; width: 100%; padding-right: 0px; font-family: &amp;#39;Courier New&amp;#39;, courier, monospace; direction: ltr; border-top-style: none; color: black; border-right-style: none; font-size: 8pt; overflow: visible; padding-top: 0px" id="codeSnippet"&gt;C:\Program Files (x86)\Microsoft Visual Studio 8\SDK\v2.0\Bin&amp;gt;peverify &lt;br /&gt;&lt;span style="color: #006080"&gt;&amp;quot;C:\RequestReduce\RequestReduce\bin\v3.5\debug\RequestReduce.dll&amp;quot;&lt;/span&gt; /verbose&lt;/pre&gt;
+
+  &lt;br /&gt;&lt;/div&gt;
+
+
+
+&lt;p&gt;I got this output:&lt;/p&gt;
+
+&lt;div id="codeSnippetWrapper"&gt;
+  &lt;pre style="border-bottom-style: none; text-align: left; padding-bottom: 0px; line-height: 12pt; background-color: #f4f4f4; margin: 0em; border-left-style: none; padding-left: 0px; width: 100%; padding-right: 0px; font-family: &amp;#39;Courier New&amp;#39;, courier, monospace; direction: ltr; border-top-style: none; color: black; border-right-style: none; font-size: 8pt; overflow: visible; padding-top: 0px" id="codeSnippet"&gt;Microsoft (R) .NET Framework PE Verifier.  Version  2.0.50727.42&lt;br /&gt;Copyright (c) Microsoft Corporation.  All rights reserved.&lt;br /&gt;&lt;br /&gt;[IL]: Error: [C:\RequestReduce\RequestReduce\bin\v3.5\debug\RequestReduce.dll :&lt;br /&gt;RequestReduce.Configuration.RRConfiguration::.ctor][mdToken=0x60000ce][offset 0x&lt;br /&gt;000000BB][found &lt;span style="color: #0000ff"&gt;ref&lt;/span&gt; &lt;span style="color: #006080"&gt;'System.Collections.IEnumerable'&lt;/span&gt;][expected &lt;span style="color: #0000ff"&gt;ref&lt;/span&gt; &lt;span style="color: #006080"&gt;'System.Colle&lt;br /&gt;ctions.Generic.IEnumerable`1[System.String]'&lt;/span&gt;] Unexpected type on the stack.&lt;br /&gt;1 Error Verifying C:\RequestReduce\RequestReduce\bin\v3.5\debug\RequestReduce.dll&lt;/pre&gt;
+
+  &lt;br /&gt;&lt;/div&gt;
+
+
+
+&lt;p&gt;Ahhh. Its all making perfect sense now. Well if you think about it (a practice that I’m quite rusty with but sometimes still capable of), it does help. As I mentioned above and is illustrated here, AuthorizedUserList expects an IEnumerable&amp;lt;string&amp;gt;. The PEVerify output complains that it is getting a plain old IEnumerable (not its generic cousin). This does make sense since the config.AuthorizedUsers.Split(‘,’) returns a string[].&lt;/p&gt;
+
+&lt;p&gt;Obviously under most circumstances, there will be no problem implicitly casting the string[] to an IEnumerable&amp;lt;string&amp;gt;. The code does run in .Net 2 and 4 in Full Trust and has never caused a problem. So .Net 2.0 must think that this conversion could potentially be un type safe and if the user is running in partial trust, the fact that its runtime type checking verification fails, causes this exception to be thrown.&lt;/p&gt;
+
+&lt;h2&gt;Forcing a cast using ToList() fixes the problem&lt;/h2&gt;
+
+&lt;p&gt;So adding nine characters to the end of the line fixes everything:&lt;/p&gt;
+
+&lt;div id="codeSnippetWrapper"&gt;
+  &lt;pre style="border-bottom-style: none; text-align: left; padding-bottom: 0px; line-height: 12pt; background-color: #f4f4f4; margin: 0em; border-left-style: none; padding-left: 0px; width: 100%; padding-right: 0px; font-family: &amp;#39;Courier New&amp;#39;, courier, monospace; direction: ltr; border-top-style: none; color: black; border-right-style: none; font-size: 8pt; overflow: visible; padding-top: 0px" id="codeSnippet"&gt;AuthorizedUserList = config == &lt;span style="color: #0000ff"&gt;null&lt;/span&gt; || &lt;span style="color: #0000ff"&gt;string&lt;/span&gt;.IsNullOrEmpty(config.AuthorizedUserList)&lt;br /&gt;    ? Anonymous&lt;br /&gt;    : config.AuthorizedUserList.Split(&lt;span style="color: #006080"&gt;','&lt;/span&gt;).Length == 0&lt;br /&gt;        ? Anonymous&lt;br /&gt;        : config.AuthorizedUserList.Split(&lt;span style="color: #006080"&gt;','&lt;/span&gt;).ToList();&lt;/pre&gt;
+
+  &lt;br /&gt;&lt;/div&gt;
+
+
+
+&lt;p&gt;And now the output of PEVerify is:&lt;/p&gt;
+
+&lt;div id="codeSnippetWrapper"&gt;
+  &lt;pre style="border-bottom-style: none; text-align: left; padding-bottom: 0px; line-height: 12pt; background-color: #f4f4f4; margin: 0em; border-left-style: none; padding-left: 0px; width: 100%; padding-right: 0px; font-family: &amp;#39;Courier New&amp;#39;, courier, monospace; direction: ltr; border-top-style: none; color: black; border-right-style: none; font-size: 8pt; overflow: visible; padding-top: 0px" id="codeSnippet"&gt;C:\Program Files (x86)\Microsoft Visual Studio 8\SDK\v2.0\Bin&amp;gt;peverify &lt;span style="color: #006080"&gt;&amp;quot;C:\Reque&lt;br /&gt;stReduce\RequestReduce\bin\v3.5\debug\RequestReduce.dll&amp;quot;&lt;/span&gt; /verbose&lt;br /&gt;&lt;br /&gt;Microsoft (R) .NET Framework PE Verifier.  Version  2.0.50727.42&lt;br /&gt;Copyright (c) Microsoft Corporation.  All rights reserved.&lt;br /&gt;&lt;br /&gt;All Classes and Methods &lt;span style="color: #0000ff"&gt;in&lt;/span&gt; C:\RequestReduce\RequestReduce\bin\v3.5\debug\Request&lt;br /&gt;Reduce.dll Verified.&lt;/pre&gt;
+
+  &lt;br /&gt;&lt;/div&gt;
+
+
+
+&lt;p&gt;So that’s it. Hopefully someone will find this useful but from what I can tell from others who have experienced this same error, the causes can vary widely.&lt;/p&gt;
+
+&lt;p&gt;Looking back on this title, I’m wondering if the bark really is worse than the bite. I suppose the good news is that in the end, no runtimes were destabilized in the making of this blog post or the events that led up to it.&lt;/p&gt;</content>
+  <ispublished>True</ispublished>
+  <isdeleted>False</isdeleted>
+  <iscommentsenabled>True</iscommentsenabled>
+  <pubDate>2012-02-03 10:38:07</pubDate>
+  <lastModified>2013-06-01 15:43:40</lastModified>
+  <raters>0</raters>
+  <rating>0</rating>
+  <slug>VerificationException-“Operation-could-destabilize-the-runtime”-An-exception-with-a-bark-much-worse-than-its-bite</slug>
+  <tags />
+  <comments>
+    <comment id="bb928f2f-30d0-45ab-b7be-4f2a7b735f36" parentid="00000000-0000-0000-0000-000000000000" approved="True" spam="False" deleted="False">
+      <date>2013-05-25 08:08:34</date>
+      <author>Christopher Bartholomew</author>
+      <email>cbartholomew@gmail.com</email>
+      <country />
+      <ip>75.67.3.29</ip>
+      <moderatedby>mwrock</moderatedby>
+      <avatar />
+      <content>Thanks for the detailed instructions on how to use peverify. I was using an .NET oAuth library from Google and it was impossible to find where it was occurring. Sure enough, however,  after using peverify w/ 4.0 - I found the issue and stackoverflow did the rest. This happend when I was publishing to GoDaddy&amp;#39;s .net 4.0/4.5 hybird framework. 
+
+Thanks!</content>
+    </comment>
+    <comment id="15f410e2-c1fc-4bac-b798-6c747999f425" parentid="00000000-0000-0000-0000-000000000000" approved="True" spam="False" deleted="False">
+      <date>2014-05-15 10:25:24</date>
+      <author>ingeniarius.net</author>
+      <email>pingback</email>
+      <country />
+      <ip>195.191.148.5</ip>
+      <website>http://ingeniarius.net/blog/azure-web-role-intelli-trace-castle-windsor-something-operation-destabilize-runtime-verificationexception/</website>
+      <content>Pingback from ingeniarius.net
+
+Azure Web Role + Intelli Trace + Castle Windsor (or Something Yours) = Operation could destabilize the runtime + VerificationException</content>
+    </comment>
+  </comments>
+  <categories />
+  <notifications />
+</post>

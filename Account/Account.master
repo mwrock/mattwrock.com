@@ -8,6 +8,8 @@
     <title>Account Login</title>
     <meta name="description" content="Account Login Membership User Password" />
     <link href="account.css" rel="stylesheet" type="text/css" />
+    <script type="text/javascript" src="../Scripts/jquery-1.9.1.min.js"></script>
+    <script type="text/javascript" src="account.js"></script>
     <asp:ContentPlaceHolder ID="HeadContent" runat="server"></asp:ContentPlaceHolder>
 </head>
 <body>
@@ -18,7 +20,7 @@
                 <img alt="BlogEngine.net" src="../pics/be-logo.jpg" />
             </div>
             <div class="loginDisplay">
-                <a href="<%= Utils.RelativeWebRoot %>default.aspx"><%=Resources.labels.returnToBlog %></a>
+                <a href="<%= Utils.RelativeWebRoot %>"><%=Resources.labels.returnToBlog %></a>
             </div>
         </div>
         <div class="clear"></div>

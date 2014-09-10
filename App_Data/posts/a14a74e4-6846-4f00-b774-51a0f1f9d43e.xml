@@ -1,0 +1,40 @@
+﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<post>
+  <author>mwrock</author>
+  <title>Extract TFS Pending Changes to a zip file</title>
+  <description />
+  <content>&lt;p&gt;Our TFS server was down today and I needed to get a Shelveset to a tester. Playing with the Power Tools PowerShell CmdLets I was able to basically pipe my pending changes to a zip file and give that to the tester.&lt;/p&gt;  &lt;h2&gt;Getting the Power Tools PowerShell Cmdlets&lt;/h2&gt;  &lt;p&gt;If you have Visual Studio Update 1 or Update two, you can download the TFS Power Tools from the Visual Studio Gallery &lt;a href="http://visualstudiogallery.msdn.microsoft.com/b1ef7eb2-e084-4cb8-9bc7-06c3bad9148f"&gt;here&lt;/a&gt;. If you have an older version of Visual Studio, download the Power Tools from the Microsoft Download Center &lt;a href="http://www.microsoft.com/en-us/download/details.aspx?id=35775"&gt;here&lt;/a&gt;.&lt;/p&gt;  &lt;p&gt;When you install the MSI, &lt;strong&gt;make sure to opt in to the PowerShell Cmdlets&lt;/strong&gt;. The default options will not include the PowerShell Cmdlets!&lt;/p&gt;  &lt;h2&gt;Accessing the Cmdlets&lt;/h2&gt;  &lt;p&gt;After you have installed the power tools, you can launch the Power Tools Powershell console from the start menu item created during install. However if you are like me and have your own shell preferences, simply import them into your shell:&lt;/p&gt;  &lt;div id="codeSnippetWrapper"&gt;   &lt;pre id="codeSnippet" style="border-top-style: none; overflow: visible; font-size: 8pt; border-left-style: none; font-family: &amp;#39;Courier New&amp;#39;, courier, monospace; border-bottom-style: none; color: black; padding-bottom: 0px; direction: ltr; text-align: left; padding-top: 0px; border-right-style: none; padding-left: 0px; margin: 0em; line-height: 12pt; padding-right: 0px; width: 100%; background-color: #f4f4f4"&gt;Import-Module &lt;span style="color: #006080"&gt;&amp;quot;${env:ProgramFiles(x86)}\Microsoft Team Foundation Server 2012 Power Tools\&lt;br /&gt;  Microsoft.TeamFoundation.PowerTools.PowerShell.dll&amp;quot;&lt;/span&gt;&lt;br /&gt;&lt;/pre&gt;
+
+  &lt;br /&gt;&lt;/div&gt;
+
+&lt;p&gt;You may want to add this to your PowerShell Profile.&lt;/p&gt;
+
+&lt;h2&gt;Extracting Pending Changes&lt;/h2&gt;
+
+&lt;p&gt;Run the following commands from the root of your workspace to pipe all pending changes to a zip.&lt;/p&gt;
+
+&lt;div id="codeSnippetWrapper"&gt;
+  &lt;pre id="codeSnippet" style="border-top-style: none; overflow: visible; font-size: 8pt; border-left-style: none; font-family: &amp;#39;Courier New&amp;#39;, courier, monospace; border-bottom-style: none; color: black; padding-bottom: 0px; direction: ltr; text-align: left; padding-top: 0px; border-right-style: none; padding-left: 0px; margin: 0em; line-height: 12pt; padding-right: 0px; width: 100%; background-color: #f4f4f4"&gt;Add-Type -AssemblyName System.IO.Compression.FileSystem,System.IO.Compression&lt;br /&gt;$here= (Get-Item .).FullName&lt;br /&gt;$archive = [System.IO.Compression.ZipFile]::Open(&lt;br /&gt;  (Join-Path $here &lt;span style="color: #006080"&gt;&amp;quot;archive.zip&amp;quot;&lt;/span&gt;), [System.IO.Compression.ZipArchiveMode]::Create&lt;br /&gt;)&lt;br /&gt;get-tfsPendingChange | % { &lt;br /&gt;  [System.IO.Compression.ZipFileExtensions]::CreateEntryFromFile(&lt;br /&gt;    $archive, $_.LocalItem, $_.LocalItem.Substring($here.Length+1)&lt;br /&gt;  ) &lt;br /&gt;}&lt;br /&gt;$archive.Dispose()&lt;/pre&gt;
+
+  &lt;br /&gt;&lt;/div&gt;
+
+
+
+&lt;p&gt;This simply adds the .net types to the powershell session and uses them to create a ZipArchive and then calls the Get-TfsPendingChanges to get a list of all files with pending changes. This is sent to a Zip file which in this case is called archive.zip and located in your current folder.&lt;/p&gt;
+
+&lt;h2&gt;Requires .NET 4.5 and Powershell 3&lt;/h2&gt;
+
+&lt;p&gt;The above zip file api makes use of the new, more friendly api for creating zip files. This will not work if you have .net 4.0 or lower. Also, since Powershell versions prior to 3.0 use the .NET 2 runtime, they will not be able to load .net 4.5 types. PowerShell 3.0 comes automatically unstalled on windows 8 and Server 2012. You may download and install the Windows Management Framework 3.0 &lt;a href="http://www.microsoft.com/en-us/download/details.aspx?id=34595"&gt;here&lt;/a&gt; on Windows 7 or Server 2008 R2 to get Powershell 3.0 on those operating systems. You may get the .net 4.5 runtime &lt;a href="http://www.microsoft.com/en-us/download/details.aspx?id=30653"&gt;here&lt;/a&gt;.&lt;/p&gt;</content>
+  <ispublished>True</ispublished>
+  <isdeleted>False</isdeleted>
+  <iscommentsenabled>True</iscommentsenabled>
+  <pubDate>2013-04-19 13:38:30</pubDate>
+  <lastModified>2013-04-28 19:59:27</lastModified>
+  <raters>0</raters>
+  <rating>0</rating>
+  <slug>Extract-TFS-Pending-Changes-to-a-zip-file</slug>
+  <tags />
+  <comments />
+  <categories />
+  <notifications />
+</post>

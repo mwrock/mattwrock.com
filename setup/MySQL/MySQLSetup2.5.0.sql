@@ -396,7 +396,7 @@ INSERT INTO be_StopWords (BlogId, StopWord)	VALUES ('27604F05-86AD-47EF-9E05-950
 INSERT INTO be_StopWords (BlogId, StopWord)	VALUES ('27604F05-86AD-47EF-9E05-950BB762570C', 'your');
 
 INSERT INTO be_BlogRollItems ( BlogId, BlogRollId, Title, Description, BlogUrl, FeedUrl, Xfn, SortIndex )
-VALUES ( '27604F05-86AD-47EF-9E05-950BB762570C', '25e4d8da-3278-4e58-b0bf-932496dabc96', 'Mads Kristensen', 'Full featured simplicity in ASP.NET and C#', 'http://www.madskristensen.dk/', 'http://feeds.feedburner.com/netslave', 'contact', 0 );
+VALUES ( '27604F05-86AD-47EF-9E05-950BB762570C', '25e4d8da-3278-4e58-b0bf-932496dabc96', 'Mads Kristensen', 'Full featured simplicity in ASP.NET and C#', 'http://madskristensen.net', 'http://feeds.feedburner.com/netslave', 'contact', 0 );
 INSERT INTO be_BlogRollItems ( BlogId, BlogRollId, Title, Description, BlogUrl, FeedUrl, Xfn, SortIndex )
 VALUES ( '27604F05-86AD-47EF-9E05-950BB762570C', 'ccc817ef-e760-482b-b82f-a6854663110f', 'Al Nyveldt', 'Adventures in Code and Other Stories', 'http://www.nyveldt.com/blog/', 'http://feeds.feedburner.com/razorant', 'contact', 1 );
 INSERT INTO be_BlogRollItems ( BlogId, BlogRollId, Title, Description, BlogUrl, FeedUrl, Xfn, SortIndex )

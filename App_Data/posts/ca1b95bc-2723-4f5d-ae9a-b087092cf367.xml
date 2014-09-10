@@ -1,0 +1,661 @@
+﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<post>
+  <author>mwrock</author>
+  <title>Latch waits on 2:1:103? You are probably creating too many temp tables in Sql Server</title>
+  <description />
+  <content>&lt;p&gt;Last week my team pushed our monthly release and all looked well and good after the launch. Then at about 10PM our site monitoring alerts started to fire as our page load times soared and this continued until early morning. There were no unusual errors in our logs and our traffic load was normal. What was clear was that our database had been running quite hot on CPU.&lt;/p&gt;  &lt;p&gt;As we continued to investigate the following day on a Friday, all systems looked quite healthy and we were very perplexed. That Friday and Saturday night there was no reoccurrence of this behavior but on Sunday it happened again. A very abrupt and fast rise in page load times, followed by a just as sudden drop in load times at around 9AM. All of this happening during what we thought was our lull in traffic.&lt;/p&gt;  &lt;p&gt;Interestingly to us but not so topical to this post, after studying our logs back several weeks, we learned that 10PM to 9AM actually is our traffic peak. So it began to make sense why this was occurring during this time. Knowing that this was manifesting itself as a database CPU issue, we ran the following query:&lt;/p&gt;  &lt;div id="codeSnippetWrapper"&gt;   &lt;pre id="codeSnippet" style="border-top-style: none; overflow: visible; font-size: 8pt; border-left-style: none; font-family: &amp;#39;Courier New&amp;#39;, courier, monospace; border-bottom-style: none; color: black; padding-bottom: 0px; direction: ltr; text-align: left; padding-top: 0px; border-right-style: none; padding-left: 0px; margin: 0em; line-height: 12pt; padding-right: 0px; width: 100%; background-color: #f4f4f4"&gt;&lt;span style="color: #0000ff"&gt;select&lt;/span&gt; * &lt;span style="color: #0000ff"&gt;from&lt;/span&gt; master..sysprocesses sp &lt;span style="color: #0000ff"&gt;cross&lt;/span&gt; apply fn_get_sql(sql_handle) &lt;span style="color: #0000ff"&gt;order&lt;/span&gt; &lt;span style="color: #0000ff"&gt;by&lt;/span&gt; cpu desc&lt;/pre&gt;
+
+  &lt;br /&gt;&lt;/div&gt;
+
+&lt;p&gt;This query will return a row for every process in descending order of CPU load along with the exact SQL statement they are executing. The will also tell you if the process is blocking on another process and if so, which process and what resource it is waiting on. Having run this query many times under this load we were seeing a pattern with results like this:&lt;/p&gt;
+
+&lt;table style="border-collapse: collapse; line-height: normal" cellspacing="0" cellpadding="0" width="610" border="0"&gt;&lt;colgroup&gt;&lt;col style="width: 48pt" width="64" /&gt;&lt;/colgroup&gt;&lt;tbody&gt;
+    &lt;tr style="height: 15pt" height="20"&gt;
+      &lt;td style="vertical-align: bottom; padding-top: 1px; padding-left: 1px; padding-right: 1px" height="20" width="30"&gt;&lt;font face="Calibri"&gt;&lt;font style="font-size: 11pt"&gt;spid&lt;/font&gt;&lt;/font&gt;&lt;/td&gt;
+
+      &lt;td style="vertical-align: bottom; padding-top: 1px; padding-left: 1px; padding-right: 1px" width="39"&gt;&lt;font face="Calibri"&gt;&lt;font style="font-size: 11pt"&gt;kpid&lt;/font&gt;&lt;/font&gt;&lt;/td&gt;
+
+      &lt;td style="vertical-align: bottom; padding-top: 1px; padding-left: 1px; padding-right: 1px" width="53"&gt;&lt;font face="Calibri"&gt;&lt;font style="font-size: 11pt"&gt;blocked&lt;/font&gt;&lt;/font&gt;&lt;/td&gt;
+
+      &lt;td style="vertical-align: bottom; padding-top: 1px; padding-left: 1px; padding-right: 1px" width="59"&gt;&lt;font face="Calibri"&gt;&lt;font style="font-size: 11pt"&gt;waittype&lt;/font&gt;&lt;/font&gt;&lt;/td&gt;
+
+      &lt;td style="vertical-align: bottom; padding-top: 1px; padding-left: 1px; padding-right: 1px" width="60"&gt;&lt;font face="Calibri"&gt;&lt;font style="font-size: 11pt"&gt;waittime&lt;/font&gt;&lt;/font&gt;&lt;/td&gt;
+
+      &lt;td style="vertical-align: bottom; padding-top: 1px; padding-left: 1px; padding-right: 1px" width="184"&gt;&lt;font face="Calibri"&gt;&lt;font style="font-size: 11pt"&gt;lastwaittype&lt;/font&gt;&lt;/font&gt;&lt;/td&gt;
+
+      &lt;td style="vertical-align: bottom; padding-top: 1px; padding-left: 1px; padding-right: 1px" width="133"&gt;&lt;font face="Calibri"&gt;&lt;font style="font-size: 11pt"&gt;waitresource&lt;/font&gt;&lt;/font&gt;&lt;/td&gt;
+
+      &lt;td style="vertical-align: bottom; padding-top: 1px; padding-left: 1px; padding-right: 1px" width="50"&gt;&lt;font face="Calibri"&gt;&lt;font style="font-size: 11pt"&gt;dbid&lt;/font&gt;&lt;/font&gt;&lt;/td&gt;
+    &lt;/tr&gt;
+
+    &lt;tr style="height: 15pt" height="20"&gt;
+      &lt;td style="vertical-align: bottom; padding-top: 1px; padding-left: 1px; padding-right: 1px" height="20" align="right"&gt;&lt;font face="Calibri"&gt;&lt;font style="font-size: 11pt"&gt;254&lt;/font&gt;&lt;/font&gt;&lt;/td&gt;
+
+      &lt;td style="vertical-align: bottom; padding-top: 1px; padding-left: 1px; padding-right: 1px" align="right"&gt;&lt;font face="Calibri"&gt;&lt;font style="font-size: 11pt"&gt;9680&lt;/font&gt;&lt;/font&gt;&lt;/td&gt;
+
+      &lt;td style="vertical-align: bottom; padding-top: 1px; padding-left: 1px; padding-right: 1px" align="right"&gt;&lt;font face="Calibri"&gt;&lt;font style="font-size: 11pt"&gt;0&lt;/font&gt;&lt;/font&gt;&lt;/td&gt;
+
+      &lt;td style="vertical-align: bottom; padding-top: 1px; padding-left: 1px; padding-right: 1px"&gt;&lt;font face="Calibri"&gt;&lt;font style="font-size: 11pt"&gt;0x0034&lt;/font&gt;&lt;/font&gt;&lt;/td&gt;
+
+      &lt;td style="vertical-align: bottom; padding-top: 1px; padding-left: 1px; padding-right: 1px" align="right"&gt;&lt;font face="Calibri"&gt;&lt;font style="font-size: 11pt"&gt;2&lt;/font&gt;&lt;/font&gt;&lt;/td&gt;
+
+      &lt;td style="vertical-align: bottom; padding-top: 1px; padding-left: 1px; padding-right: 1px"&gt;&lt;font face="Calibri"&gt;&lt;font style="font-size: 11pt"&gt;PAGELATCH_EX&lt;/font&gt;&lt;span style="mso-spacerun: yes"&gt;&lt;font style="font-size: 11pt"&gt;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160; &lt;/font&gt;&lt;/span&gt;&lt;/font&gt;&lt;/td&gt;
+
+      &lt;td style="vertical-align: bottom; padding-top: 1px; padding-left: 1px; padding-right: 1px" width="133"&gt;&lt;font face="Calibri"&gt;&lt;font style="font-size: 11pt"&gt;2:1:103&lt;/font&gt;&lt;/font&gt;&lt;/td&gt;
+
+      &lt;td style="vertical-align: bottom; padding-top: 1px; padding-left: 1px; padding-right: 1px" width="50" align="right"&gt;&lt;font face="Calibri"&gt;&lt;font style="font-size: 11pt"&gt;9&lt;/font&gt;&lt;/font&gt;&lt;/td&gt;
+    &lt;/tr&gt;
+
+    &lt;tr style="height: 15pt" height="20"&gt;
+      &lt;td style="vertical-align: bottom; padding-top: 1px; padding-left: 1px; padding-right: 1px" height="20" align="right"&gt;&lt;font face="Calibri"&gt;&lt;font style="font-size: 11pt"&gt;128&lt;/font&gt;&lt;/font&gt;&lt;/td&gt;
+
+      &lt;td style="vertical-align: bottom; padding-top: 1px; padding-left: 1px; padding-right: 1px" align="right"&gt;&lt;font face="Calibri"&gt;&lt;font style="font-size: 11pt"&gt;10288&lt;/font&gt;&lt;/font&gt;&lt;/td&gt;
+
+      &lt;td style="vertical-align: bottom; padding-top: 1px; padding-left: 1px; padding-right: 1px" align="right"&gt;&lt;font face="Calibri"&gt;&lt;font style="font-size: 11pt"&gt;163&lt;/font&gt;&lt;/font&gt;&lt;/td&gt;
+
+      &lt;td style="vertical-align: bottom; padding-top: 1px; padding-left: 1px; padding-right: 1px"&gt;&lt;font face="Calibri"&gt;&lt;font style="font-size: 11pt"&gt;0x0032&lt;/font&gt;&lt;/font&gt;&lt;/td&gt;
+
+      &lt;td style="vertical-align: bottom; padding-top: 1px; padding-left: 1px; padding-right: 1px" align="right"&gt;&lt;font face="Calibri"&gt;&lt;font style="font-size: 11pt"&gt;11&lt;/font&gt;&lt;/font&gt;&lt;/td&gt;
+
+      &lt;td style="vertical-align: bottom; padding-top: 1px; padding-left: 1px; padding-right: 1px"&gt;&lt;font face="Calibri"&gt;&lt;font style="font-size: 11pt"&gt;PAGELATCH_SH&lt;/font&gt;&lt;span style="mso-spacerun: yes"&gt;&lt;font style="font-size: 11pt"&gt;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160; &lt;/font&gt;&lt;/span&gt;&lt;/font&gt;&lt;/td&gt;
+
+      &lt;td style="vertical-align: bottom; padding-top: 1px; padding-left: 1px; padding-right: 1px" width="133"&gt;&lt;font face="Calibri"&gt;&lt;font style="font-size: 11pt"&gt;2:1:103&lt;/font&gt;&lt;/font&gt;&lt;/td&gt;
+
+      &lt;td style="vertical-align: bottom; padding-top: 1px; padding-left: 1px; padding-right: 1px" width="50" align="right"&gt;&lt;font face="Calibri"&gt;&lt;font style="font-size: 11pt"&gt;9&lt;/font&gt;&lt;/font&gt;&lt;/td&gt;
+    &lt;/tr&gt;
+
+    &lt;tr style="height: 15pt" height="20"&gt;
+      &lt;td style="vertical-align: bottom; padding-top: 1px; padding-left: 1px; padding-right: 1px" height="20" align="right"&gt;&lt;font face="Calibri"&gt;&lt;font style="font-size: 11pt"&gt;129&lt;/font&gt;&lt;/font&gt;&lt;/td&gt;
+
+      &lt;td style="vertical-align: bottom; padding-top: 1px; padding-left: 1px; padding-right: 1px" align="right"&gt;&lt;font face="Calibri"&gt;&lt;font style="font-size: 11pt"&gt;0&lt;/font&gt;&lt;/font&gt;&lt;/td&gt;
+
+      &lt;td style="vertical-align: bottom; padding-top: 1px; padding-left: 1px; padding-right: 1px" align="right"&gt;&lt;font face="Calibri"&gt;&lt;font style="font-size: 11pt"&gt;0&lt;/font&gt;&lt;/font&gt;&lt;/td&gt;
+
+      &lt;td style="vertical-align: bottom; padding-top: 1px; padding-left: 1px; padding-right: 1px"&gt;&lt;font face="Calibri"&gt;&lt;font style="font-size: 11pt"&gt;0x0000&lt;/font&gt;&lt;/font&gt;&lt;/td&gt;
+
+      &lt;td style="vertical-align: bottom; padding-top: 1px; padding-left: 1px; padding-right: 1px" align="right"&gt;&lt;font face="Calibri"&gt;&lt;font style="font-size: 11pt"&gt;0&lt;/font&gt;&lt;/font&gt;&lt;/td&gt;
+
+      &lt;td style="vertical-align: bottom; padding-top: 1px; padding-left: 1px; padding-right: 1px"&gt;&lt;font face="Calibri"&gt;&lt;font style="font-size: 11pt"&gt;MISCELLANEOUS&lt;/font&gt;&lt;span style="mso-spacerun: yes"&gt;&lt;font style="font-size: 11pt"&gt;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160; &lt;/font&gt;&lt;/span&gt;&lt;/font&gt;&lt;/td&gt;
+
+      &lt;td style="vertical-align: bottom; padding-top: 1px; padding-left: 1px; padding-right: 1px" width="133"&gt;&amp;#160;&lt;/td&gt;
+
+      &lt;td style="vertical-align: bottom; padding-top: 1px; padding-left: 1px; padding-right: 1px" width="50" align="right"&gt;&lt;font face="Calibri"&gt;&lt;font style="font-size: 11pt"&gt;9&lt;/font&gt;&lt;/font&gt;&lt;/td&gt;
+    &lt;/tr&gt;
+
+    &lt;tr style="height: 15pt" height="20"&gt;
+      &lt;td style="vertical-align: bottom; padding-top: 1px; padding-left: 1px; padding-right: 1px" height="20" align="right"&gt;&lt;font face="Calibri"&gt;&lt;font style="font-size: 11pt"&gt;116&lt;/font&gt;&lt;/font&gt;&lt;/td&gt;
+
+      &lt;td style="vertical-align: bottom; padding-top: 1px; padding-left: 1px; padding-right: 1px" align="right"&gt;&lt;font face="Calibri"&gt;&lt;font style="font-size: 11pt"&gt;10152&lt;/font&gt;&lt;/font&gt;&lt;/td&gt;
+
+      &lt;td style="vertical-align: bottom; padding-top: 1px; padding-left: 1px; padding-right: 1px" align="right"&gt;&lt;font face="Calibri"&gt;&lt;font style="font-size: 11pt"&gt;0&lt;/font&gt;&lt;/font&gt;&lt;/td&gt;
+
+      &lt;td style="vertical-align: bottom; padding-top: 1px; padding-left: 1px; padding-right: 1px"&gt;&lt;font face="Calibri"&gt;&lt;font style="font-size: 11pt"&gt;0x0000&lt;/font&gt;&lt;/font&gt;&lt;/td&gt;
+
+      &lt;td style="vertical-align: bottom; padding-top: 1px; padding-left: 1px; padding-right: 1px" align="right"&gt;&lt;font face="Calibri"&gt;&lt;font style="font-size: 11pt"&gt;0&lt;/font&gt;&lt;/font&gt;&lt;/td&gt;
+
+      &lt;td style="vertical-align: bottom; padding-top: 1px; padding-left: 1px; padding-right: 1px"&gt;&lt;font face="Calibri"&gt;&lt;font style="font-size: 11pt"&gt;SOS_SCHEDULER_YIELD&lt;/font&gt;&lt;span style="mso-spacerun: yes"&gt;&lt;font style="font-size: 11pt"&gt;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160; &lt;/font&gt;&lt;/span&gt;&lt;/font&gt;&lt;/td&gt;
+
+      &lt;td style="vertical-align: bottom; padding-top: 1px; padding-left: 1px; padding-right: 1px" width="133"&gt;&amp;#160;&lt;/td&gt;
+
+      &lt;td style="vertical-align: bottom; padding-top: 1px; padding-left: 1px; padding-right: 1px" width="50" align="right"&gt;&lt;font face="Calibri"&gt;&lt;font style="font-size: 11pt"&gt;9&lt;/font&gt;&lt;/font&gt;&lt;/td&gt;
+    &lt;/tr&gt;
+
+    &lt;tr style="height: 15pt" height="20"&gt;
+      &lt;td style="vertical-align: bottom; padding-top: 1px; padding-left: 1px; padding-right: 1px" height="20" align="right"&gt;&lt;font face="Calibri"&gt;&lt;font style="font-size: 11pt"&gt;169&lt;/font&gt;&lt;/font&gt;&lt;/td&gt;
+
+      &lt;td style="vertical-align: bottom; padding-top: 1px; padding-left: 1px; padding-right: 1px" align="right"&gt;&lt;font face="Calibri"&gt;&lt;font style="font-size: 11pt"&gt;0&lt;/font&gt;&lt;/font&gt;&lt;/td&gt;
+
+      &lt;td style="vertical-align: bottom; padding-top: 1px; padding-left: 1px; padding-right: 1px" align="right"&gt;&lt;font face="Calibri"&gt;&lt;font style="font-size: 11pt"&gt;0&lt;/font&gt;&lt;/font&gt;&lt;/td&gt;
+
+      &lt;td style="vertical-align: bottom; padding-top: 1px; padding-left: 1px; padding-right: 1px"&gt;&lt;font face="Calibri"&gt;&lt;font style="font-size: 11pt"&gt;0x0000&lt;/font&gt;&lt;/font&gt;&lt;/td&gt;
+
+      &lt;td style="vertical-align: bottom; padding-top: 1px; padding-left: 1px; padding-right: 1px" align="right"&gt;&lt;font face="Calibri"&gt;&lt;font style="font-size: 11pt"&gt;0&lt;/font&gt;&lt;/font&gt;&lt;/td&gt;
+
+      &lt;td style="vertical-align: bottom; padding-top: 1px; padding-left: 1px; padding-right: 1px"&gt;&lt;font face="Calibri"&gt;&lt;font style="font-size: 11pt"&gt;MISCELLANEOUS&lt;/font&gt;&lt;span style="mso-spacerun: yes"&gt;&lt;font style="font-size: 11pt"&gt;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160; &lt;/font&gt;&lt;/span&gt;&lt;/font&gt;&lt;/td&gt;
+
+      &lt;td style="vertical-align: bottom; padding-top: 1px; padding-left: 1px; padding-right: 1px" width="133"&gt;&amp;#160;&lt;/td&gt;
+
+      &lt;td style="vertical-align: bottom; padding-top: 1px; padding-left: 1px; padding-right: 1px" width="50" align="right"&gt;&lt;font face="Calibri"&gt;&lt;font style="font-size: 11pt"&gt;1&lt;/font&gt;&lt;/font&gt;&lt;/td&gt;
+    &lt;/tr&gt;
+
+    &lt;tr style="height: 15pt" height="20"&gt;
+      &lt;td style="vertical-align: bottom; padding-top: 1px; padding-left: 1px; padding-right: 1px" height="20" align="right"&gt;&lt;font face="Calibri"&gt;&lt;font style="font-size: 11pt"&gt;52&lt;/font&gt;&lt;/font&gt;&lt;/td&gt;
+
+      &lt;td style="vertical-align: bottom; padding-top: 1px; padding-left: 1px; padding-right: 1px" align="right"&gt;&lt;font face="Calibri"&gt;&lt;font style="font-size: 11pt"&gt;0&lt;/font&gt;&lt;/font&gt;&lt;/td&gt;
+
+      &lt;td style="vertical-align: bottom; padding-top: 1px; padding-left: 1px; padding-right: 1px" align="right"&gt;&lt;font face="Calibri"&gt;&lt;font style="font-size: 11pt"&gt;0&lt;/font&gt;&lt;/font&gt;&lt;/td&gt;
+
+      &lt;td style="vertical-align: bottom; padding-top: 1px; padding-left: 1px; padding-right: 1px"&gt;&lt;font face="Calibri"&gt;&lt;font style="font-size: 11pt"&gt;0x0000&lt;/font&gt;&lt;/font&gt;&lt;/td&gt;
+
+      &lt;td style="vertical-align: bottom; padding-top: 1px; padding-left: 1px; padding-right: 1px" align="right"&gt;&lt;font face="Calibri"&gt;&lt;font style="font-size: 11pt"&gt;0&lt;/font&gt;&lt;/font&gt;&lt;/td&gt;
+
+      &lt;td style="vertical-align: bottom; padding-top: 1px; padding-left: 1px; padding-right: 1px"&gt;&lt;font face="Calibri"&gt;&lt;font style="font-size: 11pt"&gt;MISCELLANEOUS&lt;/font&gt;&lt;span style="mso-spacerun: yes"&gt;&lt;font style="font-size: 11pt"&gt;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160; &lt;/font&gt;&lt;/span&gt;&lt;/font&gt;&lt;/td&gt;
+
+      &lt;td style="vertical-align: bottom; padding-top: 1px; padding-left: 1px; padding-right: 1px" width="133"&gt;&amp;#160;&lt;/td&gt;
+
+      &lt;td style="vertical-align: bottom; padding-top: 1px; padding-left: 1px; padding-right: 1px" width="50" align="right"&gt;&lt;font face="Calibri"&gt;&lt;font style="font-size: 11pt"&gt;4&lt;/font&gt;&lt;/font&gt;&lt;/td&gt;
+    &lt;/tr&gt;
+
+    &lt;tr style="height: 15pt" height="20"&gt;
+      &lt;td style="vertical-align: bottom; padding-top: 1px; padding-left: 1px; padding-right: 1px" height="20" align="right"&gt;&lt;font face="Calibri"&gt;&lt;font style="font-size: 11pt"&gt;148&lt;/font&gt;&lt;/font&gt;&lt;/td&gt;
+
+      &lt;td style="vertical-align: bottom; padding-top: 1px; padding-left: 1px; padding-right: 1px" align="right"&gt;&lt;font face="Calibri"&gt;&lt;font style="font-size: 11pt"&gt;9468&lt;/font&gt;&lt;/font&gt;&lt;/td&gt;
+
+      &lt;td style="vertical-align: bottom; padding-top: 1px; padding-left: 1px; padding-right: 1px" align="right"&gt;&lt;font face="Calibri"&gt;&lt;font style="font-size: 11pt"&gt;163&lt;/font&gt;&lt;/font&gt;&lt;/td&gt;
+
+      &lt;td style="vertical-align: bottom; padding-top: 1px; padding-left: 1px; padding-right: 1px"&gt;&lt;font face="Calibri"&gt;&lt;font style="font-size: 11pt"&gt;0x0034&lt;/font&gt;&lt;/font&gt;&lt;/td&gt;
+
+      &lt;td style="vertical-align: bottom; padding-top: 1px; padding-left: 1px; padding-right: 1px" align="right"&gt;&lt;font face="Calibri"&gt;&lt;font style="font-size: 11pt"&gt;9&lt;/font&gt;&lt;/font&gt;&lt;/td&gt;
+
+      &lt;td style="vertical-align: bottom; padding-top: 1px; padding-left: 1px; padding-right: 1px"&gt;&lt;font face="Calibri"&gt;&lt;font style="font-size: 11pt"&gt;PAGELATCH_EX&lt;/font&gt;&lt;span style="mso-spacerun: yes"&gt;&lt;font style="font-size: 11pt"&gt;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160; &lt;/font&gt;&lt;/span&gt;&lt;/font&gt;&lt;/td&gt;
+
+      &lt;td style="vertical-align: bottom; padding-top: 1px; padding-left: 1px; padding-right: 1px" width="133"&gt;&lt;font face="Calibri"&gt;&lt;font style="font-size: 11pt"&gt;2:1:103&lt;/font&gt;&lt;/font&gt;&lt;/td&gt;
+
+      &lt;td style="vertical-align: bottom; padding-top: 1px; padding-left: 1px; padding-right: 1px" width="50" align="right"&gt;&lt;font face="Calibri"&gt;&lt;font style="font-size: 11pt"&gt;11&lt;/font&gt;&lt;/font&gt;&lt;/td&gt;
+    &lt;/tr&gt;
+
+    &lt;tr style="height: 15pt" height="20"&gt;
+      &lt;td style="vertical-align: bottom; padding-top: 1px; padding-left: 1px; padding-right: 1px" height="20" align="right"&gt;&lt;font face="Calibri"&gt;&lt;font style="font-size: 11pt"&gt;90&lt;/font&gt;&lt;/font&gt;&lt;/td&gt;
+
+      &lt;td style="vertical-align: bottom; padding-top: 1px; padding-left: 1px; padding-right: 1px" align="right"&gt;&lt;font face="Calibri"&gt;&lt;font style="font-size: 11pt"&gt;0&lt;/font&gt;&lt;/font&gt;&lt;/td&gt;
+
+      &lt;td style="vertical-align: bottom; padding-top: 1px; padding-left: 1px; padding-right: 1px" align="right"&gt;&lt;font face="Calibri"&gt;&lt;font style="font-size: 11pt"&gt;0&lt;/font&gt;&lt;/font&gt;&lt;/td&gt;
+
+      &lt;td style="vertical-align: bottom; padding-top: 1px; padding-left: 1px; padding-right: 1px"&gt;&lt;font face="Calibri"&gt;&lt;font style="font-size: 11pt"&gt;0x0000&lt;/font&gt;&lt;/font&gt;&lt;/td&gt;
+
+      &lt;td style="vertical-align: bottom; padding-top: 1px; padding-left: 1px; padding-right: 1px" align="right"&gt;&lt;font face="Calibri"&gt;&lt;font style="font-size: 11pt"&gt;0&lt;/font&gt;&lt;/font&gt;&lt;/td&gt;
+
+      &lt;td style="vertical-align: bottom; padding-top: 1px; padding-left: 1px; padding-right: 1px"&gt;&lt;font face="Calibri"&gt;&lt;font style="font-size: 11pt"&gt;MISCELLANEOUS&lt;/font&gt;&lt;span style="mso-spacerun: yes"&gt;&lt;font style="font-size: 11pt"&gt;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160; &lt;/font&gt;&lt;/span&gt;&lt;/font&gt;&lt;/td&gt;
+
+      &lt;td style="vertical-align: bottom; padding-top: 1px; padding-left: 1px; padding-right: 1px" width="133"&gt;&amp;#160;&lt;/td&gt;
+
+      &lt;td style="vertical-align: bottom; padding-top: 1px; padding-left: 1px; padding-right: 1px" width="50" align="right"&gt;&lt;font face="Calibri"&gt;&lt;font style="font-size: 11pt"&gt;9&lt;/font&gt;&lt;/font&gt;&lt;/td&gt;
+    &lt;/tr&gt;
+
+    &lt;tr style="height: 15pt" height="20"&gt;
+      &lt;td style="vertical-align: bottom; padding-top: 1px; padding-left: 1px; padding-right: 1px" height="20" align="right"&gt;&lt;font face="Calibri"&gt;&lt;font style="font-size: 11pt"&gt;274&lt;/font&gt;&lt;/font&gt;&lt;/td&gt;
+
+      &lt;td style="vertical-align: bottom; padding-top: 1px; padding-left: 1px; padding-right: 1px" align="right"&gt;&lt;font face="Calibri"&gt;&lt;font style="font-size: 11pt"&gt;6612&lt;/font&gt;&lt;/font&gt;&lt;/td&gt;
+
+      &lt;td style="vertical-align: bottom; padding-top: 1px; padding-left: 1px; padding-right: 1px" align="right"&gt;&lt;font face="Calibri"&gt;&lt;font style="font-size: 11pt"&gt;0&lt;/font&gt;&lt;/font&gt;&lt;/td&gt;
+
+      &lt;td style="vertical-align: bottom; padding-top: 1px; padding-left: 1px; padding-right: 1px"&gt;&lt;font face="Calibri"&gt;&lt;font style="font-size: 11pt"&gt;0x0034&lt;/font&gt;&lt;/font&gt;&lt;/td&gt;
+
+      &lt;td style="vertical-align: bottom; padding-top: 1px; padding-left: 1px; padding-right: 1px" align="right"&gt;&lt;font face="Calibri"&gt;&lt;font style="font-size: 11pt"&gt;15&lt;/font&gt;&lt;/font&gt;&lt;/td&gt;
+
+      &lt;td style="vertical-align: bottom; padding-top: 1px; padding-left: 1px; padding-right: 1px"&gt;&lt;font face="Calibri"&gt;&lt;font style="font-size: 11pt"&gt;PAGELATCH_EX&lt;/font&gt;&lt;span style="mso-spacerun: yes"&gt;&lt;font style="font-size: 11pt"&gt;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160; &lt;/font&gt;&lt;/span&gt;&lt;/font&gt;&lt;/td&gt;
+
+      &lt;td style="vertical-align: bottom; padding-top: 1px; padding-left: 1px; padding-right: 1px" width="133"&gt;&lt;font face="Calibri"&gt;&lt;font style="font-size: 11pt"&gt;2:1:103&lt;/font&gt;&lt;/font&gt;&lt;/td&gt;
+
+      &lt;td style="vertical-align: bottom; padding-top: 1px; padding-left: 1px; padding-right: 1px" width="50" align="right"&gt;&lt;font face="Calibri"&gt;&lt;font style="font-size: 11pt"&gt;9&lt;/font&gt;&lt;/font&gt;&lt;/td&gt;
+    &lt;/tr&gt;
+
+    &lt;tr style="height: 15pt" height="20"&gt;
+      &lt;td style="vertical-align: bottom; padding-top: 1px; padding-left: 1px; padding-right: 1px" height="20" align="right"&gt;&lt;font face="Calibri"&gt;&lt;font style="font-size: 11pt"&gt;131&lt;/font&gt;&lt;/font&gt;&lt;/td&gt;
+
+      &lt;td style="vertical-align: bottom; padding-top: 1px; padding-left: 1px; padding-right: 1px" align="right"&gt;&lt;font face="Calibri"&gt;&lt;font style="font-size: 11pt"&gt;8568&lt;/font&gt;&lt;/font&gt;&lt;/td&gt;
+
+      &lt;td style="vertical-align: bottom; padding-top: 1px; padding-left: 1px; padding-right: 1px" align="right"&gt;&lt;font face="Calibri"&gt;&lt;font style="font-size: 11pt"&gt;163&lt;/font&gt;&lt;/font&gt;&lt;/td&gt;
+
+      &lt;td style="vertical-align: bottom; padding-top: 1px; padding-left: 1px; padding-right: 1px"&gt;&lt;font face="Calibri"&gt;&lt;font style="font-size: 11pt"&gt;0x0032&lt;/font&gt;&lt;/font&gt;&lt;/td&gt;
+
+      &lt;td style="vertical-align: bottom; padding-top: 1px; padding-left: 1px; padding-right: 1px" align="right"&gt;&lt;font face="Calibri"&gt;&lt;font style="font-size: 11pt"&gt;4&lt;/font&gt;&lt;/font&gt;&lt;/td&gt;
+
+      &lt;td style="vertical-align: bottom; padding-top: 1px; padding-left: 1px; padding-right: 1px"&gt;&lt;font face="Calibri"&gt;&lt;font style="font-size: 11pt"&gt;PAGELATCH_SH&lt;/font&gt;&lt;span style="mso-spacerun: yes"&gt;&lt;font style="font-size: 11pt"&gt;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160; &lt;/font&gt;&lt;/span&gt;&lt;/font&gt;&lt;/td&gt;
+
+      &lt;td style="vertical-align: bottom; padding-top: 1px; padding-left: 1px; padding-right: 1px" width="133"&gt;&lt;font face="Calibri"&gt;&lt;font style="font-size: 11pt"&gt;2:1:103&lt;/font&gt;&lt;/font&gt;&lt;/td&gt;
+
+      &lt;td style="vertical-align: bottom; padding-top: 1px; padding-left: 1px; padding-right: 1px" width="50" align="right"&gt;&lt;font face="Calibri"&gt;&lt;font style="font-size: 11pt"&gt;9&lt;/font&gt;&lt;/font&gt;&lt;/td&gt;
+    &lt;/tr&gt;
+
+    &lt;tr style="height: 15pt" height="20"&gt;
+      &lt;td style="vertical-align: bottom; padding-top: 1px; padding-left: 1px; padding-right: 1px" height="20" align="right"&gt;&lt;font face="Calibri"&gt;&lt;font style="font-size: 11pt"&gt;120&lt;/font&gt;&lt;/font&gt;&lt;/td&gt;
+
+      &lt;td style="vertical-align: bottom; padding-top: 1px; padding-left: 1px; padding-right: 1px" align="right"&gt;&lt;font face="Calibri"&gt;&lt;font style="font-size: 11pt"&gt;0&lt;/font&gt;&lt;/font&gt;&lt;/td&gt;
+
+      &lt;td style="vertical-align: bottom; padding-top: 1px; padding-left: 1px; padding-right: 1px" align="right"&gt;&lt;font face="Calibri"&gt;&lt;font style="font-size: 11pt"&gt;0&lt;/font&gt;&lt;/font&gt;&lt;/td&gt;
+
+      &lt;td style="vertical-align: bottom; padding-top: 1px; padding-left: 1px; padding-right: 1px"&gt;&lt;font face="Calibri"&gt;&lt;font style="font-size: 11pt"&gt;0x0000&lt;/font&gt;&lt;/font&gt;&lt;/td&gt;
+
+      &lt;td style="vertical-align: bottom; padding-top: 1px; padding-left: 1px; padding-right: 1px" align="right"&gt;&lt;font face="Calibri"&gt;&lt;font style="font-size: 11pt"&gt;0&lt;/font&gt;&lt;/font&gt;&lt;/td&gt;
+
+      &lt;td style="vertical-align: bottom; padding-top: 1px; padding-left: 1px; padding-right: 1px"&gt;&lt;font face="Calibri"&gt;&lt;font style="font-size: 11pt"&gt;MISCELLANEOUS&lt;/font&gt;&lt;span style="mso-spacerun: yes"&gt;&lt;font style="font-size: 11pt"&gt;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160; &lt;/font&gt;&lt;/span&gt;&lt;/font&gt;&lt;/td&gt;
+
+      &lt;td style="vertical-align: bottom; padding-top: 1px; padding-left: 1px; padding-right: 1px" width="133"&gt;&amp;#160;&lt;/td&gt;
+
+      &lt;td style="vertical-align: bottom; padding-top: 1px; padding-left: 1px; padding-right: 1px" width="50" align="right"&gt;&lt;font face="Calibri"&gt;&lt;font style="font-size: 11pt"&gt;11&lt;/font&gt;&lt;/font&gt;&lt;/td&gt;
+    &lt;/tr&gt;
+
+    &lt;tr style="height: 15pt" height="20"&gt;
+      &lt;td style="vertical-align: bottom; padding-top: 1px; padding-left: 1px; padding-right: 1px" height="20" align="right"&gt;&lt;font face="Calibri"&gt;&lt;font style="font-size: 11pt"&gt;105&lt;/font&gt;&lt;/font&gt;&lt;/td&gt;
+
+      &lt;td style="vertical-align: bottom; padding-top: 1px; padding-left: 1px; padding-right: 1px" align="right"&gt;&lt;font face="Calibri"&gt;&lt;font style="font-size: 11pt"&gt;8728&lt;/font&gt;&lt;/font&gt;&lt;/td&gt;
+
+      &lt;td style="vertical-align: bottom; padding-top: 1px; padding-left: 1px; padding-right: 1px" align="right"&gt;&lt;font face="Calibri"&gt;&lt;font style="font-size: 11pt"&gt;163&lt;/font&gt;&lt;/font&gt;&lt;/td&gt;
+
+      &lt;td style="vertical-align: bottom; padding-top: 1px; padding-left: 1px; padding-right: 1px"&gt;&lt;font face="Calibri"&gt;&lt;font style="font-size: 11pt"&gt;0x0034&lt;/font&gt;&lt;/font&gt;&lt;/td&gt;
+
+      &lt;td style="vertical-align: bottom; padding-top: 1px; padding-left: 1px; padding-right: 1px" align="right"&gt;&lt;font face="Calibri"&gt;&lt;font style="font-size: 11pt"&gt;11&lt;/font&gt;&lt;/font&gt;&lt;/td&gt;
+
+      &lt;td style="vertical-align: bottom; padding-top: 1px; padding-left: 1px; padding-right: 1px"&gt;&lt;font face="Calibri"&gt;&lt;font style="font-size: 11pt"&gt;PAGELATCH_EX&lt;/font&gt;&lt;span style="mso-spacerun: yes"&gt;&lt;font style="font-size: 11pt"&gt;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160; &lt;/font&gt;&lt;/span&gt;&lt;/font&gt;&lt;/td&gt;
+
+      &lt;td style="vertical-align: bottom; padding-top: 1px; padding-left: 1px; padding-right: 1px" width="133"&gt;&lt;font face="Calibri"&gt;&lt;font style="font-size: 11pt"&gt;2:1:103&lt;/font&gt;&lt;/font&gt;&lt;/td&gt;
+
+      &lt;td style="vertical-align: bottom; padding-top: 1px; padding-left: 1px; padding-right: 1px" width="50" align="right"&gt;&lt;font face="Calibri"&gt;&lt;font style="font-size: 11pt"&gt;9&lt;/font&gt;&lt;/font&gt;&lt;/td&gt;
+    &lt;/tr&gt;
+
+    &lt;tr style="height: 15pt" height="20"&gt;
+      &lt;td style="vertical-align: bottom; padding-top: 1px; padding-left: 1px; padding-right: 1px" height="20" align="right"&gt;&lt;font face="Calibri"&gt;&lt;font style="font-size: 11pt"&gt;247&lt;/font&gt;&lt;/font&gt;&lt;/td&gt;
+
+      &lt;td style="vertical-align: bottom; padding-top: 1px; padding-left: 1px; padding-right: 1px" align="right"&gt;&lt;font face="Calibri"&gt;&lt;font style="font-size: 11pt"&gt;5660&lt;/font&gt;&lt;/font&gt;&lt;/td&gt;
+
+      &lt;td style="vertical-align: bottom; padding-top: 1px; padding-left: 1px; padding-right: 1px" align="right"&gt;&lt;font face="Calibri"&gt;&lt;font style="font-size: 11pt"&gt;0&lt;/font&gt;&lt;/font&gt;&lt;/td&gt;
+
+      &lt;td style="vertical-align: bottom; padding-top: 1px; padding-left: 1px; padding-right: 1px"&gt;&lt;font face="Calibri"&gt;&lt;font style="font-size: 11pt"&gt;0x0000&lt;/font&gt;&lt;/font&gt;&lt;/td&gt;
+
+      &lt;td style="vertical-align: bottom; padding-top: 1px; padding-left: 1px; padding-right: 1px" align="right"&gt;&lt;font face="Calibri"&gt;&lt;font style="font-size: 11pt"&gt;0&lt;/font&gt;&lt;/font&gt;&lt;/td&gt;
+
+      &lt;td style="vertical-align: bottom; padding-top: 1px; padding-left: 1px; padding-right: 1px"&gt;&lt;font face="Calibri"&gt;&lt;font style="font-size: 11pt"&gt;PAGELATCH_SH&lt;/font&gt;&lt;span style="mso-spacerun: yes"&gt;&lt;font style="font-size: 11pt"&gt;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160; &lt;/font&gt;&lt;/span&gt;&lt;/font&gt;&lt;/td&gt;
+
+      &lt;td style="vertical-align: bottom; padding-top: 1px; padding-left: 1px; padding-right: 1px" width="133"&gt;&lt;font face="Calibri"&gt;&lt;font style="font-size: 11pt"&gt;2:1:103&lt;/font&gt;&lt;/font&gt;&lt;/td&gt;
+
+      &lt;td style="vertical-align: bottom; padding-top: 1px; padding-left: 1px; padding-right: 1px" width="50" align="right"&gt;&lt;font face="Calibri"&gt;&lt;font style="font-size: 11pt"&gt;9&lt;/font&gt;&lt;/font&gt;&lt;/td&gt;
+    &lt;/tr&gt;
+
+    &lt;tr style="height: 15pt" height="20"&gt;
+      &lt;td style="vertical-align: bottom; padding-top: 1px; padding-left: 1px; padding-right: 1px" height="20" align="right"&gt;&lt;font face="Calibri"&gt;&lt;font style="font-size: 11pt"&gt;216&lt;/font&gt;&lt;/font&gt;&lt;/td&gt;
+
+      &lt;td style="vertical-align: bottom; padding-top: 1px; padding-left: 1px; padding-right: 1px" align="right"&gt;&lt;font face="Calibri"&gt;&lt;font style="font-size: 11pt"&gt;0&lt;/font&gt;&lt;/font&gt;&lt;/td&gt;
+
+      &lt;td style="vertical-align: bottom; padding-top: 1px; padding-left: 1px; padding-right: 1px" align="right"&gt;&lt;font face="Calibri"&gt;&lt;font style="font-size: 11pt"&gt;0&lt;/font&gt;&lt;/font&gt;&lt;/td&gt;
+
+      &lt;td style="vertical-align: bottom; padding-top: 1px; padding-left: 1px; padding-right: 1px"&gt;&lt;font face="Calibri"&gt;&lt;font style="font-size: 11pt"&gt;0x0000&lt;/font&gt;&lt;/font&gt;&lt;/td&gt;
+
+      &lt;td style="vertical-align: bottom; padding-top: 1px; padding-left: 1px; padding-right: 1px" align="right"&gt;&lt;font face="Calibri"&gt;&lt;font style="font-size: 11pt"&gt;0&lt;/font&gt;&lt;/font&gt;&lt;/td&gt;
+
+      &lt;td style="vertical-align: bottom; padding-top: 1px; padding-left: 1px; padding-right: 1px"&gt;&lt;font face="Calibri"&gt;&lt;font style="font-size: 11pt"&gt;MISCELLANEOUS&lt;/font&gt;&lt;span style="mso-spacerun: yes"&gt;&lt;font style="font-size: 11pt"&gt;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160; &lt;/font&gt;&lt;/span&gt;&lt;/font&gt;&lt;/td&gt;
+
+      &lt;td style="vertical-align: bottom; padding-top: 1px; padding-left: 1px; padding-right: 1px" width="133"&gt;&amp;#160;&lt;/td&gt;
+
+      &lt;td style="vertical-align: bottom; padding-top: 1px; padding-left: 1px; padding-right: 1px" width="50" align="right"&gt;&lt;font face="Calibri"&gt;&lt;font style="font-size: 11pt"&gt;1&lt;/font&gt;&lt;/font&gt;&lt;/td&gt;
+    &lt;/tr&gt;
+
+    &lt;tr style="height: 15pt" height="20"&gt;
+      &lt;td style="vertical-align: bottom; padding-top: 1px; padding-left: 1px; padding-right: 1px" height="20" align="right"&gt;&lt;font face="Calibri"&gt;&lt;font style="font-size: 11pt"&gt;163&lt;/font&gt;&lt;/font&gt;&lt;/td&gt;
+
+      &lt;td style="vertical-align: bottom; padding-top: 1px; padding-left: 1px; padding-right: 1px" align="right"&gt;&lt;font face="Calibri"&gt;&lt;font style="font-size: 11pt"&gt;8108&lt;/font&gt;&lt;/font&gt;&lt;/td&gt;
+
+      &lt;td style="vertical-align: bottom; padding-top: 1px; padding-left: 1px; padding-right: 1px" align="right"&gt;&lt;font face="Calibri"&gt;&lt;font style="font-size: 11pt"&gt;0&lt;/font&gt;&lt;/font&gt;&lt;/td&gt;
+
+      &lt;td style="vertical-align: bottom; padding-top: 1px; padding-left: 1px; padding-right: 1px"&gt;&lt;font face="Calibri"&gt;&lt;font style="font-size: 11pt"&gt;0x0000&lt;/font&gt;&lt;/font&gt;&lt;/td&gt;
+
+      &lt;td style="vertical-align: bottom; padding-top: 1px; padding-left: 1px; padding-right: 1px" align="right"&gt;&lt;font face="Calibri"&gt;&lt;font style="font-size: 11pt"&gt;0&lt;/font&gt;&lt;/font&gt;&lt;/td&gt;
+
+      &lt;td style="vertical-align: bottom; padding-top: 1px; padding-left: 1px; padding-right: 1px"&gt;&lt;font face="Calibri"&gt;&lt;font style="font-size: 11pt"&gt;PAGELATCH_SH&lt;/font&gt;&lt;span style="mso-spacerun: yes"&gt;&lt;font style="font-size: 11pt"&gt;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160; &lt;/font&gt;&lt;/span&gt;&lt;/font&gt;&lt;/td&gt;
+
+      &lt;td style="vertical-align: bottom; padding-top: 1px; padding-left: 1px; padding-right: 1px" width="133"&gt;&lt;font face="Calibri"&gt;&lt;font style="font-size: 11pt"&gt;2:1:103&lt;/font&gt;&lt;/font&gt;&lt;/td&gt;
+
+      &lt;td style="vertical-align: bottom; padding-top: 1px; padding-left: 1px; padding-right: 1px" width="50" align="right"&gt;&lt;font face="Calibri"&gt;&lt;font style="font-size: 11pt"&gt;9&lt;/font&gt;&lt;/font&gt;&lt;/td&gt;
+    &lt;/tr&gt;
+
+    &lt;tr style="height: 15pt" height="20"&gt;
+      &lt;td style="vertical-align: bottom; padding-top: 1px; padding-left: 1px; padding-right: 1px" height="20" align="right"&gt;&lt;font face="Calibri"&gt;&lt;font style="font-size: 11pt"&gt;201&lt;/font&gt;&lt;/font&gt;&lt;/td&gt;
+
+      &lt;td style="vertical-align: bottom; padding-top: 1px; padding-left: 1px; padding-right: 1px" align="right"&gt;&lt;font face="Calibri"&gt;&lt;font style="font-size: 11pt"&gt;7004&lt;/font&gt;&lt;/font&gt;&lt;/td&gt;
+
+      &lt;td style="vertical-align: bottom; padding-top: 1px; padding-left: 1px; padding-right: 1px" align="right"&gt;&lt;font face="Calibri"&gt;&lt;font style="font-size: 11pt"&gt;0&lt;/font&gt;&lt;/font&gt;&lt;/td&gt;
+
+      &lt;td style="vertical-align: bottom; padding-top: 1px; padding-left: 1px; padding-right: 1px"&gt;&lt;font face="Calibri"&gt;&lt;font style="font-size: 11pt"&gt;0x0034&lt;/font&gt;&lt;/font&gt;&lt;/td&gt;
+
+      &lt;td style="vertical-align: bottom; padding-top: 1px; padding-left: 1px; padding-right: 1px" align="right"&gt;&lt;font face="Calibri"&gt;&lt;font style="font-size: 11pt"&gt;1&lt;/font&gt;&lt;/font&gt;&lt;/td&gt;
+
+      &lt;td style="vertical-align: bottom; padding-top: 1px; padding-left: 1px; padding-right: 1px"&gt;&lt;font face="Calibri"&gt;&lt;font style="font-size: 11pt"&gt;PAGELATCH_EX&lt;/font&gt;&lt;span style="mso-spacerun: yes"&gt;&lt;font style="font-size: 11pt"&gt;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160; &lt;/font&gt;&lt;/span&gt;&lt;/font&gt;&lt;/td&gt;
+
+      &lt;td style="vertical-align: bottom; padding-top: 1px; padding-left: 1px; padding-right: 1px" width="133"&gt;&lt;font face="Calibri"&gt;&lt;font style="font-size: 11pt"&gt;2:1:103&lt;/font&gt;&lt;/font&gt;&lt;/td&gt;
+
+      &lt;td style="vertical-align: bottom; padding-top: 1px; padding-left: 1px; padding-right: 1px" width="50" align="right"&gt;&lt;font face="Calibri"&gt;&lt;font style="font-size: 11pt"&gt;9&lt;/font&gt;&lt;/font&gt;&lt;/td&gt;
+    &lt;/tr&gt;
+
+    &lt;tr style="height: 15pt" height="20"&gt;
+      &lt;td style="vertical-align: bottom; padding-top: 1px; padding-left: 1px; padding-right: 1px" height="20" align="right"&gt;&lt;font face="Calibri"&gt;&lt;font style="font-size: 11pt"&gt;267&lt;/font&gt;&lt;/font&gt;&lt;/td&gt;
+
+      &lt;td style="vertical-align: bottom; padding-top: 1px; padding-left: 1px; padding-right: 1px" align="right"&gt;&lt;font face="Calibri"&gt;&lt;font style="font-size: 11pt"&gt;0&lt;/font&gt;&lt;/font&gt;&lt;/td&gt;
+
+      &lt;td style="vertical-align: bottom; padding-top: 1px; padding-left: 1px; padding-right: 1px" align="right"&gt;&lt;font face="Calibri"&gt;&lt;font style="font-size: 11pt"&gt;0&lt;/font&gt;&lt;/font&gt;&lt;/td&gt;
+
+      &lt;td style="vertical-align: bottom; padding-top: 1px; padding-left: 1px; padding-right: 1px"&gt;&lt;font face="Calibri"&gt;&lt;font style="font-size: 11pt"&gt;0x0000&lt;/font&gt;&lt;/font&gt;&lt;/td&gt;
+
+      &lt;td style="vertical-align: bottom; padding-top: 1px; padding-left: 1px; padding-right: 1px" align="right"&gt;&lt;font face="Calibri"&gt;&lt;font style="font-size: 11pt"&gt;0&lt;/font&gt;&lt;/font&gt;&lt;/td&gt;
+
+      &lt;td style="vertical-align: bottom; padding-top: 1px; padding-left: 1px; padding-right: 1px"&gt;&lt;font face="Calibri"&gt;&lt;font style="font-size: 11pt"&gt;MISCELLANEOUS&lt;/font&gt;&lt;span style="mso-spacerun: yes"&gt;&lt;font style="font-size: 11pt"&gt;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160; &lt;/font&gt;&lt;/span&gt;&lt;/font&gt;&lt;/td&gt;
+
+      &lt;td style="vertical-align: bottom; padding-top: 1px; padding-left: 1px; padding-right: 1px" width="133"&gt;&amp;#160;&lt;/td&gt;
+
+      &lt;td style="vertical-align: bottom; padding-top: 1px; padding-left: 1px; padding-right: 1px" width="50" align="right"&gt;&lt;font face="Calibri"&gt;&lt;font style="font-size: 11pt"&gt;6&lt;/font&gt;&lt;/font&gt;&lt;/td&gt;
+    &lt;/tr&gt;
+
+    &lt;tr style="height: 15pt" height="20"&gt;
+      &lt;td style="vertical-align: bottom; padding-top: 1px; padding-left: 1px; padding-right: 1px" height="20" align="right"&gt;&lt;font face="Calibri"&gt;&lt;font style="font-size: 11pt"&gt;117&lt;/font&gt;&lt;/font&gt;&lt;/td&gt;
+
+      &lt;td style="vertical-align: bottom; padding-top: 1px; padding-left: 1px; padding-right: 1px" align="right"&gt;&lt;font face="Calibri"&gt;&lt;font style="font-size: 11pt"&gt;11124&lt;/font&gt;&lt;/font&gt;&lt;/td&gt;
+
+      &lt;td style="vertical-align: bottom; padding-top: 1px; padding-left: 1px; padding-right: 1px" align="right"&gt;&lt;font face="Calibri"&gt;&lt;font style="font-size: 11pt"&gt;163&lt;/font&gt;&lt;/font&gt;&lt;/td&gt;
+
+      &lt;td style="vertical-align: bottom; padding-top: 1px; padding-left: 1px; padding-right: 1px"&gt;&lt;font face="Calibri"&gt;&lt;font style="font-size: 11pt"&gt;0x0034&lt;/font&gt;&lt;/font&gt;&lt;/td&gt;
+
+      &lt;td style="vertical-align: bottom; padding-top: 1px; padding-left: 1px; padding-right: 1px" align="right"&gt;&lt;font face="Calibri"&gt;&lt;font style="font-size: 11pt"&gt;10&lt;/font&gt;&lt;/font&gt;&lt;/td&gt;
+
+      &lt;td style="vertical-align: bottom; padding-top: 1px; padding-left: 1px; padding-right: 1px"&gt;&lt;font face="Calibri"&gt;&lt;font style="font-size: 11pt"&gt;PAGELATCH_EX&lt;/font&gt;&lt;span style="mso-spacerun: yes"&gt;&lt;font style="font-size: 11pt"&gt;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160; &lt;/font&gt;&lt;/span&gt;&lt;/font&gt;&lt;/td&gt;
+
+      &lt;td style="vertical-align: bottom; padding-top: 1px; padding-left: 1px; padding-right: 1px" width="133"&gt;&lt;font face="Calibri"&gt;&lt;font style="font-size: 11pt"&gt;2:1:103&lt;/font&gt;&lt;/font&gt;&lt;/td&gt;
+
+      &lt;td style="vertical-align: bottom; padding-top: 1px; padding-left: 1px; padding-right: 1px" width="50" align="right"&gt;&lt;font face="Calibri"&gt;&lt;font style="font-size: 11pt"&gt;11&lt;/font&gt;&lt;/font&gt;&lt;/td&gt;
+    &lt;/tr&gt;
+
+    &lt;tr style="height: 15pt" height="20"&gt;
+      &lt;td style="vertical-align: bottom; padding-top: 1px; padding-left: 1px; padding-right: 1px" height="20" align="right"&gt;&lt;font face="Calibri"&gt;&lt;font style="font-size: 11pt"&gt;205&lt;/font&gt;&lt;/font&gt;&lt;/td&gt;
+
+      &lt;td style="vertical-align: bottom; padding-top: 1px; padding-left: 1px; padding-right: 1px" align="right"&gt;&lt;font face="Calibri"&gt;&lt;font style="font-size: 11pt"&gt;10016&lt;/font&gt;&lt;/font&gt;&lt;/td&gt;
+
+      &lt;td style="vertical-align: bottom; padding-top: 1px; padding-left: 1px; padding-right: 1px" align="right"&gt;&lt;font face="Calibri"&gt;&lt;font style="font-size: 11pt"&gt;0&lt;/font&gt;&lt;/font&gt;&lt;/td&gt;
+
+      &lt;td style="vertical-align: bottom; padding-top: 1px; padding-left: 1px; padding-right: 1px"&gt;&lt;font face="Calibri"&gt;&lt;font style="font-size: 11pt"&gt;0x0034&lt;/font&gt;&lt;/font&gt;&lt;/td&gt;
+
+      &lt;td style="vertical-align: bottom; padding-top: 1px; padding-left: 1px; padding-right: 1px" align="right"&gt;&lt;font face="Calibri"&gt;&lt;font style="font-size: 11pt"&gt;1&lt;/font&gt;&lt;/font&gt;&lt;/td&gt;
+
+      &lt;td style="vertical-align: bottom; padding-top: 1px; padding-left: 1px; padding-right: 1px"&gt;&lt;font face="Calibri"&gt;&lt;font style="font-size: 11pt"&gt;PAGELATCH_EX&lt;/font&gt;&lt;span style="mso-spacerun: yes"&gt;&lt;font style="font-size: 11pt"&gt;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160; &lt;/font&gt;&lt;/span&gt;&lt;/font&gt;&lt;/td&gt;
+
+      &lt;td style="vertical-align: bottom; padding-top: 1px; padding-left: 1px; padding-right: 1px" width="133"&gt;&lt;font face="Calibri"&gt;&lt;font style="font-size: 11pt"&gt;2:1:103&lt;/font&gt;&lt;/font&gt;&lt;/td&gt;
+
+      &lt;td style="vertical-align: bottom; padding-top: 1px; padding-left: 1px; padding-right: 1px" width="50" align="right"&gt;&lt;font face="Calibri"&gt;&lt;font style="font-size: 11pt"&gt;9&lt;/font&gt;&lt;/font&gt;&lt;/td&gt;
+    &lt;/tr&gt;
+
+    &lt;tr style="height: 15pt" height="20"&gt;
+      &lt;td style="vertical-align: bottom; padding-top: 1px; padding-left: 1px; padding-right: 1px" height="20" align="right"&gt;&lt;font face="Calibri"&gt;&lt;font style="font-size: 11pt"&gt;210&lt;/font&gt;&lt;/font&gt;&lt;/td&gt;
+
+      &lt;td style="vertical-align: bottom; padding-top: 1px; padding-left: 1px; padding-right: 1px" align="right"&gt;&lt;font face="Calibri"&gt;&lt;font style="font-size: 11pt"&gt;10108&lt;/font&gt;&lt;/font&gt;&lt;/td&gt;
+
+      &lt;td style="vertical-align: bottom; padding-top: 1px; padding-left: 1px; padding-right: 1px" align="right"&gt;&lt;font face="Calibri"&gt;&lt;font style="font-size: 11pt"&gt;0&lt;/font&gt;&lt;/font&gt;&lt;/td&gt;
+
+      &lt;td style="vertical-align: bottom; padding-top: 1px; padding-left: 1px; padding-right: 1px"&gt;&lt;font face="Calibri"&gt;&lt;font style="font-size: 11pt"&gt;0x0034&lt;/font&gt;&lt;/font&gt;&lt;/td&gt;
+
+      &lt;td style="vertical-align: bottom; padding-top: 1px; padding-left: 1px; padding-right: 1px" align="right"&gt;&lt;font face="Calibri"&gt;&lt;font style="font-size: 11pt"&gt;14&lt;/font&gt;&lt;/font&gt;&lt;/td&gt;
+
+      &lt;td style="vertical-align: bottom; padding-top: 1px; padding-left: 1px; padding-right: 1px"&gt;&lt;font face="Calibri"&gt;&lt;font style="font-size: 11pt"&gt;PAGELATCH_EX&lt;/font&gt;&lt;span style="mso-spacerun: yes"&gt;&lt;font style="font-size: 11pt"&gt;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160; &lt;/font&gt;&lt;/span&gt;&lt;/font&gt;&lt;/td&gt;
+
+      &lt;td style="vertical-align: bottom; padding-top: 1px; padding-left: 1px; padding-right: 1px" width="133"&gt;&lt;font face="Calibri"&gt;&lt;font style="font-size: 11pt"&gt;2:1:103&lt;/font&gt;&lt;/font&gt;&lt;/td&gt;
+
+      &lt;td style="vertical-align: bottom; padding-top: 1px; padding-left: 1px; padding-right: 1px" width="50" align="right"&gt;&lt;font face="Calibri"&gt;&lt;font style="font-size: 11pt"&gt;9&lt;/font&gt;&lt;/font&gt;&lt;/td&gt;
+    &lt;/tr&gt;
+
+    &lt;tr style="height: 15pt" height="20"&gt;
+      &lt;td style="vertical-align: bottom; padding-top: 1px; padding-left: 1px; padding-right: 1px" height="20" align="right"&gt;&lt;font face="Calibri"&gt;&lt;font style="font-size: 11pt"&gt;226&lt;/font&gt;&lt;/font&gt;&lt;/td&gt;
+
+      &lt;td style="vertical-align: bottom; padding-top: 1px; padding-left: 1px; padding-right: 1px" align="right"&gt;&lt;font face="Calibri"&gt;&lt;font style="font-size: 11pt"&gt;0&lt;/font&gt;&lt;/font&gt;&lt;/td&gt;
+
+      &lt;td style="vertical-align: bottom; padding-top: 1px; padding-left: 1px; padding-right: 1px" align="right"&gt;&lt;font face="Calibri"&gt;&lt;font style="font-size: 11pt"&gt;0&lt;/font&gt;&lt;/font&gt;&lt;/td&gt;
+
+      &lt;td style="vertical-align: bottom; padding-top: 1px; padding-left: 1px; padding-right: 1px"&gt;&lt;font face="Calibri"&gt;&lt;font style="font-size: 11pt"&gt;0x0000&lt;/font&gt;&lt;/font&gt;&lt;/td&gt;
+
+      &lt;td style="vertical-align: bottom; padding-top: 1px; padding-left: 1px; padding-right: 1px" align="right"&gt;&lt;font face="Calibri"&gt;&lt;font style="font-size: 11pt"&gt;0&lt;/font&gt;&lt;/font&gt;&lt;/td&gt;
+
+      &lt;td style="vertical-align: bottom; padding-top: 1px; padding-left: 1px; padding-right: 1px"&gt;&lt;font face="Calibri"&gt;&lt;font style="font-size: 11pt"&gt;MISCELLANEOUS&lt;/font&gt;&lt;span style="mso-spacerun: yes"&gt;&lt;font style="font-size: 11pt"&gt;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160; &lt;/font&gt;&lt;/span&gt;&lt;/font&gt;&lt;/td&gt;
+
+      &lt;td style="vertical-align: bottom; padding-top: 1px; padding-left: 1px; padding-right: 1px" width="133"&gt;&amp;#160;&lt;/td&gt;
+
+      &lt;td style="vertical-align: bottom; padding-top: 1px; padding-left: 1px; padding-right: 1px" width="50" align="right"&gt;&lt;font face="Calibri"&gt;&lt;font style="font-size: 11pt"&gt;10&lt;/font&gt;&lt;/font&gt;&lt;/td&gt;
+    &lt;/tr&gt;
+
+    &lt;tr style="height: 15pt" height="20"&gt;
+      &lt;td style="vertical-align: bottom; padding-top: 1px; padding-left: 1px; padding-right: 1px" height="20" align="right"&gt;&lt;font face="Calibri"&gt;&lt;font style="font-size: 11pt"&gt;164&lt;/font&gt;&lt;/font&gt;&lt;/td&gt;
+
+      &lt;td style="vertical-align: bottom; padding-top: 1px; padding-left: 1px; padding-right: 1px" align="right"&gt;&lt;font face="Calibri"&gt;&lt;font style="font-size: 11pt"&gt;0&lt;/font&gt;&lt;/font&gt;&lt;/td&gt;
+
+      &lt;td style="vertical-align: bottom; padding-top: 1px; padding-left: 1px; padding-right: 1px" align="right"&gt;&lt;font face="Calibri"&gt;&lt;font style="font-size: 11pt"&gt;0&lt;/font&gt;&lt;/font&gt;&lt;/td&gt;
+
+      &lt;td style="vertical-align: bottom; padding-top: 1px; padding-left: 1px; padding-right: 1px"&gt;&lt;font face="Calibri"&gt;&lt;font style="font-size: 11pt"&gt;0x0000&lt;/font&gt;&lt;/font&gt;&lt;/td&gt;
+
+      &lt;td style="vertical-align: bottom; padding-top: 1px; padding-left: 1px; padding-right: 1px" align="right"&gt;&lt;font face="Calibri"&gt;&lt;font style="font-size: 11pt"&gt;0&lt;/font&gt;&lt;/font&gt;&lt;/td&gt;
+
+      &lt;td style="vertical-align: bottom; padding-top: 1px; padding-left: 1px; padding-right: 1px"&gt;&lt;font face="Calibri"&gt;&lt;font style="font-size: 11pt"&gt;MISCELLANEOUS&lt;/font&gt;&lt;span style="mso-spacerun: yes"&gt;&lt;font style="font-size: 11pt"&gt;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160; &lt;/font&gt;&lt;/span&gt;&lt;/font&gt;&lt;/td&gt;
+
+      &lt;td style="vertical-align: bottom; padding-top: 1px; padding-left: 1px; padding-right: 1px" width="133"&gt;&amp;#160;&lt;/td&gt;
+
+      &lt;td style="vertical-align: bottom; padding-top: 1px; padding-left: 1px; padding-right: 1px" width="50" align="right"&gt;&lt;font face="Calibri"&gt;&lt;font style="font-size: 11pt"&gt;1&lt;/font&gt;&lt;/font&gt;&lt;/td&gt;
+    &lt;/tr&gt;
+
+    &lt;tr style="height: 15pt" height="20"&gt;
+      &lt;td style="vertical-align: bottom; padding-top: 1px; padding-left: 1px; padding-right: 1px" height="20" align="right"&gt;&lt;font face="Calibri"&gt;&lt;font style="font-size: 11pt"&gt;175&lt;/font&gt;&lt;/font&gt;&lt;/td&gt;
+
+      &lt;td style="vertical-align: bottom; padding-top: 1px; padding-left: 1px; padding-right: 1px" align="right"&gt;&lt;font face="Calibri"&gt;&lt;font style="font-size: 11pt"&gt;0&lt;/font&gt;&lt;/font&gt;&lt;/td&gt;
+
+      &lt;td style="vertical-align: bottom; padding-top: 1px; padding-left: 1px; padding-right: 1px" align="right"&gt;&lt;font face="Calibri"&gt;&lt;font style="font-size: 11pt"&gt;0&lt;/font&gt;&lt;/font&gt;&lt;/td&gt;
+
+      &lt;td style="vertical-align: bottom; padding-top: 1px; padding-left: 1px; padding-right: 1px"&gt;&lt;font face="Calibri"&gt;&lt;font style="font-size: 11pt"&gt;0x0000&lt;/font&gt;&lt;/font&gt;&lt;/td&gt;
+
+      &lt;td style="vertical-align: bottom; padding-top: 1px; padding-left: 1px; padding-right: 1px" align="right"&gt;&lt;font face="Calibri"&gt;&lt;font style="font-size: 11pt"&gt;0&lt;/font&gt;&lt;/font&gt;&lt;/td&gt;
+
+      &lt;td style="vertical-align: bottom; padding-top: 1px; padding-left: 1px; padding-right: 1px"&gt;&lt;font face="Calibri"&gt;&lt;font style="font-size: 11pt"&gt;MISCELLANEOUS&lt;/font&gt;&lt;span style="mso-spacerun: yes"&gt;&lt;font style="font-size: 11pt"&gt;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160; &lt;/font&gt;&lt;/span&gt;&lt;/font&gt;&lt;/td&gt;
+
+      &lt;td style="vertical-align: bottom; padding-top: 1px; padding-left: 1px; padding-right: 1px" width="133"&gt;&amp;#160;&lt;/td&gt;
+
+      &lt;td style="vertical-align: bottom; padding-top: 1px; padding-left: 1px; padding-right: 1px" width="50" align="right"&gt;&lt;font face="Calibri"&gt;&lt;font style="font-size: 11pt"&gt;11&lt;/font&gt;&lt;/font&gt;&lt;/td&gt;
+    &lt;/tr&gt;
+
+    &lt;tr style="height: 15pt" height="20"&gt;
+      &lt;td style="vertical-align: bottom; padding-top: 1px; padding-left: 1px; padding-right: 1px" height="20" align="right"&gt;&lt;font face="Calibri"&gt;&lt;font style="font-size: 11pt"&gt;98&lt;/font&gt;&lt;/font&gt;&lt;/td&gt;
+
+      &lt;td style="vertical-align: bottom; padding-top: 1px; padding-left: 1px; padding-right: 1px" align="right"&gt;&lt;font face="Calibri"&gt;&lt;font style="font-size: 11pt"&gt;0&lt;/font&gt;&lt;/font&gt;&lt;/td&gt;
+
+      &lt;td style="vertical-align: bottom; padding-top: 1px; padding-left: 1px; padding-right: 1px" align="right"&gt;&lt;font face="Calibri"&gt;&lt;font style="font-size: 11pt"&gt;0&lt;/font&gt;&lt;/font&gt;&lt;/td&gt;
+
+      &lt;td style="vertical-align: bottom; padding-top: 1px; padding-left: 1px; padding-right: 1px"&gt;&lt;font face="Calibri"&gt;&lt;font style="font-size: 11pt"&gt;0x0000&lt;/font&gt;&lt;/font&gt;&lt;/td&gt;
+
+      &lt;td style="vertical-align: bottom; padding-top: 1px; padding-left: 1px; padding-right: 1px" align="right"&gt;&lt;font face="Calibri"&gt;&lt;font style="font-size: 11pt"&gt;0&lt;/font&gt;&lt;/font&gt;&lt;/td&gt;
+
+      &lt;td style="vertical-align: bottom; padding-top: 1px; padding-left: 1px; padding-right: 1px"&gt;&lt;font face="Calibri"&gt;&lt;font style="font-size: 11pt"&gt;MISCELLANEOUS&lt;/font&gt;&lt;span style="mso-spacerun: yes"&gt;&lt;font style="font-size: 11pt"&gt;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160;&amp;#160; &lt;/font&gt;&lt;/span&gt;&lt;/font&gt;&lt;/td&gt;
+
+      &lt;td style="vertical-align: bottom; padding-top: 1px; padding-left: 1px; padding-right: 1px" width="133"&gt;&amp;#160;&lt;/td&gt;
+
+      &lt;td style="vertical-align: bottom; padding-top: 1px; padding-left: 1px; padding-right: 1px" width="50" align="right"&gt;&lt;font face="Calibri"&gt;&lt;font style="font-size: 11pt"&gt;7&lt;/font&gt;&lt;/font&gt;&lt;/td&gt;
+    &lt;/tr&gt;
+  &lt;/tbody&gt;&lt;/table&gt;
+
+&lt;p&gt;What this tells me is that there are several queries lined up behind the query executing under spid 163 and they are waiting for 163 to release its shared lock on a latch so that they can aquire an exclusive lock.&amp;#160; To quote the SQLCAT team, “Latches are lightweight synchronization primitives that are used by the SQL Server engine to guarantee consistency of in-memory structures including; index, data pages and internal structures such as non-leaf pages in a B-Tree.” See &lt;a href="http://www.microsoft.com/download/en/details.aspx?displaylang=en&amp;amp;id=26665" target="_blank"&gt;this white paper&lt;/a&gt; for an in depth discussion on latch contention. So the next question is what is 2:1:103 – the resource everyone is fighting for.&lt;/p&gt;
+
+&lt;p&gt;The first number will be the database id, the second is the database file and the third and last number is the page.&amp;#160; 2 is temp db. If you don’t believe me, just execute:&lt;/p&gt;
+
+&lt;div id="codeSnippetWrapper"&gt;
+  &lt;pre id="codeSnippet" style="border-top-style: none; overflow: visible; font-size: 8pt; border-left-style: none; font-family: &amp;#39;Courier New&amp;#39;, courier, monospace; border-bottom-style: none; color: black; padding-bottom: 0px; direction: ltr; text-align: left; padding-top: 0px; border-right-style: none; padding-left: 0px; margin: 0em; line-height: 12pt; padding-right: 0px; width: 100%; background-color: #f4f4f4"&gt;&lt;span style="color: #0000ff"&gt;select&lt;/span&gt; db_name(2)&lt;/pre&gt;
+
+  &lt;br /&gt;&lt;/div&gt;
+
+&lt;p&gt;It says “tempdb” doesn’t it? I just knew that it would.&lt;/p&gt;
+
+&lt;p&gt;To track down the actual object that owns that page, execute:&lt;/p&gt;
+
+&lt;div id="codeSnippetWrapper"&gt;
+  &lt;pre id="codeSnippet" style="border-top-style: none; overflow: visible; font-size: 8pt; border-left-style: none; font-family: &amp;#39;Courier New&amp;#39;, courier, monospace; border-bottom-style: none; color: black; padding-bottom: 0px; direction: ltr; text-align: left; padding-top: 0px; border-right-style: none; padding-left: 0px; margin: 0em; line-height: 12pt; padding-right: 0px; width: 100%; background-color: #f4f4f4"&gt;&lt;span style="color: #0000ff"&gt;DBCC&lt;/span&gt; Traceon(3604)&lt;br /&gt;&lt;span style="color: #0000ff"&gt;DBCC&lt;/span&gt; PAGE (2, 1, 103)&lt;br /&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;The key item of interest in the results is the Metadata: ObjectId with a value of 75. Then execute:&lt;/p&gt;
+
+&lt;div id="codeSnippetWrapper"&gt;
+  &lt;pre id="codeSnippet" style="border-top-style: none; overflow: visible; font-size: 8pt; border-left-style: none; font-family: &amp;#39;Courier New&amp;#39;, courier, monospace; border-bottom-style: none; color: black; padding-bottom: 0px; direction: ltr; text-align: left; padding-top: 0px; border-right-style: none; padding-left: 0px; margin: 0em; line-height: 12pt; padding-right: 0px; width: 100%; background-color: #f4f4f4"&gt;&lt;span style="color: #0000ff"&gt;select&lt;/span&gt; object_name(75)&lt;/pre&gt;
+
+  &lt;br /&gt;&lt;/div&gt;
+
+&lt;p&gt;and the object is sysmultiobjrefs.&lt;/p&gt;
+
+&lt;p&gt;So what the heck am I supposed to do with this? If this was blocking on a user table that was part of my application, it seems I would have something to work with. But tempdb? Really? Ugh.&lt;/p&gt;
+
+&lt;p&gt;After recovering from a spiral of primal self-loathing and despair, I turn to google. I’m sure lots of people have seen contention on 2:1:103 and it will be no time at all before a clear explanation and remedy are revealed. Well, yes, there are several people struggling with contention on this object, but alas, not there is no clear explanations and answers. I find several posts talking about 2:1:1 and 2:2:3 (see this &lt;a href="http://support.microsoft.com/kb/328551" target="_blank"&gt;KB article&lt;/a&gt; for those). But those struggling with 2:1:103 seem to be being told to turn on trace flag –T1118 but then later complaining that this flag is not doing anything. Or they were told to add more files but they replied that they had plenty of files. And by the way, –T1118 was turned on already in our DB and we have plenty of files too.&lt;/p&gt;
+
+&lt;p&gt;Well finally I come across &lt;a href="http://www.sqlservercentral.com/Forums/Topic1024413-1550-1.aspx#bm1024431" target="_blank"&gt;this post&lt;/a&gt; from someone with this exact issue and the poster states that they contacted Microsoft and then reports the explanation MS gave and this explanation actually makes sense. The issue is from contention of DDL operations in tempdb. In other words, the Creating and dropping of temp tables. Well we just so happen to do a lot of that and added more in this last release.&lt;/p&gt;
+
+&lt;p&gt;I then came upon this &lt;a href="http://technet.microsoft.com/en-us/library/cc966545.aspx" target="_blank"&gt;white paper&lt;/a&gt; and while it did not specifically refer to 2:1:103, it really provided an in depth description of the inner workings of tempdb and how to identify and troubleshoot different forms of contention there. Of particular interest was its explanation of contention in DML and DDL operations.&lt;/p&gt;
+
+&lt;p&gt;Contention in DML (select, update, insert) operations is identified by contention on 2:1:1 or 2:1:3. This can be caused by either “internal” objects such as the objects that the sql query engine creates to when executing certain hash joins, sorts and groupings. Or it can be caused by user objects like temp tables and temp table variables. At the root of the issue here is SQL Servers struggle to allocate and deallocate pages and updating metadata tables that track those pages. In addition to suggesting that those who suffer from this issue analyze query plans to make more efficient use of tempdb, it also suggests turning on –T1118 and adding data files to tempdb.&lt;/p&gt;
+
+&lt;p&gt;My team’s plight seemed to fall under DDL Contention. This can be determined by checking if the object under contention is a system catalog table in sysobjects. Well according to:&lt;/p&gt;
+
+&lt;div id="codeSnippetWrapper"&gt;
+  &lt;pre id="codeSnippet" style="border-top-style: none; overflow: visible; font-size: 8pt; border-left-style: none; font-family: &amp;#39;Courier New&amp;#39;, courier, monospace; border-bottom-style: none; color: black; padding-bottom: 0px; direction: ltr; text-align: left; padding-top: 0px; border-right-style: none; padding-left: 0px; margin: 0em; line-height: 12pt; padding-right: 0px; width: 100%; background-color: #f4f4f4"&gt;&lt;span style="color: #0000ff"&gt;select&lt;/span&gt; * &lt;span style="color: #0000ff"&gt;from&lt;/span&gt; sys.objects &lt;span style="color: #0000ff"&gt;where&lt;/span&gt; object_id=75&lt;/pre&gt;
+
+  &lt;br /&gt;&lt;/div&gt;
+
+&lt;p&gt;sysmultiobjrefs is a system table. DDL contention is not impacted by internal objects but deals strictly with the creation and destruction of user objects. Namely temp tables and temp table variables.&lt;/p&gt;
+
+&lt;p&gt;In addition to checking on the wait resource, there are two performance counters that you can turn on to track the real time creation and destruction of temp tables:&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;Temp Tables Creation Rate &lt;/li&gt;
+
+  &lt;li&gt;Temp Tables For Destruction &lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;You can turn these counters on and run your queries to determine how many temporary resources they are creating. We were able to identify that 70% of our traffic was issuing a query that now created 4 temp tables. The advice given here is to:&lt;/p&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;Use fewer temp tables and temp table variables. &lt;/li&gt;
+
+  &lt;li&gt;Check to see if your use of temp tables takes advantage of temp table caching which reduces contention. Sql Server will automatically cache created temp tables as long as: 
+    &lt;ul&gt;
+      &lt;li&gt;
+        &lt;p&gt;Named constraints are not created.&lt;/p&gt;
+      &lt;/li&gt;
+
+      &lt;li&gt;
+        &lt;p&gt;Data Definition Language (DDL) statements that affect the table are not run after the temp table has been created, such as the CREATE INDEX or CREATE STATISTICS statements.&lt;/p&gt;
+      &lt;/li&gt;
+
+      &lt;li&gt;
+        &lt;p&gt;Temp object is not created by using dynamic SQL, such as: sp_executesql N'create table #t(a int)'.&lt;/p&gt;
+      &lt;/li&gt;
+
+      &lt;li&gt;
+        &lt;p&gt;Temp object is created inside another object, such as a stored procedure, trigger, and user-defined function; or is the return table of a user-defined, table-valued function.&lt;/p&gt;
+      &lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;Well we use dynamic SQL so none of our temp tables get cached which probably means 2:1:103 is being updated on every creation.&lt;/p&gt;
+
+&lt;p&gt;Our “quick fix” was to take the query that 70% of our traffic hits and remove the use of temp tables as well as trim it down to something highly optimized to exactly what that traffic was doing. Fortunately something very simple. Moving forward we will need to seriously curb the use of temp tables or wrap them in sql functions or stored procs.&lt;/p&gt;
+
+&lt;p&gt;I am intentionally putting 2:1:103 in the title of this post with the hope that someone will find this more quickly that it took me to track all of this down.&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;UPDATE&lt;/strong&gt;: &lt;a href="http://michaeljswart.com/about/"&gt;Michael J. Swart&lt;/a&gt; (&lt;a href="https://twitter.com/MJSwart"&gt;@MJSwart&lt;/a&gt;) wrote a great post on this exact same problem &lt;a href="http://michaeljswart.com/2013/01/pagelatch-contention-on-21103/"&gt;here&lt;/a&gt;. I strongly encourage you to read about his run in with this awful awful problem.&lt;/p&gt;</content>
+  <ispublished>True</ispublished>
+  <isdeleted>False</isdeleted>
+  <iscommentsenabled>True</iscommentsenabled>
+  <pubDate>2011-09-09 23:48:31</pubDate>
+  <lastModified>2013-01-23 21:46:15</lastModified>
+  <raters>0</raters>
+  <rating>0</rating>
+  <slug>Latch-waits-on-21103-You-are-probably-creating-too-many-temp-tables-in-Sql-Server</slug>
+  <tags />
+  <comments>
+    <comment id="c43e2213-4cd7-4910-8e4e-a1152ed8c185" parentid="00000000-0000-0000-0000-000000000000" approved="True" spam="False" deleted="False">
+      <date>2011-09-16 03:31:13</date>
+      <author>Patrik</author>
+      <email>patrik.nilsson@teknomedia.se</email>
+      <country />
+      <ip>212.214.212.16</ip>
+      <moderatedby>mwrock</moderatedby>
+      <avatar />
+      <content>Thank you for putting 2:1:103 in the subject (and thanks for a good and hopefully useful post :o). </content>
+    </comment>
+    <comment id="594cc224-48e4-4287-ba34-511bc2dfcbd7" parentid="00000000-0000-0000-0000-000000000000" approved="True" spam="False" deleted="False">
+      <date>2011-10-04 07:23:42</date>
+      <author>David</author>
+      <email>dmathis@new-innov.com</email>
+      <country />
+      <ip>70.60.171.180</ip>
+      <moderatedby>mwrock</moderatedby>
+      <avatar />
+      <content>Hi Matt! 
+
+Excellent post. I&amp;#39;m having this same issue, but it has been months ongoing. During these months there have been many releases so I can&amp;#39;t easily point it to a certain release.. I&amp;#39;ve been collecting Temp Create/Destroy counters and my destroy counters are super-duper HIGH, like averaging 800-1600 and sometimes spiking in the 5,000 range. This issue sprang up on these servers a while back, but I unfortunately was brought in too late to the fight. 
+
+How can I identify where the majority of the contention is coming from? Do I need to run PSSDiag and correlate the Destruction counters with the output? Or is there an easier method?
+
+Best Regards,
+David</content>
+    </comment>
+    <comment id="10ac3ceb-82a6-473c-94b4-8caccb824256" parentid="00000000-0000-0000-0000-000000000000" approved="True" spam="False" deleted="False">
+      <date>2011-11-13 06:30:22</date>
+      <author>Matt Wrock</author>
+      <email>matt@mattwrock.com</email>
+      <country />
+      <ip>50.46.255.50</ip>
+      <avatar />
+      <content>Hi David,
+
+My sympathies! This can be a tough one to isolate. I don&amp;#39;t know an easy way to find the trouble spots. The more sql in your app, the harder this is to find. Essentially, you want to find frequently executed sql that creates temporary tables and temp variables. Then, find another way to architect those queries.</content>
+    </comment>
+    <comment id="c8de4f86-0ac9-41de-b6ba-95a73ac3be08" parentid="00000000-0000-0000-0000-000000000000" approved="True" spam="False" deleted="False">
+      <date>2011-11-13 06:44:21</date>
+      <author>David</author>
+      <email>dmathis@new-innov.com</email>
+      <country />
+      <ip>70.60.171.180</ip>
+      <avatar />
+      <content>Thanks for the reply Matt. What I ended up doing to get a quicker resolve was I installed secondary instances on the servers. So each server has two instances of SQL so I was able to split the load up (roughly 125 databases per instance now, versus 250 per instance before). </content>
+    </comment>
+    <comment id="f6d32584-f73b-4777-8173-e92fd8b4bb15" parentid="00000000-0000-0000-0000-000000000000" approved="True" spam="False" deleted="False">
+      <date>2012-12-30 01:04:00</date>
+      <author>idit</author>
+      <email>idizak@microsoft.com</email>
+      <country />
+      <ip>94.245.127.21</ip>
+      <moderatedby>mwrock</moderatedby>
+      <avatar />
+      <content>there is a Fix for it :
+http://support.microsoft.com/kb/2566163/EN-US</content>
+    </comment>
+    <comment id="47c85381-d85f-45df-a86d-6d61240645c5" parentid="00000000-0000-0000-0000-000000000000" approved="True" spam="False" deleted="False">
+      <date>2013-01-20 17:36:42</date>
+      <author>David</author>
+      <email>dmathis@new-innov.com</email>
+      <country />
+      <ip>12.118.253.230</ip>
+      <avatar />
+      <content>Hi Idit,
+
+Thank you for the information, but the problem Matt (and also myself) were having was on SQL Server 2005 which has no patch available. 
+
+Best,
+David</content>
+    </comment>
+    <comment id="b687d0b0-f0d6-4e83-a7f5-f23f9188a3d7" parentid="00000000-0000-0000-0000-000000000000" approved="True" spam="False" deleted="False">
+      <date>2013-02-07 14:32:39</date>
+      <author>SQL Server</author>
+      <email>trackback</email>
+      <country />
+      <ip>12.173.168.199</ip>
+      <website>http://stage.toadworld.com/platforms/sql-server/b/sqlserver/archive/2013/01/22/pagelatch-ex-contention-on-2-1-103.aspx</website>
+      <content>PAGELATCH_EX Contention on 2:1:103
+
+This blog post is meant to help people troubleshoot page latch contention on 2:1:103. If that&amp;#8217;s</content>
+    </comment>
+    <comment id="c4546639-351e-4dd1-aadb-230f8a67535d" parentid="00000000-0000-0000-0000-000000000000" approved="True" spam="False" deleted="False">
+      <date>2014-02-01 21:52:08</date>
+      <author>michaeljswart.com</author>
+      <email>pingback</email>
+      <country />
+      <ip>67.192.46.14</ip>
+      <website>http://michaeljswart.com/2013/01/pagelatch-contention-on-21103/</website>
+      <content>Pingback from michaeljswart.com
+
+PAGELATCH Contention on 2:1:103 | Michael J. Swart</content>
+    </comment>
+  </comments>
+  <categories />
+  <notifications>
+    <email>patrik.nilsson@teknomedia.se</email>
+    <email>dmathis@new-innov.com</email>
+    <email>idizak@microsoft.com</email>
+  </notifications>
+</post>

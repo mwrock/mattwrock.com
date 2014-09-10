@@ -5,6 +5,7 @@
   <Description>Auto resolves URLs in the comments and turn them into valid hyperlinks.</Description>
   <Enabled>true</Enabled>
   <Priority>999</Priority>
+  <SubBlogEnabled>true</SubBlogEnabled>
   <ShowSettings>true</ShowSettings>
   <Version>1.5</Version>
 </ManagedExtension>

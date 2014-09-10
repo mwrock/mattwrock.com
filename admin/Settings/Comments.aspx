@@ -15,6 +15,10 @@
 			<menu:TabMenu ID="TabMenu1" runat="server" />
 		</div>
 		<div class="content-box-left">
+            <div class="rightligned-top action_buttons">
+                <asp:Button runat="server" class="btn primary" ID="btnSave" Text="<%$Resources:labels, saveSettings %>" />&nbsp;
+                <span class="loader">&nbsp;</span>
+            </div>
             <h1 style="border:none;"><%=labels.commentSettings %></h1>
             <h2><%=labels.basic %></h2>
             <ul class="fl leftaligned">
@@ -39,13 +43,13 @@
                 </li>
                 <li>
                     <span class="filler"></span>
-                    <asp:CheckBox runat="server" ID="cbEnableComments" onclick="ToggleEnableComments();" />
+                    <asp:CheckBox runat="server" ID="cbEnableComments" />
                     <label for="<%=cbEnableComments.ClientID %>"><%=labels.enableComments %></label>
                     <span class="insetHelp">(<%=labels.enableCommentsDescription %>)</span>
                 </li>
                 <li>
                     <span class="filler"></span>
-                    <asp:CheckBox runat="server" ID="cbEnableCommentsModeration" onclick="ToggleModeration();" /> 
+                    <asp:CheckBox runat="server" ID="cbEnableCommentsModeration" /> 
                     <label for="<%=cbEnableCommentsModeration.ClientID %>"><%=labels.enableCommentsModeration%></label>
                     <span class="insetHelp">(<%=labels.pendingApproval%>)</span>
                 </li>
@@ -65,13 +69,42 @@
             <h2><%=labels.appearance %></h2>
             <ul class="fl leftaligned">
                 <li>
+                    <div class="avatar-list">
+                        <img src="../images/avatars/monsterid.png" alt="None" />
+                        <img src="../images/avatars/wavatar.png" alt="None" />
+                        <img src="../images/avatars/identicon.png" alt="None" />
+                        <img src="../images/avatars/retro.png" alt="None" />
+                        <img src="../images/avatars/mm.png" alt="None" />
+                        <img src="../images/avatars/blank.png" alt="None" />
+                        <img src="../../pics/noavatar.jpg" alt="None" />
+                    </div>
                     <label class="lbl" for="<%=rblAvatar.ClientID %>"><%=labels.avatars %></label>
-                    <asp:RadioButtonList runat="Server" ID="rblAvatar" RepeatLayout="flow" RepeatDirection="horizontal">
+                    <asp:RadioButtonList runat="Server" ID="rblAvatar" RepeatLayout="Table" RepeatDirection="horizontal" CssClass="avatar-radio-button">
                         <asp:ListItem Text="MonsterID" Value="monster" />
                         <asp:ListItem Text="Wavatar" Value="wavatar" />
                         <asp:ListItem Text="Identicon" Value="identicon" />
+                        <asp:ListItem Text="Retro" Value="retro" />
+                        <asp:ListItem Text="MysteryMan" Value="mm" />
+                        <asp:ListItem Text="Blank" Value="blank" />
                         <asp:ListItem Text="<%$ Resources:labels, none %>" Value="none" />
                     </asp:RadioButtonList>
+                </li>
+                <li>
+                    <label class="lbl" for=""><%=Resources.labels.enableTrackbacks %></label>
+                        <asp:CheckBox runat="server" ID="cbEnableTrackBackSend" /><label><%=Resources.labels.send %></label>
+                        &nbsp;&nbsp;
+                        <asp:CheckBox runat="server" ID="cbEnableTrackBackReceive" /><label><%=Resources.labels.receive %></label>
+                </li>
+                <li>
+                    <label for="" class="lbl"><%=Resources.labels.enablePingbacks %></label>
+                        <asp:CheckBox runat="server" ID="cbEnablePingBackSend" /><label><%=Resources.labels.send %></label>
+                        &nbsp;&nbsp;
+                        <asp:CheckBox runat="server" ID="cbEnablePingBackReceive" /><label><%=Resources.labels.receive %></label>
+                </li>
+                <li>
+                    <label class="lbl" for="<%=txtThumbProvider.ClientID %>"><%=labels.thumbnailServiceProvider %></label>
+                    <asp:TextBox runat="server" ID="txtThumbProvider" Width="250" MaxLength="550" />
+                    <span class="insetHelp">(<%=labels.thumbnailServiceProviderHelp%>)</span>
                 </li>
                 <li>
                     <label class="lbl" for="<%=ddlCommentsPerPage.ClientID %>" style="position: relative; top: 4px">
@@ -102,44 +135,40 @@
                     <asp:CheckBox runat="server" ID="cbShowLivePreview" />
                     <label for="<%=cbShowLivePreview.ClientID %>"><%=labels.showLivePreview %></label>
                 </li>
-                <li>
-                    <span class="filler"></span>
-                    <asp:CheckBox runat="server" ID="cbShowPingBacks" />
-                    <label for="<%=cbShowPingBacks.ClientID %>"><%=labels.showPingBacks %></label>
-                </li>
             </ul>
 
-            <h2><%=labels.disqusSettings %></h2>       
+            <% if (BlogEngine.Core.Blog.CurrentInstance.IsPrimary){ %>
+            <h2><%=labels.disqusSettings%></h2>       
             <div class="info rounded" style="max-width:600px;">
-                <%=labels.disqusSignupMessage %>
+                <%=labels.disqusSignupMessage%>
             </div>  
             <ul class="fl leftaligned">
                 <li>
-                    <label class="lbl"><%=labels.turnDisqusOnOff %></label>
+                    <label class="lbl"><%=labels.turnDisqusOnOff%></label>
                     <asp:CheckBox runat="server" ID="cbEnableDisqus" />
-                    <label for="<%=cbEnableDisqus.ClientID %>"><%=labels.useDisqusAsCommentProvider %></label>
+                    <label for="<%=cbEnableDisqus.ClientID %>"><%=labels.useDisqusAsCommentProvider%></label>
                 </li>
                 <li>
-                    <label class="lbl" for="<%=txtDisqusName.ClientID %>"><%=labels.disqusShortName %></label>
+                    <label class="lbl" for="<%=txtDisqusName.ClientID %>"><%=labels.disqusShortName%></label>
                     <asp:TextBox runat="server" ID="txtDisqusName" Width="250" MaxLength="250" />
                 </li>
                 <li>
                     <span class="filler"></span>
                     <asp:CheckBox runat="server" ID="cbDisqusDevMode" />
-                    <label for="<%=cbDisqusDevMode.ClientID %>"><%=labels.developmentMode %></label>
-                    <span class="insetHelp">(<%=labels.developmentModeCheckboxMessage %>)</span>
+                    <label for="<%=cbDisqusDevMode.ClientID %>"><%=labels.developmentMode%></label>
+                    <span class="insetHelp">(<%=labels.developmentModeCheckboxMessage%>)</span>
                 </li>
                 <li>
                     <span class="filler"></span>
                     <asp:CheckBox runat="server" ID="cbDisqusAddToPages" />
-                    <label for="<%=cbDisqusAddToPages.ClientID %>"><%=labels.addCommentsToPages %></label>
-                    <span class="insetHelp">(<%=labels.addToPages %>)</span>
+                    <label for="<%=cbDisqusAddToPages.ClientID %>"><%=labels.addCommentsToPages%></label>
+                    <span class="insetHelp">(<%=labels.addToPages%>)</span>
                 </li>
             </ul>
-            <div class="clear"></div>
+            <% } %>
     
-            <div class="action_buttons">
-                <asp:Button runat="server" class="btn primary" ID="btnSave" Text="<%$Resources:labels, saveSettings %>" />&nbsp;
+            <div class="rightligned-bottom action_buttons">
+                <asp:Button runat="server" class="btn primary" ID="btnSave2" Text="<%$Resources:labels, saveSettings %>" />&nbsp;
                 <span class="loader">&nbsp;</span>
             </div>
             

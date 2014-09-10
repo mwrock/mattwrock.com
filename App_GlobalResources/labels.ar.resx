@@ -577,4 +577,7 @@
   <data name="youAlreadyRated" xml:space="preserve">
     <value>لقد قمت بتقييم الموضوع من قبل</value>
   </data>
+  <data name="LangDirection" xml:space="preserve">
+	<value>rtl</value>
+  </data>
 </root>

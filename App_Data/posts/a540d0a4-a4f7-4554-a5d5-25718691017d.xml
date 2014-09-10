@@ -1,0 +1,386 @@
+﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<post>
+  <author>mwrock</author>
+  <title>Released Boxstarter 2.3: Windows Azure integration</title>
+  <description />
+  <content>&lt;p&gt;&lt;img style="border-left-width: 0px; border-right-width: 0px; background-image: none; border-bottom-width: 0px; float: none; padding-top: 0px; padding-left: 0px; margin: 0px auto; display: block; padding-right: 0px; border-top-width: 0px" border="0" src="http://osswatch.jiscinvolve.org/wp/files/2013/07/cloud.png" /&gt;Just a month after releasing integration with Hyper-V, I am pleased to announce support for auto connection configuration and first class Checkpointing in Windows Azure VMs. &lt;a href="http://boxstarter.org/"&gt;Boxstarter&lt;/a&gt; can now make cloud provisioning of your boxes a straight forward process.&lt;/p&gt;  &lt;h2&gt;What does this do?&lt;/h2&gt;  &lt;p&gt;For readers unfamiliar with Boxstarter or &lt;a href="http://chocolatey.org"&gt;Chocolatey&lt;/a&gt;, this makes the provisioning of Azure VM’s with all of the tools, applications, settings, patches, etc that you require a simple and repeatable event. If you spend much time building out VMs, tearing them down and then rebuilding them again and again, please stop immediately. Create a Chocolatey package to define your server’s end state and let Boxstarter push it out.&lt;/p&gt;  &lt;p&gt;What I have just described can be accomplished on a local physical box, a remote physical box or a VM. Below I will describe the features in this release that apply specifically to the newly released Azure Integration.&lt;/p&gt;  &lt;h2&gt;Auto Connection Configuration&lt;/h2&gt;  &lt;p&gt;Boxstarter uses Powershell remoting to initiate provisioning. By default, Azure enables Powershell remoting on all of its Windows server VMs. However, there are a few not so obvious steps involved to make a connection to the VM. Boxstarter will locate the DNS name of the VM and the WinRM port listening for remoting connections. Boxstarter will also download the SSL certificate on the machine and install it locally. This allows Boxstarter to make a secure connection with the VM and invoke the provisioning of your server.&lt;/p&gt;  &lt;h2&gt;Checkpoints&lt;/h2&gt;  &lt;p&gt;If you are familiar with almost any popular VM technology, you are certainly familiar with checkpointing (also known as Snapshots). This is the ability to save the state of the VM at a particular point in time and later restore to that point. Unfortunately Azure VMs do not easily expose this same functionality. You can create SysPrepped images in the portal, attach and detach disks, but there is no clear and simple way to take and restore a checkpoint let alone several checkpoints.&lt;/p&gt;  &lt;p&gt;Boxstarter makes this possible by leveraging Azure Blob Snapshots under the hood and exposing this via four commands:&lt;/p&gt;  &lt;ul&gt;   &lt;li&gt;Set-AzureVMCheckpoint &lt;/li&gt;    &lt;li&gt;Get-AzureVMCheckpoint &lt;/li&gt;    &lt;li&gt;Restore-AzureVMCheckpoint &lt;/li&gt;    &lt;li&gt;Remove-AzureVMCheckpoint &lt;/li&gt; &lt;/ul&gt;  &lt;p&gt;Each of these take a VM and CheckpointName parameter. Just like the Hyper-V integration, Boxstarter can create and restore checkpoints as part of the provisioning process since you may want to take or restore a checkpoint just before provisioning begins. For more information regarding their usage, please view their commandline help or visit Boxstarter.orgs &lt;a href="http://boxstarter.org/VMIntegration#azure"&gt;Azure documentation page&lt;/a&gt;.&lt;/p&gt;  &lt;h2&gt;Case Study: Provision a public Minecraft server&lt;/h2&gt;  &lt;p&gt;You and your friends have decided to play homage to your local NFL team’s upcoming Superbowl challenge by constructing a replica of the team’s arena within a Minecraft landscape. You need a server that everyone can connect to and contribute as time permits. It’s a common cloud deployment scenario. We’ve all been there.&lt;/p&gt;  &lt;h3&gt;Step One: Get the Boxstarter.Azure module&lt;/h3&gt;  &lt;p&gt;The Boxstarter.Azure module does not install along with the core Boxstarter bits. To download and install it along with all of its dependencies, run:&lt;/p&gt;  &lt;pre class="csharpcode"&gt;CINST Boxstarter.Azure&lt;/pre&gt;
+
+&lt;p&gt;&lt;style type="text/css"&gt;
+
+
+
+
+.csharpcode, .csharpcode pre
+{
+	font-size: small;
+	color: black;
+	font-family: consolas, "Courier New", courier, monospace;
+	background-color: #ffffff;
+	/*white-space: pre;*/
+}
+.csharpcode pre { margin: 0em; }
+.csharpcode .rem { color: #008000; }
+.csharpcode .kwrd { color: #0000ff; }
+.csharpcode .str { color: #006080; }
+.csharpcode .op { color: #0000c0; }
+.csharpcode .preproc { color: #cc6633; }
+.csharpcode .asp { background-color: #ffff00; }
+.csharpcode .html { color: #800000; }
+.csharpcode .attr { color: #ff0000; }
+.csharpcode .alt 
+{
+	background-color: #f4f4f4;
+	width: 100%;
+	margin: 0em;
+}
+.csharpcode .lnum { color: #606060; }&lt;/style&gt;&lt;/p&gt;
+
+&lt;p&gt;Note: You will need to be running at least Powershell version 3. You can run:&lt;/p&gt;
+
+&lt;pre class="csharpcode"&gt;$Host.Version&lt;/pre&gt;
+
+&lt;p&gt;&lt;style type="text/css"&gt;
+
+
+
+
+.csharpcode, .csharpcode pre
+{
+	font-size: small;
+	color: black;
+	font-family: consolas, "Courier New", courier, monospace;
+	background-color: #ffffff;
+	/*white-space: pre;*/
+}
+.csharpcode pre { margin: 0em; }
+.csharpcode .rem { color: #008000; }
+.csharpcode .kwrd { color: #0000ff; }
+.csharpcode .str { color: #006080; }
+.csharpcode .op { color: #0000c0; }
+.csharpcode .preproc { color: #cc6633; }
+.csharpcode .asp { background-color: #ffff00; }
+.csharpcode .html { color: #800000; }
+.csharpcode .attr { color: #ff0000; }
+.csharpcode .alt 
+{
+	background-color: #f4f4f4;
+	width: 100%;
+	margin: 0em;
+}
+.csharpcode .lnum { color: #606060; }&lt;/style&gt;&lt;/p&gt;
+
+&lt;p&gt;at any powershell console to determine your version and if you are running a previous version, you can install Powershell version 3 or 4 via Chocolatey.&lt;/p&gt;
+
+&lt;p&gt;Now, for best results, open the Boxstarter Shell to run the rest of this sample.&lt;/p&gt;
+
+&lt;h3&gt;Step Two: Configure your Azure subscription&lt;/h3&gt;
+
+&lt;p&gt;There is a one time configuration step required so that the Azure Powershell commands know which account to manage and also know that you are authorized to manage it. This step includes running three commands:&lt;/p&gt;
+
+&lt;pre class="csharpcode"&gt;Get-AzurePublishSettingsFile&lt;/pre&gt;
+
+&lt;p&gt;&lt;style type="text/css"&gt;
+
+
+
+
+.csharpcode, .csharpcode pre
+{
+	font-size: small;
+	color: black;
+	font-family: consolas, "Courier New", courier, monospace;
+	background-color: #ffffff;
+	/*white-space: pre;*/
+}
+.csharpcode pre { margin: 0em; }
+.csharpcode .rem { color: #008000; }
+.csharpcode .kwrd { color: #0000ff; }
+.csharpcode .str { color: #006080; }
+.csharpcode .op { color: #0000c0; }
+.csharpcode .preproc { color: #cc6633; }
+.csharpcode .asp { background-color: #ffff00; }
+.csharpcode .html { color: #800000; }
+.csharpcode .attr { color: #ff0000; }
+.csharpcode .alt 
+{
+	background-color: #f4f4f4;
+	width: 100%;
+	margin: 0em;
+}
+.csharpcode .lnum { color: #606060; }&lt;/style&gt;&lt;/p&gt;
+
+&lt;p&gt;This command will launch your default browser and initiate a Publisher Settings download. First you will land on the Windows Azure sign in page and as soon as you successfully authenticate, the download will begin.&lt;/p&gt;
+
+&lt;p&gt;&lt;img style="margin: 0px 10px 0px 0px" src="http://boxstarter.org/images/publishAzure.png" width="802" height="626" /&gt;&lt;/p&gt;
+
+&lt;p&gt;Now simply import the file that was just downloaded:&lt;/p&gt;
+
+&lt;pre class="csharpcode"&gt;Import-AzurePublishSettingsFile -PublishSettingsFile C:\Users\Matt\Downloads\Subscription-1-1-19-2014-credentials.publishsettings&lt;/pre&gt;
+
+&lt;p&gt;&amp;#160;&lt;/p&gt;
+
+&lt;p&gt;Finally, specify the name of the storage account you want to use. You can run &lt;code&gt;Get-AzureStorageAccount&lt;/code&gt; for a list of all of your storage accounts.&lt;/p&gt;
+
+&lt;pre class="csharpcode"&gt;Set-AzureSubscription -SubscriptionName MySubscription -CurrentStorageAccountName MyStorageAccount&lt;/pre&gt;
+
+&lt;p&gt;&lt;style type="text/css"&gt;
+
+
+
+
+.csharpcode, .csharpcode pre
+{
+	font-size: small;
+	color: black;
+	font-family: consolas, "Courier New", courier, monospace;
+	background-color: #ffffff;
+	/*white-space: pre;*/
+}
+.csharpcode pre { margin: 0em; }
+.csharpcode .rem { color: #008000; }
+.csharpcode .kwrd { color: #0000ff; }
+.csharpcode .str { color: #006080; }
+.csharpcode .op { color: #0000c0; }
+.csharpcode .preproc { color: #cc6633; }
+.csharpcode .asp { background-color: #ffff00; }
+.csharpcode .html { color: #800000; }
+.csharpcode .attr { color: #ff0000; }
+.csharpcode .alt 
+{
+	background-color: #f4f4f4;
+	width: 100%;
+	margin: 0em;
+}
+.csharpcode .lnum { color: #606060; }&lt;/style&gt;&lt;/p&gt;
+
+&lt;p&gt;Note: Boxstarter will attempt to set your Current Storage Account for you if it has not been specified. However, you will need to run the command yourself if you need to run other Windows Azure Powershell commands prior to using Boxstarter.&lt;/p&gt;
+
+&lt;p&gt;Thats it. You can now use the Windows Azure Powershell and Boxstarter commands to provision VMs in Azure.&lt;/p&gt;
+
+&lt;h3&gt;Step Three: Create the Azure VM&lt;/h3&gt;
+
+&lt;pre class="csharpcode"&gt;$cred=Get-Credential AzureAdmin
+New-AzureQuickVM –ServiceName BoxstarterTest1 -Windows -Name MyVM `
+  -ImageName 3a50f22b388a4ff7ab41029918570fa6__Windows-Server-2012-Essentials-20131217-enus `
+  -Password $cred.GetNetworkCredential().Password -AdminUsername $cred.UserName `
+  -Location &lt;span class="str"&gt;&amp;quot;West US&amp;quot;&lt;/span&gt; –WaitForBoot&lt;/pre&gt;
+
+&lt;p&gt;&lt;style type="text/css"&gt;
+
+
+
+
+.csharpcode, .csharpcode pre
+{
+	font-size: small;
+	color: black;
+	font-family: consolas, "Courier New", courier, monospace;
+	background-color: #ffffff;
+	/*white-space: pre;*/
+}
+.csharpcode pre { margin: 0em; }
+.csharpcode .rem { color: #008000; }
+.csharpcode .kwrd { color: #0000ff; }
+.csharpcode .str { color: #006080; }
+.csharpcode .op { color: #0000c0; }
+.csharpcode .preproc { color: #cc6633; }
+.csharpcode .asp { background-color: #ffff00; }
+.csharpcode .html { color: #800000; }
+.csharpcode .attr { color: #ff0000; }
+.csharpcode .alt 
+{
+	background-color: #f4f4f4;
+	width: 100%;
+	margin: 0em;
+}
+.csharpcode .lnum { color: #606060; }&lt;/style&gt;&lt;/p&gt;
+
+&lt;p&gt;This uses the Azure Powershell module to create a new Cloud Service and a new small VM with Server 2012 R2 in Azure’s West US data center which just so happens to reside relatively near your football team. How convenient. Ehh…maybe not. But it is a pretty neat coincidence. Note that if you are reusing an existing Cloud service in the command above, you want to omit the –Location argument since the location of the existing service will be used.&lt;/p&gt;
+
+&lt;h3&gt;Step Four: Create your Chocolatey package&lt;/h3&gt;
+
+&lt;p&gt;Getting a Minecraft server up and running is really pretty simple. Here is the script we will use:&lt;/p&gt;
+
+&lt;pre class="csharpcode"&gt;CINST Bukkit
+Install-WindowsUpdate –AcceptEula
+New-NetFirewallRule -DisplayName &lt;span class="str"&gt;&amp;quot;Minecraft&amp;quot;&lt;/span&gt; -Direction Inbound -LocalPort 25565 -Protocol TCP
+-Action Allow
+Invoke-WmiMethod Win32_Process Create -Args &amp;quot;$env:systemdrive\tools\bukkit\Bukkit.bat&amp;quot;&lt;/pre&gt;
+
+&lt;p&gt;&lt;style type="text/css"&gt;
+
+
+
+
+.csharpcode, .csharpcode pre
+{
+	font-size: small;
+	color: black;
+	font-family: consolas, "Courier New", courier, monospace;
+	background-color: #ffffff;
+	/*white-space: pre;*/
+}
+.csharpcode pre { margin: 0em; }
+.csharpcode .rem { color: #008000; }
+.csharpcode .kwrd { color: #0000ff; }
+.csharpcode .str { color: #006080; }
+.csharpcode .op { color: #0000c0; }
+.csharpcode .preproc { color: #cc6633; }
+.csharpcode .asp { background-color: #ffff00; }
+.csharpcode .html { color: #800000; }
+.csharpcode .attr { color: #ff0000; }
+.csharpcode .alt 
+{
+	background-color: #f4f4f4;
+	width: 100%;
+	margin: 0em;
+}
+.csharpcode .lnum { color: #606060; }&lt;/style&gt;&lt;/p&gt;
+
+&lt;p&gt;This installs Bukkit, a popular Minecraft server management software which will also install the Java runtime. It will install all critical Windows updates. Then we allow inbound traffic to port 25565, the default port used by Minecraft servers. We will save this in a Gist and use the RAW gist url as our package source. The Url for the gist is:&lt;/p&gt;
+
+&lt;pre class="csharpcode"&gt;&lt;a title="https://gist.github.com/mwrock/8518683/raw/43ab568ff32629b278cfa8ab3e7fb4c417c9b188/gistfile1.txt" href="https://gist.github.com/mwrock/8518683/raw/43ab568ff32629b278cfa8ab3e7fb4c417c9b188/gistfile1.txt"&gt;https://gist.github.com/mwrock/8518683/raw/43ab568ff32629b278cfa8ab3e7fb4c417c9b188/gistfile1.txt&lt;/a&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;style type="text/css"&gt;
+
+
+
+
+.csharpcode, .csharpcode pre
+{
+	font-size: small;
+	color: black;
+	font-family: consolas, "Courier New", courier, monospace;
+	background-color: #ffffff;
+	/*white-space: pre;*/
+}
+.csharpcode pre { margin: 0em; }
+.csharpcode .rem { color: #008000; }
+.csharpcode .kwrd { color: #0000ff; }
+.csharpcode .str { color: #006080; }
+.csharpcode .op { color: #0000c0; }
+.csharpcode .preproc { color: #cc6633; }
+.csharpcode .asp { background-color: #ffff00; }
+.csharpcode .html { color: #800000; }
+.csharpcode .attr { color: #ff0000; }
+.csharpcode .alt 
+{
+	background-color: #f4f4f4;
+	width: 100%;
+	margin: 0em;
+}
+.csharpcode .lnum { color: #606060; }&lt;/style&gt;&lt;/p&gt;
+
+&lt;h3&gt;Step Five: Use Boxstarter to provision the server&lt;/h3&gt;
+
+&lt;pre class="csharpcode"&gt;$cred=Get-Credential AzureAdmin
+Enable-BoxstarterVM -provider Azure -CloudServiceName BoxstarterTest1 `
+  -VMName MyVM -Credential $cred –CheckpointName Fresh | 
+    Install-BoxstarterPackage `
+     -PackageName &lt;a title="https://gist.github.com/mwrock/8518683/raw/43ab568ff32629b278cfa8ab3e7fb4c417c9b188/gistfile1.txt" href="https://gist.github.com/mwrock/8518683/raw/43ab568ff32629b278cfa8ab3e7fb4c417c9b188/gistfile1.txt"&gt;https://gist.github.com/mwrock/8518683/raw/43ab568ff32629b278cfa8ab3e7fb4c417c9b188/gistfile1.txt&lt;/a&gt;&lt;/pre&gt;
+
+&lt;p&gt;This creates a connection to the VM and runs the installation script on that server. This may take a little time and is likely to include at least one reboot.&lt;/p&gt;
+
+&lt;h3&gt;Step Six: Create a new Azure endpoint for the Minecraft port&lt;/h3&gt;
+
+&lt;pre class="csharpcode"&gt;$vm = Get-AzureVM -ServiceName BoxstarterTest1 -Name MyVM
+Add-AzureEndpoint -Name Minecraft -Protocol tcp -LocalPort 25565 -PublicPort 25565 -VM $vm | 
+  Update-AzureVM&lt;/pre&gt;
+
+&lt;p&gt;This is necessary so that traffic can be properly routed to our server.&lt;/p&gt;
+
+&lt;p&gt;Thats it, fire up Minecraft and connect to our server.&lt;/p&gt;
+
+&lt;p&gt;&lt;a href="http://www.mattwrock.com/image.axd?picture=image_26.png"&gt;&lt;img title="image" style="border-left-width: 0px; border-right-width: 0px; background-image: none; border-bottom-width: 0px; padding-top: 0px; padding-left: 0px; margin: 0px 10px 0px 0px; display: inline; padding-right: 0px; border-top-width: 0px" border="0" alt="image" src="http://www.mattwrock.com/image.axd?picture=image_thumb_26.png" width="661" height="394" /&gt;&lt;/a&gt;&lt;/p&gt;
+
+&lt;h2&gt;Other new features worth mentioning&lt;/h2&gt;
+
+&lt;h3&gt;Enable-MicrosoftUpdate and Disable-MicrosoftUpdate&lt;/h3&gt;
+
+&lt;p&gt;The credit to these new functions goes to &lt;a href="http://www.gep13.co.uk/blog"&gt;Gary Ewan Park&lt;/a&gt; (&lt;a href="https://twitter.com/gep13"&gt;@gep13&lt;/a&gt;) who contributed both. Thanks Gary!! This adds the ability for windows to update many Microsoft products beyond just windows. It essentially toggles this:&lt;/p&gt;
+
+&lt;p&gt;&lt;a href="http://www.mattwrock.com/image.axd?picture=image_27.png"&gt;&lt;img title="image" style="border-left-width: 0px; border-right-width: 0px; background-image: none; border-bottom-width: 0px; padding-top: 0px; padding-left: 0px; margin: 0px 10px 0px 0px; display: inline; padding-right: 0px; border-top-width: 0px" border="0" alt="image" src="http://www.mattwrock.com/image.axd?picture=image_thumb_27.png" width="614" height="61" /&gt;&lt;/a&gt;&lt;/p&gt;
+&lt;style type="text/css"&gt;
+
+
+
+
+.csharpcode, .csharpcode pre
+{
+	font-size: small;
+	color: black;
+	font-family: consolas, "Courier New", courier, monospace;
+	background-color: #ffffff;
+	/*white-space: pre;*/
+}
+.csharpcode pre { margin: 0em; }
+.csharpcode .rem { color: #008000; }
+.csharpcode .kwrd { color: #0000ff; }
+.csharpcode .str { color: #006080; }
+.csharpcode .op { color: #0000c0; }
+.csharpcode .preproc { color: #cc6633; }
+.csharpcode .asp { background-color: #ffff00; }
+.csharpcode .html { color: #800000; }
+.csharpcode .attr { color: #ff0000; }
+.csharpcode .alt 
+{
+	background-color: #f4f4f4;
+	width: 100%;
+	margin: 0em;
+}
+.csharpcode .lnum { color: #606060; }&lt;/style&gt;
+
+&lt;p&gt;&amp;#160;&lt;/p&gt;
+
+&lt;h3&gt;The Boxstarter Shell&lt;/h3&gt;
+
+&lt;p&gt;Especially if you are not comfortable with Windows PowerShell, you may prefer to use the Boxstarter Shell to run Boxstarter commands. The Boxstarter Shell will make sure that the user is running with administrative privileges, the execution policy is compatible and all Boxstarter PowerShell modules are loaded and accessible. This shell also prints some basic &amp;quot;Getting Started&amp;quot; text at startup to assist you in running your first commands.&lt;/p&gt;</content>
+  <ispublished>True</ispublished>
+  <isdeleted>False</isdeleted>
+  <iscommentsenabled>True</iscommentsenabled>
+  <pubDate>2014-01-20 20:54:00</pubDate>
+  <lastModified>2014-01-20 21:12:13</lastModified>
+  <raters>0</raters>
+  <rating>0</rating>
+  <slug>Released-Boxstarter-23-Windows-Azure-integration</slug>
+  <tags />
+  <comments>
+    <comment id="b990ed10-6e72-4d5a-9f2e-9b36e8e9af61" parentid="00000000-0000-0000-0000-000000000000" approved="True" spam="False" deleted="False">
+      <date>2014-01-26 02:25:50</date>
+      <author>Matt Wrock's Blog</author>
+      <email>trackback</email>
+      <country />
+      <ip>96.31.33.25</ip>
+      <website>http://www.mattwrock.com/post/2014/01/26/.aspx</website>
+      <content>Automate the Install and setup of a Team Foundation 2013 Server with Build services on a Azure VM with Boxstarter
+
+Automate the Install and setup of a Team Foundation 2013 Server with Build services on a Azure VM with Boxstarter</content>
+    </comment>
+    <comment id="b022f535-f551-4c77-9e61-272b05c27f1b" parentid="00000000-0000-0000-0000-000000000000" approved="True" spam="False" deleted="False">
+      <date>2014-01-26 02:57:15</date>
+      <author>Matt Wrock's Blog</author>
+      <email>trackback</email>
+      <country />
+      <ip>131.107.159.115</ip>
+      <website>http://feedproxy.google.com/~r/Wrockblog/~3/4tq1Z-CnLFY/post.aspx</website>
+      <content>Automate the Install and setup of a Team Foundation 2013 Server with Build services on a Azure VM with Boxstarter
+
+Last week I released version 2.3 of Boxstarter which includes some Azure VM integration features to Boxstarter</content>
+    </comment>
+    <comment id="bee1fd5d-1663-406b-8a76-06d782510d6b" parentid="00000000-0000-0000-0000-000000000000" approved="True" spam="False" deleted="False">
+      <date>2014-08-19 01:21:12</date>
+      <author>mattwp.azurewebsites.net</author>
+      <email>pingback</email>
+      <country />
+      <ip>168.62.22.219</ip>
+      <website>http://mattwp.azurewebsites.net/?p=1481</website>
+      <content>Pingback from mattwp.azurewebsites.net
+
+Automate the Install and setup of a Team Foundation 2013 Server with Build services on a Azure VM with Boxstarter | mattwrock</content>
+    </comment>
+  </comments>
+  <categories>
+    <category>219109f8-7b0b-459b-8f25-9ce747eb0851</category>
+  </categories>
+  <notifications />
+</post>

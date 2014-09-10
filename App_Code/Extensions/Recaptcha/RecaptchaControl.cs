@@ -129,7 +129,7 @@ namespace App_Code.Controls
             get
             {
                 var settings = ExtensionManager.GetSettings("Recaptcha");
-                return Convert.ToInt32(settings.GetSingleValue("MaxLogEntries"));
+                return settings != null ? Convert.ToInt32(settings.GetSingleValue("MaxLogEntries")) : 0;
             }
         }
 
@@ -451,7 +451,7 @@ namespace App_Code.Controls
             {
                 var validator = new RecaptchaValidator
                     {
-                       PrivateKey = this.privateKey, RemoteIP = this.Page.Request.UserHostAddress 
+                       PrivateKey = this.privateKey, RemoteIP = Utils.GetClientIP() 
                     };
                 if (String.IsNullOrEmpty(this.RecaptchaChallengeValue) &&
                     String.IsNullOrEmpty(this.RecaptchaResponseValue))

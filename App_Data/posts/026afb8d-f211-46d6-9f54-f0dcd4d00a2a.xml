@@ -1,0 +1,65 @@
+﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<post>
+  <author>mwrock</author>
+  <title>Released RequestReduce.SassLessCoffee: Now have RequestReduce compile your .less, .sass, .scss and .coffee files before minifying and bundling them</title>
+  <description />
+  <content>&lt;p&gt;I&amp;rsquo;ve been wanting to get this post out for a few days since I launched this last Friday. I have to make this quick before I hop in the shower to go to work. I owe at least that to my coworkers.&lt;/p&gt;
+&lt;h2&gt;Less, Sass and Coffee script compiling&lt;/h2&gt;
+&lt;p&gt;I&amp;rsquo;ve had a few &lt;a href="http://RequestReduce.com"&gt;RequestReduce&lt;/a&gt; users asking me about adding Less, Sass and Coffee script compiling to &lt;a href="http://RequestReduce.com"&gt;RequestReduce&lt;/a&gt;. Technically, this has been doable for some time along side &lt;a href="http://www.dotlesscss.org/" target="_blank"&gt;DotLess&lt;/a&gt; and &lt;a href="https://github.com/xpaulbettsx/SassAndCoffee" target="_blank"&gt;SassLessCoffee.AspNet&lt;/a&gt;. However, I wanted to optimize the integration since by default, using the handlers provided by those two excellent projects bring in their own caching and, in the case of SassAndCoffee, its own bundling and an issue with setting &amp;ldquo;near&amp;rdquo; future caching headers (which is now &lt;a href="https://github.com/xpaulbettsx/SassAndCoffee/issues/34" target="_blank"&gt;fixed in the latest source code&lt;/a&gt;). This extra caching and bundling just adds unnecessary processing time and possibly disk space consumption.&lt;/p&gt;
+&lt;p&gt;&lt;a href="http://RequestReduce.com"&gt;RequestReduce&lt;/a&gt;.SassLessCoffee, available at &lt;a href="http://RequestReduce.com"&gt;http://&lt;/a&gt;&lt;a href="http://RequestReduce.com"&gt;RequestReduce&lt;/a&gt;&lt;a href="http://RequestReduce.com"&gt;.com&lt;/a&gt; and via &lt;a href="http://nuget.org/packages/RequestReduce.SassLessCoffee" target="_blank"&gt;Nuget&lt;/a&gt; now calls into the APIs exposed by both DotLess and SassAndCoffee.Core to have them simply compile the contents of your .less, .sass, .scss and .coffee files. &lt;a href="http://RequestReduce.com"&gt;RequestReduce&lt;/a&gt; then takes over with its own minification, bundling and caching logic.&lt;/p&gt;
+&lt;p&gt;To get this simply requires adding the &lt;a href="http://RequestReduce.com"&gt;RequestReduce&lt;/a&gt;.SassLessCoffee Dll and those of its dependencies to your project. No handler config entries are necessary in your web.config. This is because &lt;a href="http://RequestReduce.com"&gt;RequestReduce&lt;/a&gt; will map these extensions to its own handlers at run time.&lt;/p&gt;
+&lt;p&gt;Hopefully this is what the Less/Sass/Coffee users have been looking for in &lt;a href="http://RequestReduce.com"&gt;RequestReduce&lt;/a&gt;. Please let me know if you run into issues here.&lt;/p&gt;
+&lt;h2&gt;New Look on the &lt;a href="http://RequestReduce.com"&gt;RequestReduce&lt;/a&gt; Homepage&lt;/h2&gt;
+&lt;p&gt;I gave &lt;a href="http://RequestReduce.com"&gt;RequestReduce&lt;/a&gt;.com a facelift last weekend. A couple weeks ago &lt;a href="http://zachholman.com/" target="_blank"&gt;Zach Holman&lt;/a&gt; gave me some &lt;a href="https://github.com/holman/feedback/issues/86" target="_blank"&gt;good advice&lt;/a&gt; on my github readme. He commented that my headline and the first paragraph was too wordy. I had felt the same way for a while but this weekend finally did something about it. I shortened up my github headline and readme and took it a step further and totally revamped the homepage. It looked more like an essay than a pitch for &lt;a href="http://RequestReduce.com"&gt;RequestReduce&lt;/a&gt;. When I&amp;rsquo;m looking for OSS solutions, I typically don&amp;rsquo;t like essays as my introduction to the project. So now the first thing you see are basically bullet points highlighting what's important and some before and after images from &lt;a href="http://www.webpagetest.org"&gt;www.webpagetest.org&lt;/a&gt; waterfall tests.&lt;/p&gt;
+&lt;p&gt;I&amp;rsquo;d really be interested in hearing your feedback on the new look. I already shrunk the huge Getting Started font based on some early comments. Does this quickly &amp;ldquo;bring the message home?&amp;rdquo; I did get a comment about the waterfall images appearing out of context and that the reader may not know what they are or why they are important. Their importance seem clear to me but then I do perf testing every day unlike a lot of other devs and web folk.&lt;/p&gt;</content>
+  <ispublished>True</ispublished>
+  <isdeleted>False</isdeleted>
+  <iscommentsenabled>True</iscommentsenabled>
+  <pubDate>2011-12-13 07:26:00</pubDate>
+  <lastModified>2013-05-31 18:05:44</lastModified>
+  <raters>0</raters>
+  <rating>0</rating>
+  <slug>Released-RequestReduceSassLessCoffee-Now-have-RequestReduce-compile-your-less-sass-scss-and-coffee-files-before-minifying-and-bundling-them</slug>
+  <tags />
+  <comments>
+    <comment id="b84e802c-dcf3-4e56-a81f-435bc53ee261" parentid="00000000-0000-0000-0000-000000000000" approved="True" spam="False" deleted="False">
+      <date>2011-12-14 13:18:22</date>
+      <author>Martin</author>
+      <email>martin@wonderlab.se</email>
+      <country />
+      <ip>89.253.103.136</ip>
+      <moderatedby>mwrock</moderatedby>
+      <avatar />
+      <content>Thanks, exactley what I&amp;#180;ve been looking for last few weeks. Hope it works with twitters bootstrap :)</content>
+    </comment>
+    <comment id="f97946fd-8059-41da-80f5-854a67b1bc67" parentid="00000000-0000-0000-0000-000000000000" approved="True" spam="False" deleted="False">
+      <date>2011-12-14 16:41:34</date>
+      <author>mwrock</author>
+      <email>matt@mattwrock.com</email>
+      <country />
+      <ip>131.107.0.81</ip>
+      <avatar />
+      <content>Hi Martin,
+
+Haven&amp;#39;t tried it myself but someone did post the following on the RR issues page:
+
+&amp;quot;For kicks I threw Twitter&amp;#39;s Bootstrap CSS framework at dotless/RR because it covers a lot of the available LESS functionality like mixins, functions and operations. Everything seems to work as expected.&amp;quot;
+
+So you should be good. Please file an issue if anything doesn&amp;#39;t look right.</content>
+    </comment>
+    <comment id="9e2e6eb3-6621-4c6f-b2a5-8329f8bca0b9" parentid="00000000-0000-0000-0000-000000000000" approved="True" spam="False" deleted="False">
+      <date>2012-07-22 11:12:06</date>
+      <author>SimpleScripts</author>
+      <email>arnivdisuza@yahoo.in</email>
+      <country />
+      <ip>122.173.210.204</ip>
+      <avatar />
+      <content>Great post. I was checking continuously this blog and I’m impressed! Extremely helpful info specially the last part I care for such information a lot. I was seeking this certain information for a very long time. Thank you and best of luck.
+</content>
+    </comment>
+  </comments>
+  <categories>
+    <category>2f8206f0-95a4-449e-bf74-3b2cb761de04</category>
+  </categories>
+  <notifications />
+</post>

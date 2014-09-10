@@ -23,6 +23,8 @@
 
             btnSave.Click += btnSave_Click;
             btnSave.Text = Resources.labels.saveSettings;
+            btnSave2.Click += btnSave_Click;
+            btnSave2.Text = Resources.labels.saveSettings;
         }
 
         private void BindSettings()
@@ -36,10 +38,14 @@
             cbEnableWebsiteInComments.Checked = BlogSettings.Instance.EnableWebsiteInComments;
             cbEnableCoComment.Checked = BlogSettings.Instance.IsCoCommentEnabled;
             cbShowLivePreview.Checked = BlogSettings.Instance.ShowLivePreview;
-            cbShowPingBacks.Checked = BlogSettings.Instance.ShowPingBacks;
             ddlCloseComments.SelectedValue = BlogSettings.Instance.DaysCommentsAreEnabled.ToString();
             cbEnableCommentsModeration.Checked = BlogSettings.Instance.EnableCommentsModeration;
             rblAvatar.SelectedValue = BlogSettings.Instance.Avatar;
+            cbEnablePingBackSend.Checked = BlogSettings.Instance.EnablePingBackSend;
+            cbEnablePingBackReceive.Checked = BlogSettings.Instance.EnablePingBackReceive;
+            cbEnableTrackBackSend.Checked = BlogSettings.Instance.EnableTrackBackSend;
+            cbEnableTrackBackReceive.Checked = BlogSettings.Instance.EnableTrackBackReceive;
+            txtThumbProvider.Text = BlogSettings.Instance.ThumbnailServiceApi;
             ddlCommentsPerPage.SelectedValue = BlogSettings.Instance.CommentsPerPage.ToString();
 
             // disqus
@@ -64,11 +70,15 @@
             BlogSettings.Instance.EnableWebsiteInComments = cbEnableWebsiteInComments.Checked;
             BlogSettings.Instance.IsCoCommentEnabled = cbEnableCoComment.Checked;
             BlogSettings.Instance.ShowLivePreview = cbShowLivePreview.Checked;
-            BlogSettings.Instance.ShowPingBacks = cbShowPingBacks.Checked;
 
             BlogSettings.Instance.DaysCommentsAreEnabled = int.Parse(ddlCloseComments.SelectedValue);
             BlogSettings.Instance.EnableCommentsModeration = cbEnableCommentsModeration.Checked;
             BlogSettings.Instance.Avatar = rblAvatar.SelectedValue;
+            BlogSettings.Instance.EnableTrackBackSend = cbEnableTrackBackSend.Checked;
+            BlogSettings.Instance.EnableTrackBackReceive = cbEnableTrackBackReceive.Checked;
+            BlogSettings.Instance.EnablePingBackSend = cbEnablePingBackSend.Checked;
+            BlogSettings.Instance.EnablePingBackReceive = cbEnablePingBackReceive.Checked;
+            BlogSettings.Instance.ThumbnailServiceApi = txtThumbProvider.Text;
             BlogSettings.Instance.CommentsPerPage = int.Parse(ddlCommentsPerPage.SelectedValue);
 
             // disqus 

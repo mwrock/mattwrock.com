@@ -25,8 +25,8 @@
 				"smtpServerPort": $("[id$='_txtSmtpServerPort']").val(),
 				"smtpUserName": $("[id$='_txtSmtpUsername']").val(),
 				"smtpPassword": $("[id$='_txtSmtpPassword']").val(),
-				"sendMailOnComment": $("[id$='_cbComments']").attr('checked'),
-				"enableSsl": $("[id$='_cbEnableSsl']").attr('checked'),
+				"sendMailOnComment": $("[id$='_cbComments']").is(':checked'),
+				"enableSsl": $("[id$='_cbEnableSsl']").is(':checked'),
 				"emailSubjectPrefix": $("[id$='_txtEmailSubjectPrefix']").val()
 			};
 			
@@ -56,8 +56,8 @@
                 "smtpServerPort": $("[id$='_txtSmtpServerPort']").val(),
                 "smtpUserName": $("[id$='_txtSmtpUsername']").val(),
                 "smtpPassword": $("[id$='_txtSmtpPassword']").val(),
-                "sendMailOnComment": $("[id$='_cbComments']").attr('checked'),
-                "enableSsl": $("[id$='_cbEnableSsl']").attr('checked'),
+                "sendMailOnComment": $("[id$='_cbComments']").is(':checked').toString(),
+                "enableSsl": $("[id$='_cbEnableSsl']").is(':checked').toString(),
                 "emailSubjectPrefix": $("[id$='_txtEmailSubjectPrefix']").val()
             };
 
@@ -86,7 +86,10 @@
 			<menu:TabMenu ID="TabMenu" runat="server" />
 		</div>
 		<div class="content-box-left">
-        <h1><%=Resources.labels.settings %></h1>
+            <div class="rightligned-top action_buttons">
+                <input type="submit" id="btnSave" class="btn primary" value="<%=Resources.labels.saveSettings %>" />
+            </div>
+            <h1><%=Resources.labels.settings %></h1>
 
                 <ul class="fl leftaligned">
                     <li>
@@ -126,8 +129,7 @@
                     </li>
                 </ul>
             <div class="action_buttons">
-                <input type="submit" id="btnSave" class="btn primary" value="<%=Resources.labels.saveSettings %>" />
-                <input type="submit" class="btn" value="<%=Resources.labels.testEmailSettings %>" onclick="return TestEmail();" />
+                <input style="margin-left: 220px" type="submit" class="btn" value="<%=Resources.labels.testEmailSettings %>" onclick="return TestEmail();" />
                 <asp:Label runat="Server" ID="lbSmtpStatus" />
             </div>
         </div>

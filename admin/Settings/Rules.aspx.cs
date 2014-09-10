@@ -54,6 +54,8 @@
 
             btnSave.Click += btnSave_Click;
             btnSave.Text = Resources.labels.saveSettings;
+            btnSave2.Click += btnSave_Click;
+            btnSave2.Text = Resources.labels.saveSettings;
         }
 
         protected void BindFilters()

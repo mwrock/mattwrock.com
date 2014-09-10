@@ -63,7 +63,7 @@
             var rightsToSave = {};
             for (var category in rights) {
                 for (var key in rights[category]) {
-                    if (rightsControls[key].checkBox.attr("checked") === true) {
+                    if (rightsControls[key].checkBox.is(":checked")) {
                         rightsToSave[key] = true;
                     }
                 }

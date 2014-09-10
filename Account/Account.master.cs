@@ -41,7 +41,7 @@
 
             //add at top in header to prevent any javascript issue.
             // ToDo: Insert this script exactly before account.js
-            this.Page.Header.Controls.AddAt(0, script);
+            Page.Header.Controls.AddAt(0, script);
         }
 
         #region Public Methods
@@ -57,12 +57,12 @@
         /// </param>
         public void SetStatus(string status, string msg)
         {
-            this.AdminStatus.Attributes.Clear();
-            this.AdminStatus.Attributes.Add("class", status);
-            this.AdminStatus.InnerHtml =
+            AdminStatus.Attributes.Clear();
+            AdminStatus.Attributes.Add("class", status);
+            AdminStatus.InnerHtml =
                 string.Format(
                     "{0}<a href=\"javascript:HideStatus()\" style=\"width:20px;float:right\">X</a>", 
-                    this.Server.HtmlEncode(msg));
+                    Server.HtmlEncode(msg));
         }
 
         #endregion
@@ -89,11 +89,8 @@
                 "minPassLengthInChars"
             };
 
-            Utils.AddFolderJavaScripts(this.Page, "Scripts", true);
-
-            this.AddLocalizedStringsToJavaScript(resources);
-
-            Utils.AddJavaScriptInclude(this.Page, string.Format("{0}Account/account.js", Utils.ApplicationRelativeWebRoot), false, false);
+            AddLocalizedStringsToJavaScript(resources);
+            //Utils.AddJavaScriptInclude(Page, string.Format("{0}Account/account.js", Utils.ApplicationRelativeWebRoot), false, false);
         }
 
         #endregion

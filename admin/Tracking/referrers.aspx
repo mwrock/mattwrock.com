@@ -16,7 +16,7 @@
         function SaveSettings() {
 
             var dto = {
-                "enable": $("[id$='_cbEnableReferrers']").attr('checked'),
+                "enable": $("[id$='_cbEnableReferrers']").is(':checked'),
                 "days": $("[id$='_txtNumberOfDays']").val()
             };
 

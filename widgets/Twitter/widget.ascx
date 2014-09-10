@@ -7,4 +7,4 @@
   </ItemTemplate>
 </asp:Repeater>
 
-<asp:HyperLink runat="server" ID="hlTwitterAccount" Text="Follow me on Twitter" rel="me" />
+<asp:HyperLink runat="server" ID="hlTwitterAccount" Text="<%$Resources:labels, followTwitter %>" rel="me" />

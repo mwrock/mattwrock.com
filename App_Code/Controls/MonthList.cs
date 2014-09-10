@@ -270,7 +270,7 @@ namespace App_Code.Controls
 						CacheKey, months, null, DateTime.Now.AddHours(CacheTimeoutInHours), Cache.NoSlidingExpiration);
 
 				foreach (
-					var month in Post.Posts.Where(post => post.IsVisibleToPublic).Select(
+					var month in Post.ApplicablePosts.Where(post => post.IsVisibleToPublic).Select(
 						post => new DateTime(post.DateCreated.Year, post.DateCreated.Month, 1)))
 				{
 					int count;
@@ -294,6 +294,12 @@ namespace App_Code.Controls
 		{
 			// invalidate cache whenever a post is modified
 			Blog.CurrentInstance.Cache.Remove(CacheKey);
+
+            Blog siteAggregationBlog = Blog.SiteAggregationBlog;
+            if (siteAggregationBlog != null)
+            {
+                siteAggregationBlog.Cache.Remove(CacheKey);
+            }
 		}
 		
 		#region Rendering Methods
@@ -350,7 +356,7 @@ namespace App_Code.Controls
 				string aHref = string.Format
 				(
 					"{0}{1}/{2}/default{3}",
-					Utils.RelativeWebRoot,
+					Utils.RelativeOrAbsoluteWebRoot,
 					theDate.Year,
 					theDate.ToString("MM"),
 					BlogConfig.FileExtension

@@ -9,6 +9,9 @@
 			<menu:TabMenu ID="TabMenu" runat="server" />
 		</div>
 		<div class="content-box-left">
+            <div class="rightligned-top action_buttons">
+                <asp:Button runat="server" ID="btnSave" CssClass="btn primary rounded" />
+            </div>
             <h1><%=Resources.labels.recentPosts %></h1>
             <ul class="fl">
                 <li>
@@ -88,8 +91,8 @@
                     <span class="belowHelp"><%=Resources.labels.recaptchaConfigureReminder%></span>
                 </li>
             </ul>
-            <div class="action_buttons">
-                <asp:Button runat="server" ID="btnSave" CssClass="btn primary rounded" />
+            <div class="rightligned-bottom action_buttons">
+                <asp:Button runat="server" ID="btnSave2" CssClass="btn primary rounded" />
             </div>
         </div>
     </div>

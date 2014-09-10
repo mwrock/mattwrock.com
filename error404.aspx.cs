@@ -35,7 +35,7 @@ public partial class error404 : BlogBasePage
             divExternalReferrer.Visible = true;
         }
 
-        Page.Title += Server.HtmlEncode(" - " + "Page not found");
+        Page.Title += Server.HtmlEncode(" - " + Resources.labels.PageNotFound);
     }
 
     private void DirectHitSearch()

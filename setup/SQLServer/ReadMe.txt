@@ -1,10 +1,10 @@
-﻿Running BlogEngine.NET 2.5 using SQL Server 2005/2008:
+﻿Running BlogEngine.NET 2.7 using SQL Server 2005/2008/2012:
 
 If you wish to use SQL Server to store all your blog data, this folder has all the 
 information you'll likely need.  The scripts included here are for SQL Server 2005/2008.
 They could be modified to be used with earlier or later versions if needed.
 
-Included is the Initial Setup script for use with new installation of 2.5.  Also,
+Included is the Initial Setup script for use with new installation of 2.7.  Also,
 included is an upgrade script for users of BlogEngine 2.5.  In addition, you 
 will find a sample web.config file with the needed changes to use SQL Server.
 
@@ -20,12 +20,16 @@ you have a backup).
 6. Surf out to your Blog and see the welcome post.
 7. Login with the username admin and password admin.  Change the password.
 
-Upgrading from 2.0
+Upgrading from 2.6
+
+ - There are no changes between 2.6 and 2.7.  If you are upgrading from 2.5, see upgrade notes below.
+
+Upgrading from 2.5
 
 1. Open SQL Server Management Studio and connect to your SQL Server.
 2. Execute the desired upgrade script against the database where you have your BlogEngine
 data.
-3. The web.config file has changed from 2.0 to 2.5.  It will likely be easiest to start
+3. The web.config file has changed from 2.5 to 2.7.  It will likely be easiest to start
 with the sample web.config file as described above, but if you have other changes in it, 
 you'll need to merge them.  Don't forget to move your connectionString over.
 

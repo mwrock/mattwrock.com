@@ -95,9 +95,9 @@ public class SendCommentMail
         var mail = new MailMessage
             {
                 From = new MailAddress(BlogSettings.Instance.Email),
-                ReplyTo = new MailAddress(replyTo, HttpUtility.HtmlDecode(comment.Author)),
                 Subject = BlogSettings.Instance.EmailSubjectPrefix + subject + post.Title
             };
+        mail.ReplyToList.Add(new MailAddress(replyTo, HttpUtility.HtmlDecode(comment.Author)));
         mail.To.Add(BlogSettings.Instance.Email);
 
         var sb = new StringBuilder();
@@ -135,7 +135,7 @@ public class SendCommentMail
 
         if (HttpContext.Current != null)
         {
-            sb.AppendFormat("<strong>IP address:</strong> {0}<br />", HttpContext.Current.Request.UserHostAddress);
+            sb.AppendFormat("<strong>IP address:</strong> {0}<br />", Utils.GetClientIP());
             sb.AppendFormat("<strong>User-agent:</strong> {0}", HttpContext.Current.Request.UserAgent);
         }
 

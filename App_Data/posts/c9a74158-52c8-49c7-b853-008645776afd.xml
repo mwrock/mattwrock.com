@@ -1,0 +1,187 @@
+﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<post>
+  <author>mwrock</author>
+  <title>Released Boxstarter 2.0: Remote Windows Environment Installs, Packageless Scripts and a New Documentation Web Site!</title>
+  <description />
+  <content>&lt;p&gt;&lt;a href="http://www.mattwrock.com/image.axd?picture=amazon_1.png"&gt;&lt;img title="amazon" style="border-left-width: 0px; border-right-width: 0px; background-image: none; border-bottom-width: 0px; padding-top: 0px; padding-left: 0px; margin: 0px 10px 0px 0px; display: inline; padding-right: 0px; border-top-width: 0px" border="0" alt="amazon" src="http://www.mattwrock.com/image.axd?picture=amazon_thumb_1.png" width="514" height="357" /&gt;&lt;/a&gt;&lt;/p&gt;  &lt;p&gt;A couple weeks ago, I released &lt;a href="http://chocolatey.org/packages/boxstarter"&gt;Boxstarter 2.0&lt;/a&gt; with lots of new features, a couple of which I think are especially cool. Now that the &lt;a href="http://boxstarter.org/"&gt;documentation and new web site at Boxstarter.org&lt;/a&gt; are complete, I think a proper blog post is in order.&lt;/p&gt;  &lt;p&gt;While I did bump the major version, this release is compatible with any 1.x.x Boxstarter script. The version number increase is intended to emphasize some significant features introduced in this release.&lt;/p&gt;  &lt;p&gt;Above is a screenshot of installing a &lt;a href="https://minecraft.net/"&gt;Minecraft&lt;/a&gt; server onto an AWS Machine on my local laptop powershell console.&lt;/p&gt;  &lt;h2&gt;Remote Installations&lt;/h2&gt;  &lt;p&gt;Perhaps the most significant feature introduced in this release is &lt;a href="http://boxstarter.org/InstallingPackages.cshtml?#RemoteInstallations"&gt;remote installations&lt;/a&gt; - the ability to point Boxstarter to any remote machine and supply a package that can be installed on that machine from the user’s local command line. This could be your other laptop or a Hyper-V, Azure or AWS VM.&lt;/p&gt;  &lt;p&gt;This does require powershell remoting to be enabled on the remote machine. That’s uper simple to do. Just run this command as administrator on the remote machine. &lt;/p&gt;  &lt;pre class="csharpcode"&gt;Enable-PSRemoting –Force&lt;/pre&gt;
+
+&lt;pre class="csharpcode"&gt;&amp;#160;&lt;/pre&gt;
+&lt;style type="text/css"&gt;
+.csharpcode, .csharpcode pre
+{
+	font-size: small;
+	color: black;
+	font-family: consolas, "Courier New", courier, monospace;
+	background-color: #ffffff;
+	/*white-space: pre;*/
+}
+.csharpcode pre { margin: 0em; }
+.csharpcode .rem { color: #008000; }
+.csharpcode .kwrd { color: #0000ff; }
+.csharpcode .str { color: #006080; }
+.csharpcode .op { color: #0000c0; }
+.csharpcode .preproc { color: #cc6633; }
+.csharpcode .asp { background-color: #ffff00; }
+.csharpcode .html { color: #800000; }
+.csharpcode .attr { color: #ff0000; }
+.csharpcode .alt 
+{
+	background-color: #f4f4f4;
+	width: 100%;
+	margin: 0em;
+}
+.csharpcode .lnum { color: #606060; }&lt;/style&gt;
+
+&lt;p&gt;You only have to do this once. However, if WMI ports are open on that machine, Boxstarter can enable remoting remotely. Remoting on the local machine where Boxstarter runs is completely configured, if necessary, by Boxstarter. You can install &lt;a href="http://boxstarter.org/CreatingPackages"&gt;Boxstarter Packages&lt;/a&gt; (which are &lt;a href="http://chocolatey.org/"&gt;Chocolatey&lt;/a&gt; packages really) on any remote machine that meets Boxstarter’s &lt;a href="http://boxstarter.org/InstallBoxstarter"&gt;prerequisites&lt;/a&gt; (at least Powershell 2 on Windows 7/2008R2 or higher) just like you would locally with this command:&lt;/p&gt;
+
+&lt;pre class="csharpcode"&gt;$cred=Get-Credential=MyTargetMachine\myusername
+Install-BoxstarterPackage -ComputerName MyTargetMachine -PackageName MyPackage -Credential $cred&lt;/pre&gt;
+
+&lt;p&gt;Here is a screenshot of a remote install to a Windows 7 VM: &lt;a href="http://www.mattwrock.com/image.axd?picture=result_1.png"&gt;&lt;img title="result" style="border-left-width: 0px; border-right-width: 0px; background-image: none; border-bottom-width: 0px; padding-top: 0px; padding-left: 0px; margin: 0px 10px 0px 0px; display: inline; padding-right: 0px; border-top-width: 0px" border="0" alt="result" src="http://www.mattwrock.com/image.axd?picture=result_thumb_1.png" width="672" height="675" /&gt;&lt;/a&gt;&lt;/p&gt;
+&lt;style type="text/css"&gt;
+.csharpcode, .csharpcode pre
+{
+	font-size: small;
+	color: black;
+	font-family: consolas, "Courier New", courier, monospace;
+	background-color: #ffffff;
+	/*white-space: pre;*/
+}
+.csharpcode pre { margin: 0em; }
+.csharpcode .rem { color: #008000; }
+.csharpcode .kwrd { color: #0000ff; }
+.csharpcode .str { color: #006080; }
+.csharpcode .op { color: #0000c0; }
+.csharpcode .preproc { color: #cc6633; }
+.csharpcode .asp { background-color: #ffff00; }
+.csharpcode .html { color: #800000; }
+.csharpcode .attr { color: #ff0000; }
+.csharpcode .alt 
+{
+	background-color: #f4f4f4;
+	width: 100%;
+	margin: 0em;
+}
+.csharpcode .lnum { color: #606060; }&lt;/style&gt;
+
+&lt;h3&gt;Laying the groundwork for VM provisioning&lt;/h3&gt;
+
+&lt;p&gt;Back in September I began work to automate VM provisioning using Boxstarter. This really ended up being more about learning than simply building features. Long story short: I ended up figuring out exactly how to do this but in the process realized it would be best to “decouple” the remote installation from the VM mechanics. So expect the VM stuff fairly soon where you may see a command like this:&lt;/p&gt;
+
+&lt;pre class="csharpcode"&gt;Get-BoxstarterVM -VMName MyVM -SnapShotName myCheckpoint | `
+Install-BoxstarterPackage -PackageName MyPackage -Credential $creds&lt;/pre&gt;
+
+&lt;pre class="csharpcode"&gt;&amp;#160;&lt;/pre&gt;
+
+&lt;p&gt;Get-BoxstarterVM will enable remoting, restore the optional chekpoint and return a ConnectionURI to be piped to Install-BoxstarterPackage. There will be a different flavor for Hyper-V, Azure and AWS.&lt;/p&gt;
+
+&lt;h2&gt;No Package needed, Install environments with a Gist!&lt;/h2&gt;
+
+&lt;p&gt;Now you can use a text file or any URL that contains raw text (like a &lt;a href="https://gist.github.com/"&gt;gist&lt;/a&gt;) in lieu of a Package name. If Boxstarter detects that a package name is resolvable to a local file or it begins with http(s)://, Boxstarter will auto generate a temporary package injecting this text as the ChocolateyInstall.ps1. For example:&lt;/p&gt;
+
+&lt;p&gt;&lt;a href="http://www.mattwrock.com/image.axd?picture=gist3_1.png"&gt;&lt;img title="gist3" style="border-left-width: 0px; border-right-width: 0px; background-image: none; border-bottom-width: 0px; padding-top: 0px; padding-left: 0px; margin: 0px 10px 0px 0px; display: inline; padding-right: 0px; border-top-width: 0px" border="0" alt="gist3" src="http://www.mattwrock.com/image.axd?picture=gist3_thumb_1.png" width="695" height="194" /&gt;&lt;/a&gt;&lt;/p&gt;
+
+&lt;pre class="csharpcode"&gt;Install-BoxstarterPackage -PackageName `
+https://gist.github.com/mwrock/7382880/raw/f6525387b4b524b8eccef6ed4d5ec219c82c0ac7/gistfile1.txt&lt;/pre&gt;
+
+&lt;pre class="csharpcode"&gt;&amp;#160;&lt;/pre&gt;
+
+&lt;p&gt;I’d like to credit and thank &lt;a href="http://motowilliams.com/"&gt;Eric Williams&lt;/a&gt; (&lt;a href="https://twitter.com/MotoWilliams"&gt;@MotoWilliams&lt;/a&gt;) for coming up with this great idea. In many cases particularly with a Boxstarter install, there may not be a need to have a &lt;a href="http://www.nuget.org/"&gt;Nuget&lt;/a&gt; package published on a feed. It might be a one-off install or something intended for just yourself and maybe a few others. So having to pack and push a Chocolatey package is likely overkill.&lt;/p&gt;
+
+&lt;p&gt;This also works with the &lt;a href="http://boxstarter.org/WebLauncher"&gt;Boxstarter Web Launcher&lt;/a&gt; URLs.&lt;/p&gt;
+
+&lt;pre class="csharpcode"&gt;&lt;a href="http://boxstarter.org/package/nr/url?https://gist.github.com/mwrock/7382880/raw/f6525387b4b524b8eccef6ed4d5ec219c82c0ac7/gistfile1.txt"&gt;http://boxstarter.org/package/nr/url?https://gist.github.com/mwrock/7382880/raw/f6525387b4b524b8eccef6ed4d5ec219c82c0ac7/gistfile1.txt&lt;/a&gt;&lt;/pre&gt;
+
+&lt;pre class="csharpcode"&gt;&amp;#160;&lt;/pre&gt;
+&lt;style type="text/css"&gt;
+.csharpcode, .csharpcode pre
+{
+	font-size: small;
+	color: black;
+	font-family: consolas, "Courier New", courier, monospace;
+	background-color: #ffffff;
+	/*white-space: pre;*/
+}
+.csharpcode pre { margin: 0em; }
+.csharpcode .rem { color: #008000; }
+.csharpcode .kwrd { color: #0000ff; }
+.csharpcode .str { color: #006080; }
+.csharpcode .op { color: #0000c0; }
+.csharpcode .preproc { color: #cc6633; }
+.csharpcode .asp { background-color: #ffff00; }
+.csharpcode .html { color: #800000; }
+.csharpcode .attr { color: #ff0000; }
+.csharpcode .alt 
+{
+	background-color: #f4f4f4;
+	width: 100%;
+	margin: 0em;
+}
+.csharpcode .lnum { color: #606060; }&lt;/style&gt;&lt;style type="text/css"&gt;
+.csharpcode, .csharpcode pre
+{
+	font-size: small;
+	color: black;
+	font-family: consolas, "Courier New", courier, monospace;
+	background-color: #ffffff;
+	/*white-space: pre;*/
+}
+.csharpcode pre { margin: 0em; }
+.csharpcode .rem { color: #008000; }
+.csharpcode .kwrd { color: #0000ff; }
+.csharpcode .str { color: #006080; }
+.csharpcode .op { color: #0000c0; }
+.csharpcode .preproc { color: #cc6633; }
+.csharpcode .asp { background-color: #ffff00; }
+.csharpcode .html { color: #800000; }
+.csharpcode .attr { color: #ff0000; }
+.csharpcode .alt 
+{
+	background-color: #f4f4f4;
+	width: 100%;
+	margin: 0em;
+}
+.csharpcode .lnum { color: #606060; }&lt;/style&gt;
+
+&lt;p&gt;This doesn’t even require Boxstarter or Chocolatey to be installed. Run this from IE and a .net click-once app is downloaded and installed that will bootstrap a Boxstarter install of the gist script.&lt;/p&gt;
+
+&lt;h2&gt;Other new Features:&lt;/h2&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;Reboots now suspend Bitlocker if enabled, preventing the need to enter your bitlocker key before startig windows &lt;/li&gt;
+
+  &lt;li&gt;Its compatible with the newly released Chocolatey version 0.9.8.23 &lt;/li&gt;
+
+  &lt;li&gt;If installing on a machine that does not require a password, Boxstarter will no longer prompt for one if you do not provide Credentials to Install-BoxstarterPackage or if you use the –NoPassword parameter of Invoke-ChocolateyBoxstarter or Boxstarter.bat.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2&gt;Brand new Boxstarter.org with lots of Documentation and “How To”s&lt;/h2&gt;
+
+&lt;p&gt;I want Boxstarter to be easy to use and help to be discoverable. So I spent my free time over a weekend composing a bunch of help pages capturing all of the key Boxstarter scenarios. This includes instructions for:&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;Installing Boxstarter &lt;/li&gt;
+
+  &lt;li&gt;Creating Packages &lt;/li&gt;
+
+  &lt;li&gt;Publishing Packages &lt;/li&gt;
+
+  &lt;li&gt;Executing packages&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;I think I covered most of the permutations of these activities clearly. Please let me know if you find anything that is not clear or if there are gaps not covered.&lt;/p&gt;
+
+&lt;p&gt;Hope to be getting back to feature work soon and release the new Boxstarter Virtualization module.&lt;/p&gt;</content>
+  <ispublished>False</ispublished>
+  <isdeleted>True</isdeleted>
+  <iscommentsenabled>True</iscommentsenabled>
+  <pubDate>2013-11-22 02:12:46</pubDate>
+  <lastModified>2013-11-22 02:12:46</lastModified>
+  <raters>0</raters>
+  <rating>0</rating>
+  <slug />
+  <tags />
+  <comments />
+  <categories />
+  <notifications />
+</post>

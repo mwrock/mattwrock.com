@@ -59,7 +59,7 @@ namespace App_Code.Controls
         {
             if (Saved != null)
             {
-                Saved(null, new EventArgs());
+                Saved(null, EventArgs.Empty);
             }
         }
 

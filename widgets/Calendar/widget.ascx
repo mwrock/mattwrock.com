@@ -6,5 +6,5 @@
         WeekendDayStyle-CssClass="weekend" OtherMonthDayStyle-CssClass="other" UseAccessibleHeader="true"
         EnableViewState="false" />
     <br />
-    <a href="<%=Utils.AbsoluteWebRoot %>calendar/default.aspx">View posts in large calendar</a>
+    <a href="<%=Utils.AbsoluteWebRoot %>calendar/default.aspx"><%=Resources.labels.viewLargeCalendar %></a>
 </div>

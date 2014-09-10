@@ -1007,9 +1007,6 @@
 	<data name="createUser" xml:space="preserve">
 		<value>Créer un utilisateur</value>
 	</data>
-	<data name="deleteConfirm" xml:space="preserve">
-		<value>Êtes-vous sûr de vouloir supprimer ce commentaire ?</value>
-	</data>
 	<data name="developmentMode" xml:space="preserve">
 		<value>Mode développement</value>
 	</data>
@@ -1505,7 +1502,7 @@
 		<value>Ajouter une nouvelle catégorie</value>
 	</data>
 	<data name="setPublishDate" xml:space="preserve">
-		<value>Entrer la date de publication</value>
+		<value>Date de publication</value>
 	</data>
 	<data name="excerpt" xml:space="preserve">
 		<value>Extrait (optionnel)</value>
@@ -1647,5 +1644,170 @@
 	</data>
 	<data name="defaultEditorsRole" xml:space="preserve">
 		<value>Rôle Editors par défaut</value>
+	</data>
+	<data name="showEnableWebsiteInComments" xml:space="preserve">
+		<value>Activer les sites web dans les commentaires</value>
+	</data>
+	<data name="areYouSureDeleteComment" xml:space="preserve">
+		<value>Êtes-vous sûr de vouloir supprimer ce commentaire ?</value>
+	</data>
+	<data name="areYouSureDeleteEmail" xml:space="preserve">
+		<value>Êtes-vous sûr de vouloir supprimer cet e-mail ?</value>
+	</data>
+	<data name="areYouSureDeletePage" xml:space="preserve">
+		<value>Êtes-vous sûr de vouloir supprimer cette page ?</value>
+	</data>
+	<data name="allowMobileTheme" xml:space="preserve">
+		<value>Site pour mobile</value>
+	</data>
+	<data name="blogs" xml:space="preserve">
+		<value>Blogs</value>
+	</data>
+	<data name="itemsPerPage" xml:space="preserve">
+		<value>Éléments/page</value>
+	</data>
+	<data name="couldNotDeleteBlog" xml:space="preserve">
+		<value>Impossible de supprimer le blog : {0}</value>
+	</data>
+	<data name="blogDeleted" xml:space="preserve">
+		<value>Le blog "{0}" a été supprimé</value>
+	</data>
+	<data name="blogAdded" xml:space="preserve">
+		<value>Le blog "{0}" a été ajouté</value>
+	</data>
+	<data name="invalidBlogId" xml:space="preserve">
+		<value>Id de blog invalide</value>
+	</data>
+	<data name="editExistingBlog" xml:space="preserve">
+		<value>Modifier le blog</value>
+	</data>
+	<data name="active" xml:space="preserve">
+		<value>Activé</value>
+	</data>
+	<data name="hostName" xml:space="preserve">
+		<value>Nom d'hôte (optionnel)</value>
+	</data>
+	<data name="available" xml:space="preserve">
+		<value>Disponible</value>
+	</data>
+	<data name="currentTheme" xml:space="preserve">
+		<value>Thème actuel</value>
+	</data>
+	<data name="gallery" xml:space="preserve">
+		<value>Gallerie des thèmes</value>
+	</data>
+	<data name="installed" xml:space="preserve">
+		<value>Thèmes installés</value>
+	</data>
+	<data name="themes" xml:space="preserve">
+		<value>Thèmes</value>
+	</data>
+	<data name="alphaNumeric" xml:space="preserve">
+		<value>Alphabétique</value>
+	</data>
+	<data name="downloads" xml:space="preserve">
+		<value>Téléchargements</value>
+	</data>
+	<data name="newest" xml:space="preserve">
+		<value>Nouveautés</value>
+	</data>
+	<data name="orderBy" xml:space="preserve">
+		<value>Classé par</value>
+	</data>
+	<data name="activeThemes" xml:space="preserve">
+		<value>Thèmes activés</value>
+	</data>
+	<data name="enterEmail" xml:space="preserve">
+		<value>Entrez votre e-mail</value>
+	</data>
+	<data name="enterEmailAddress" xml:space="preserve">
+		<value>Veuillez entrer une adresse e-mail</value>
+	</data>
+	<data name="notifyMe" xml:space="preserve">
+		<value>Me notifier</value>
+	</data>
+	<data name="thankYou" xml:space="preserve">
+		<value>Merci</value>
+	</data>
+	<data name="nowUnsubscribed" xml:space="preserve">
+		<value>Vous êtes maintenant désinscris</value>
+	</data>
+	<data name="followTwitter" xml:space="preserve">
+		<value>Suivez-moi sur Twitter</value>
+	</data>
+	<data name="visitorHi" xml:space="preserve">
+		<value>Salut</value>
+	</data>
+	<data name="contactAuthorInformation" xml:space="preserve">
+		<value>Informations sur l'auteur</value>
+	</data>
+	<data name="countryCode" xml:space="preserve">
+		<value>Code pays</value>
+	</data>
+	<data name="contactIPAddress" xml:space="preserve">
+		<value>Adresse IP</value>
+	</data>
+	<data name="contactUserAgent" xml:space="preserve">
+		<value>User-agent</value>
+	</data>
+	<data name="downloadOPML" xml:space="preserve">
+		<value>Télécharger le fichier OPML</value>
+	</data>
+	<data name="incorrectSimpleCaptcha" xml:space="preserve">
+		<value>Le captcha est incorrect</value>
+	</data>
+	<data name="showEnableWebsiteInCommentsDescription" xml:space="preserve">
+		<value>Autoriser ou non l'affichage des sites web dans les commentaires</value>
+	</data>
+	<data name="type" xml:space="preserve">
+		<value>Type</value>
+	</data>
+	<data name="commentRSS" xml:space="preserve">
+		<value>Commentaire dans le flux RSS</value>
+	</data>
+	<data name="cannotDeleteLastAdmin" xml:space="preserve">
+		<value>Vous ne pouvez pas supprimer le dernier utilisateur avec des droits pour créer ou modifier des utilisateurs. Accorder ces droits à un autre utilisateur avant de supprimer celui-ci.</value>
+	</data>
+	<data name="storageContainerName" xml:space="preserve">
+		<value>Nom du conteneur de stockage</value>
+	</data>
+	<data name="virtualPath" xml:space="preserve">
+		<value>Répertoire virtuel</value>
+	</data>
+	<data name="existingBlogToCreateNewBlogFrom" xml:space="preserve">
+		<value>Blog existant pour créer un nouveau blog à partir de</value>
+	</data>
+	<data name="acceptAnyTextBeforeHostname" xml:space="preserve">
+		<value>Accepter n'importe quel texte avant le nom d'hôte</value>
+	</data>
+	<data name="latestFromTheGallery" xml:space="preserve">
+		<value>Dernières nouveautés</value>
+	</data>
+	<data name="savedByAtTime" xml:space="preserve">
+		<value>Enregistré par {0} à {1}</value>
+	</data>
+	<data name="setAsCurrentTheme" xml:space="preserve">
+		<value>Définir comme thème actuel</value>
+	</data>
+	<data name="setAsMobileTheme" xml:space="preserve">
+		<value>Définir comme thème mobile</value>
+	</data>
+	<data name="viewLargeCalendar" xml:space="preserve">
+		<value>Voir sur toute la page</value>
+	</data>
+	<data name="welcomeBack" xml:space="preserve">
+		<value>Content de vous revoir !</value>
+	</data>
+	<data name="commentsAddedSince" xml:space="preserve">
+		<value>De nouveaux commentaires ont été ajoutés à {0} depuis votre dernier commentaire.</value>
+	</data>
+	<data name="writtenCommentsTotal" xml:space="preserve">
+		<value>Vous avez écrit {0} commentaire en tout.</value>
+	</data>
+	<data name="filestorage" xml:space="preserve">
+		<value>Gestion des fichiers</value>
+	</data>
+	<data name="forceMainTheme" xml:space="preserve">
+		<value>Site normal</value>
 	</data>
 </root>

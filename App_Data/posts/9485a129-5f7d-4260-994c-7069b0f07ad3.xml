@@ -1,0 +1,139 @@
+﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<post>
+  <author>mwrock</author>
+  <title>Recycling an Application Pool with C#</title>
+  <description />
+  <content>&lt;p&gt;I have been developing a &lt;a href="http://www.requestreduce.com"&gt;CSS background image spriting, merging and minification application&lt;/a&gt; where I often force an app pool recycle in my integration tests. This is handy because it essentially allows me to reset the state of a web application in my test and it is a bit more light weight than performing a full IIS reset. I can specifically test certain scenarios where I want to make sure that some data or state can be persisted if the application is shut down. Its also a good way to isolate a test case from the effects of other integration tests. Things like output caching or any staticly held application memory resources are flushed and the next test has a clean slate.&lt;/p&gt;  &lt;p&gt;To perform an app pool refresh, I use the following helper method in a class called IntegrationFactHelper:&lt;/p&gt;  &lt;div id="codeSnippetWrapper"&gt;   &lt;pre style="border-bottom-style: none; text-align: left; padding-bottom: 0px; line-height: 12pt; background-color: #f4f4f4; margin: 0em; border-left-style: none; padding-left: 0px; width: 100%; padding-right: 0px; font-family: &amp;#39;Courier New&amp;#39;, courier, monospace; direction: ltr; border-top-style: none; color: black; border-right-style: none; font-size: 8pt; overflow: visible; padding-top: 0px" id="codeSnippet"&gt;&lt;span style="color: #0000ff"&gt;public&lt;/span&gt; &lt;span style="color: #0000ff"&gt;static&lt;/span&gt; &lt;span style="color: #0000ff"&gt;void&lt;/span&gt; RecyclePool()&lt;br /&gt;{&lt;br /&gt;  &lt;span style="color: #0000ff"&gt;using&lt;/span&gt; (var pool =     &lt;span style="color: #0000ff"&gt;new&lt;/span&gt; DirectoryEntry(&lt;span style="color: #006080"&gt;&amp;quot;IIS://localhost/W3SVC/AppPools/RequestReduce&amp;quot;&lt;/span&gt;))&lt;br /&gt;  {&lt;br /&gt;    pool.Invoke(&lt;span style="color: #006080"&gt;&amp;quot;Recycle&amp;quot;&lt;/span&gt;, &lt;span style="color: #0000ff"&gt;null&lt;/span&gt;);&lt;br /&gt;  }&lt;br /&gt;  Thread.Sleep(2000);&lt;br /&gt;}&lt;/pre&gt;
+
+  &lt;br /&gt;&lt;/div&gt;
+
+&lt;p class="brush: c-sharp;"&gt;Make sure you have a using statement pulling in the System.DirectoryServices namespace. The path above (&lt;span style="white-space: pre" class="Apple-style-span"&gt;IIS://localhost/W3SVC/AppPools/RequestReduce&lt;/span&gt;) would be the path to your IIS application pool. Note this is the IIS application and not the IIS site.&lt;/p&gt;
+
+&lt;p class="brush: c-sharp;"&gt;I'm not too proud of the Thread.Sleep(2000) here. I just have not invested time in a better way to actually wait for the pool to restart. The call to Invoke does not block and wait for the restart to complete. I briefly played with polling the application state but still found that after the application claimed to be on (or whatever the state name is) that the app was unresponsive. I tend to think that I have not investigated that far enough and would be delighted if someone commented with a way to more elegantly accomplish this. Having said that, I have found that on my system, 2 seconds is the sweet spot.&lt;/p&gt;
+
+&lt;p class="brush: c-sharp;"&gt;&lt;strong&gt;UPDATE&lt;/strong&gt;: See &lt;a href="http://www.mattwrock.com/post/2011/07/28/Recycling-an-Application-Pool-with-C-(Part-2).aspx" target="_blank"&gt;this post&lt;/a&gt; for an improved implementation that avoids this Thread.Sleep kludge and also gets around the dependency discussed below.&lt;/p&gt;
+
+&lt;p class="brush: c-sharp;"&gt;One cautionary and rather annoying note on using this DirectoryServices call on IIS applications. You may encounter this not so delightful error:&lt;/p&gt;
+
+&lt;pre class="brush: c-sharp;"&gt;System.Runtime.InteropServices.COMException : Unknown error (0x80005000)
+ at System.DirectoryServices.DirectoryEntry.Bind(Boolean throwIfFail)
+ at System.DirectoryServices.DirectoryEntry.Bind()
+ at System.DirectoryServices.DirectoryEntry.get_NativeObject()
+ at System.DirectoryServices.DirectoryEntry.Invoke(String methodName, Object[] args)&lt;/pre&gt;
+
+&lt;p class="brush: c-sharp;"&gt;Isn't that nice? I love unknown errors...almost as much as unspecified ones.&lt;/p&gt;
+
+&lt;p class="brush: c-sharp;"&gt;There may be other causes, but I have found that one reason this error may occur is if you have not enabled the Windows feature: IIS Metabase and IIS 6 configuration compatibility (see image below). I am using IIS 7, but this feature is required to use the above code.&lt;/p&gt;
+
+&lt;p&gt;&lt;img alt="" src="/image.axd?picture=2011%2f7%2fiis_Capture.PNG" /&gt;&lt;/p&gt;</content>
+  <ispublished>True</ispublished>
+  <isdeleted>False</isdeleted>
+  <iscommentsenabled>True</iscommentsenabled>
+  <pubDate>2011-07-26 07:46:00</pubDate>
+  <lastModified>2012-04-25 03:34:35</lastModified>
+  <raters>0</raters>
+  <rating>0</rating>
+  <slug>Recycling-an-Application-Pool-with-C-sharp</slug>
+  <tags />
+  <comments>
+    <comment id="bffc76da-8208-48ca-8c50-a93d917f2319" parentid="00000000-0000-0000-0000-000000000000" approved="True" spam="False" deleted="False">
+      <date>2011-07-28 03:24:22</date>
+      <author>Matt Wrock's Blog</author>
+      <email>trackback</email>
+      <country />
+      <ip>96.31.33.25</ip>
+      <website>http://www.mattwrock.com/post/2011/07/28/Recycling-an-Application-Pool-with-C-(Part-2).aspx</website>
+      <content>Recycling an Application Pool with C# (Part 2)
+
+Recycling an Application Pool with C# (Part 2)</content>
+    </comment>
+    <comment id="633022dc-2eb0-4040-a3fe-af566818929c" parentid="00000000-0000-0000-0000-000000000000" approved="True" spam="False" deleted="False">
+      <date>2011-07-28 03:46:30</date>
+      <author>Matt Wrock's Blog</author>
+      <email>trackback</email>
+      <country />
+      <ip>65.55.57.13</ip>
+      <website>http://blogs.msdn.com/b/mattwrock/archive/2011/07/28/recycling-an-application-pool-with-c-part-2.aspx</website>
+      <content>Recycling an Application Pool with C# (Part 2)
+
+The other day I shared how to use the DirectoryServices namespace to restart an app pool via C# code</content>
+    </comment>
+    <comment id="4264bda7-f475-4505-9746-8b91069eaacb" parentid="00000000-0000-0000-0000-000000000000" approved="True" spam="False" deleted="False">
+      <date>2011-09-28 08:34:42</date>
+      <author>Walter</author>
+      <email>walter.sassano@avon.com</email>
+      <country />
+      <ip>69.119.123.151</ip>
+      <avatar />
+      <content>Thanks for the code. I&amp;#39;m working through some issues that i hoped you could add some insight. 
+
+When I run pool.Invoke(&amp;quot;Recycle&amp;quot;, null); I get a &amp;quot;Class not registered&amp;quot; error (System.Runtime.InteropServices.COMExecption) and have come to a complete dead end on what needs to be registered.  Any thoughts?
+</content>
+    </comment>
+    <comment id="b1345f63-6cfc-41ce-8710-9d6470f00af3" parentid="00000000-0000-0000-0000-000000000000" approved="True" spam="False" deleted="False">
+      <date>2011-10-20 05:20:11</date>
+      <author>Martin Thwaites</author>
+      <email>blogs@my2cents.co.uk</email>
+      <country />
+      <ip>194.70.54.51</ip>
+      <avatar />
+      <content>Thanks for this, I was missing the management features which was causing 0x80005000... installed them and it&amp;#39;s working great now.</content>
+    </comment>
+    <comment id="f2df8e2d-fceb-4415-bc68-420d1b1fef7d" parentid="00000000-0000-0000-0000-000000000000" approved="True" spam="False" deleted="False">
+      <date>2011-11-13 05:58:56</date>
+      <author>Matt Wrock</author>
+      <email>matt@mattwrock.com</email>
+      <country />
+      <ip>50.46.255.50</ip>
+      <moderatedby>mwrock</moderatedby>
+      <avatar />
+      <content>Walter, did you see part 2 of this post? See http://www.mattwrock.com/post/2011/07/28/Recycling-an-Application-Pool-with-C-(Part-2).aspx</content>
+    </comment>
+    <comment id="ef2c1c6b-c3d3-41cc-9f3b-74dcfe30728f" parentid="00000000-0000-0000-0000-000000000000" approved="True" spam="False" deleted="False">
+      <date>2012-02-27 23:29:40</date>
+      <author>Limpard Dwear</author>
+      <email>Sarwar@gmail.com</email>
+      <country />
+      <ip>196.205.231.48</ip>
+      <avatar />
+      <content>I dont know what it is about this blog that turns me off so much, but you just dont seem to get me excited.  I dont know if its the lack of content or just the way you wrote it.  But you really dont seem to understand that your readers may not agree with you.  Youre really just too out there for me.</content>
+    </comment>
+    <comment id="dc0800a4-fdf2-4991-aebc-3b01009a5476" parentid="00000000-0000-0000-0000-000000000000" approved="True" spam="False" deleted="False">
+      <date>2012-02-28 13:56:57</date>
+      <author>Limpard Dwear</author>
+      <email>Bejar@gmail.com</email>
+      <country />
+      <ip>196.205.227.222</ip>
+      <moderatedby>mwrock</moderatedby>
+      <avatar />
+      <content>You...are...my...hero!!!  I cant believe something like this exists on the internet!  Its so true, so honest, and more than that you dont sound like an idiot!  Finally, someone who knows how to talk about a subject without sounding like a kid who didnt get that bike he wanted for Christmas.</content>
+    </comment>
+    <comment id="5465137c-264c-4d05-bc04-ee17b839febd" parentid="00000000-0000-0000-0000-000000000000" approved="True" spam="False" deleted="False">
+      <date>2012-04-24 18:34:35</date>
+      <author>Conrad</author>
+      <email>vest@gmail.com</email>
+      <country />
+      <ip>113.165.171.238</ip>
+      <moderatedby>mwrock</moderatedby>
+      <avatar />
+      <content>Great site. A great deal of practical information and facts listed here. I am going to sending it to 3 buddies ans also revealing in delicious. As well as, thanks for your sweat!</content>
+    </comment>
+    <comment id="7ed37721-aa8a-4563-b498-4d95d3fa1cff" parentid="00000000-0000-0000-0000-000000000000" approved="False" spam="True" deleted="False">
+      <date>2013-07-15 20:48:36</date>
+      <author>Michael Kors Bags</author>
+      <email>raymonmccorkle@gmail.com</email>
+      <country />
+      <ip>184.154.254.172</ip>
+      <moderatedby>App_Code.Extensions.StopForumSpam</moderatedby>
+      <avatar />
+      <content>Re, the smallest version of the original SC bag. Whether it is world wide web. Sign inRachel Dillin Feb 9, 2012, 5:41pm ESTRachel DillinFeb 9, 2012, 5:41pm EST lmao. In the age where more people were beginning to travel on cruise ships and trains and with the renovation of Santa Monica Place; this will be the real money makers though. &amp;#39;Lily has previously modelled for the French brand - best known for its logo bags and luggage, with outsize jewelled clasps appearing as buttons on dresses and jackets.
+
+Here is my weblog ...  Michael Kors Bags - http://06design.com/michaelkors.html </content>
+    </comment>
+  </comments>
+  <categories />
+  <notifications>
+    <email>recycle@brotherstv.com</email>
+    <email>sabaattitute@gmail.com</email>
+  </notifications>
+</post>

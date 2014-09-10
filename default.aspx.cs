@@ -36,24 +36,27 @@ public partial class _default : BlogEngine.Core.Web.Controls.BlogBasePage
 				Redirect();
 			else
 				DisplayDateRange();
+
+            base.AddMetaTag("description", Server.HtmlEncode(BlogSettings.Instance.Description));
 		}
 		else if (Request.QueryString["apml"] != null)
 		{
 			DisplayApmlFiltering();
+
+            base.AddMetaTag("description", Server.HtmlEncode(BlogSettings.Instance.Description));
 		}
 		else
-		{
-            PostList1.ContentBy = ServingContentBy.AllContent;
-			PostList1.Posts = Post.Posts.ConvertAll(new Converter<Post, IPublishable>(delegate(Post p) { return p as IPublishable; }));
+		{			
 			if (!BlogSettings.Instance.UseBlogNameInPageTitles)
 				Page.Title = BlogSettings.Instance.Name + " | ";
 
 			if (!string.IsNullOrEmpty(BlogSettings.Instance.Description))
 				Page.Title += Server.HtmlEncode(BlogSettings.Instance.Description);
+
+            base.AddMetaTag("description", Server.HtmlEncode(BlogSettings.Instance.Description));
 		}
 
 		AddMetaKeywords();
-		base.AddMetaTag("description", Server.HtmlEncode(BlogSettings.Instance.Description));
 		base.AddMetaTag("author", Server.HtmlEncode(BlogSettings.Instance.AuthorName));		
 	}
 
@@ -176,7 +179,6 @@ public partial class _default : BlogEngine.Core.Web.Controls.BlogBasePage
 			{
 				base.AddMetaTag("keywords", metakeywords);
 			} 
-			//base.AddMetaTag("keywords", Server.HtmlEncode(string.Join(",", categories)));
 		}
 	}
 
@@ -186,9 +188,11 @@ public partial class _default : BlogEngine.Core.Web.Controls.BlogBasePage
 		{
 			Guid categoryId = new Guid(Request.QueryString["id"]);
             PostList1.ContentBy = ServingContentBy.Category;
-			PostList1.Posts = Post.GetPostsByCategory(categoryId).ConvertAll(new Converter<Post, IPublishable>(delegate(Post p) { return p as IPublishable; }));
-			Page.Title = Category.GetCategory(categoryId).Title;
-		}
+            Category category = Category.GetCategory(categoryId, Blog.CurrentInstance.IsSiteAggregation);
+			PostList1.Posts = Post.GetPostsByCategory(category).ConvertAll(new Converter<Post, IPublishable>(delegate(Post p) { return p as IPublishable; }));
+            Page.Title = category.Title;
+            base.AddMetaTag("description", string.IsNullOrWhiteSpace(category.Description) ? Server.HtmlEncode(BlogSettings.Instance.Description + ", " + category.Title) : category.Description);
+        }
 	}
 
 	private void DisplayAuthors()
@@ -198,7 +202,8 @@ public partial class _default : BlogEngine.Core.Web.Controls.BlogBasePage
 			string author = Server.UrlDecode(Request.QueryString["name"]);
             PostList1.ContentBy = ServingContentBy.Author;
 			PostList1.Posts = Post.GetPostsByAuthor(author).ConvertAll(new Converter<Post, IPublishable>(delegate(Post p) { return p as IPublishable; }));
-			Title = "All posts by " + Server.HtmlEncode(author);
+			Title = Resources.labels.AllPostsBy +" " + Server.HtmlEncode(author);
+            base.AddMetaTag("description", Server.HtmlEncode(BlogSettings.Instance.Description + ", " + Title));
 		}
 	}
 
@@ -208,8 +213,8 @@ public partial class _default : BlogEngine.Core.Web.Controls.BlogBasePage
 		{
             PostList1.ContentBy = ServingContentBy.Tag;
 			PostList1.Posts = Post.GetPostsByTag(Request.QueryString["tag"].Substring(1)).ConvertAll(new Converter<Post, IPublishable>(delegate(Post p) { return p as IPublishable; }));
-			base.Title = " All posts tagged '" + Request.QueryString["tag"].Substring(1) + "'";
-			//base.AddMetaTag("description", Server.HtmlEncode(BlogSettings.Instance.Description));
+			base.Title = Resources.labels.AllPostsTagged + " '" + Request.QueryString["tag"].Substring(1) + "'";
+            base.AddMetaTag("description", Server.HtmlEncode(BlogSettings.Instance.Description + ", " + base.Title));
 		}
 	}
 

@@ -1,0 +1,67 @@
+﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<post>
+  <author>mwrock</author>
+  <title>Visual Studio Installations: The 15 minutes you will never see again. Don’t do it. Have Chocolatey do it for you.</title>
+  <description />
+  <content>&lt;p&gt;&lt;a href="http://www.mattwrock.com/image.axd?picture=image_25.png"&gt;&lt;img style="background-image: none; float: none; padding-top: 0px; padding-left: 0px; margin-left: auto; display: block; padding-right: 0px; margin-right: auto; border: 0px;" title="image" src="http://www.mattwrock.com/image.axd?picture=image_thumb_25.png" alt="image" width="707" height="218" border="0" /&gt;&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;For the .Net developer, reinstalling Visual Studio is not far from repaving your machine. Its something almost all of us has had to do. No doubt it gets faster in every version. I remember when VS 2003 would take hours and you had to sit there looking at goofy model engineers and read scrolling marketing text. I already bought the damn product. If you are so awesome why am I sitting here completely unproductive?! Thank god those days are gone, but it still takes a lot longer to install than Minecraft.&lt;/p&gt;
+&lt;p&gt;About 18 months ago, I joined a new team where we had to work against new Visual Studio builds and reinstalling Visual Studio was AT LEAST a weekly event. I then hunkered down and looked into how to install Visual Studio unattended. Then I created &lt;a href="http://chocolatey.org/packages/VisualStudio2013Ultimate"&gt;Chocolatey&lt;/a&gt; packages for it.&lt;/p&gt;
+&lt;h2&gt;Chocolatey, here to save you from the tyranny of Next&amp;hellip;Next&amp;hellip;Finish&lt;/h2&gt;
+&lt;p&gt;Look. Just finish. I don&amp;rsquo;t do Next anymore. There is nothing of value at Next.Its simply a passing, transient WPF form standing between where you are now and your ability to deliver something awesome.&lt;/p&gt;
+&lt;p&gt;Chocolatey is a great tool every Windows dev and power user should have. Here is how it works:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;I need a tool, lets say fiddler for inspecting HTTP traffic.&lt;/li&gt;
+&lt;li&gt;I pop open a command prompt and type CINST fiddler&lt;/li&gt;
+&lt;li&gt;I do something else for a minute.&lt;/li&gt;
+&lt;li&gt;I have fiddler installed and ready to run.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;Chocolatey has almost 1500 software packages that follow this same model. Most are dev tools so the chances are that your tool is in the public Chocolatey feed. You are wasting your time going to the web and searching for a GIT download and reading up on how to install it. Just type CINST GIT and be done with it.&lt;/p&gt;
+&lt;h2&gt;Getting Visual Studio with Chocolatey&lt;/h2&gt;
+&lt;p&gt;Since there are different Visual Studio SKUs (Ultimate, Professional, etc.), there re separate Visual Studio Chocolatey Packages for each. I have created packages for most of them covering versions 2012 and 2013. Go to &lt;a href="http://chocolatey.org/packages?q=visual+studio+ide"&gt;Chocolatey.org&lt;/a&gt; and search for &amp;ldquo;visual studio ide&amp;rdquo;. You will see a bunch of them.&lt;/p&gt;
+&lt;p&gt;If you have Chocolatey, simply run:&lt;/p&gt;
+&lt;pre class="csharpcode"&gt;CINST VisualStudio2013ExpressWeb&lt;/pre&gt;
+&lt;p&gt;That&amp;rsquo;s it. Give it 10 to 20 minutes and you have it. Oh you wanted Resharper too? Quit your crying and enter: CINST resharper.&lt;/p&gt;
+&lt;h2&gt;How do I pay for the Non-Express SKUs?&lt;/h2&gt;
+&lt;p&gt;If you work with the professional or ultimate Visual studio SKUs, you likely have the product key. Install Visual Studio via Chocolatey and you will be prompted for your key upon first use. I believe (I could be wrong here) that you have 30 days to enter the key.&lt;/p&gt;
+&lt;h2&gt;How do I specify the Visual Studio features I want installed?&lt;/h2&gt;
+&lt;p&gt;The non-express skus all have at least a half dozen features you can add to the initial download and install. These include some very valuable features like the Web Tooling that brings in CSS and Javascript editing goodness. By default, a Chocolatey flavored Visual Studio install does not install any of these. Most people want either none or just one or two. However, as of today, I have added support for specifying optional features in the Chocolatey install command. It leverages the &amp;ndash;InstallArguments parameter. Here is an example:&lt;/p&gt;
+&lt;pre class="csharpcode"&gt;cinst VisualStudio2013Ultimate -InstallArguments &lt;span class="str"&gt;"WebTools Win8SDK"&lt;/span&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;span class="str"&gt;This installs both the Web tooling features and the Windows 8 Store Apps SDK. Here are all of the available feature names:&lt;/span&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Blend&lt;/li&gt;
+&lt;li&gt;LightSwitch&lt;/li&gt;
+&lt;li&gt;VC_MFC_Libraries&lt;/li&gt;
+&lt;li&gt;OfficeDeveloperTools&lt;/li&gt;
+&lt;li&gt;SQL&lt;/li&gt;
+&lt;li&gt;WebTools&lt;/li&gt;
+&lt;li&gt;Win8SDK&lt;/li&gt;
+&lt;li&gt;SilverLight_Developer_Kit&lt;/li&gt;
+&lt;li&gt;WindowsPhone80&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;I didn&amp;rsquo;t make these names up. They come from the &lt;a href="http://msdn.microsoft.com/en-us/library/ee225237.aspx"&gt;AdminFile&lt;/a&gt; SelectableItemCustomization strings.&lt;/p&gt;
+&lt;h2&gt;Uninstalling and Reinstalling&lt;/h2&gt;
+&lt;p&gt;Sometimes we want to start over from scratch and with Visual Studio, the uninstall is not much faster than the install. So that is nice to script as well and Chocolatey has you covered here. The Visual Studio 2013 packages come with uninstallers. So if you wanted to say uninstall and then reinstall in one script, it would look like this:&lt;/p&gt;
+&lt;pre class="csharpcode"&gt;CUNINST VisualStudio2013Ultimate
+CINST VisualStudio2013Ultimate&lt;/pre&gt;
+&lt;p&gt;The uninstaller looks through your installed MSI packages for the correct uninstaller and invokes it with instructions to run passively.&lt;/p&gt;
+&lt;h2&gt;Visual Studio loves Rebooting&lt;/h2&gt;
+&lt;p&gt;Here again, things are much better than they were years ago. One can typically install an Express or optionless install of Visual Studio never needing to reboot. However, once you start adding features, in addition to perhaps installing the .Net framework, SQL Server and on and on, a reboot (or a couple) becomes nearly inevitable.&lt;/p&gt;
+&lt;p&gt;In these cases check out &lt;a href="http://boxstarter.org/"&gt;Boxstarter&lt;/a&gt;. That&amp;rsquo;s my little project and I&amp;rsquo;m proud to say both it and Chocolatey were given a mention in &lt;a href="http://www.hanselman.com/blog/ScottHanselmans2014UltimateDeveloperAndPowerUsersToolListForWindows.aspx"&gt;Scott Hanselman's 2014 Ultimate Developer and Power Users Tool List for Windows&lt;/a&gt;. Boxstarter provides an environment for invoking Chocolatey packages that is reboot resilient. It also allows you to run them on remote machines and Hyper-V VMs. Have a couple VMs that need Visual Studio? Run:&lt;/p&gt;
+&lt;pre class="csharpcode"&gt;$c=Get-Credential administrator
+&lt;span class="str"&gt;"VM1"&lt;/span&gt;,&lt;span class="str"&gt;"VM2"&lt;/span&gt; | 
+Enable-BoxstarterVM -Credential $c -Checkpoint BareOS |
+Install-BoxstarterPackage -PackageName VisualStudio2013Ultimate &amp;ndash;Force&lt;/pre&gt;
+&lt;p&gt;This will run the VisualStudio installer on Hyper-V VMs named VM1 and VM2. If there are pending reboots before the install, Boxstarter will reboot the VM. If you need to install multiple packages (maybe SqlServer and the IIS Windows Feature), Boxstarter will check for pending reboots before each package. There is lots of information on running Boxstarter at &lt;a href="http://boxstarter.org/"&gt;Boxstarter.org&lt;/a&gt;.&lt;/p&gt;</content>
+  <ispublished>True</ispublished>
+  <isdeleted>False</isdeleted>
+  <iscommentsenabled>True</iscommentsenabled>
+  <pubDate>2013-12-30 03:36:00</pubDate>
+  <lastModified>2014-01-02 10:40:09</lastModified>
+  <raters>0</raters>
+  <rating>0</rating>
+  <slug>Visual-Studio-Installations-The-15-minutes-you-will-never-see-again-Dont-do-it-Have-Chocolatey-do-it-for-you</slug>
+  <tags />
+  <comments />
+  <categories />
+  <notifications />
+</post>

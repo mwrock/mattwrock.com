@@ -1,0 +1,19 @@
+﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<post>
+  <author>mwrock</author>
+  <title>Memory Footprint Comparison of .net IDEs</title>
+  <description />
+  <content>&lt;p&gt;I got a Amazon gift&amp;#160; certificate a couple weeks ago as a birthday present and decided to get a &lt;a href="http://www.amazon.com/gp/product/B004SUO0SQ" target="_blank"&gt;Asus Netbook&lt;/a&gt; (Thanks Mom and Dad!!) So far I really like it. It has 2GB of ram, and a Duo Core Atom Processor. Its very lite and small enough to lug around comfortably but not so small that it is unusable. I also figured out that I can tether with my Samsung Focus phone which is very cool when I don’t have WiFi.&lt;/p&gt;  &lt;p&gt;While I do not intend for this device to become my primary at home coding station, I at least want to be capable of doing light coding on it at the times and places of my choosing. (US Military leaders seem to like that phrase and I admit that I am rather attracted to the feeling of free will, self determination and “screw you its all about me” ethos that the phrase exudes).&amp;#160; Oh yeah, I was talking about my new netbook.&lt;/p&gt;  &lt;p&gt;So I installed both &lt;a href="http://www.icsharpcode.net/OpenSource/SD/Default.aspx" target="_blank"&gt;SharpDevelop&lt;/a&gt; and &lt;a href="http://monodevelop.com/" target="_blank"&gt;MonoDevelop&lt;/a&gt; because both appeared to be strong light weight contenders against VS but still seemed to be full fledged IDEs and not just a snippet or one off file compiler. I have not done any significant coding yet on either beyond loading my &lt;a href="http://www.RequestReduce.com/" target="_blank"&gt;OSS project&lt;/a&gt; that I have been working on and successfully building it.&lt;/p&gt;  &lt;p&gt;What is interesting is the Ram footprint of each IDE:&lt;/p&gt;  &lt;ul&gt;   &lt;li&gt;Visual Studio Ultimate on my laptop with Resharper: &amp;gt;300M&lt;/li&gt;    &lt;li&gt;SharpDevelop: ~90M&lt;/li&gt;    &lt;li&gt;MonoDevelop: ~30M&lt;/li&gt; &lt;/ul&gt;  &lt;p&gt;I would really like to port my project to an Apache Module one day so unless there is a compelling reason to switch, I’m sticking with MonoDevelop for now.&lt;/p&gt;</content>
+  <ispublished>True</ispublished>
+  <isdeleted>False</isdeleted>
+  <iscommentsenabled>True</iscommentsenabled>
+  <pubDate>2011-07-29 05:15:22</pubDate>
+  <lastModified>2013-03-27 22:08:15</lastModified>
+  <raters>0</raters>
+  <rating>0</rating>
+  <slug>Memory-Footprint-Comparison-of-net-IDEs</slug>
+  <tags />
+  <comments />
+  <categories />
+  <notifications />
+</post>

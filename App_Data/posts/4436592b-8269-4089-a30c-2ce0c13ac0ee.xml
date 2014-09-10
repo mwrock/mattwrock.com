@@ -1,0 +1,164 @@
+﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<post>
+  <author>mwrock</author>
+  <title>Installing an HttpModule via Dropping in the bin without Editing Web.config</title>
+  <description />
+  <content>&lt;p&gt;Last week another team wanted to use an HttpModule I had written. The problem is that they had no access to the hosting platform of their content. Their DLLs are consumed via MEF by a rather large infrastructure affectionately known as MTPS or what the world knows as the MSDN Library.&lt;/p&gt;  &lt;p&gt;Unfortunately, the functionality provided by this DLL requires that it be run as an HttpModule. So I remembered reading a &lt;a href="http://blog.davidebbo.com/2011/02/register-your-http-modules-at-runtime.html"&gt;post of David Ebbo&lt;/a&gt; that described how to load an HttpModule dynamically at run time.The topic suddenly seemed relevant to this issue so I revisited his blog and applied his instructions to my assembly and wow…sure enough, just drop my dll in the bin and BAM! it loads and runs. If you would like to see a very small example app that does this please see &lt;a href="http://code.msdn.microsoft.com/Installing-an-HttpModule-27d7c6e1"&gt;my code sample on the MSDN Samples Gallery&lt;/a&gt;. &lt;/p&gt;  &lt;p&gt;Technically, to accomplish this the code involved couldn’t be more trivial. Here is a quick walk through.&lt;/p&gt;  &lt;h3&gt;Specify a PreApplicationStartMethod&lt;/h3&gt;  &lt;p&gt;In the Assembly.info of the assembly containing the HttpModule, the below attribute must be included:&lt;/p&gt;  &lt;div id="codeSnippetWrapper"&gt;   &lt;pre style="border-bottom-style: none; text-align: left; padding-bottom: 0px; line-height: 12pt; background-color: #f4f4f4; margin: 0em; border-left-style: none; padding-left: 0px; width: 100%; padding-right: 0px; font-family: &amp;#39;Courier New&amp;#39;, courier, monospace; direction: ltr; border-top-style: none; color: black; border-right-style: none; font-size: 8pt; overflow: visible; padding-top: 0px" id="codeSnippet"&gt;[assembly: PreApplicationStartMethod(&lt;span style="color: #0000ff"&gt;typeof&lt;/span&gt;(Loader), &lt;span style="color: #006080"&gt;&amp;quot;LoadModule&amp;quot;&lt;/span&gt;)]&lt;/pre&gt;
+
+  &lt;br /&gt;&lt;/div&gt;
+
+&lt;p&gt;This line points to a Method inside the assembly which should be envoked during Pre Application Startup. This event occurs even before the Application Start event in the ASP.NET lifecycle. The official MSDN Library reference for this attribute can be found &lt;a href="http://msdn.microsoft.com/en-us/library/system.web.preapplicationstartmethodattribute.aspx"&gt;here&lt;/a&gt;. Of course this is assuming that there is a class either inside the assembly or referencable to the assembly of type Loader and that it contains a method called &amp;quot;LoadModule.&amp;quot;&lt;/p&gt;
+
+&lt;h3&gt;Dynamically Register the Module&lt;/h3&gt;
+
+&lt;p&gt;Inside the LoadModule method, you will use the Microsoft.Web.Infrastructure assembly to actually register the module. The Microsoft.Web.Infrastructure assembly is not included in the .net BCL but you can easily download and install via &lt;a href="http://nuget.org/List/Packages/Microsoft.Web.Infrastructure"&gt;Nuget&lt;/a&gt;. Here is a look at the entire Loader class:&lt;/p&gt;
+
+&lt;div&gt;
+  &lt;pre style="border-bottom-style: none; text-align: left; padding-bottom: 0px; line-height: 12pt; background-color: #f4f4f4; margin: 0em; border-left-style: none; padding-left: 0px; width: 100%; padding-right: 0px; font-family: &amp;#39;Courier New&amp;#39;, courier, monospace; direction: ltr; border-top-style: none; color: black; border-right-style: none; font-size: 8pt; overflow: visible; padding-top: 0px" id="codeSnippet"&gt;&lt;span style="color: #0000ff"&gt;using&lt;/span&gt; Microsoft.Web.Infrastructure.DynamicModuleHelper; &lt;br /&gt; &lt;br /&gt;&lt;span style="color: #0000ff"&gt;namespace&lt;/span&gt; HttpModule &lt;br /&gt;{ &lt;br /&gt;    &lt;span style="color: #0000ff"&gt;public&lt;/span&gt; &lt;span style="color: #0000ff"&gt;class&lt;/span&gt; Loader &lt;br /&gt;    { &lt;br /&gt;        &lt;span style="color: #0000ff"&gt;public&lt;/span&gt; &lt;span style="color: #0000ff"&gt;static&lt;/span&gt; &lt;span style="color: #0000ff"&gt;void&lt;/span&gt; LoadModule() &lt;br /&gt;        { &lt;br /&gt;            DynamicModuleUtility.RegisterModule(&lt;span style="color: #0000ff"&gt;typeof&lt;/span&gt; (DynamicModule)); &lt;br /&gt;        } &lt;br /&gt;    } &lt;br /&gt;} &lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;div&gt;As you can see there is not a whole lot to this. Just one line simply tells the run time the type name of the HttpModule to be registered. Here the HttpModule is inside a class called DynamicModule. The type that you pass to RegisterModule must derrive from IHttpModule.&lt;/div&gt;
+
+&lt;div&gt;
+  &lt;br /&gt;
+
+  &lt;h2&gt;Is this a good practice?&lt;/h2&gt;
+
+  &lt;p&gt;At first glance this seems really cool. It removes one setup step that consumers of the HttpModule would normally have to go through to install a third party module. It appears that this would provide a more friction free installation story for any third party module. What can be bad about that?&lt;/p&gt;
+
+  &lt;p&gt;Well maybe I'm over thinking this but my first concern here is discoverability. What if the module has heavy hitting impact on the markup of the page. I envision a new developer or team inheriting such an application and wonder just how long it will take for them to find where this &amp;quot;alteration&amp;quot; is coming from especially in a sophisticated application with perhaps 20 referenced DLLs and lots of internal code. Or perhaps a team member drops in such a module and forgets to tell the team she put it there. I'm thinking that at some point in this story some negative energy will be exerted. Perhaps even a tear shed?&lt;/p&gt;
+
+  &lt;p&gt;As an author myself of an open source HttpModule that can transform the markup of a site, this is of particular interest to me. My &lt;a href="http://www.requestreduce.com/"&gt;RequestReduce&lt;/a&gt; project is a module that combines and minifies CSS and Javascript and sprites and optimizes CSS background images on the fly. Since the default behavior of the module simply requires the module to be registered in the user's web.confg, if I were to employ the technique used in this sample, the module installation would have a truly plug and play installation story which sounds very awesome and I am tempted to add it. But I worry.&lt;/p&gt;
+
+  &lt;p&gt;I'd be interested in others feedback in this matter. Do you think it is a good idea in general practice? Do you think the perhaps limited discoverability poses a true risk? In the end, do you think consumers would be more or less attracted to such an installation story?&lt;/p&gt;
+&lt;/div&gt;</content>
+  <ispublished>True</ispublished>
+  <isdeleted>False</isdeleted>
+  <iscommentsenabled>True</iscommentsenabled>
+  <pubDate>2011-11-12 20:40:39</pubDate>
+  <lastModified>2011-11-14 09:06:58</lastModified>
+  <raters>0</raters>
+  <rating>0</rating>
+  <slug>Installing-an-HttpModule-via-Dropping-in-the-bin-without-Editing-Webconfig</slug>
+  <tags />
+  <comments>
+    <comment id="f2948e12-8cf2-4304-a506-266a8835e7cf" parentid="00000000-0000-0000-0000-000000000000" approved="True" spam="False" deleted="False">
+      <date>2011-11-12 20:56:20</date>
+      <author>DotNetKicks.com</author>
+      <email>trackback</email>
+      <country />
+      <ip>74.86.105.210</ip>
+      <website>http://www.dotnetkicks.com/aspnet/Installing_an_HttpModule_via_Dropping_in_the_bin_No_Web_config</website>
+      <content>Installing an HttpModule via Dropping in the bin. No Web.config
+
+You've been kicked (a good thing) - Trackback from DotNetKicks.com</content>
+    </comment>
+    <comment id="fe798a70-4ee8-4886-854b-fa96d595e1d3" parentid="00000000-0000-0000-0000-000000000000" approved="True" spam="False" deleted="False">
+      <date>2011-11-12 21:15:12</date>
+      <author>Jeff Putz</author>
+      <email>jeff@popw.com</email>
+      <country />
+      <ip>184.56.147.10</ip>
+      <moderatedby>mwrock</moderatedby>
+      <avatar />
+      <content>Wow, just seeing &amp;quot;MTPS&amp;quot; makes me cringe, even knowing I never have to think about it ever again!
+
+Regarding your concerns, think about it this way. The alternative is to have to explicitly declare the module in config. What you&amp;#39;re suggesting is that it lives in its own assembly, and automagically registers itself. It stands to reason that if you don&amp;#39;t want to use it, you won&amp;#39;t have the assembly in your bin. In the times of NuGet, who doesn&amp;#39;t know what&amp;#39;s in their bin? I think it&amp;#39;s a great approach.</content>
+    </comment>
+    <comment id="fdf65134-1fb6-4a9f-9f2e-46b2c4e4bad5" parentid="00000000-0000-0000-0000-000000000000" approved="True" spam="False" deleted="False">
+      <date>2011-11-13 04:21:01</date>
+      <author>rey rahadian</author>
+      <email>rahadian.rey@gmail.com</email>
+      <country />
+      <ip>114.79.62.210</ip>
+      <moderatedby>mwrock</moderatedby>
+      <avatar />
+      <content>in my opinion it has more positive impact than negative. As you point out it becames fairly easy to add in new modules without editing the web.config. What you fear about the problem in maintenance can be avoided by providing some kind of agreement or common understanding of how the dynamic module should be added, for eq: use special prefix for the module, or something a long that line</content>
+    </comment>
+    <comment id="e8d37025-ed25-4fb1-84ff-d0e8dd23f7b0" parentid="00000000-0000-0000-0000-000000000000" approved="True" spam="False" deleted="False">
+      <date>2011-11-13 13:20:04</date>
+      <author>Paul Vaillant</author>
+      <email>paul.vaillant@gmail.com</email>
+      <country />
+      <ip>70.28.245.23</ip>
+      <avatar />
+      <content>I think it&amp;#39;s a great idea and while it&amp;#39;s true that in a very large project it could get lost in the shuffle, what if the code &amp;quot;announces&amp;quot; that it has autoregistered itself via an entry in the event log?</content>
+    </comment>
+    <comment id="088b3abf-15a2-406b-ab8d-5fe226ef3f15" parentid="00000000-0000-0000-0000-000000000000" approved="True" spam="False" deleted="False">
+      <date>2011-11-13 17:22:40</date>
+      <author>Lars Outzen</author>
+      <email>larsoutzen@gmail.com</email>
+      <country />
+      <ip>2.105.93.10</ip>
+      <avatar />
+      <content>Do proceed to also reduce our config work.
+
+Trust you or anyone else will NOT piggy-bag this fictive feature; AutoReg-ed HttpModule that ships validated authentication requests. Guess that could be &amp;#39;the&amp;#39; reason to remove the PreApplicationStartMethod. Maybe a mandatory warning-level system-EventLog-entry is enough pr invoke.
+
+BTW RequestReduce will be somewhat obsoleted by msdn.microsoft.com/library/system.web.optimization.bundlecollection.enabledefaultbundles.aspx except for the sprits: https://github.com/mwrock/RequestReduce/issues/54
+
+To continue MS-momentum try to promote a RequestReduce-rule in Forefront. Do open-source for Fiddler2/other (reverse-)proxies. 
+
+Anyway it is probably also possible to do a dynamic check of browser-rendering with/out reduce and then compare =&amp;gt; in/valid reduction or not. InProxy+AutoTests =&amp;gt; Easy to test your changes against world-wide-sites, that use more and more cross-site-JS, and e.g. auto-optimize buttom/top-page-loads like http://code.google.com/speed/page-speed/docs/rtt.html#PutStylesBeforeScripts
+
+Nice that you have open-sourced your unique skills - sorry that you are doing it in your &amp;quot;free&amp;quot; time.</content>
+    </comment>
+    <comment id="90cebe3a-e077-4b0e-9009-79e6f1420bc1" parentid="00000000-0000-0000-0000-000000000000" approved="True" spam="False" deleted="False">
+      <date>2011-11-13 23:48:12</date>
+      <author>Matt Wrock</author>
+      <email>matt@mattwrock.com</email>
+      <country />
+      <ip>50.46.255.50</ip>
+      <avatar />
+      <content>Paul,
+
+Yes. I had considered something like this too. Perhaps logging a html comment in the head stating something like &amp;quot;Image Spriting and CSS and Javascript Merging and Minification provided by RequestReduce. It might seem a bit overly self promoting but I&amp;#39;d provide an optional config setting to turn it off. If someone does turn it off, simply having that config in the web.config may be discoverable enough.</content>
+    </comment>
+    <comment id="bd8b9541-57d6-4e50-813f-840e2fad72f3" parentid="00000000-0000-0000-0000-000000000000" approved="True" spam="False" deleted="False">
+      <date>2011-11-14 00:06:58</date>
+      <author>Matt Wrock</author>
+      <email>matt@mattwrock.com</email>
+      <country />
+      <ip>50.46.255.50</ip>
+      <moderatedby>mwrock</moderatedby>
+      <avatar />
+      <content>Hi Lars,
+
+I&amp;#39;m not sure RequestReduce will be made obsolete by the new bundling feature in .net 4.5. While the functionality of merging and minification provided by both is clearly similar they are implemented differently in that RequestReuce performs the reductions at runtime via a response filter allowing it to:
+ - Include css and javascript hosted outside of your domain
+ - take control of serving the reduced content with optimized caching headers
+ - Can include dynamically generated scripts and css like WebResource.axd and ScriptResource.axd
+ - Requires no config or code to find and reduce static resources. RequetReduce knows how to find everything. You only need to use the RequetReduce api if you want certain content to be excluded.
+ - Will support the ability to load css and javascript asynchronously via a loader and support browser specific optimization APIs depending  on the user&amp;#39;s user agent.
+
+I don&amp;#39;t believe the .net bundler will do any of that. I think the new bundler is great and will provide some good functionality to alot of sites but if you have alot of dynamically included js/css or want to leverage some cutting edge perf techniques, RequestReduce provides some nice features.</content>
+    </comment>
+    <comment id="81a678af-d92d-4a3a-b8bb-fb75e366be5e" parentid="00000000-0000-0000-0000-000000000000" approved="True" spam="False" deleted="False">
+      <date>2013-01-03 09:40:02</date>
+      <author>siteduct.com</author>
+      <email>pingback</email>
+      <country />
+      <ip>199.188.200.60</ip>
+      <website>http://www.siteduct.com/blogs.php?pg=256245</website>
+      <content>Pingback from siteduct.com
+
+ASP.Net Script Installation Service</content>
+    </comment>
+    <comment id="547f51d1-c182-4811-808d-451609d04912" parentid="00000000-0000-0000-0000-000000000000" approved="True" spam="False" deleted="False">
+      <date>2013-07-28 03:02:10</date>
+      <author>followliker.com</author>
+      <email>pingback</email>
+      <country />
+      <ip>199.188.205.29</ip>
+      <website>http://followliker.com/blog/blogs.php?pg=197666</website>
+      <content>Pingback from followliker.com
+
+twitter automation tool</content>
+    </comment>
+  </comments>
+  <categories />
+  <notifications>
+    <email>paul.vaillant@gmail.com</email>
+    <email>sabaattitute@gmail.com</email>
+  </notifications>
+</post>

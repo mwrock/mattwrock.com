@@ -11,8 +11,7 @@
 
   <asp:placeholder runat="server" id="phPostNavigation" visible="false">
     <div id="postnavigation">
-      <asp:hyperlink runat="server" id="hlPrev" /> | 
-      <asp:hyperlink runat="server" id="hlNext" />
+      <asp:hyperlink runat="server" id="hlNext" CssClass="nav-next" /> | <asp:hyperlink runat="server" id="hlPrev" CssClass="nav-prev" />
     </div>
   </asp:placeholder>
   

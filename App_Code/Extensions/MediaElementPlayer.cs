@@ -158,19 +158,12 @@ public class MediaElementPlayer
 
     private static void AddJavaScript(string src, Page page)
     {
-        HtmlGenericControl script = new HtmlGenericControl("script");
-        script.Attributes["type"] = "text/javascript";
-        script.Attributes["src"] = src;
-        page.Header.Controls.Add(script);
+        BlogEngine.Core.Web.Scripting.Helpers.AddScript(page, src, false, true, true);
     }
 
     private static void AddStylesheet(string href, Page page)
     {
-        HtmlLink css = new HtmlLink();
-        css.Attributes["type"] = "text/css";
-        css.Attributes["rel"] = "stylesheet";
-        css.Attributes["href"] = href;
-        page.Header.Controls.Add(css);
+        BlogEngine.Core.Web.Scripting.Helpers.AddStyle(page, href);
     }
 
     private static void AddFooter(Page page)
@@ -307,7 +300,5 @@ jQuery(document).ready(function($) {
 				return defaultValue;
 		}
 	}
-	
-	
 	
 }

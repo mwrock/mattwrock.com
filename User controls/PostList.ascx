@@ -2,8 +2,8 @@
 <div runat="server" id="posts" class="posts" />
 
 <div id="postPaging" style="display: none">
-  <a runat="server" ID="hlPrev" style="float:left">&lt;&lt; <%=Resources.labels.previousPosts %></a>
-  <a runat="server" ID="hlNext" style="float:right"><%=Resources.labels.nextPosts %> &gt;&gt;</a>
+  <a runat="server" id="hlPrev" style="float:left">&lt;&lt; <%=Resources.labels.previousPosts %></a>
+  <a runat="server" id="hlNext" style="float:right"><%=Resources.labels.nextPosts %> &gt;&gt;</a>
 </div>
 
 <div style="clear:both; display:block">

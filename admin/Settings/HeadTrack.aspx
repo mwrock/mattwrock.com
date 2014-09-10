@@ -35,6 +35,9 @@
 			<menu:TabMenu ID="TabMenu" runat="server" />
 		</div>
 		<div class="content-box-left">
+            <div class="rightligned-top action_buttons">
+                <input type="submit" class="btn primary" value="<%=Resources.labels.saveSettings %>" onclick="return SaveSettings();" />
+            </div>
             <h1><%=Resources.labels.settings %></h1>
 
                 <ul class="fl leftaligned">
@@ -50,9 +53,7 @@
                     </li>
                 </ul>
 
-             <div class="action_buttons">
-                <input type="submit" class="btn primary" value="<%=Resources.labels.saveSettings %>" onclick="return SaveSettings();" />
-            </div>
+             
         </div>
     </div>
 </asp:Content>

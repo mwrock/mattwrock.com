@@ -1,7 +1,31 @@
-﻿@using BlogEngine.Core
+﻿@using System.Collections
+@using System.Web.Hosting
+@using BlogEngine.Core
 @using BlogEngine.Core.Json
 @using BlogEngine.Core.Packaging
 @using System.Collections.Specialized
+
+@helper GetLog(){
+    string fileLocation = HostingEnvironment.MapPath(Path.Combine(BlogConfig.StorageLocation, "logger.txt"));
+    
+    if (File.Exists(fileLocation))
+    {
+        using (var sw = new StreamReader(fileLocation))
+        {
+            string line;
+            while ((line = sw.ReadLine()) != null)
+            {
+                @line
+                <br/>
+            }
+            sw.Close();
+        }
+    }
+    else
+    {
+        <em>No errors yet, nice @Security.CurrentUser.Identity.Name!</em>
+    }
+}
 
 @helper GetStats() {
     var DraftPosts = (from pst in Post.Posts where pst.IsPublished == false select pst);
@@ -126,7 +150,7 @@
 }
 
 @helper GetLatestPackages(){
-    var packages = JsonPackages.GetPage("all", 1, PackageManager.OrderType.Newest);
+    var packages = PackageRepository.FromGallery("all", 0, Gallery.OrderType.Newest);
     
     if(packages != null && packages.Count() > 0){
     <ul>
@@ -138,14 +162,16 @@
                             
                     @if(!string.IsNullOrEmpty(p.PackageUrl)){
                         <a href="@p.PackageUrl" target="_new">
-                        <h4>@p.Title <span> - @Resources.labels.version: @p.Version</span></h4> 
+                        <h4>@p.Title <span> - @Resources.labels.version: @p.OnlineVersion</span></h4> 
                         </a>
                     }
                     else
                     {
-                        <h4>@p.Title <span> - @Resources.labels.version: @p.Version</span></h4> 
+                        <h4>@p.Title <span> - @Resources.labels.version: @p.OnlineVersion</span></h4> 
                     }
-                    <p>@if(p.Description.Length > 140){@string.Format("{0}...",p.Description.Substring(0, 140))}else{@p.Description}</p>
+                    <p>@if (p.Description.Length > 140) { string.Format("{0}...", p.Description.Substring(0, 140)); }
+                       else
+                       {@p.Description}</p>
                 </div>
             </div>
         </li>

@@ -90,7 +90,7 @@ namespace Widgets.MostComments
         /// </summary>
         static Widget()
         {
-            Post.CommentAdded += (sender, args) => Blog.CurrentInstance.Cache.Remove("most_comments");
+            Post.CommentAdded += ClearCache;
         }
 
         #endregion
@@ -134,12 +134,13 @@ namespace Widgets.MostComments
         {
             this.LoadSettings();
 
-            if (Blog.CurrentInstance.Cache["most_comments"] == null)
-            {
-                this.BuildList();
-            }
+            var visitors = Blog.CurrentInstance.Cache["most_comments"] as List<Visitor>;
 
-            var visitors = (List<Visitor>)Blog.CurrentInstance.Cache["most_comments"];
+            if (visitors == null)
+            {
+                visitors = BuildList();
+                Blog.CurrentInstance.Cache.Insert("most_comments", visitors);
+            }
 
             this.rep.ItemDataBound += this.RepItemDataBound;
             this.rep.DataSource = visitors;
@@ -149,6 +150,17 @@ namespace Widgets.MostComments
         #endregion
 
         #region Methods
+
+        private static void ClearCache(object sender, EventArgs e)
+        {
+            Blog.CurrentInstance.Cache.Remove("most_comments");
+
+            Blog siteAggregationBlog = Blog.SiteAggregationBlog;
+            if (siteAggregationBlog != null)
+            {
+                siteAggregationBlog.Cache.Remove("most_comments");
+            }
+        }
 
         /// <summary>
         /// Finds the visitor.
@@ -164,7 +176,7 @@ namespace Widgets.MostComments
         /// </returns>
         private static Visitor FindVisitor(string email, int comments)
         {
-            foreach (var visitor in from post in Post.Posts
+            foreach (var visitor in from post in Post.ApplicablePosts
                                     from comment in post.ApprovedComments
                                     where comment.Email == email
                                     select
@@ -204,10 +216,10 @@ namespace Widgets.MostComments
         /// <summary>
         /// Builds the list.
         /// </summary>
-        private void BuildList()
+        private List<Visitor> BuildList()
         {
             var visitors = new Dictionary<string, int>();
-            foreach (var comment in from post in Post.Posts
+            foreach (var comment in from post in Post.ApplicablePosts
                                     from comment in post.ApprovedComments
                                     where
                                         (comment.DateCreated.AddDays(this.days) >= DateTime.Now &&
@@ -243,7 +255,7 @@ namespace Widgets.MostComments
                 }
             }
 
-            Blog.CurrentInstance.Cache.Insert("most_comments", list);
+            return list;
         }
 
         /// <summary>
@@ -323,7 +335,7 @@ namespace Widgets.MostComments
 
             if (!string.IsNullOrEmpty(visitor.Country))
             {
-                imgCountry.ImageUrl = string.Format("{0}pics/flags/{1}.png", Utils.RelativeWebRoot, visitor.Country);
+                imgCountry.ImageUrl = string.Format("{0}pics/flags/{1}.png", Utils.RelativeOrAbsoluteWebRoot, visitor.Country);
                 imgCountry.AlternateText = visitor.Country;
 
                 foreach (var ri in

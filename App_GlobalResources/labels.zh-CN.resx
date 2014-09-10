@@ -406,13 +406,12 @@
     <comment>Go to front page</comment>
   </data>
   <data name="handleWwwSubdomain" xml:space="preserve">
-    <value>万维网子域名策略</value>
+    <value>WWW 域名策略</value>
     <comment>www subdomain policy</comment>
   </data>
   <data name="home" xml:space="preserve">
     <value>首页</value>
-    <comment>As used for linking to the front-page</comment>
-    <comment>Home</comment>
+    <comment>Home（As used for linking to the front-page）</comment>
   </data>
   <data name="htmlHeadSection" xml:space="preserve">
     <value>HTML头区域</value>
@@ -675,10 +674,12 @@
     <comment>If the country chooser isn't shown, no flag can be shown on each comment.</comment>
   </data>
   <data name="showEnableWebsiteInComments" xml:space="preserve">
-    <value>Need Translation:Enable Website in Comments</value>
+    <value>在评论中启用网站</value>
+    <comment>Enable Website in Comments</comment>
   </data>
   <data name="showEnableWebsiteInCommentsDescription" xml:space="preserve">
-    <value>Need Translation:Choose whether to allow Website to be published in Comments</value>
+    <value>是否允许评论中显示网站</value>
+    <comment>Choose whether to allow Website to be published in Comments</comment>
   </data>
   <data name="showDescriptionInPostList" xml:space="preserve">
     <value>仅仅显示文章摘要</value>
@@ -737,7 +738,7 @@
     <comment>Add date to post links</comment>
   </data>
   <data name="timezone" xml:space="preserve">
-    <value>保存时区</value>
+    <value>服务器时区</value>
     <comment>Server time offset</comment>
   </data>
   <data name="title" xml:space="preserve">
@@ -1097,7 +1098,7 @@
     <comment>Block on delete</comment>
   </data>
   <data name="commentsPerPage" xml:space="preserve">
-    <value>条评论每页</value>
+    <value>每页评论数</value>
     <comment>Comments per page</comment>
   </data>
   <data name="commentsUnmodApproved" xml:space="preserve">
@@ -1309,7 +1310,7 @@
     <comment>Create User</comment>
   </data>
   <data name="deleteConfirm" xml:space="preserve">
-    <value>您确定要删除这条的评论吗?</value>
+    <value>您确定要删除这条评论吗?</value>
     <comment>Are you sure you want to delete this comment?</comment>
   </data>
   <data name="developmentMode" xml:space="preserve">
@@ -1586,15 +1587,11 @@
   </data>
   <data name="Referrers_BindTable_Total" xml:space="preserve">
     <value>总计</value>
-    <comment>
-			Footer row text of first cell
-		</comment>
+    <comment>Footer row text of first cell</comment>
   </data>
   <data name="Configuration_OnInit_Please_specify_a_number" xml:space="preserve">
     <value>请输入一个数</value>
-    <comment>
-			valDescChar Error Message
-		</comment>
+    <comment>valDescChar Error Message</comment>
   </data>
   <data name="Configuration_BtnTestSmtpClick_Test_successfull" xml:space="preserve">
     <value>测试成功</value>
@@ -1637,7 +1634,7 @@
     <comment>Enable Recaptcha</comment>
   </data>
   <data name="recaptchaConfigureReminder" xml:space="preserve">
-    <value>请确保 Recaptcha 插件已呗启用并配置完整.</value>
+    <value>请确保 Recaptcha 插件已被启用并配置完整.</value>
     <comment>Make sure the Recaptcha extension is enabled and properly configured.</comment>
   </data>
   <data name="whitelistIpOnCommentApproval" xml:space="preserve">
@@ -1651,5 +1648,685 @@
   <data name="dashboard" xml:space="preserve">
     <value>控制台</value>
     <comment>Dashboard</comment>
+  </data>
+  <data name="groupByYear" xml:space="preserve">
+    <value>按年显示</value>
+    <comment>Group by year</comment>
+  </data>
+  <data name="recentDatesAtTop" xml:space="preserve">
+    <value>最近的日期在最上面</value>
+    <comment>Recent dates at top</comment>
+  </data>
+  <data name="confirmPasswordIsRequired" xml:space="preserve">
+    <value>请填写密码确认</value>
+    <comment>Confirm password is required</comment>
+  </data>
+  <data name="emailIsInvalid" xml:space="preserve">
+    <value>Email 无效</value>
+    <comment>Email is invalid</comment>
+  </data>
+  <data name="emailIsRequired" xml:space="preserve">
+    <value>请填写 Email</value>
+    <comment>Email is required</comment>
+  </data>
+  <data name="minPassLengthInChars" xml:space="preserve">
+    <value>密码至少要包含 {0} 个字符</value>
+    <comment>Minimum password length is {0} characters</comment>
+  </data>
+  <data name="newAndConfirmPasswordMismatch" xml:space="preserve">
+    <value>新密码与密码确认不一致</value>
+    <comment>New and confirm passwords do not match</comment>
+  </data>
+  <data name="newPasswordIsRequired" xml:space="preserve">
+    <value>请填写新密码</value>
+    <comment>New password is required</comment>
+  </data>
+  <data name="oldPasswordIsRequired" xml:space="preserve">
+    <value>请填写原密码</value>
+    <comment>Old password is required</comment>
+  </data>
+  <data name="passwordAndConfirmPasswordMismatch" xml:space="preserve">
+    <value>密码与密码确认不一致</value>
+    <comment>Password and confirm password do not match</comment>
+  </data>
+  <data name="passwordIsRequried" xml:space="preserve">
+    <value>请填写密码</value>
+    <comment>Password is required</comment>
+  </data>
+  <data name="passwordAndConfirmPasswordIsMatch" xml:space="preserve">
+    <value>新密码与密码确认不一致</value>
+    <comment>New and confirm passwords do not match</comment>
+  </data>
+  <data name="userNameIsRequired" xml:space="preserve">
+    <value>请填写用户名</value>
+    <comment>User name is required</comment>
+  </data>
+  <data name="tracking" xml:space="preserve">
+    <value>追踪</value>
+    <comment>Tracking</comment>
+  </data>
+  <data name="welcome" xml:space="preserve">
+    <value>欢迎</value>
+    <comment>Welcome</comment>
+  </data>
+  <data name="addNewPage" xml:space="preserve">
+    <value>添加页面</value>
+    <comment>Add new page</comment>
+  </data>
+  <data name="admin" xml:space="preserve">
+    <value>管理面板</value>
+    <comment>Admin</comment>
+  </data>
+  <data name="draftPages" xml:space="preserve">
+    <value>页面稿件</value>
+    <comment>Draft pages</comment>
+  </data>
+  <data name="draftPosts" xml:space="preserve">
+    <value>文章稿件</value>
+    <comment>Draft posts</comment>
+  </data>
+  <data name="emptyTrash" xml:space="preserve">
+    <value>清空垃圾</value>
+    <comment>Empty trash</comment>
+  </data>
+  <data name="recentPendingComments" xml:space="preserve">
+    <value>最近未审核的评论</value>
+    <comment>Recent pending comments</comment>
+  </data>
+  <data name="stats" xml:space="preserve">
+    <value>统计</value>
+    <comment>Stats</comment>
+  </data>
+  <data name="trash" xml:space="preserve">
+    <value>垃圾</value>
+    <comment>Trash</comment>
+  </data>
+  <data name="unapproved" xml:space="preserve">
+    <value>未批准</value>
+    <comment>Unapproved</comment>
+  </data>
+  <data name="viewAll" xml:space="preserve">
+    <value>查看</value>
+    <comment>View all</comment>
+  </data>
+  <data name="writeNewPost" xml:space="preserve">
+    <value>撰写文章</value>
+    <comment>Write new post</comment>
+  </data>
+  <data name="youDontHaveAnyDraftPages" xml:space="preserve">
+    <value>没有任何页面稿件.</value>
+    <comment>You don't have any draft pages.</comment>
+  </data>
+  <data name="youDontHaveAnyDraftPosts" xml:space="preserve">
+    <value>没有任何文章稿件.</value>
+    <comment>You don't have any draft posts.</comment>
+  </data>
+  <data name="notAuthorized" xml:space="preserve">
+    <value>未授权.</value>
+    <comment>Not authorized.</comment>
+  </data>
+  <data name="userAlreadyExists" xml:space="preserve">
+    <value>用户 "{0}" 已存在.</value>
+    <comment>User "{0}" already exists.</comment>
+  </data>
+  <data name="commentsDeleted" xml:space="preserve">
+    <value>评论已被删除</value>
+    <comment>Comments deleted</comment>
+  </data>
+  <data name="couldNotCreateRole" xml:space="preserve">
+    <value>无法创建角色: {0}</value>
+    <comment>Could not create the role: {0}</comment>
+  </data>
+  <data name="couldNotCreateUser" xml:space="preserve">
+    <value>无法创建用户: {0} : {1}</value>
+    <comment>Could not create user: {0} : {1}</comment>
+  </data>
+  <data name="couldNotDeleteComment" xml:space="preserve">
+    <value>无法删除评论: {0}</value>
+    <comment>Could not delete comment: {0}</comment>
+  </data>
+  <data name="couldNotDeleteComments" xml:space="preserve">
+    <value>无法删除所有评论: {0}</value>
+    <comment>Could not delete all comment: {0}</comment>
+  </data>
+  <data name="couldNotDeletePage" xml:space="preserve">
+    <value>无法删除页面: {0}</value>
+    <comment>Could not delete page: {0}</comment>
+  </data>
+  <data name="couldNotDeletePost" xml:space="preserve">
+    <value>无法删除文章: {0}</value>
+    <comment>Could not delete post: {0}</comment>
+  </data>
+  <data name="couldNotDeleteRole" xml:space="preserve">
+    <value>无法删除角色: {0}</value>
+    <comment>Could not delete the role: {0}</comment>
+  </data>
+  <data name="couldNotDeleteTag" xml:space="preserve">
+    <value>无法删除标签: {0}</value>
+    <comment>Could not delete the tag: {0}</comment>
+  </data>
+  <data name="couldNotDeleteUser" xml:space="preserve">
+    <value>无法删除用户 : {0}</value>
+    <comment>Could not delete user : {0}</comment>
+  </data>
+  <data name="couldNotUpdateProfile" xml:space="preserve">
+    <value>无法更新个人资料: {0}</value>
+    <comment>Could not update the profile: {0}</comment>
+  </data>
+  <data name="couldNotUpdateRole" xml:space="preserve">
+    <value>无法更新角色: {0}</value>
+    <comment>Could not update the role: {0}</comment>
+  </data>
+  <data name="couldNotUpdateTag" xml:space="preserve">
+    <value>无法更新标签: {0}</value>
+    <comment>Could not update the tag: {0}</comment>
+  </data>
+  <data name="couldNotUpdateUser" xml:space="preserve">
+    <value>无法更新用户: {0}</value>
+    <comment>Could not update user: {0}</comment>
+  </data>
+  <data name="displayNameIsRequired" xml:space="preserve">
+    <value>必须填写显示名称</value>
+    <comment>Display name is required field</comment>
+  </data>
+  <data name="doNotPassRightsWithFalseValue" xml:space="preserve">
+    <value>无法传回值为False的权限.</value>
+    <comment>Do not pass back rights that have false values.</comment>
+  </data>
+  <data name="emailArgumentInvalid" xml:space="preserve">
+    <value>Email 参数无效.</value>
+    <comment>Email argument is invalid.</comment>
+  </data>
+  <data name="errorApprovingComment" xml:space="preserve">
+    <value>审核评论出错: {0}</value>
+    <comment>Error approving comment: {0}</comment>
+  </data>
+  <data name="errorRejectingComment" xml:space="preserve">
+    <value>拒绝评论出错</value>
+    <comment>Error rejecting comment</comment>
+  </data>
+  <data name="idArgumentNull" xml:space="preserve">
+    <value>id 参数为空.</value>
+    <comment>id argument is null.</comment>
+  </data>
+  <data name="invalidPageId" xml:space="preserve">
+    <value>无效的页面ID</value>
+    <comment>Invalid page id</comment>
+  </data>
+  <data name="invalidPostId" xml:space="preserve">
+    <value>无效的文章ID</value>
+    <comment>Invalid post id</comment>
+  </data>
+  <data name="invalidRoleName" xml:space="preserve">
+    <value>无效的角色名</value>
+    <comment>Invalid role name</comment>
+  </data>
+  <data name="noRightExists" xml:space="preserve">
+    <value>未找到权限: {0}</value>
+    <comment>No such Right exists: {0}</comment>
+  </data>
+  <data name="pageDeleted" xml:space="preserve">
+    <value>页面已删除</value>
+    <comment>Page deleted</comment>
+  </data>
+  <data name="pageIdRequired" xml:space="preserve">
+    <value>请提供页面ID</value>
+    <comment>Page id is required</comment>
+  </data>
+  <data name="passwordArgumentInvalid" xml:space="preserve">
+    <value>Password 参数无效.</value>
+    <comment>Password argument is invalid.</comment>
+  </data>
+  <data name="postDeleted" xml:space="preserve">
+    <value>文章已删除</value>
+    <comment>Post deleted</comment>
+  </data>
+  <data name="profileUpdated" xml:space="preserve">
+    <value>个人资料 {0} 已更新</value>
+    <comment>Profile {0} updated</comment>
+  </data>
+  <data name="rightsCanNotBeNull" xml:space="preserve">
+    <value>权限集参数不能为空.</value>
+    <comment>Rights Collection argument can not be null.</comment>
+  </data>
+  <data name="rightsUpdatedForRole" xml:space="preserve">
+    <value>角色 "{0}" 的权限已更新</value>
+    <comment>Rights updated for role "{0}"</comment>
+  </data>
+  <data name="roleAlreadyExists" xml:space="preserve">
+    <value>角色 "{0}" 已存在</value>
+    <comment>Role "{0}" already exists</comment>
+  </data>
+  <data name="roleHasBeenCreated" xml:space="preserve">
+    <value>角色 "{0}" 已创建</value>
+    <comment>Role "{0}" has been created</comment>
+  </data>
+  <data name="roleHasBeenDeleted" xml:space="preserve">
+    <value>角色 "{0}" 已删除</value>
+    <comment>Role "{0}" has been deleted</comment>
+  </data>
+  <data name="roleNameArgumentNull" xml:space="preserve">
+    <value>roleName 参数为空.</value>
+    <comment>roleName argument is null.</comment>
+  </data>
+  <data name="roleNameIsRequired" xml:space="preserve">
+    <value>请填写角色名.</value>
+    <comment>Role name is a required field.</comment>
+  </data>
+  <data name="roleUpdatedFromTo" xml:space="preserve">
+    <value>角色从 "{0}" 已变更为 "{1}"</value>
+    <comment>Role updated from "{0}" to "{1}"</comment>
+  </data>
+  <data name="selectedCommentDeleted" xml:space="preserve">
+    <value>所选评论已删除</value>
+    <comment>Selected comments deleted</comment>
+  </data>
+  <data name="selectedCommentRejected" xml:space="preserve">
+    <value>所选评论已拒绝</value>
+    <comment>Selected comments rejected</comment>
+  </data>
+  <data name="selectedCommentRestored" xml:space="preserve">
+    <value>所选评论已恢复</value>
+    <comment>Selected comments restored</comment>
+  </data>
+  <data name="tagChangedFromTo" xml:space="preserve">
+    <value>标签 "{0}" 已变更为 "{1}"</value>
+    <comment>Tag updated from "{0}" to "{1}"</comment>
+  </data>
+  <data name="tagHasBeenDeleted" xml:space="preserve">
+    <value>标签 "{0}" 已删除</value>
+    <comment>Tag "{0}" has been deleted</comment>
+  </data>
+  <data name="tagIsRequired" xml:space="preserve">
+    <value>请填写标签.</value>
+    <comment>Tag is required field.</comment>
+  </data>
+  <data name="userArgumentInvalid" xml:space="preserve">
+    <value>User 参数无效.</value>
+    <comment>User argument is invalid.</comment>
+  </data>
+  <data name="userHasBeenCreated" xml:space="preserve">
+    <value>用户 "{0}" 已创建</value>
+    <comment>User "{0}" has been created</comment>
+  </data>
+  <data name="userHasBeenDeleted" xml:space="preserve">
+    <value>用户 "{0}" 已删除</value>
+    <comment>User "{0}" has been deleted</comment>
+  </data>
+  <data name="userUpdated" xml:space="preserve">
+    <value>用户 "{0}" 已更新</value>
+    <comment>User "{0}" updated</comment>
+  </data>
+  <data name="userWithEmailExists" xml:space="preserve">
+    <value>此邮件地址的用户已存在</value>
+    <comment>User with this email already exists</comment>
+  </data>
+  <data name="valsArgumentNull" xml:space="preserve">
+    <value>vals 参数为空.</value>
+    <comment>vals argument is null.</comment>
+  </data>
+  <data name="addEditPost" xml:space="preserve">
+    <value>添加/编辑 文章</value>
+    <comment>Add/edit post</comment>
+  </data>
+  <data name="addNewCategory" xml:space="preserve">
+    <value>新增分类</value>
+    <comment>Add new category</comment>
+  </data>
+  <data name="insertImage" xml:space="preserve">
+    <value>插入图片</value>
+    <comment>Insert image</comment>
+  </data>
+  <data name="insertVideo" xml:space="preserve">
+    <value>插入视频</value>
+    <comment>Insert video</comment>
+  </data>
+  <data name="published" xml:space="preserve">
+    <value>已发布</value>
+    <comment>Published</comment>
+  </data>
+  <data name="show" xml:space="preserve">
+    <value>显示</value>
+    <comment>Show</comment>
+  </data>
+  <data name="automatically" xml:space="preserve">
+    <value>自动</value>
+    <comment>Automatically</comment>
+  </data>
+  <data name="chooseFromExistingTags" xml:space="preserve">
+    <value>从现有标签中选择</value>
+    <comment>Choose from existing tags</comment>
+  </data>
+  <data name="clickTag" xml:space="preserve">
+    <value>点击一个标签:</value>
+    <comment>Click a tag:</comment>
+  </data>
+  <data name="editPage" xml:space="preserve">
+    <value>编辑页面</value>
+    <comment>Edit page</comment>
+  </data>
+  <data name="excerpt" xml:space="preserve">
+    <value>摘要（可选）</value>
+    <comment>Excerpt (optional)</comment>
+  </data>
+  <data name="goToPage" xml:space="preserve">
+    <value>转到页面</value>
+    <comment>Go to page</comment>
+  </data>
+  <data name="goToPost" xml:space="preserve">
+    <value>转到文章</value>
+    <comment>Go to post</comment>
+  </data>
+  <data name="manually" xml:space="preserve">
+    <value>手工设定</value>
+    <comment>Manually</comment>
+  </data>
+  <data name="options" xml:space="preserve">
+    <value>选项</value>
+    <comment>Options</comment>
+  </data>
+  <data name="quickAddNewCategory" xml:space="preserve">
+    <value>快速创建分类</value>
+    <comment>Quick add new category</comment>
+  </data>
+  <data name="setPublishDate" xml:space="preserve">
+    <value>设定发布时间</value>
+    <comment>Set publish date</comment>
+  </data>
+  <data name="uploadVideo" xml:space="preserve">
+    <value>选择您要上传的视频文件 (MP4, WMV, FLV, OGG, WebM) or audio (MP3)</value>
+    <comment>Choose video (MP4, WMV, FLV, OGG, WebM) or audio (MP3) file you wish to upload</comment>
+  </data>
+  <data name="enablePasswordReset" xml:space="preserve">
+    <value>启用密码重置</value>
+    <comment>Enable Password Resets</comment>
+  </data>
+  <data name="addNewBlog" xml:space="preserve">
+    <value>新增博客</value>
+    <comment>Add new blog</comment>
+  </data>
+  <data name="approvedComments" xml:space="preserve">
+    <value>已通过评论</value>
+    <comment>Approved Comments</comment>
+  </data>
+  <data name="commonControls" xml:space="preserve">
+    <value>公共设置</value>
+    <comment>Common controls</comment>
+  </data>
+  <data name="disable" xml:space="preserve">
+    <value>禁用</value>
+    <comment>Disable</comment>
+  </data>
+  <data name="drafts" xml:space="preserve">
+    <value>稿件</value>
+    <comment>Drafts</comment>
+  </data>
+  <data name="enable" xml:space="preserve">
+    <value>启用</value>
+    <comment>Enable</comment>
+  </data>
+  <data name="pending" xml:space="preserve">
+    <value>待审核</value>
+    <comment>Pending</comment>
+  </data>
+  <data name="pingbacksAndTrackbacks" xml:space="preserve">
+    <value>Pingbacks 与 Trackbacks</value>
+    <comment>Pingbacks &amp;amp; Trackbacks</comment>
+  </data>
+  <data name="viewSource" xml:space="preserve">
+    <value>查看源代码</value>
+    <comment>View source</comment>
+  </data>
+  <data name="addNewUser" xml:space="preserve">
+    <value>新增用户</value>
+    <comment>Add new user</comment>
+  </data>
+  <data name="appearance" xml:space="preserve">
+    <value>显示</value>
+    <comment>Appearance</comment>
+  </data>
+  <data name="commentSettings" xml:space="preserve">
+    <value>评论设置</value>
+    <comment>Comment settings</comment>
+  </data>
+  <data name="copyRightsFrom" xml:space="preserve">
+    <value>复制权限从</value>
+    <comment>Copy Rights From</comment>
+  </data>
+  <data name="customCode" xml:space="preserve">
+    <value>用户自定义代码</value>
+    <comment>Custom code</comment>
+  </data>
+  <data name="defaultAnonymousRole" xml:space="preserve">
+    <value>默认的匿名角色</value>
+    <comment>default Anonymous role</comment>
+  </data>
+  <data name="defaultEditorsRole" xml:space="preserve">
+    <value>默认的编辑角色</value>
+    <comment>default Editors role</comment>
+  </data>
+  <data name="editingRightsForRole" xml:space="preserve">
+    <value>为角色配置权限</value>
+    <comment>Editing Rights for Role</comment>
+  </data>
+  <data name="feed" xml:space="preserve">
+    <value>Feed</value>
+    <comment>Feed</comment>
+  </data>
+  <data name="newUserRoles" xml:space="preserve">
+    <value>创建用户角色</value>
+    <comment>New user Roles</comment>
+  </data>
+  <data name="otherSettings" xml:space="preserve">
+    <value>其他设置</value>
+    <comment>Other settings</comment>
+  </data>
+  <data name="smtpServer" xml:space="preserve">
+    <value>SMTP 服务器</value>
+    <comment>SMTP server</comment>
+  </data>
+  <data name="turnDisqusOnOff" xml:space="preserve">
+    <value>启用或禁用 Disqus 服务</value>
+    <comment>Turn Disqus on or off</comment>
+  </data>
+  <data name="useDisqusAsCommentProvider" xml:space="preserve">
+    <value>使用 Disqus 提供的评论服务</value>
+    <comment>Use Disqus as a comment provider</comment>
+  </data>
+  <data name="antiSpamServices" xml:space="preserve">
+    <value>反垃圾服务</value>
+    <comment>Anti-spam Services</comment>
+  </data>
+  <data name="exportIntoBlogML" xml:space="preserve">
+    <value>将您的博客数据导出成 XML 文件 (BlogML)</value>
+    <comment>Export your blog's content into XML file (BlogML)</comment>
+  </data>
+  <data name="importFromFile" xml:space="preserve">
+    <value>从文件导入</value>
+    <comment>Import from file</comment>
+  </data>
+  <data name="importWithClickOnce" xml:space="preserve">
+    <value>一键导入</value>
+    <comment>Import with click-once</comment>
+  </data>
+  <data name="pingServiceUrl" xml:space="preserve">
+    <value>Ping 服务 URL</value>
+    <comment>Ping service URL</comment>
+  </data>
+  <data name="runClickOnceApplicationToImport" xml:space="preserve">
+    <value>运行 BlogML 或 RSS 一键导入程序，为博客导入数据. &lt;i&gt;仅支持 IE 浏览器.&lt;/i&gt;</value>
+    <comment>Run click-once application to import content saved as BlogML or RSS 2.0 into your blog. &lt;i&gt;Internet Explorer only.&lt;/i&gt;</comment>
+  </data>
+  <data name="selectSavedBlogMlFle" xml:space="preserve">
+    <value>选择 BlogML 文件并导入到当前博客. 支持任何浏览器，但仅支持 BlogML 格式文件.</value>
+    <comment>Select saved BlogML file and import it into your blog. Any browser, BlogML only.</comment>
+  </data>
+  <data name="toDisableSetTo0" xml:space="preserve">
+    <value>设定为 "0" 即禁用</value>
+    <comment>To disable, set to "0"</comment>
+  </data>
+  <data name="cannotDeleteLastAdmin" xml:space="preserve">
+    <value>无法删除最后一位拥有创建、编辑用户权限的用户. 请在删除该用户前把这些权限授予其他用户.</value>
+    <comment>You cannot delete the last user with rights to create or edit users. Grant these rights to another user first before deleting this user.</comment>
+  </data>
+  <data name="tools" xml:space="preserve">
+    <value>工具</value>
+    <comment>Tools</comment>
+  </data>
+  <data name="blogs" xml:space="preserve">
+    <value>博客</value>
+    <comment>Blogs</comment>
+  </data>
+  <data name="plugins" xml:space="preserve">
+    <value>插件</value>
+    <comment>plugins</comment>
+  </data>
+  <data name="areYouSureDeleteComment" xml:space="preserve">
+    <value>您确定要删除这条评论吗?</value>
+  </data>
+  <data name="areYouSureDeleteEmail" xml:space="preserve">
+    <value>您确定要删除这个e-mail吗?</value>
+  </data>
+  <data name="areYouSureDeletePage" xml:space="preserve">
+    <value>您确定要删除这个页面吗?</value>
+  </data>  
+  <data name="forceMainTheme" xml:space="preserve">
+    <value>标准站点</value>
+  </data>
+  <data name="allowMobileTheme" xml:space="preserve">
+    <value>移动站点 Site</value>
+  </data>
+  <data name="itemsPerPage" xml:space="preserve">
+    <value>每页显示数</value>
+  </data>
+  <data name="couldNotDeleteBlog" xml:space="preserve">
+    <value>无法删除: {0}</value>
+  </data>
+  <data name="blogDeleted" xml:space="preserve">
+    <value>博客 "{0}" 已删除</value>
+  </data>
+  <data name="blogAdded" xml:space="preserve">
+    <value>博客 "{0}" 已添加</value>
+  </data>
+  <data name="invalidBlogId" xml:space="preserve">
+    <value>无效的博客 id</value>
+  </data>
+  <data name="editExistingBlog" xml:space="preserve">
+    <value>编辑博客</value>
+  </data>
+  <data name="storageContainerName" xml:space="preserve">
+    <value>存储器名字</value>
+  </data>
+  <data name="virtualPath" xml:space="preserve">
+    <value>虚拟路径</value>
+  </data>
+  <data name="active" xml:space="preserve">
+    <value>活动状态</value>
+  </data>
+  <data name="existingBlogToCreateNewBlogFrom" xml:space="preserve">
+    <value>从现有博客创建新博客</value>
+  </data>
+  <data name="hostName" xml:space="preserve">
+    <value>主机名(可选)</value>
+  </data>
+  <data name="acceptAnyTextBeforeHostname" xml:space="preserve">
+    <value>主机名前允许任意字符(泛解析)</value>
+  </data>
+  <data name="latestFromTheGallery" xml:space="preserve">
+    <value>博易最新资讯</value>
+  </data>
+  <data name="savedByAtTime" xml:space="preserve">
+    <value>{0} 保存于 {1}</value>
+  </data>
+  <data name="available" xml:space="preserve">
+    <value>可用</value>
+  </data>
+  <data name="currentTheme" xml:space="preserve">
+    <value>当前主题</value>
+  </data>
+  <data name="gallery" xml:space="preserve">
+    <value>资源</value>
+  </data>
+  <data name="installed" xml:space="preserve">
+    <value>安装</value>
+  </data>
+  <data name="setAsCurrentTheme" xml:space="preserve">
+    <value>设为当前主题</value>
+  </data>
+  <data name="setAsMobileTheme" xml:space="preserve">
+    <value>设为移动设备主题</value>
+  </data>
+  <data name="themes" xml:space="preserve">
+    <value>主题模板</value>
+  </data>
+  <data name="alphaNumeric" xml:space="preserve">
+    <value>版本号</value>
+  </data>
+  <data name="downloads" xml:space="preserve">
+    <value>下载</value>
+  </data>
+  <data name="newest" xml:space="preserve">
+    <value>最新</value>
+  </data>
+  <data name="orderBy" xml:space="preserve">
+    <value>排序</value>
+  </data>
+  <data name="activeThemes" xml:space="preserve">
+    <value>可用主题</value>
+  </data>
+  <data name="enterEmail" xml:space="preserve">
+    <value>输入您的 e-mail</value>
+  </data>
+  <data name="enterEmailAddress" xml:space="preserve">
+    <value>请输入您的 e-mail 地址</value>
+  </data>
+  <data name="notifyMe" xml:space="preserve">
+    <value>通知我</value>
+  </data>
+  <data name="thankYou" xml:space="preserve">
+    <value>感谢</value>
+  </data>
+  <data name="nowUnsubscribed" xml:space="preserve">
+    <value>您现在没有订阅</value>
+  </data>  
+  <data name="commentRSS" xml:space="preserve">
+    <value>评论 RSS</value>
+  </data>
+  <data name="viewLargeCalendar" xml:space="preserve">
+    <value>在日历中浏览文章</value>
+  </data>
+  <data name="followTwitter" xml:space="preserve">
+    <value>Follow me on Twitter</value>
+  </data>
+  <data name="visitorHi" xml:space="preserve">
+    <value>Hi</value>
+  </data>
+  <data name="welcomeBack" xml:space="preserve">
+    <value>欢迎回来!</value>
+  </data>
+  <data name="commentsAddedSince" xml:space="preserve">
+    <value>您在 {0} 的最后一条评论之后有新的评论.</value>
+  </data>
+  <data name="writtenCommentsTotal" xml:space="preserve">
+    <value>您在这里总共发表了 {0} 条评论.</value>
+  </data>
+  <data name="contactAuthorInformation" xml:space="preserve">
+    <value>作者信息</value>
+  </data>
+  <data name="countryCode" xml:space="preserve">
+    <value>国家代码</value>
+  </data>
+  <data name="contactIPAddress" xml:space="preserve">
+    <value>IP 地址</value>
+  </data>
+  <data name="contactUserAgent" xml:space="preserve">
+    <value>用户浏览器</value>
+  </data>
+  <data name="filestorage" xml:space="preserve">
+    <value>文件存储管理</value>
+  </data>
+  <data name="serverTime" xml:space="preserve">
+    <value>服务器时间</value>
+    <comment>Server time</comment>
   </data>
 </root>

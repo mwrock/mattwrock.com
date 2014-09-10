@@ -9,9 +9,7 @@
 </h3>
 <%} %>
 
-<div id="commentlist" style="display:block">
-  <asp:PlaceHolder runat="server" ID="phComments" />  
-</div>
+<div id="commentlist" style="display:block"><asp:PlaceHolder runat="server" ID="phComments" /></div>
 
 <asp:PlaceHolder runat="server" ID="phTrckbacks"></asp:PlaceHolder>
 
@@ -19,7 +17,7 @@
 
 <div id="comment-form">
 
-	<img src="<%=Utils.RelativeWebRoot %>pics/ajax-loader.gif" alt="Saving the comment" style="display:none" id="ajaxLoader" />  
+	<img src="<%=Utils.RelativeWebRoot %>pics/ajax-loader.gif" width="24" height="24" alt="Saving the comment" style="display:none" id="ajaxLoader" />  
 	<span id="status"></span>
 
 	<div class="commentForm">
@@ -30,14 +28,14 @@
 		<p id="cancelReply" style="display:none;"><a href="javascript:void(0);" onclick="BlogEngine.cancelReply();"><%=Resources.labels.cancelReply %></a></p>
 	  <%} %>
       <p>
-	      <label for="<%=this.NameInputId %>" class="lbl-user"><%=Resources.labels.name %>*</label>
-	      <input type="text" class="txt-user" name="<%= this.NameInputId %>" id="<%= this.NameInputId %>" tabindex="2" value="<%= this.DefaultName %>" />
+	      <label for="<%=NameInputId %>" class="lbl-user"><%=Resources.labels.name %>*</label>
+	      <input type="text" class="txt-user" name="<%= NameInputId %>" id="<%= NameInputId %>" tabindex="2" value="<%= DefaultName %>" />
 	      <span id="spnNameRequired" style="color:Red;display:none;"> <asp:Literal ID="Literal1" runat="server" Text="<%$Resources:labels, required %>"></asp:Literal></span>
 	      <span id="spnChooseOtherName" style="color:Red;display:none;"> <asp:Literal ID="Literal2" runat="server" Text="<%$Resources:labels, chooseOtherName %>"></asp:Literal></span>
       </p>
       <p>
 	      <label for="<%=txtEmail.ClientID %>" class="lbl-email"><%=Resources.labels.email %>*</label>
-	      <asp:TextBox runat="Server" CssClass="lbl-email" ID="txtEmail" TabIndex="3" ValidationGroup="AddComment" />
+	      <asp:TextBox runat="Server" CssClass="txt-email" ID="txtEmail" TabIndex="3" ValidationGroup="AddComment" />
 	      <span id="gravatarmsg"></span>
 	      <asp:RequiredFieldValidator ID="RequiredFieldValidator2" runat="server" ControlToValidate="txtEmail" ErrorMessage="<%$Resources:labels, required %>" Display="dynamic" ValidationGroup="AddComment" />
 	      <asp:RegularExpressionValidator ID="RegularExpressionValidator1" runat="server" ControlToValidate="txtEmail" ErrorMessage="<%$Resources:labels, enterValidEmail%>" Display="dynamic" ValidationExpression="\w+([-+.']\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*" ValidationGroup="AddComment" />
@@ -53,8 +51,10 @@
 	  <% if(BlogSettings.Instance.EnableCountryInComments){ %>
 	  <p>
           <label for="<%=ddlCountry.ClientID %>" class="lbl-country"><%=Resources.labels.country %></label>
-	      <asp:DropDownList runat="server" CssClass="txt-country" ID="ddlCountry" onchange="BlogEngine.setFlag(this.value)" TabIndex="5" EnableViewState="false" ValidationGroup="AddComment" />&nbsp;
-	      <span class="CommentFlag"><asp:Image runat="server" ID="imgFlag" AlternateText="Country flag" Width="16" Height="11" EnableViewState="false" /></span>
+	      <asp:DropDownList runat="server" CssClass="txt-country" ID="ddlCountry" onchange="BlogEngine.setFlag(value)" TabIndex="5" EnableViewState="false" ValidationGroup="AddComment" />&nbsp;
+	      <span class="CommentFlag">
+	          <img id="imgFlag" src="<%= FlagUrl() %>" alt="Country flag" width="16" height="11" />
+	      </span>
 	  </p>
       <%} %>
 
@@ -76,7 +76,7 @@
 		<asp:TextBox runat="server" CssClass="txt-content" ID="txtContent" TextMode="multiLine" Columns="50" Rows="10" TabIndex="7" ValidationGroup="AddComment" />
 	  </div>
 	  <div id="commentPreview">
-		<img src="<%=Utils.RelativeWebRoot %>pics/ajax-loader.gif" style="display:none" alt="Loading" />  
+		<img src="<%=Utils.RelativeWebRoot %>pics/ajax-loader.gif" width="24" height="24" style="display:none" alt="Loading" />  
 	  </div>
 	  
 	  <p>
@@ -96,34 +96,32 @@
 
 <script type="text/javascript">
 <!--//
-function registerCommentBox(){
-	BlogEngine.comments.flagImage = BlogEngine.$("<%= imgFlag.ClientID %>");
+	BlogEngine.comments.flagImage = BlogEngine.$("imgFlag");
 	BlogEngine.comments.contentBox = BlogEngine.$("<%=txtContent.ClientID %>");
 	BlogEngine.comments.moderation = <%=BlogSettings.Instance.EnableCommentsModeration.ToString().ToLowerInvariant() %>;
 	BlogEngine.comments.checkName = <%=(!Security.IsAuthenticated).ToString().ToLowerInvariant() %>;
 	BlogEngine.comments.postAuthor = "<%=Post.Author %>";
-	BlogEngine.comments.nameBox = BlogEngine.$("<%= this.NameInputId %>");
+	BlogEngine.comments.nameBox = BlogEngine.$("<%= NameInputId %>");
 	BlogEngine.comments.emailBox = BlogEngine.$("<%=txtEmail.ClientID %>");
 	BlogEngine.comments.websiteBox = BlogEngine.$("<%=txtWebsite.ClientID %>");
 	BlogEngine.comments.countryDropDown = BlogEngine.$("<%=ddlCountry.ClientID %>"); 
 	BlogEngine.comments.captchaField = BlogEngine.$('<%=hfCaptcha.ClientID %>');
-	BlogEngine.comments.controlId = '<%=this.UniqueID %>';
+	BlogEngine.comments.controlId = '<%=UniqueID %>';
 	BlogEngine.comments.replyToId = BlogEngine.$("<%=hiddenReplyTo.ClientID %>"); 
-}
 //-->
 </script>
 
 <% if (BlogSettings.Instance.IsCoCommentEnabled){ %>
 <script type="text/javascript">
-    // this ensures coComment gets the correct values
-    coco =
+// this ensures coComment gets the correct values
+coco =
 {
     tool: "BlogEngine",
     siteurl: "<%=Utils.AbsoluteWebRoot %>",
     sitetitle: "<%=BlogSettings.Instance.Name %>",
     pageurl: location.href,
-    pagetitle: "<%=this.Post.Title %>",
-    author: "<%=this.Post.Title %>",
+    pagetitle: "<%=Post.Title %>",
+    author: "<%=Post.Title %>",
     formID: "<%=Page.Form.ClientID %>",
     textareaID: "<%=txtContent.UniqueID %>",
     buttonID: "btnSaveAjax"
@@ -149,4 +147,4 @@ function registerCommentBox(){
     }
 </script>
 
-<asp:label runat="server" id="lbCommentsDisabled" visible="false"><%=Resources.labels.commentsAreClosed %></asp:label>
+<asp:label runat="server" id="lbCommentsDisabled" CssClass="lbl-CommentsDisabled" visible="false"><%=Resources.labels.commentsAreClosed %></asp:label>

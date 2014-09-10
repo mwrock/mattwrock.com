@@ -47,13 +47,15 @@
     {
         Utils.Log("admin/Extensions/Editor.cshtml", ex);
     }
+    var hRoot = Utils.ApplicationRelativeWebRoot + "editors/tiny_mce_3_5_8/plugins/syntaxhighlighter";
 }
 
-<link rel="stylesheet" href="@Href(Utils.RelativeWebRoot + "Styles/syntaxhighlighter/shCore.css")" type="text/css" />
-<link rel="stylesheet" href="@Href(Utils.RelativeWebRoot + "Styles/syntaxhighlighter/shThemeDefault.css")" type="text/css" />
-<script src="@Href(Utils.RelativeWebRoot + "Scripts/syntaxhighlighter/shCore.js")" type="text/javascript"></script>
-<script src="@Href(Utils.RelativeWebRoot + "Scripts/syntaxhighlighter/shBrushCSharp.js")" type="text/javascript"></script>
-<script src="@Href(Utils.RelativeWebRoot + "Scripts/syntaxhighlighter/shBrushCss.js")" type="text/javascript"></script>
+<link rel="stylesheet" href="@Href(hRoot + "/styles/shCore.css")" type="text/css" />
+<link rel="stylesheet" href="@Href(hRoot + "/styles/shThemeDefault.css")" type="text/css" />
+<script src="@Href(hRoot + "/scripts/XRegExp.js")" type="text/javascript"></script>
+<script src="@Href(hRoot + "/scripts/shCore.js")" type="text/javascript"></script>
+<script src="@Href(hRoot + "/scripts/shBrushCSharp.js")" type="text/javascript"></script>
+<script src="@Href(hRoot + "/scripts/shBrushCss.js")" type="text/javascript"></script>
 <script type="text/javascript">SyntaxHighlighter.all();</script>
 <script type="text/javascript">
     function ShowEditor() {

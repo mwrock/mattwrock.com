@@ -1,0 +1,127 @@
+﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<post>
+  <author>mwrock</author>
+  <title>Reflecting on two years as a Microsoft employee</title>
+  <description />
+  <content>&lt;p&gt;&lt;img src="http://ih2.redbubble.net/work.1578969.5.flat,550x550,075,f.self-reflection.jpg" /&gt;&lt;/p&gt;  &lt;p&gt;So its New Years Day and I’m thinking maybe its appropriate to write a post that’s deep and introspective. Something that speaks to a broad audience and asks the reader to stop, reach deep within. Real deep. Ok even deeper…deeper still. Wait. Uh oh we’ve gone too deep now. Pull back. Further. Keep going. Ugh…now I’m just tired.&lt;/p&gt;  &lt;p&gt;Anyhoo, I really have been wanting to write about the things I have learned since joining Microsoft. Things I have learned about working at Microsoft in general and things I have learned about software engineering. So I’ll start with some observations about my employee experience at Microsoft and then get a bit more technical talking about practices I have learned and found valuable. These are not necessarily “Microsoft practices” but just things I have learned by working with a new team and new people.&lt;/p&gt;  &lt;p&gt;This dovetails nicely into my first point:&lt;/p&gt;  &lt;h1&gt;One Microsoft Way is just an address&lt;/h1&gt;  &lt;p&gt;Its very common to hear non Microsoft employees say things like “Microsoft employees are…” or “That’s very typical Microsoft.” People often&amp;#160; think of Microsoft as an organization that acts in one accord and that all Microsoft employees, managers and practices can be codified within a single set of characteristics, values and practices. I largely subscribed to this perspective before becoming employed at Microsoft.&lt;/p&gt;  &lt;p&gt;The reality is that Microsoft is like a collection of many small to mid sized companies and each can have dramatically different practices and employee profiles. There are teams that follow a variety of practices from traditional waterfall to “scrumerfall” to text book scrum to strict TDD and pair programming XP like disciplines. There are teams where everyone works in their own office, others that always work in an open team room and others that work sometimes in a team room but have their own office if they want some “alone time.” There are teams who follow strict policies prohibiting the use of any Open Source Software and others who actively seek out OSS to incorporate in there code base and others who look for opportunities to open source their own projects.&lt;/p&gt;  &lt;p&gt;You have microsofties that will only ever use Microsoft tools and others carrying around IPhones and wearing Chrome T-Shirts. I think this is an important fact to keep in mind and most likely typical of other large companies. I think perhaps15 years ago, the culture may have been more homogeneous but it is far from that now. There is a lot going on behind Microsoft source control that would surprise a lot of anti MS geeks.&lt;/p&gt;  &lt;h1&gt;Per Capita, Microsoft engineers are the brightest and most passionate I have ever worked with&lt;/h1&gt;  &lt;p&gt;Honestly, this has been both a curse and a blessing for me but by far mostly a blessing. Overall, the caliber of the engineers that I work with is higher than the startups I have worked with in the past. I had been used to easily obtaining the role “rock star” developer at previous gigs. This is not because I am particularly smart or clever. Far be it. I just work incredibly hard (too hard) and really really like what I do. Being around so many great developers was difficult to adjust to because it blends poorly with my self conscious nature. Its normal for me to go through a 3 month period of “Oh shit, I’m gonna get fired today” and this period was dramatically prolonged at Microsoft.&lt;/p&gt;  &lt;p&gt;The flipside is that I get to come to work everyday and blab for long periods about technology and developing practices and disciplines with others who are equally if not more informed and enthusiastic. I am constantly learning new technical tidbits and insightful disciplines and interesting ways of looking at problems.&lt;/p&gt;  &lt;h1&gt;There is a “Microsoft Bubble” and it must be popped&lt;/h1&gt;  &lt;p&gt;This may appear to contradict my first point. I still stand by my statement that the Microsoft employee population and vast array of different business units cannot be pigeon holed. However, I have found a surprisingly strong tide of what some call “old Microsoft.” What is Old Microsoft? Well I‘ve only been there two years so I can’t speak with much authority here. Some think it’s a group of grey haired and clean shaven engineers hunkering down in the basement of Building one, writing UML diagrams and a huge Gnat chart behind a technology to bring down&amp;#160; all continuous integration servers, DVCS repositories and instances of Fire Bug. I’m keeping backups of all of these in case this is true.&lt;/p&gt;  &lt;p&gt;In all honesty, “old Microsoft” to me is waterfall processes, large, monolithic architectures and a “not created here” mentality. What is interesting to me is that this is not an active tide striving to beat down any ideology opposed to it. Rather, its sheer ignorance resulting from a simple lack of awareness of what goes on outside of Microsoft. I have noticed that especially among the upper ranks, it is infrequent to see outsiders recruited. There are a lot of very seasoned engineers who have been in the industry for years and years and almost every one of those years have been at Microsoft. Some of these individuals simply have not had exposure to other organizational practices and have grown comfortable with what they have practiced for years.&lt;/p&gt;  &lt;p&gt;These are not evil people. They are smart and simply need to be educated.I need to be educated. We all need education every day and a diverse one at that. If others do not approach this “old guard” and introduce them to evolving and progressive practices, because they are intimidated or are afraid of demonstrating a lack of company loyalty, it is mainly Microsoft who will suffer. Fortunately there are some very influential and some not so influential folks doing just this. As a result you are seeing more groups releasing earlier and more often and using things like OSS instead of the stock MS tools, and using tools like Mercurial instead of TFS. These engineers are more loyal to quality than they are to the Microsoft brand. I believe it is employees like these that an employer should seek out. An employee loyal to quality and engineering efficiencies should never be perceived as undermining Microsoft interests but rather raising the bar to higher standards and continuous improvement.&lt;/p&gt;  &lt;h1&gt;Some Valuable Technical Practices&lt;/h1&gt;  &lt;p&gt;Here are some purely technical practices I have picked up by working with my team over the past couple years. As I said before, these are not practices unique to Microsoft, but are simply a collection of new tools learned like I have learned from any other new team.&lt;/p&gt;  &lt;h1&gt;Test Driven Development: It supports and is not opposed to rapid development&lt;/h1&gt;  &lt;p&gt;For years before joining Microsoft I had been highly intrigued by TDD (Test Driven Development). It was a practice I truly believed in and wanted to master. Unfortunately I was too mired in managerial responsibilities to really master it and teach it to others. Also, TDD is one of those practices that is difficult to learn on your own and it is very easy to adopt anti patterns without knowing it. One great example is understanding the differences between unit tests and integration tests. If you look at the “unit tests” written by someone without any guidance, these tests are often actually integration tests and not unit tests at all. Developers end up frustrated writing these tests because they are fragile, time consuming and difficult and sometimes nearly impossible to write before writing implementation code. A typical response you hear from developers struggling to adopt TDD is something like, “we tried it but we ran out of time” or “management did not want us spending the time writing tests.”&lt;/p&gt;  &lt;p&gt;Having lived in a strict TDD culture and learning a lot of the tricks and principles of true TDD, I now see that I don’t have time NOT to write unit tests. Yes, I do believe that unit tests will make V1 longer to develop. Some may disagree. But with each new version or release, unit testing incrementally increases the velocity of getting new features to market. When done right, unit tests are the safety harness any new team member needs when adding code to an existing codebase. I have worked with code bases that had parts of code that developers were scared to death to touch for fear of breaking some functionality that they were not aware of. On the other hand, if there is good test coverage, I can be fairly confident that if I break existing functionality, tests will fail and alert me to this fact.&lt;/p&gt;  &lt;p&gt;One of the key leanings for me about TDD was the principle of testing ONLY the functionality of the method being tested. Too often, tests try to test all the way down the stack and you end up with a lot of tests repeating one another. The tests take longer to write and take much longer to refactor when refactoring code. Learning to mock or fake underlying services here is key. If you have a MVC action method that writes to a logging service, there is no need to test the logging in the tests built around the action method. You do that in the tests you write for the logging service.&lt;/p&gt;  &lt;p&gt;Perhaps above all, the virtue of TDD is that it imposes a requirement of designing decoupled code, each component having as few responsibilities as possible. That’s just good design. However I will say as an OSS contributor to a code base with no dedicated test engineers, I am indebted to the QA virtues as well.&lt;/p&gt;  &lt;h1&gt;Always create a Build.bat file that can setup, build and deploy your entire app&lt;/h1&gt;  &lt;p&gt;This has been so incredibly helpful. I never create anything either at work or on my own without this. This bat file is probably a very small batch script that invokes a much larger power shell script ensuring that the build can be launched from both powershell as well as an old school DOS command console. As powershell gains momentum, the batch file may not be necessary. I plan to devote a future post to this topic alone.&lt;/p&gt;  &lt;p&gt;This script should ideally setup ALL dependencies including IIS site configuration, database creation, installation of any services, certificates, etc. All of this can be done via power shell and other command line tools. If there is something that has to be manually setup, I would argue that you either do not fully understand the scripting capabilities of powershell or the technology you need to configure or you are using a technology that you should not be using.&lt;/p&gt;  &lt;p&gt;This script (or collection of scripts) should also be able to package all build artifacts. Typically this is the script invoked by your continuous integration system.&lt;/p&gt;  &lt;p&gt;The script may take some time to write, but it will pay off fast and will drastically reduce the time needed for onboarding new team members.&amp;#160; You no longer have to sit with a new dev and hold their had to get an app up and running or hand them a 20 page document that is old and has some frustrating mistakes. The script itself is now your build and deployment document. If the build script fails, it means no new code is written until it is fixed.&lt;/p&gt;  &lt;p&gt;For an example of what such a script looks like in the wild, check out Build.bat in my &lt;a href="https://github.com/mwrock/RequestReduce/blob/master/build.bat"&gt;RequestReduce Github Repo&lt;/a&gt; and follow it through to its powershell script. I use &lt;a href="https://github.com/JamesKovacs/psake"&gt;PSake&lt;/a&gt; to manage the build. I like its native support for powershell over MSBuild or NANT but those will work too,&lt;/p&gt;  &lt;h1&gt;Use DVCS for source control&lt;/h1&gt;  &lt;p&gt;The biggest downside to using a DVCS (Distributed Version Control System) like Mercurial at Microsoft is that if you ever find yourself on a team that uses TFS, and inevitably you will, you will find yourself craving to dine on broken glass in an effort to mask the pain of bad merges, locked files and a less than poor disconnected user experience.&lt;/p&gt;  &lt;p&gt;My team uses Mercurial because it is more Windows friendly than GIT. I do use git for my personal project &lt;a href="http://RequestReduce.com"&gt;RequestReduce&lt;/a&gt;. I’ll admit than when I was migrating from SVN to Mercurial 18 months ago, there were some learning curve issues.I often find that it takes a while for DVCS newbies to “get it.” But once they do, they will swear by it. Lets face it, this is the future of source control. &lt;/p&gt;  &lt;p&gt;From a install and setup perspective, the comparison between Mercurial or git to TFS is stark indeed. TFS is a monster (and not one of those cute and friendly monsters in Monsters Inc.) and Mercurial or git is refreshing to setup in comparison (like a young Golden Retriever puppy – so small and cute you just want to spoon it – perhaps I have said too much here). However, this is the least of the benefits of DVCS. To me the true beauty is having a complete local repository that I can commit to, branch and merge all locally. Also the complete history of the repo including all activity both local and remote is stored locally. I can play and merge and commit ar granularly as I want without disturbing or being disturbed by others. And merging is rock solid. I get far fewer merge conflicts than I ever had on SVN or other weirdness on TFS.&lt;/p&gt;  &lt;p&gt;My other big tip here is learn the command line. This may seem daunting if you are used to a GUI but once you learn it, I assure you that you will have a better understanding of what it is doing and how it works which can be very important. Also, even to an appalling typist like myself, it is much faster.&lt;/p&gt;  &lt;h1&gt;Microsoft: A far from perfect great place to work&lt;/h1&gt;  &lt;p&gt;To sum up my time so far at Microsoft, its been a really good place to work. Overall it has been a very positive experience and I have no regrets. Its like working in a technical play ground. Ever seen a young kid in a big play ground? That’s me when I realize I get to build apps for a day. However its far from perfect. Working for Microsoft had been a long time dream which I had long idealized. I had spent my career in startup mode and always wondered how outfits like Microsoft handled things like data center deployments and recruiting. I had always assumed that they probably handled those things in a far superior manner than I ever had. Turns out there are a lot of kinks here even at Microsoft. Probably because they are really hard things to get right. There are times when I laugh at how much I idealized and even romanticized Microsoft. Its run by a bunch of humans like most other companies and humans can only be so right so often.&lt;/p&gt;  &lt;p&gt;My next place of employment will be run by aliens. That should really take things to the next level.&lt;/p&gt;</content>
+  <ispublished>True</ispublished>
+  <isdeleted>False</isdeleted>
+  <iscommentsenabled>True</iscommentsenabled>
+  <pubDate>2012-01-02 01:37:44</pubDate>
+  <lastModified>2013-01-12 17:28:02</lastModified>
+  <raters>0</raters>
+  <rating>0</rating>
+  <slug>Reflecting-on-two-years-as-a-Microsoft-employee</slug>
+  <tags />
+  <comments>
+    <comment id="a2dd5740-09f1-4a5d-9457-8139e140da50" parentid="00000000-0000-0000-0000-000000000000" approved="True" spam="False" deleted="False">
+      <date>2012-01-02 12:26:39</date>
+      <author>Bob wright</author>
+      <email>Nwright41@cox.net</email>
+      <country />
+      <ip>97.50.86.39</ip>
+      <avatar />
+      <content>Very interesting, Mat,  I am so glad you enjoy what you do and who you work with and for. If you]run into any technical questions don&amp;#39;t hesitate to ask. Remember, I just got a new hammer and screwdriver.
+Dad</content>
+    </comment>
+    <comment id="d02303c5-8755-498e-8f47-a6e9ae42d277" parentid="00000000-0000-0000-0000-000000000000" approved="True" spam="False" deleted="False">
+      <date>2012-01-02 14:15:37</date>
+      <author>Hannes Kochni&amp;#223;</author>
+      <email>okh397@gmail.com</email>
+      <country />
+      <ip>178.25.34.246</ip>
+      <moderatedby>mwrock</moderatedby>
+      <avatar />
+      <content>Hey, good read. Some of this resonates with me. I like to see somone reinforcing my believe that the (almost always falsy) assumption &amp;quot;from the outside everybody looks like an integral group, and I&amp;#39;m the outsider&amp;quot; is also a false assumption in the case of Microsoft. And reading the ASP.NET team blogs, it&amp;#39;s pretty obvious MS company spirit changed a lot in the last years.
+
+I don&amp;#39;t have near the experience as you have, but have to agre on your point with serverbased CVS, SVN branching is horror. 
+
+But as someone who has to use Hg daily, I have to say I&amp;#39;m not totally happy with it. That&amp;#39;s mainly because of TortoiseHg and it&amp;#39;s resource usage (1GB and sloooow opening of workbench/history). Ok, that&amp;#39;s not exactly Hgs fault. But.. branching in Hg is not as common as it is in git.. I think that&amp;#39;s because bookmarks are just a module (hg equivalent to git branches) and hg branches are.. well.. not so nice to work with as in git. And I heard about a conceptual bug in Hg making working with branches(and bookmarks?) harder.. therefor no MercurialHub site. But that&amp;#39;s just repeating what others said.
+
+But anyway.. TDD sounds great, but after heaving read 2 books, and many many opinions, I think it has it&amp;#39;s downsides on the efficiency side. Sometimes BDD fits better (I guess), and to know when and where not to use it under time pressure may be the true mastery.. but just thoughts on my side. Also I think that anything that closes the gap between the ubiquitous/domain language and the code (and that is where I think e.g. Mspec excells) is better than traditional TDD. But, again, just thoughts.
+
+If you not use it already, you should try NCrunch, it&amp;#39;s awesome!
+
+Love your blog (because it&amp;#39;s more &amp;quot;down to earth&amp;quot; then some others), hope you stay active for a long time. :)</content>
+    </comment>
+    <comment id="f0a1ad78-6277-4a2d-93af-4dc391eb713f" parentid="00000000-0000-0000-0000-000000000000" approved="True" spam="False" deleted="False">
+      <date>2012-01-02 18:10:12</date>
+      <author>Matt Wrock</author>
+      <email>matt@mattwrock.com</email>
+      <country />
+      <ip>50.46.255.50</ip>
+      <avatar />
+      <content>Thanks Hannes! I haven&amp;#39;t experienced the sluggishness with hg you have noticed but I only use tortoiseHG for reviewing history. I think bitbucket is the equivelent of MercurialHub (or codeplex using mercurial) :) .
+
+On the TDD front, there are unarguably times when writing the test will add time. If I am doing an &amp;quot;emergency&amp;quot; bug fix and adding the test is not super simple, I might add the test after releasing the fix but I will always make a point of adding the test. I think that I can safely say that I spend more time writing test code and fixing broken tests than I do writing implementation code. However in the end I spend less time tracking down phantom bugs and &amp;quot;stepping&amp;quot; through code in the debugger. The final code ends up being better written and less of a rats nest. I love being able to add features or refactor large chunks of code without fear because I&amp;#39;m confident that my failing tests are the canaries in the mine shaft that will warn me when the business rules have been broken.
+
+I&amp;#39;m also not a fanatic about writing tests first. I probably do so 80% - 85% of the time. I&amp;#39;m more likely to write tests later if I&amp;#39;m refactoring or if I&amp;#39;m playing with ideas that I suspect will end up nowhere. Or, to be honest, If I&amp;#39;m on the verge of something I think is really cool and I just can&amp;#39;t wait to see it work.</content>
+    </comment>
+    <comment id="05707045-4632-4caf-8be0-d6a2ebd12542" parentid="00000000-0000-0000-0000-000000000000" approved="True" spam="False" deleted="False">
+      <date>2012-01-03 00:13:24</date>
+      <author>Dan</author>
+      <email>ddelucie@hotmail.com</email>
+      <country />
+      <ip>72.219.154.248</ip>
+      <avatar />
+      <content>I really enjoyed this post.  Nice one Matt.</content>
+    </comment>
+    <comment id="56af1f20-74e8-4b1d-a2ba-17132006e442" parentid="00000000-0000-0000-0000-000000000000" approved="True" spam="False" deleted="False">
+      <date>2012-01-03 07:18:46</date>
+      <author>Todd S.</author>
+      <email>amsabunu@gmail.com</email>
+      <country />
+      <ip>95.15.222.189</ip>
+      <avatar />
+      <content>I agree w/ the other posters, this is a good read, thanks.</content>
+    </comment>
+    <comment id="d5587c25-9967-4d02-93f8-136c4b95d941" parentid="00000000-0000-0000-0000-000000000000" approved="True" spam="False" deleted="False">
+      <date>2012-01-03 09:44:51</date>
+      <author>Matthew Manela</author>
+      <email>mmanela@gmail.com</email>
+      <country />
+      <ip>131.107.0.81</ip>
+      <moderatedby>mwrock</moderatedby>
+      <avatar />
+      <content>Regarding TDD,
+
+It took me a long time to really buy into it. I was reluctant at first and thought I was wasting too much time. However, after developing for several years with it I now swear by it (and I hate to swear!). I have some older code bases that I work on that didn&amp;#39;t use TDD and it is a mess. I am afraid to touch parts of the code and the architecture is a mess. Now, TDD alone would not have fixed this but as Matt has pointed out, it leads to more decoupled code that is much easier to maintain.
+
+
+</content>
+    </comment>
+    <comment id="e37f54a4-a757-4c71-b846-38abede03c4d" parentid="00000000-0000-0000-0000-000000000000" approved="True" spam="False" deleted="False">
+      <date>2012-10-30 01:28:12</date>
+      <author>Hao Nguyen</author>
+      <email>hao.nguyen@devsoft.vn</email>
+      <country />
+      <ip>115.73.16.101</ip>
+      <moderatedby>mwrock</moderatedby>
+      <avatar />
+      <content>Hi Matt,
+
+It has been a long time since we met in American. Thank you for hosting in your house when I was there. 
+
+I was searching technical guides to organize my tests in a better way and found you from some comments on the Internet. 
+
+Keep in touch man. I&amp;#39;d like to learn more about TDD from you. 
+
+Thank you again.</content>
+    </comment>
+    <comment id="0d239d41-f0aa-431c-b5a2-245f750b92a3" parentid="00000000-0000-0000-0000-000000000000" approved="True" spam="False" deleted="False">
+      <date>2013-01-12 08:28:02</date>
+      <author>How Can I Become More Mature</author>
+      <email>Knox2969@yahoo.com</email>
+      <country />
+      <ip>99.91.238.97</ip>
+      <moderatedby>mwrock</moderatedby>
+      <avatar />
+      <content>I gotta give you some thanks for making this post, it had me thinking on really being straightforward in every single thing I do or else it can  will come back to bite you (from my own experience with things). Very good read through, will be back to check out some more.</content>
+    </comment>
+  </comments>
+  <categories />
+  <notifications>
+    <email>amsabunu@gmail.com</email>
+    <email>hao.nguyen@devsoft.vn</email>
+  </notifications>
+</post>

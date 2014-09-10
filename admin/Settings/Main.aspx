@@ -9,7 +9,7 @@
         var oDescCharContainer;
         var oDescCharTagCatContainer;
 
-        function syncCharCountBox(oChkBox,oCharContainer) {
+        function syncCharCountBox(oChkBox, oCharContainer) {
 
             var isChecked = oChkBox.is(":checked");
             if (isChecked) {
@@ -30,7 +30,7 @@
             oDescCharContainer = $("#DescriptionCharacters");
             oDescCharTagCatContainer = $("#DescriptionCharactersForPostsByTagOrCategory");
 
-            $("#btnSave").click(function (evt) {
+            $(".btn").click(function (evt) {
                 if ($(frm).valid())
                     SaveSettings();
 
@@ -51,27 +51,26 @@
         });
         function SaveSettings() {
             $('.loader').show();
-            var dto = { 
-				"name": $("[id$='_txtName']").val(),
-				"desc": $("[id$='_txtDescription']").val(),
-				"postsPerPage": $("[id$='_txtPostsPerPage']").val(),
-				"themeCookieName": $("[id$='_txtThemeCookieName']").val(),
-				"useBlogNameInPageTitles": $("[id$='_cbUseBlogNameInPageTitles']").attr('checked'),
-				"enableRelatedPosts": $("[id$='_cbShowRelatedPosts']").attr('checked'),
-				"enableRating": $("[id$='_cbEnableRating']").attr('checked'),
-				"showDescriptionInPostList": oShowDescChkBox.attr('checked'),
-				"descriptionCharacters": $("input", oDescCharContainer).val(),
-				"showDescriptionInPostListForPostsByTagOrCategory": oShowDescTagCatChkBox.attr('checked'),
-				"descriptionCharactersForPostsByTagOrCategory": $("input", oDescCharTagCatContainer).val(),
-				"timeStampPostLinks": $("[id$='_cbTimeStampPostLinks']").attr('checked'),
-				"showPostNavigation": $("[id$='_cbShowPostNavigation']").attr('checked'),
-				"culture": $("[id$='_ddlCulture']").val(),
-				"timezone": $("[id$='_txtTimeZone']").val(),
-				"enablePasswordReset": $("[id$='cbEnablePasswordReset']").attr('checked'),
-				"enableSelfRegistration": $("[id$='_cbEnableSelfRegistration']").attr('checked'),
-				"selfRegistrationInitialRole": $("[id$='_ddlSelfRegistrationInitialRole']").val()
-			};
-			
+            var dto = {
+                "name": $("[id$='_txtName']").val(),
+                "desc": $("[id$='_txtDescription']").val(),
+                "postsPerPage": $("[id$='_txtPostsPerPage']").val(),
+                "themeCookieName": $("[id$='_txtThemeCookieName']").val(),
+                "useBlogNameInPageTitles": $("[id$='_cbUseBlogNameInPageTitles']").is(':checked'),
+                "enableRelatedPosts": $("[id$='_cbShowRelatedPosts']").is(':checked'),
+                "enableRating": $("[id$='_cbEnableRating']").is(':checked'),
+                "showDescriptionInPostList": oShowDescChkBox.is(':checked'),
+                "descriptionCharacters": $("input", oDescCharContainer).val(),
+                "showDescriptionInPostListForPostsByTagOrCategory": oShowDescTagCatChkBox.is(':checked'),
+                "descriptionCharactersForPostsByTagOrCategory": $("input", oDescCharTagCatContainer).val(),
+                "timeStampPostLinks": $("[id$='_cbTimeStampPostLinks']").is(':checked'),
+                "showPostNavigation": $("[id$='_cbShowPostNavigation']").is(':checked'),
+                "culture": $("[id$='_ddlCulture']").val(),
+                "timezone": $("[id$='_txtTimeZone']").val(),
+                "removeFileExtension": $("[id$='_cbRemoveFileExtension']").is(':checked'),
+                "redirectToRemoveFileExtension": $("[id$='_cbRedirectToRemoveFileExtension']").is(':checked')
+            };
+
             $.ajax({
                 url: SiteVars.ApplicationRelativeWebRoot + "admin/Settings/Main.aspx/Save",
                 type: "POST",
@@ -98,6 +97,10 @@
 			<menu:TabMenu ID="TabMenu" runat="server" />
 		</div>
 		<div class="content-box-left">
+            <div class="rightligned-top action_buttons">
+                <input type="submit" id="btnSave" class="btn primary" value="<%=Resources.labels.saveSettings %>" />
+            </div>
+
             <h1 ><%=Resources.labels.basic %> <%=Resources.labels.settings %></h1>
 
                 <ul class="fl leftaligned">
@@ -163,6 +166,18 @@
                         <span class="insetHelp">(<%=Resources.labels.useBlogNameInPageTitlesDescription%>)</span>
                     </li>
                     <li>
+			            <span class="filler"></span>
+			            <asp:CheckBox runat="server" ID="cbRemoveFileExtension" />
+			            <label for="<%=cbRemoveFileExtension.ClientID %>"><%=Resources.labels.removeExtensionsFromUrls %></label>
+			            <span class="insetHelp">(<%=Resources.labels.removeExtensionsFromUrlsDesc %>)</span>
+		            </li>
+                    <li>
+			            <span class="filler"></span>
+			            <asp:CheckBox runat="server" ID="cbRedirectToRemoveFileExtension" />
+			            <label for="<%=cbRedirectToRemoveFileExtension.ClientID %>"><%=Resources.labels.redirectToRemoveFileExtension %></label>
+			            <span class="insetHelp">(<%=Resources.labels.redirectToRemoveFileExtensionDesc %>)</span>
+		            </li>
+                    <li>
                         <span class="filler"></span>
                         <asp:CheckBox runat="server" ID="cbEnableRating" />
                         <label for="<%=cbEnableRating.ClientID %>"><%=Resources.labels.enableRating %></label>
@@ -172,26 +187,10 @@
                         <asp:CheckBox runat="server" ID="cbTimeStampPostLinks" />
                         <label for="<%=cbTimeStampPostLinks.ClientID %>"><%=Resources.labels.timeStampPostLinks %></label>
                     </li>
-                    <li>
-                        <span class="filler"></span>
-                        <asp:CheckBox runat="server" ID="cbEnablePasswordReset" />
-                        <label for="<%=cbEnablePasswordReset.ClientID %>"><%=Resources.labels.enablePasswordReset %></label>
-                    </li>
-                    <li>
-                        <span class="filler"></span>
-                        <asp:CheckBox runat="server" ID="cbEnableSelfRegistration" />
-                        <label for="<%=cbEnableSelfRegistration.ClientID %>"><%=Resources.labels.enableSelfRegistration %></label>
-                    </li>
-                    <li>
-                        <label class="lbl" for="<%=ddlSelfRegistrationInitialRole.ClientID %>"><%=Resources.labels.selfRegistrationInitialRole%></label>
-                        <asp:DropDownList runat="Server" ID="ddlSelfRegistrationInitialRole" Style="text-transform: capitalize">
-                            <asp:ListItem Text="Select" />
-                        </asp:DropDownList>
-                    </li>
                 </ul>
 
-            <div class="action_buttons">
-                <input type="submit" id="btnSave" class="btn primary" value="<%=Resources.labels.saveSettings %>" />
+            <div class="rightligned-bottom action_buttons">
+                <input type="submit" id="btnSave2" class="btn primary" value="<%=Resources.labels.saveSettings %>" />
             </div>
 		</div>
 	</div>    

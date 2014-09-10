@@ -99,7 +99,7 @@ namespace App_Code.Controls
                     return;
                 }
 
-                blogsShowRssIcon.Remove(Blog.CurrentInstance.Id);
+                blogsShowRssIcon[Blog.CurrentInstance.Id] = value;
                 blogsHtml.Remove(Blog.CurrentInstance.Id);
             }
         }
@@ -162,7 +162,7 @@ namespace App_Code.Controls
         private static bool HasPosts(Category cat)
         {
             return
-                Post.Posts.Where(post => post.IsVisible).SelectMany(post => post.Categories).Any(
+                Post.ApplicablePosts.Where(post => post.IsVisible).SelectMany(post => post.Categories).Any(
                     category => category == cat);
         }
 
@@ -172,12 +172,15 @@ namespace App_Code.Controls
         /// <returns>
         /// The sorted categories.
         /// </returns>
-        private static SortedDictionary<string, Guid> SortCategories()
+        private static SortedDictionary<string, Category> SortCategories()
         {
-            var dic = new SortedDictionary<string, Guid>();
-            foreach (var cat in Category.Categories.Where(HasPosts))
+            var dic = new SortedDictionary<string, Category>();
+            foreach (var cat in Category.ApplicableCategories.Where(HasPosts))
             {
-                dic.Add(cat.CompleteTitle(), cat.Id);
+                if (!dic.ContainsKey(cat.CompleteTitle()))
+                {
+                    dic.Add(cat.CompleteTitle(), cat);
+                }
             }
 
             return dic;
@@ -199,13 +202,30 @@ namespace App_Code.Controls
 
             var ul = new HtmlGenericControl("ul") { ID = "categorylist" };
 
-            foreach (var id in dic.Values)
+            foreach (var cat in dic.Values)
             {
+                //var x = id.CompleteTitle();
                 // Find full category
-                var cat = Category.GetCategory(id);
-                var key = cat.CompleteTitle();
+                //var cat = Category.GetCategory(id, true);
+                //var key = cat.CompleteTitle();
 
                 var li = new HtmlGenericControl("li");
+
+                int i = cat.CompleteTitle().Count(c => c == '-');
+
+                string spaces = string.Empty;
+
+                for (int j = 0; j < i; j++)
+                {
+                    spaces += "&#160;&#160;&#160;";
+                }
+
+                if (i > 0)
+                {
+                    var textArea = new HtmlAnchor();
+                    textArea.InnerHtml = spaces;
+                    li.Controls.Add(textArea);
+                }
 
                 if (this.ShowRssIcon)
                 {
@@ -214,7 +234,7 @@ namespace App_Code.Controls
                             Src = string.Format("{0}pics/rssButton.png", Utils.RelativeWebRoot),
                             Alt =
                                 string.Format(
-                                    "{0} feed for {1}", BlogSettings.Instance.SyndicationFormat.ToUpperInvariant(), key)
+                                    "{0} feed for {1}", BlogSettings.Instance.SyndicationFormat.ToUpperInvariant(), cat.Title)
                         };
                     img.Attributes["class"] = "rssButton";
 
@@ -225,7 +245,7 @@ namespace App_Code.Controls
                     li.Controls.Add(feedAnchor);
                 }
 
-                var posts = Post.GetPostsByCategory(dic[key]).FindAll(p => p.IsVisible).Count;
+                var posts = Post.GetPostsByCategory(cat).FindAll(p => p.IsVisible).Count;
 
                 var postCount = string.Format(" ({0})", posts);
                 if (!this.ShowPostCount)
@@ -236,9 +256,10 @@ namespace App_Code.Controls
                 var anc = new HtmlAnchor
                     {
                         HRef = cat.RelativeLink,
-                        InnerHtml = HttpUtility.HtmlEncode(key) + postCount,
-                        Title = string.Format("Category: {0}", key)
+                        InnerHtml = HttpUtility.HtmlEncode(cat.Title) + postCount,
+                        Title = string.Format("{0}: {1}", Resources.labels.category, cat.Title)
                     };
+                
 
                 li.Controls.Add(anc);
                 ul.Controls.Add(li);

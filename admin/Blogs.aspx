@@ -19,7 +19,8 @@
                 "hostname": $.trim($('#txtHostname').val()),
                 "isAnyTextBeforeHostnameAccepted": $('#cbAcceptAnyTextBeforeHostname').is(':checked'),
                 "virtualPath": $.trim($('#txtVirtualPath').val()),
-                "isActive": $('#cbActive').is(':checked')
+                "isActive": $('#cbActive').is(':checked'),
+                "isSiteAggregation": $('#cbIsSiteAggregation').is(':checked')
             };
 
             return data;
@@ -115,7 +116,7 @@
             if (!data.blogId) {
 
                 if (!data.copyFromExistingBlogId) {
-                    $('#existingBlogToCreateNewBlogFrom').focus()
+                    $('#existingBlogToCreateNewBlogFrom').focus();
                     alert('An existing blog to create the new blog from must be selected.');
                     return false;
                 }
@@ -148,6 +149,7 @@
 
             SetCheckbox($('#cbAcceptAnyTextBeforeHostname'), data.IsAnyTextBeforeHostnameAccepted);
             SetCheckbox($('#cbActive'), data.IsActive);
+            SetCheckbox($('#cbIsSiteAggregation'), data.IsSiteAggregation);
 
             OpenColorbox();
         }
@@ -283,6 +285,7 @@
             $('#cbAcceptAnyTextBeforeHostname').attr('checked', 'checked');
             $('#txtVirtualPath').val('');
             $('#cbActive').attr('checked', 'checked');
+            $('#cbIsSiteAggregation').removeAttr('checked');
         }
 
         function OpenColorbox() {
@@ -362,6 +365,14 @@
                 <td>
                         <label for="cbActive" class="lbl"><%=Resources.labels.active %></label>
 				        <input type="checkbox" id="cbActive"/>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                </td>
+                <td>
+                        <label for="cbIsSiteAggregation" class="lbl"><%=Resources.labels.isForSiteAggregation%></label>
+				        <input type="checkbox" id="cbIsSiteAggregation"/>
                 </td>
             </tr>
         </table>

@@ -128,22 +128,21 @@
             // Last check - it should not be possible to remove the last use who has the right to Add and/or Edit other user accounts. If only one of such a 
             // user remains, that user must be the current user, and can not be deleted, as it would lock the user out of the BE environment, left to fix
             // it in XML or SQL files / commands. See issue 11990
-            int adminCount = 0;
+            bool adminsExist = false;
             MembershipUserCollection users = Membership.GetAllUsers();
             foreach (MembershipUser user in users)
             {
                 string[] roles = Roles.GetRolesForUser(user.UserName);
 
-                if (Right.HasRight(Rights.EditOtherUsers, roles) || Right.HasRight(Rights.CreateNewUsers, roles))
+                // look for admins other than 'id' 
+                if (!id.Equals(user.UserName, StringComparison.OrdinalIgnoreCase) && (Right.HasRight(Rights.EditOtherUsers, roles) || Right.HasRight(Rights.CreateNewUsers, roles)))
                 {
-                    adminCount++;
-                }
-
-                if (adminCount > 1)
+                    adminsExist = true;
                     break;
+                }
             }
 
-            if (adminCount <= 1)
+            if (!adminsExist)
             {
                 return new JsonResponse() { Message = Resources.labels.cannotDeleteLastAdmin };
             }
@@ -158,6 +157,12 @@
                 }
                 
                 Membership.DeleteUser(id);
+
+                var pf = AuthorProfile.GetProfile(id);
+                if (pf != null)
+                {
+                    BlogEngine.Core.Providers.BlogService.DeleteProfile(pf);
+                }
             }
             catch (Exception ex)
             {

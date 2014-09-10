@@ -333,7 +333,7 @@ INSERT INTO be_StopWords (StopWord)	VALUES ('you');
 INSERT INTO be_StopWords (StopWord)	VALUES ('your');
 
 INSERT INTO be_BlogRollItems ( BlogRollId, Title, Description, BlogUrl, FeedUrl, Xfn, SortIndex )
-VALUES ( '25e4d8da-3278-4e58-b0bf-932496dabc96', 'Mads Kristensen', 'Full featured simplicity in ASP.NET and C#', 'http://www.madskristensen.dk/', 'http://feeds.feedburner.com/netslave', 'contact', 0 );
+VALUES ( '25e4d8da-3278-4e58-b0bf-932496dabc96', 'Mads Kristensen', 'Full featured simplicity in ASP.NET and C#', 'http://madskristensen.net', 'http://feeds.feedburner.com/netslave', 'contact', 0 );
 INSERT INTO be_BlogRollItems ( BlogRollId, Title, Description, BlogUrl, FeedUrl, Xfn, SortIndex )
 VALUES ( 'ccc817ef-e760-482b-b82f-a6854663110f', 'Al Nyveldt', 'Adventures in Code and Other Stories', 'http://www.nyveldt.com/blog/', 'http://feeds.feedburner.com/razorant', 'contact', 1 );
 INSERT INTO be_BlogRollItems ( BlogRollId, Title, Description, BlogUrl, FeedUrl, Xfn, SortIndex )
